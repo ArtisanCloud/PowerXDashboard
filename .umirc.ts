@@ -1,6 +1,7 @@
 import { defineConfig } from '@umijs/max';
 
 import defaultSettings from './config/defaultSettings';
+import routes from './config/routes';
 
 export default defineConfig({
   antd: {
@@ -22,26 +23,6 @@ export default defineConfig({
     locale: true,
     ...defaultSettings,
   },
-  routes: [
-    {
-      path: '/',
-      redirect: '/home',
-    },
-    {
-      name: '首页',
-      path: '/home',
-      component: './Home',
-    },
-    {
-      name: '权限演示',
-      path: '/access',
-      component: './Access',
-    },
-    {
-      name: ' CRUD 示例',
-      path: '/table',
-      component: './Table',
-    },
-  ],
+  routes: routes,
   npmClient: 'yarn',
 });
