@@ -138,7 +138,7 @@
     use-json-comparison "^1.0.5"
     use-media-antd-query "^1.1.0"
 
-"@ant-design/pro-layout@7.0.7":
+"@ant-design/pro-layout@7.0.7", "@ant-design/pro-layout@^7.0.7":
   version "7.0.7"
   resolved "https://registry.npmmirror.com/@ant-design/pro-layout/-/pro-layout-7.0.7.tgz#2612dddd4366bf6ca40109af67b31a59e6053376"
   integrity sha512-txEX2OgBvT/WwV/vwWEUFw1T+++Ex61TZ3un5FMpc+AWCDFaseBo3MtOpH85j4CVbP/TW0HzbI3GSpb0wKOzFw==

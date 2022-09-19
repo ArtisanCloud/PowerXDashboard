@@ -8,6 +8,16 @@ export default defineConfig({
   request: {},
   layout: {
     title: 'PowerX - Dashboard',
+    logo: 'https://preview.pro.ant.design/static/logo.f0355d39.svg',
+    // copy from pro site
+    navTheme: 'dark',
+    primaryColor: '#1890ff',
+    layout: 'sidemenu',
+    contentWidth: 'Fluid',
+    fixedHeader: false,
+    fixSiderbar: false,
+    pwa: false,
+    iconfontUrl: '',
   },
   routes: [
     {
