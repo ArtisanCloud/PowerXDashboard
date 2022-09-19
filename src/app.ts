@@ -1,7 +1,7 @@
 // 运行时配置
 
-import LogoSVG from '@/assets/logo.svg';
-import LogoAvatar from '@/assets/logo.png';
+import logo from '@/assets/logo.svg';
+import iconAvatar from '@/assets/logo.png';
 
 // 全局初始化数据配置，用于 Layout 用户信息和权限初始化
 // 更多信息见文档：https://next.umijs.org/docs/api/runtime-config#getinitialstate
@@ -11,13 +11,13 @@ export async function getInitialState(): Promise<{
 }> {
   return {
     name: '@ArtisanCloud/PowerX',
-    avatar: LogoAvatar,
+    avatar: iconAvatar,
   };
 }
 
 export const layout = () => {
   return {
-    logo: LogoSVG,
+    logo: logo,
     menu: {
       locale: false,
     },

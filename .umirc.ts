@@ -1,23 +1,26 @@
 import { defineConfig } from '@umijs/max';
 
+import defaultSettings from './config/defaultSettings';
+
 export default defineConfig({
-  antd: {},
+  antd: {
+    // configProvider
+    configProvider: {},
+    // themes
+    dark: false,
+    compact: false,
+    // babel-plugin-import
+    import: true,
+    // less or css, default less
+    style: 'less',
+  },
   access: {},
   model: {},
   initialState: {},
   request: {},
   layout: {
-    title: 'PowerX - Dashboard',
-    logo: 'https://preview.pro.ant.design/static/logo.f0355d39.svg',
-    // copy from pro site
-    navTheme: 'dark',
-    primaryColor: '#1890ff',
-    layout: 'sidemenu',
-    contentWidth: 'Fluid',
-    fixedHeader: false,
-    fixSiderbar: false,
-    pwa: false,
-    iconfontUrl: '',
+    locale: true,
+    ...defaultSettings,
   },
   routes: [
     {
