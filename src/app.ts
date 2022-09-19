@@ -1,6 +1,7 @@
 // 运行时配置
 
-import logo from '@/assets/logo.svg';
+import { Settings as LayoutSettings } from '@ant-design/pro-layout';
+// import logo from '@/assets/logo.svg';
 import iconAvatar from '@/assets/logo.png';
 
 // 全局初始化数据配置，用于 Layout 用户信息和权限初始化
@@ -15,11 +16,33 @@ export async function getInitialState(): Promise<{
   };
 }
 
-export const layout = () => {
+// export const layout = () => {
+//   return {
+//     logo: logo,
+//     menu: {
+//       locale: false,
+//     },
+//   };
+// };
+
+export const layout = ({
+  initialState,
+}: {
+  initialState: { settings?: LayoutSettings; currentUser?: API.UserInfoVO };
+}): any => {
   return {
-    logo: logo,
-    menu: {
-      locale: false,
+    // rightContentRender: () => <RightContent />,
+    // disableContentMargin: false,
+    // footerRender: () => <Footer />,
+    onPageChange: () => {
+      // const { currentUser } = initialState;
+      // const { location } = history;
+      // // 如果没有登录，重定向到 login
+      // if (!currentUser && location.pathname !== '/user/login') {
+      //   history.push('/user/login');
+      // }
     },
+    menuHeaderRender: undefined,
+    ...initialState?.settings,
   };
 };
