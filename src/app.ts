@@ -31,13 +31,8 @@ export const layout = ({
   initialState: { settings?: LayoutSettings; currentUser?: API.UserInfoVO };
 }): any => {
   return {
-    // rightContentRender: () => <RightContent />,
-    // disableContentMargin: false,
-    // footerRender: () => <Footer />,
     onPageChange: () => {
-      // const { currentUser } = initialState;
-      // const { location } = history;
-      // // 如果没有登录，重定向到 login
+      console.log('change paged');
       // if (!currentUser && location.pathname !== '/user/login') {
       //   history.push('/user/login');
       // }
