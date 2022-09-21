@@ -1,10 +1,10 @@
 // 运行时配置
 
-import { Settings as LayoutSettings } from '@ant-design/pro-layout';
-// import logo from '@/assets/logo.svg';
+import logo from '@/assets/logo.svg';
 import iconAvatar from '@/assets/logo.png';
 
-// import { useModel,history } from 'umi';
+import { history } from 'umi';
+import UseAuthUser from '@/models/auth';
 
 // 全局初始化数据配置，用于 Layout 用户信息和权限初始化
 // 更多信息见文档：https://next.umijs.org/docs/api/runtime-config#getinitialstate
@@ -18,30 +18,20 @@ export async function getInitialState(): Promise<{
   };
 }
 
-// export const layout = () => {
-//   return {
-//     logo: logo,
-//     menu: {
-//       locale: false,
-//     },
-//   };
-// };
+export const layout = () => {
+  // check current auth user
+  const { AuthUser } = UseAuthUser();
 
-export const layout = ({
-  initialState,
-}: {
-  initialState: { settings?: LayoutSettings; currentUser?: API.UserInfoVO };
-}): any => {
-  // const { user } = useModel('auth')
-  // const currentUser = user
   return {
-    onPageChange: () => {
-      console.log('change paged');
-      // if (!currentUser && location.pathname !== '/user/login') {
-      //   history.push('/user/login');
-      // }
+    logo: logo,
+    menu: {
+      locale: false,
     },
-    menuHeaderRender: undefined,
-    ...initialState?.settings,
+    onPageChange: () => {
+      // console.log('change paged');
+      if (!AuthUser && location.pathname !== '/user/login') {
+        history.push('/user/login');
+      }
+    },
   };
 };
