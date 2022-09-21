@@ -4,6 +4,8 @@ import { Settings as LayoutSettings } from '@ant-design/pro-layout';
 // import logo from '@/assets/logo.svg';
 import iconAvatar from '@/assets/logo.png';
 
+// import { useModel,history } from 'umi';
+
 // 全局初始化数据配置，用于 Layout 用户信息和权限初始化
 // 更多信息见文档：https://next.umijs.org/docs/api/runtime-config#getinitialstate
 export async function getInitialState(): Promise<{
@@ -30,6 +32,8 @@ export const layout = ({
 }: {
   initialState: { settings?: LayoutSettings; currentUser?: API.UserInfoVO };
 }): any => {
+  // const { user } = useModel('auth')
+  // const currentUser = user
   return {
     onPageChange: () => {
       console.log('change paged');
