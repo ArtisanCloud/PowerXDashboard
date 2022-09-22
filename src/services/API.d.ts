@@ -1,6 +1,7 @@
 declare namespace API {
   export interface APIResponse {
-    status: Meta;
+    meta: Meta;
+    data: any;
   }
 
   export interface Meta {
