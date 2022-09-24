@@ -5,11 +5,10 @@ import logo from '@/assets/logo.svg';
 import iconAvatar from '@/assets/logo.png';
 
 // import from umi
-// import { history } from 'umi';
 import type { RequestConfig } from 'umi';
 
 // import from models
-// import UseAuthUser from '@/models/auth';
+
 // import APIResponse = API.APIResponse;
 // import { API_RETURN_CODE_INIT } from '@/constants';
 
@@ -28,20 +27,12 @@ export async function getInitialState(): Promise<{
 // 布局设置
 // https://umijs.org/docs/max/layout-menu
 export const layout = () => {
-  // check current auth user
-  // const { AuthUser } = UseAuthUser();
-
   return {
     logo: logo,
     menu: {
       locale: false,
     },
-    onPageChange: () => {
-      // console.log('change paged');
-      // if (!AuthUser && location.pathname !== '/user/login') {
-      //   history.push('/user/login');
-      // }
-    },
+    onPageChange: () => {},
   };
 };
 
