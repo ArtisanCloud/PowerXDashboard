@@ -40,6 +40,7 @@ export const layout = () => {
 // https://umijs.org/docs/max/request
 export const request: RequestConfig = {
   // 统一的请求设定
+  baseURL: 'http://localhost:8080',
   timeout: 1000,
   headers: { 'X-Requested-With': 'XMLHttpRequest' },
 

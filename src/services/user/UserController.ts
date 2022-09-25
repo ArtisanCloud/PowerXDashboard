@@ -1,15 +1,15 @@
 import { request } from '@umijs/max';
 
 /** 此处后端没有提供注释 GET /api/v1/queryUserList */
-export async function Login(
+export async function LoginByCode(
   params: {
     // query
-    /** keyword */
-    keyword?: string;
-    /** current */
-    current?: number;
-    /** pageSize */
-    pageSize?: number;
+    /** code */
+    code: string;
+    /** appid */
+    appid?: string;
+    /** state */
+    state?: string;
   },
   options?: { [key: string]: any },
 ) {
@@ -23,4 +23,8 @@ export async function Login(
       ...(options || {}),
     },
   );
+}
+
+export async function Test() {
+  return request<API.APIResponse>('/wechat/api/weCom/callback/test');
 }

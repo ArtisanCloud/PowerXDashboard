@@ -1,5 +1,5 @@
 import routesInstall from './install';
-import routesUser from './user';
+import routesAuth from './auth';
 import routesAdmin from './admin';
 
 export default [
@@ -7,7 +7,7 @@ export default [
   routesInstall,
 
   // routes for user to auth
-  routesUser,
+  routesAuth,
 
   // routes for authorized user
   {
