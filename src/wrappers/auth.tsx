@@ -1,13 +1,16 @@
-import { Navigate, Outlet } from 'umi';
+import { Navigate } from 'umi';
 
-import UseAuthUser from '@/models/auth';
+import { useModel } from 'umi';
 
-export default () => {
-  const { AuthUser } = UseAuthUser();
+const withAuth = (Component) => () => {
+  const { AuthUser } = useModel('auth');
+  // console.log(AuthUser)
 
   if (!AuthUser) {
     return <Navigate to="/user/login" />;
   } else {
-    return <Outlet />;
+    return <Component />;
   }
 };
+
+export default withAuth;

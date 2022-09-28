@@ -1,12 +1,12 @@
 export default [
   {
     name: '首页',
-    path: '/home',
+    path: '/',
     component: './Home',
     routes: [
       {
         name: '一级页面',
-        path: '/home/13',
+        path: '/dashboard/13',
         component: './Table',
       },
     ],

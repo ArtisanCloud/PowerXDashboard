@@ -11,6 +11,7 @@ import { Button, Divider, Drawer, message } from 'antd';
 import React, { useRef, useState } from 'react';
 import CreateForm from './components/CreateForm';
 import UpdateForm, { FormValueType } from './components/UpdateForm';
+import withAuth from '@/wrappers/auth';
 
 const { addUser, queryUserList, deleteUser, modifyUser } =
   services.UserController;
@@ -267,4 +268,4 @@ const TableList: React.FC<unknown> = () => {
   );
 };
 
-export default TableList;
+export default withAuth(TableList);

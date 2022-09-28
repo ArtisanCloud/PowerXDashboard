@@ -10,10 +10,5 @@ export default [
   routesAuth,
 
   // routes for authorized user
-  {
-    path: '/',
-    redirect: '/home',
-    wrappers: ['@/wrappers/auth'],
-    routes: routesAdmin,
-  },
+  ...routesAdmin,
 ];

@@ -1,6 +1,16 @@
 declare namespace API {
+  export interface QueryOAuthCallback {
+    // query
+    /** code */
+    code: string;
+    /** appid */
+    appid?: string;
+    /** state */
+    state?: string;
+  }
+
   export interface RSAuthUser extends APIResponse {
-    Data: Employee;
+    data: Employee | null;
   }
 
   export interface Employee {

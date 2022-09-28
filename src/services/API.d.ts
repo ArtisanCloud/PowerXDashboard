@@ -5,18 +5,18 @@ declare namespace API {
   }
 
   export interface Meta {
-    locale: string;
+    locale?: string;
     result_code: number;
-    result_message: string;
+    result_message?: string;
     return_code: number;
-    return_message: string;
-    timezone: string;
+    return_message?: string;
+    timezone?: string;
   }
 
   // ---------------------------------------------------------------------------
 
   export interface RSToken extends APIResponse {
-    Data: Token;
+    data: Token | null;
   }
 
   export interface Token {

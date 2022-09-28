@@ -1,20 +1,11 @@
 import { request } from '@umijs/max';
 
-/** 此处后端没有提供注释 GET /api/v1/queryUserList */
 export async function LoginByCode(
-  params: {
-    // query
-    /** code */
-    code: string;
-    /** appid */
-    appid?: string;
-    /** state */
-    state?: string;
-  },
+  params: API.QueryOAuthCallback,
   options?: { [key: string]: any },
 ) {
-  return request<API.RSAuthUser>(
-    '/wechat/api/weCom/oauth2/authorize/qr/employee',
+  return request<API.RSToken>(
+    '/wechat/api/weCom/callback/authorized/qr/employee',
     {
       method: 'GET',
       params: {
@@ -25,6 +16,6 @@ export async function LoginByCode(
   );
 }
 
-export async function Test() {
-  return request<API.APIResponse>('/wechat/api/weCom/callback/test');
+export async function MeDetail() {
+  return request<API.RSAuthUser>('/admin/api/me/detail');
 }
