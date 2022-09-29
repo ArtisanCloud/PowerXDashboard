@@ -7,6 +7,7 @@ import iconAvatar from '@/assets/logo.png';
 // import from umi
 import type { RequestConfig } from 'umi';
 import { history } from 'umi';
+import { message } from 'antd';
 
 // import from models
 import { UseAuthUser } from '@/models/global';
@@ -76,13 +77,25 @@ export const request: RequestConfig = {
     errorHandler: (error: any, opts: any) => {
       if (opts?.skipErrorHandler) throw error;
       if (error.response) {
-        console.log(222, error.response);
+        console.log('response err', error);
         const rs: API.APIResponse = error.response.data;
-        if (rs) {
-          console.error(rs);
+
+        // 后台服务器未启动
+        if (error.code === 'ERR_NETWORK') {
+          message.error('后端服务端无法响应，请确保后台服务器运行正常');
         }
+        // 显示后台的接口错误
+        if (rs) {
+          console.error(rs.meta.result_message);
+        }
+      } else if (error.request) {
+        // 请求已经成功发起，但没有收到响应
+        console.log('request err');
+        // \`error.request\` 在浏览器中是 XMLHttpRequest 的实例，
+        // 而在node.js中是 http.ClientRequest 的实例
+        message.error('None response! Please retry.');
       } else {
-        console.error(error);
+        console.log('other err', error);
       }
     },
   },
