@@ -15,3 +15,8 @@ export const UseAuthUser = () => {
   const { AuthUser } = useModel('auth');
   return AuthUser;
 };
+
+export const UseToken = () => {
+  const { AuthToken } = useModel('auth');
+  return AuthToken;
+};
