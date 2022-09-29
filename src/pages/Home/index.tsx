@@ -7,7 +7,7 @@ export default () => {
   const { sysInstalled, rootInitialized } = UseApp();
   console.log('home page check sys status', sysInstalled, rootInitialized);
   if (!sysInstalled) {
-    history.push(URIConstant.URI_BOOT_INSTALL);
+    history.push(URIConstant.URI_INSTALL);
     return <div></div>;
   }
   if (!rootInitialized) {

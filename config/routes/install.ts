@@ -1,17 +1,17 @@
 export default {
-  path: '/boot',
+  path: '/install',
   layout: false,
   routes: [
     {
       name: '安装系统',
-      path: '/boot/install',
-      component: './Boot/Install',
+      path: '/install',
+      component: './Init/Install',
       layout: false,
     },
     {
       name: '初始化Root账号',
-      path: '/boot/root/init',
-      component: './Boot/Root',
+      path: '/install/root/init',
+      component: './Init/Root',
       layout: false,
     },
   ],

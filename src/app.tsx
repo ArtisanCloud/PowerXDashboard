@@ -48,7 +48,7 @@ export const layout = () => {
     onPageChange: () => {
       // 判断是否系统安装成功
       if (!sysInstalled) {
-        history.push(URIConstant.URI_BOOT_INSTALL);
+        history.push(URIConstant.URI_INSTALL);
         return;
       }
       // 判断是否Root被初始化
