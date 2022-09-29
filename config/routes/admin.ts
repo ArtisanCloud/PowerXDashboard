@@ -1,24 +1,24 @@
 export default [
   {
     name: '首页',
-    path: '/',
-    component: './Home',
+    path: '/dashboard',
+    component: '@/pages/Dashboard',
     routes: [
       {
         name: '一级页面',
         path: '/dashboard/13',
-        component: './Table',
+        component: '@/pages/Table',
       },
     ],
   },
   {
     name: '权限演示',
     path: '/access',
-    component: './Access',
+    component: '@/pages/Access',
   },
   {
     name: ' CRUD 示例',
     path: '/table',
-    component: './Table',
+    component: '@/pages/Table',
   },
 ];

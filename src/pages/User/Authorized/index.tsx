@@ -1,4 +1,4 @@
-import { useSearchParams, useLocation } from 'umi';
+import { useSearchParams, useLocation, history } from 'umi';
 import { useEffect, useState } from 'react';
 import { LoginByCode } from '@/services/user/UserController';
 import * as APIConstant from '@/constants/backend';
@@ -39,7 +39,7 @@ const AuthorizedUser: React.FC = () => {
         const rs = await LoginByCode(queries!);
         setRS(rs);
       } catch (e) {
-        // console.log(e)
+        console.log(e);
 
         // 后台系统错误信息
         if (e.response.status === APIConstant.API_RETURN_CODE_ERROR) {
@@ -70,6 +70,7 @@ const AuthorizedUser: React.FC = () => {
 
     // 跳转首页
     location.pathname = '/';
+    history.push(location.pathname);
     return <div>{location.pathname}</div>;
   } else {
     return (

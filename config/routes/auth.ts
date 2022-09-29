@@ -1,3 +1,5 @@
+// import from constant
+
 export default {
   path: '/user',
   layout: false,

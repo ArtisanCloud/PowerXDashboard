@@ -1,7 +1,6 @@
 import { PageContainer } from '@ant-design/pro-components';
 import { Access, useAccess } from '@umijs/max';
 import { Button } from 'antd';
-import withAuth from '@/wrappers/auth';
 
 const AccessPage: React.FC = () => {
   const access = useAccess();
@@ -19,4 +18,4 @@ const AccessPage: React.FC = () => {
   );
 };
 
-export default withAuth(AccessPage);
+export default AccessPage;

@@ -1,19 +1,24 @@
-import Guide from '@/components/Guide';
-import { trim } from '@/utils/format';
-import { PageContainer } from '@ant-design/pro-components';
-import { useModel } from '@umijs/max';
-import styles from './index.less';
-import withAuth from '@/wrappers/auth';
+import { UseAuthUser } from '@/models/global';
+import { NavLink } from 'umi';
+import * as URIConstant from '@/constants/uri';
 
-const HomePage: React.FC = () => {
-  const { name } = useModel('global');
+export default () => {
+  const AuthUser = UseAuthUser();
+
   return (
-    <PageContainer ghost>
-      <div className={styles.container}>
-        <Guide name={trim(name)} />
-      </div>
-    </PageContainer>
+    <div>
+      <div> Welcome! I am PowerX Dashboard</div>
+      <ul>
+        {AuthUser ? (
+          <li>
+            <NavLink to="dashboard">进入系统</NavLink>
+          </li>
+        ) : (
+          <li>
+            <NavLink to={URIConstant.URI_LOGIN}>请先登录</NavLink>
+          </li>
+        )}
+      </ul>
+    </div>
   );
 };
-
-export default withAuth(HomePage);

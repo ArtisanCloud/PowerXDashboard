@@ -6,9 +6,13 @@ import iconAvatar from '@/assets/logo.png';
 
 // import from umi
 import type { RequestConfig } from 'umi';
+import { history } from 'umi';
 
 // import from models
+import { UseAuthUser } from '@/models/global';
 
+// import from constant
+import * as URIConstant from '@/constants/uri';
 // import APIResponse = API.APIResponse;
 // import { API_RETURN_CODE_INIT } from '@/constants';
 
@@ -27,12 +31,23 @@ export async function getInitialState(): Promise<{
 // 布局设置
 // https://umijs.org/docs/max/layout-menu
 export const layout = () => {
+  const AuthUser = UseAuthUser();
+
   return {
     logo: logo,
     menu: {
       locale: false,
     },
-    onPageChange: () => {},
+    onPageChange: () => {
+      // 如果当前页面是首页，但是用户同时用户未登录，则显示当前页
+      if (!AuthUser && location.pathname === '/') {
+        return;
+      }
+      // 如果当前页面不是登陆页面，同时用户未登录，则跳转到登陆页面
+      else if (!AuthUser && location.pathname !== URIConstant.URI_LOGIN) {
+        history.push(URIConstant.URI_LOGIN);
+      }
+    },
   };
 };
 
