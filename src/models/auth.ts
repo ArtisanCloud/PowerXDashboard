@@ -1,13 +1,12 @@
 // hook useAuthUser for handling current auth.js user
 import { useEffect, useState } from 'react';
-// import {MeDetail} from '@/services/user/UserController';
-// import * as APIConstant from '@/constants/backend';
-// import {history} from 'umi';
-import { FakeUser } from '../../mock/user';
-// import * as URIConstant from "@/constants/uri";
+import { history } from 'umi';
+// import { FakeUser } from '../../mock/user';
+import * as APIConstant from '@/constants/api';
+import * as URIConstant from '@/constants/uri';
+import { MeDetail } from '@/services/user/UserController';
 
 export default () => {
-  // const [Loading, SetLoading] = useState<boolean>(true);
   const [AuthUser, SetUser] = useState<API.Employee>();
   const [AuthToken, SetAuthToken] = useState<API.Token>();
 
@@ -20,6 +19,7 @@ export default () => {
       // 解析token
       let authToken: API.RSToken;
       let authUser: API.Employee;
+      // console.log( jsonAuthUser)
       if (jsonAuthUser !== null) {
         authToken = JSON.parse(jsonAuthUser!);
 
@@ -29,15 +29,15 @@ export default () => {
         }
 
         // 全局token设置好后，请求登陆用户的信息
-        authUser = FakeUser;
+        // authUser = FakeUser;
         // console.log(authToken)
-        // const rsAuthUser = await MeDetail();
-        // if (rsAuthUser.meta.result_code === APIConstant.API_RETURN_CODE_INIT) {
-        //   authUser = rsAuthUser.data!;
-        // } else {
-        //   // token无效
-        //   return history.push(URIConstant.URI_LOGIN);
-        // }
+        const rsAuthUser = await MeDetail();
+        if (rsAuthUser.meta.return_code === APIConstant.API_RETURN_CODE_INIT) {
+          authUser = rsAuthUser.data!;
+        } else {
+          // token无效
+          return history.push(URIConstant.URI_LOGIN);
+        }
       } else {
         authUser = null!;
       }

@@ -1,7 +1,7 @@
 import { useSearchParams, useLocation, history } from 'umi';
 import { useEffect, useState } from 'react';
 import { LoginByCode } from '@/services/user/UserController';
-import * as APIConstant from '@/constants/backend';
+import * as APIConstant from '@/constants/api';
 import * as WXConstant from '@/constants/web';
 
 const AuthorizedUser: React.FC = () => {
