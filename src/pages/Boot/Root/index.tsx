@@ -1,39 +1,14 @@
 import { PageContainer } from '@ant-design/pro-components';
 import styles from './index.less';
-// import {useEffect, useState} from "react";
-// import {Ping} from "@/services/detect/DetectController";
-// import {useRequest} from "@@/exports";
-// import {LoginByCode} from "@/services/user/UserController";
+import { UseApp } from '@/models/global';
+import * as URIConstant from '@/constants/uri';
+import { history } from 'umi';
 
 const HomePage: React.FC = () => {
-  // // ping backend via useRequest
-  // const {data, error, loading} = useRequest(() => {
-  // 	return Ping();
-  // });
-  //
-  // if (loading) {
-  // 	return <div>loading...</div>;
-  // }
-  // if (error) {
-  // 	return <div>{error.response.status}</div>;
-  // }
-  // return <div>{data}</div>;
-
-  // // ping backend via useEffect
-  // const [rs, setRS] = useState<API.RSPing>();
-  // useEffect(() => {
-  // 	const HandlePing = async () => {
-  // 		const rs = await Ping()
-  // 		// Update the document title using the browser API
-  // 		setRS(rs)
-  // 	};
-  // 	HandlePing();
-  //
-  // 	return () => {
-  // 		console.log(rs)
-  // 	};
-  //
-  // }, []);
+  const { rootInitialized } = UseApp();
+  if (rootInitialized) {
+    history.push(URIConstant.URI_HOME);
+  }
 
   return (
     <PageContainer ghost>

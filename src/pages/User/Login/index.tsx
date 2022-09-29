@@ -3,6 +3,6 @@
 
 export default () => {
   const oauthURL = '' + APP_OAUTH_URL;
-  console.log(oauthURL);
+  // console.log(oauthURL);
   return (window.location.href = oauthURL);
 };

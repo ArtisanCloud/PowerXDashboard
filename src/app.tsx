@@ -10,7 +10,7 @@ import { history } from 'umi';
 import { message } from 'antd';
 
 // import from models
-import { UseAuthUser } from '@/models/global';
+import { UseAuthUser, UseApp } from '@/models/global';
 
 // import from constant
 import * as URIConstant from '@/constants/uri';
@@ -32,6 +32,7 @@ export async function getInitialState(): Promise<{
 // 布局设置
 // https://umijs.org/docs/max/layout-menu
 export const layout = () => {
+  const { sysInstalled, rootInitialized } = UseApp();
   const AuthUser = UseAuthUser();
 
   return {
@@ -40,13 +41,25 @@ export const layout = () => {
       locale: false,
     },
     onPageChange: () => {
+      // 判断是否系统安装成功
+      if (!sysInstalled) {
+        history.push(URIConstant.URI_BOOT_INSTALL);
+        return;
+      }
+      // 判断是否Root被初始化
+      else if (!rootInitialized) {
+        history.push(URIConstant.URI_ROOT_INIT);
+        return;
+      }
+
       // 如果当前页面是首页，但是用户同时用户未登录，则显示当前页
-      if (!AuthUser && location.pathname === '/') {
+      else if (!AuthUser && location.pathname === URIConstant.URI_HOME) {
         return;
       }
       // 如果当前页面不是登陆页面，同时用户未登录，则跳转到登陆页面
       else if (!AuthUser && location.pathname !== URIConstant.URI_LOGIN) {
         history.push(URIConstant.URI_LOGIN);
+        return;
       }
     },
   };
@@ -85,7 +98,7 @@ export const request: RequestConfig = {
           message.error('后端服务端无法响应，请确保后台服务器运行正常');
         }
         // 显示后台的接口错误
-        if (rs) {
+        if (rs.meta) {
           console.error(rs.meta.result_message);
         }
       } else if (error.request) {
@@ -100,7 +113,7 @@ export const request: RequestConfig = {
     },
   },
   requestInterceptors: [
-    (config) => {
+    (config: any) => {
       const jsonAuthUser = localStorage.getItem('auth');
       if (jsonAuthUser !== null) {
         const authToken: API.APIResponse = JSON.parse(jsonAuthUser!);
