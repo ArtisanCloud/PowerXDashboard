@@ -4,8 +4,9 @@ import { UseApp } from '@/models/global';
 import * as URIConstant from '@/constants/uri';
 import { history } from 'umi';
 
-const HomePage: React.FC = () => {
+const RootInitPage: React.FC = () => {
   const { rootInitialized } = UseApp();
+  console.log('root init page status', rootInitialized);
   if (rootInitialized) {
     history.push(URIConstant.URI_HOME);
   }
@@ -17,4 +18,4 @@ const HomePage: React.FC = () => {
   );
 };
 
-export default HomePage;
+export default RootInitPage;

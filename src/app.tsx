@@ -33,7 +33,12 @@ export async function getInitialState(): Promise<{
 // https://umijs.org/docs/max/layout-menu
 export const layout = () => {
   const { sysInstalled, rootInitialized } = UseApp();
-  const AuthUser = UseAuthUser();
+  console.log('app layout check system status', sysInstalled, rootInitialized);
+
+  let AuthUser: API.Employee | undefined;
+  if (sysInstalled && rootInitialized) {
+    AuthUser = UseAuthUser();
+  }
 
   return {
     logo: logo,
@@ -98,7 +103,7 @@ export const request: RequestConfig = {
           message.error('后端服务端无法响应，请确保后台服务器运行正常');
         }
         // 显示后台的接口错误
-        if (rs.meta) {
+        if (rs && rs.meta) {
           console.error(rs.meta.result_message);
         }
       } else if (error.request) {

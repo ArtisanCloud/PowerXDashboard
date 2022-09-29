@@ -4,11 +4,13 @@ import { history } from 'umi';
 import * as APIConstant from '@/constants/api';
 import * as URIConstant from '@/constants/uri';
 import { MeDetail } from '@/services/user/UserController';
+import { UseApp } from '@/models/global';
 
 // hook UseAuthUser for handling current auth.js user
 export default () => {
   const [AuthUser, SetUser] = useState<API.Employee>();
   const [AuthToken, SetAuthToken] = useState<API.Token>();
+  const { sysInstalled, rootInitialized } = UseApp();
 
   // 加载localstorage中的token，然后请求后台换取user的信息
   useEffect(() => {
@@ -47,7 +49,12 @@ export default () => {
       }
     };
 
-    LoadToken();
+    // 如果系统未初始化，则不用去考虑token
+    if (sysInstalled && rootInitialized) {
+      LoadToken().catch((e) => {
+        console.error('LoadToken', e);
+      });
+    }
 
     return () => {};
   }, [AuthToken]);
