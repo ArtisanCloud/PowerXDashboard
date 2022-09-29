@@ -1,14 +1,9 @@
-import { PageContainer } from '@ant-design/pro-components';
-import styles from './index.less';
+// https://developer.work.weixin.qq.com/document/path/91025
+// 获取环境变量中的oauth 地址
 
-const Login: React.FC = () => {
-  return (
-    <PageContainer ghost>
-      <div className={styles.container}>
-        <div>QR Code</div>
-      </div>
-    </PageContainer>
-  );
+export default () => {
+  const oauthURL = '' + APP_OAUTH_URL;
+  console.log(oauthURL);
+  // return (window.location.href = oauthURL);
+  return <div>login</div>;
 };
-
-export default Login;

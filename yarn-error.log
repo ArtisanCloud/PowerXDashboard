@@ -14,7 +14,7 @@ Platform:
   darwin arm64
 
 Trace: 
-  Error: ENOENT: no such file or directory, copyfile '/Users/michaelhu/Library/Caches/Yarn/v6/npm-escape-string-regexp-4.0.0-14ba83a5d373e3d311e5afca29cf5bfad965bf34-integrity/node_modules/escape-string-regexp/index.d.ts' -> '/private/var/www/html/PowerXDashboard/node_modules/eslint/node_modules/escape-string-regexp/index.d.ts'
+  Error: ENOENT: no such file or directory, copyfile '/Users/michaelhu/Library/Caches/Yarn/v6/npm-escape-string-regexp-4.0.0-14ba83a5d373e3d311e5afca29cf5bfad965bf34-integrity/node_modules/escape-string-regexp/index.ts' -> '/private/var/www/html/PowerXDashboard/node_modules/eslint/node_modules/escape-string-regexp/index.ts'
 
 npm manifest: 
   {
