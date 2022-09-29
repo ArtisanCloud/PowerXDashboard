@@ -1,8 +1,19 @@
-import { UseAuthUser } from '@/models/global';
+import { UseApp, UseAuthUser } from '@/models/global';
 import { NavLink } from 'umi';
 import * as URIConstant from '@/constants/uri';
+import { history } from '@@/core/history';
 
 export default () => {
+  const { sysInstalled, rootInitialized } = UseApp();
+  if (!sysInstalled) {
+    history.push(URIConstant.URI_BOOT_INSTALL);
+    return <div></div>;
+  }
+  if (!rootInitialized) {
+    history.push(URIConstant.URI_ROOT_INIT);
+    return <div></div>;
+  }
+
   const AuthUser = UseAuthUser();
 
   return (

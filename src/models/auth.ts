@@ -1,4 +1,3 @@
-// hook useAuthUser for handling current auth.js user
 import { useEffect, useState } from 'react';
 import { history } from 'umi';
 // import { FakeUser } from '../../mock/user';
@@ -6,6 +5,7 @@ import * as APIConstant from '@/constants/api';
 import * as URIConstant from '@/constants/uri';
 import { MeDetail } from '@/services/user/UserController';
 
+// hook UseAuthUser for handling current auth.js user
 export default () => {
   const [AuthUser, SetUser] = useState<API.Employee>();
   const [AuthToken, SetAuthToken] = useState<API.Token>();

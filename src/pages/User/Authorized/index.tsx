@@ -38,7 +38,7 @@ const AuthorizedUser: React.FC = () => {
       try {
         const rs = await LoginByCode(queries!);
         setRS(rs);
-      } catch (e) {
+      } catch (e: any) {
         console.log(e);
 
         // 后台系统错误信息
@@ -59,7 +59,9 @@ const AuthorizedUser: React.FC = () => {
     };
 
     // 调用后台code换取用户登陆信息
-    HandleLogin().catch(console.error);
+    HandleLogin().catch((e) => {
+      console.error('HandleCheckSysInstalled', e);
+    });
 
     // 返回值
     return () => {};
