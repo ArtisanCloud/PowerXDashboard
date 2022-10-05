@@ -1,321 +1,111 @@
 import {
+  FormInstance,
   PageContainer,
-  ProFormColumnsType,
-  ProFormLayoutType,
+  ProForm,
 } from '@ant-design/pro-components';
-import { BetaSchemaForm, ProFormSelect } from '@ant-design/pro-components';
-import { Alert, DatePicker, Space } from 'antd';
-import dayjs from 'dayjs';
-import { useState } from 'react';
+import { Divider, Space } from 'antd';
+import { useEffect, useRef } from 'react';
 
 import { UseApp } from '@/models/global';
 import { history } from 'umi';
 import * as URIConstant from '@/constants/uri';
-
-const valueEnum = {
-  all: { text: '全部', status: 'Default' },
-  open: {
-    text: '未解决',
-    status: 'Error',
-  },
-  closed: {
-    text: '已解决',
-    status: 'Success',
-    disabled: true,
-  },
-  processing: {
-    text: '解决中',
-    status: 'Processing',
-  },
-};
-
-type DataItem = {
-  name: string;
-  state: string;
-};
-
-const columns: ProFormColumnsType<DataItem>[] = [
-  {
-    title: '标题',
-    dataIndex: 'title',
-    formItemProps: {
-      rules: [
-        {
-          required: true,
-          message: '此项为必填项',
-        },
-      ],
-    },
-    width: 'md',
-    colProps: {
-      xs: 24,
-      md: 12,
-    },
-    initialValue: '默认值',
-    convertValue: (value) => {
-      return `标题：${value}`;
-    },
-    transform: (value) => {
-      return {
-        title: `${value}-转换`,
-      };
-    },
-  },
-  {
-    title: '状态',
-    dataIndex: 'state',
-    valueType: 'select',
-    valueEnum,
-    width: 'md',
-    colProps: {
-      xs: 24,
-      md: 12,
-    },
-  },
-  {
-    title: '标签',
-    dataIndex: 'labels',
-    width: 'md',
-    colProps: {
-      xs: 12,
-      md: 4,
-    },
-  },
-  {
-    valueType: 'switch',
-    title: '开关',
-    dataIndex: 'Switch',
-    fieldProps: {
-      style: {
-        width: '200px',
-      },
-    },
-    width: 'md',
-    colProps: {
-      xs: 12,
-      md: 20,
-    },
-  },
-  {
-    title: '创建时间',
-    key: 'showTime',
-    dataIndex: 'createName',
-    initialValue: [dayjs().add(-1, 'm'), dayjs()],
-    renderFormItem: () => <DatePicker.RangePicker />,
-    width: 'md',
-    colProps: {
-      xs: 24,
-      md: 12,
-    },
-  },
-  {
-    title: '更新时间',
-    dataIndex: 'updateName',
-    initialValue: [dayjs().add(-1, 'm'), dayjs()],
-    renderFormItem: () => <DatePicker.RangePicker />,
-    width: 'md',
-    colProps: {
-      xs: 24,
-      md: 12,
-    },
-  },
-  {
-    title: '分组',
-    valueType: 'group',
-    columns: [
-      {
-        title: '状态',
-        dataIndex: 'groupState',
-        valueType: 'select',
-        width: 'xs',
-        colProps: {
-          xs: 12,
-        },
-        valueEnum,
-      },
-      {
-        title: '标题',
-        width: 'md',
-        dataIndex: 'groupTitle',
-        colProps: {
-          xs: 12,
-        },
-        formItemProps: {
-          rules: [
-            {
-              required: true,
-              message: '此项为必填项',
-            },
-          ],
-        },
-      },
-    ],
-  },
-  {
-    title: '列表',
-    valueType: 'formList',
-    dataIndex: 'list',
-    initialValue: [{ state: 'all', title: '标题' }],
-    colProps: {
-      xs: 24,
-      sm: 12,
-    },
-    columns: [
-      {
-        valueType: 'group',
-        columns: [
-          {
-            title: '状态',
-            dataIndex: 'state',
-            valueType: 'select',
-            colProps: {
-              xs: 24,
-              sm: 12,
-            },
-            width: 'xs',
-            valueEnum,
-          },
-          {
-            title: '标题',
-            dataIndex: 'title',
-            width: 'md',
-            formItemProps: {
-              rules: [
-                {
-                  required: true,
-                  message: '此项为必填项',
-                },
-              ],
-            },
-            colProps: {
-              xs: 24,
-              sm: 12,
-            },
-          },
-        ],
-      },
-      {
-        valueType: 'dateTime',
-        initialValue: new Date(),
-        dataIndex: 'currentTime',
-        width: 'md',
-      },
-    ],
-  },
-  {
-    title: 'FormSet',
-    valueType: 'formSet',
-    dataIndex: 'formSet',
-    colProps: {
-      xs: 24,
-      sm: 12,
-    },
-    rowProps: {
-      gutter: [16, 0],
-    },
-    columns: [
-      {
-        title: '状态',
-        dataIndex: 'groupState',
-        valueType: 'select',
-        width: 'md',
-        valueEnum,
-      },
-      {
-        width: 'xs',
-        title: '标题',
-        dataIndex: 'groupTitle',
-        tip: '标题过长会自动收缩',
-        formItemProps: {
-          rules: [
-            {
-              required: true,
-              message: '此项为必填项',
-            },
-          ],
-        },
-      },
-    ],
-  },
-  {
-    title: '创建时间',
-    dataIndex: 'created_at',
-    valueType: 'dateRange',
-    width: 'md',
-    colProps: {
-      span: 24,
-    },
-    transform: (value) => {
-      return {
-        startTime: value[0],
-        endTime: value[1],
-      };
-    },
-  },
-];
+import AppConfig from '@/pages/Init/Install/components/AppConfig';
+import ServerConfig from '@/pages/Init/Install/components/ServerConfig';
+import JWTConfig from '@/pages/Init/Install/components/JWTConfig';
+import LogConfig from '@/pages/Init/Install/components/LogConfig';
+import DatabaseConfig from '@/pages/Init/Install/components/DatabaseConfig';
+import CacheConfig from '@/pages/Init/Install/components/CacheConfig';
+import WechatConfig from '@/pages/Init/Install/components/WechatConfig';
 
 const InstallPage: React.FC = () => {
   const { sysInstalled } = UseApp();
-  console.log('system install page status', sysInstalled);
-  if (sysInstalled) {
-    history.push(URIConstant.URI_HOME);
-  }
+  const formRef = useRef<FormInstance>();
 
-  const [layoutType, setLayoutType] = useState<ProFormLayoutType>('Form');
+  // 如果系统已经被安装，则直接跳转到系统首页
+  useEffect(() => {
+    console.log('system install page status', sysInstalled);
+    if (sysInstalled) {
+      history.push(URIConstant.URI_HOME);
+    }
+  }, [sysInstalled]);
 
   return (
-    <PageContainer>
+    <PageContainer
+      header={{
+        title: '安装PowerX系统',
+      }}
+    >
       <Space
         style={{
           width: '100%',
+          display: 'flex',
         }}
+        align="baseline"
         direction="vertical"
       >
-        <Alert
-          type="warning"
-          message="QueryFilter 和 lightFilter 暂不支持grid模式"
-          style={{
-            marginBlockEnd: 24,
+        <ProForm
+          submitter={
+            {
+              // render: false,
+            }
+          }
+          initialValues={{}}
+          formRef={formRef}
+          layout={'horizontal'}
+          // labelCol={{ span: 150 }}
+          labelAlign={'left'}
+          onFinish={async (values) => {
+            console.log(values);
+            // const params = { ...values };
+            // const hide = message.loading('处理中');
+            // const res: CommonResp = await Create(params);
+            // hide();
+            // if (res.code === 0) {
+            // 	history.push('/staff-admin/customer-growth/contact-way');
+            // 	message.success('添加成功');
+            // 	return true;
+            // }
+            //
+            // if (res.message) {
+            // 	message.error(res.message);
+            // 	return false;
+            // }
+            //
+            // message.error('添加失败');
+            return false;
           }}
-        />
-        <ProFormSelect
-          label="布局方式"
-          options={[
-            'Form',
-            'ModalForm',
-            'DrawerForm',
-            'LightFilter',
-            'QueryFilter',
-            'StepsForm',
-            'StepForm',
-            'Embed',
-          ]}
-          fieldProps={{
-            value: layoutType,
-            onChange: (e) => setLayoutType(e),
-          }}
-        />
+        >
+          <Divider orientation={'center'}>App 配置信息</Divider>
+
+          <AppConfig />
+
+          <Divider orientation={'center'}>服务器启动信息</Divider>
+
+          <ServerConfig />
+
+          <Divider orientation={'center'}>JWT 配置信息</Divider>
+
+          <JWTConfig />
+
+          <Divider orientation={'center'}>日志配置</Divider>
+
+          <LogConfig />
+
+          <Divider orientation={'center'}>Postgres 数据库配置</Divider>
+
+          <DatabaseConfig />
+
+          <Divider orientation={'center'}>Redis 缓存配置</Divider>
+
+          <CacheConfig />
+
+          <Divider orientation={'center'}>微信配置</Divider>
+
+          <WechatConfig />
+
+          <Divider orientation={'center'}></Divider>
+        </ProForm>
       </Space>
-      <BetaSchemaForm<DataItem>
-        trigger={<a>点击我</a>}
-        layoutType={layoutType}
-        steps={[
-          {
-            title: 'ProComponent',
-          },
-        ]}
-        rowProps={{
-          gutter: [16, 16],
-        }}
-        colProps={{
-          span: 12,
-        }}
-        grid={layoutType !== 'LightFilter' && layoutType !== 'QueryFilter'}
-        onFinish={async (values) => {
-          console.log(values);
-        }}
-        columns={(layoutType === 'StepsForm' ? [columns] : columns) as any}
-      />
     </PageContainer>
   );
 };

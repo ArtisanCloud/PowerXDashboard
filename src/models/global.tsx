@@ -14,6 +14,19 @@ export const UseApp = () => {
   useEffect(() => {
     const HandleCheckSysInstalled = async () => {
       // console.log(queries!)
+      // 读取localstorage的installStatus
+      const jsonSysInstalled = localStorage.getItem('sysInstalled');
+      if (jsonSysInstalled !== null) {
+        const isSysInstalled: boolean = JSON.parse(jsonSysInstalled!);
+        // console.log(authToken)
+        // 如果系统已经安装过，则直接进入系统
+        if (isSysInstalled) {
+          setSystemInstall(sysInstalled);
+          return;
+        }
+      }
+
+      // 检查远程是否安装成功
       const rs: API.RSSystemInstalledStatus = await CheckSystemInstalled();
       if (rs.meta.return_code === API_RETURN_CODE_INIT) {
         let sysInstalled = false;
