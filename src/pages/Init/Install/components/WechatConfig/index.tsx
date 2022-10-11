@@ -5,7 +5,7 @@ import {
 } from '@ant-design/pro-components';
 import { Col, Row } from 'antd';
 
-export default () => {
+export default (Props: { required: boolean }) => {
   const rowGutter = 32;
   return (
     <ProForm.Group>
@@ -16,7 +16,7 @@ export default () => {
             label="企业微信账号"
             tooltip="请到微信商户号后台配置获取"
             placeholder="如：ww45xxxxxxxxxxxxxxx"
-            rules={[{ required: true }]}
+            rules={[{ required: Props.required }]}
           />
         </Col>
         <Col>
@@ -25,7 +25,7 @@ export default () => {
             label="企业微信Oauth回调地址"
             tooltip="请到微信商户号后台配置获取"
             placeholder="如：http://power.artisancloud.cn"
-            rules={[{ required: true }]}
+            rules={[{ required: Props.required }]}
           />
         </Col>
       </Row>
@@ -37,7 +37,7 @@ export default () => {
             label="企微应用账号"
             tooltip="请到微信商户号后台配置获取"
             placeholder="如：10000001"
-            rules={[{ required: true }]}
+            rules={[{ required: Props.required }]}
           />
         </Col>
         <Col>
@@ -45,7 +45,7 @@ export default () => {
             name="weComSecret"
             label="企微应用账号密钥"
             tooltip="请到微信商户号后台配置获取"
-            rules={[{ required: true }]}
+            rules={[{ required: Props.required }]}
           />
         </Col>
       </Row>
@@ -60,7 +60,7 @@ export default () => {
     xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
     xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
     xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-            rules={[{ required: true }]}
+            rules={[{ required: Props.required }]}
           />
         </Col>
       </Row>
@@ -71,7 +71,7 @@ export default () => {
             name="appMessageAESKey"
             label="企微应用AES密钥"
             tooltip="请到微信商户号后台配置获取"
-            rules={[{ required: true }]}
+            rules={[{ required: Props.required }]}
           />
         </Col>
         <Col>
@@ -82,7 +82,7 @@ export default () => {
             tooltip="请保证host替换成你想要的域名，后面URI为 wechat/api/weCom/app"
             placeholder="https://{host}/wechat/api/weCom/app"
             initialValue={'https://{host}/wechat/api/weCom/app'}
-            rules={[{ required: true }]}
+            rules={[{ required: Props.required }]}
           />
         </Col>
         <Col>
@@ -91,7 +91,7 @@ export default () => {
             name="appMessageToken"
             label="企微应用消息Token"
             tooltip="请到微信商户号后台配置获取"
-            rules={[{ required: true }]}
+            rules={[{ required: Props.required }]}
           />
         </Col>
       </Row>
@@ -101,7 +101,7 @@ export default () => {
       {/*  name="customerMessageAESKey"*/}
       {/*  label="企微客户联系人AES密钥"*/}
       {/*  tooltip="请到微信商户号后台配置获取"*/}
-      {/*  rules={[{ required: true }]}*/}
+      {/*  rules={[{ required: Props.required }]}*/}
       {/*/>*/}
       {/*<ProFormText*/}
       {/*  width={'lg'}*/}
@@ -110,14 +110,14 @@ export default () => {
       {/*  tooltip="请保证host替换成你想要的域名，后面URI为 wechat/api/weCom/customer"*/}
       {/*  placeholder="https://{host}/wechat/api/weCom/customer"*/}
       {/*  initialValue={'https://{host}/wechat/api/weCom/customer'}*/}
-      {/*  rules={[{ required: true }]}*/}
+      {/*  rules={[{ required: Props.required }]}*/}
       {/*/>*/}
       {/*<ProFormText.Password*/}
       {/*  width={'lg'}*/}
       {/*  name="customerMessageToken"*/}
       {/*  label="企微客户联系人消息Token"*/}
       {/*  tooltip="请到微信商户号后台配置获取"*/}
-      {/*  rules={[{ required: true }]}*/}
+      {/*  rules={[{ required: Props.required }]}*/}
       {/*/>*/}
 
       {/*<ProFormText.Password*/}
@@ -125,7 +125,7 @@ export default () => {
       {/*  name="employeeMessageAESKey"*/}
       {/*  label="企微内部联系人AES密钥"*/}
       {/*  tooltip="请到微信商户号后台配置获取"*/}
-      {/*  rules={[{ required: true }]}*/}
+      {/*  rules={[{ required: Props.required }]}*/}
       {/*/>*/}
       {/*<ProFormText*/}
       {/*  width={'lg'}*/}
@@ -134,14 +134,14 @@ export default () => {
       {/*  tooltip="请保证host替换成你想要的域名，后面URI为 wechat/api/weCom/employee"*/}
       {/*  placeholder="https://{host}/wechat/api/weCom/employee"*/}
       {/*  initialValue={'https://{host}/wechat/api/weCom/employee'}*/}
-      {/*  rules={[{ required: true }]}*/}
+      {/*  rules={[{ required: Props.required }]}*/}
       {/*/>*/}
       {/*<ProFormText.Password*/}
       {/*  width={'lg'}*/}
       {/*  name="employeeMessageToken"*/}
       {/*  label="企微内部联系人消息Token"*/}
       {/*  tooltip="请到微信商户号后台配置获取"*/}
-      {/*  rules={[{ required: true }]}*/}
+      {/*  rules={[{ required: Props.required }]}*/}
       {/*/>*/}
 
       {/*	<ProFormText*/}

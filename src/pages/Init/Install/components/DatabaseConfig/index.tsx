@@ -1,7 +1,7 @@
 import { ProForm, ProFormText } from '@ant-design/pro-components';
 import { Col, Row } from 'antd';
 
-export default () => {
+export default (Props: { required: boolean }) => {
   const rowGutter = 32;
   return (
     <ProForm.Group>
@@ -13,7 +13,7 @@ export default () => {
             tooltip="比如 - 127.0.0.1"
             placeholder="如：127.0.0.1"
             initialValue={'127.0.0.1'}
-            rules={[{ required: true }]}
+            rules={[{ required: Props.required }]}
           />
         </Col>
         <Col>
@@ -23,7 +23,7 @@ export default () => {
             tooltip="5432"
             placeholder="如：5432"
             initialValue={'5432'}
-            rules={[{ required: true }]}
+            rules={[{ required: Props.required }]}
           />
         </Col>
         <Col>
@@ -33,7 +33,7 @@ export default () => {
             tooltip="输入自己的库名"
             placeholder="如：powerx"
             initialValue={'powerx'}
-            rules={[{ required: true }]}
+            rules={[{ required: Props.required }]}
           />
         </Col>
       </Row>
@@ -46,7 +46,7 @@ export default () => {
             tooltip="powerxdev"
             placeholder="如：powerxdev"
             initialValue={'powerxdev'}
-            rules={[{ required: true }]}
+            rules={[{ required: Props.required }]}
           />
         </Col>
         <Col>
@@ -56,7 +56,7 @@ export default () => {
             tooltip="powerxdev"
             placeholder="如：powerxdev"
             initialValue={'powerxdev'}
-            rules={[{ required: true }]}
+            rules={[{ required: Props.required }]}
           />
         </Col>
       </Row>
@@ -77,7 +77,7 @@ export default () => {
             tooltip="如果你的数据库存在schema，请设置"
             placeholder="默认是public"
             initialValue={'public'}
-            rules={[{ required: true }]}
+            rules={[{ required: Props.required }]}
           />
         </Col>
       </Row>

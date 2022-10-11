@@ -1,6 +1,6 @@
 import { ProForm, ProFormText } from '@ant-design/pro-components';
 
-export default () => {
+export default (Props: { required: boolean }) => {
   return (
     <ProForm.Group>
       <ProFormText
@@ -9,7 +9,7 @@ export default () => {
         tooltip="比如 - 127.0.0.1:6379"
         placeholder="如：127.0.0.1:6379"
         initialValue={'127.0.0.1:6379'}
-        rules={[{ required: true }]}
+        rules={[{ required: Props.required }]}
       />
 
       <ProFormText
@@ -18,7 +18,7 @@ export default () => {
         tooltip="输入库名"
         placeholder="如：1"
         initialValue={'1'}
-        rules={[{ required: true }]}
+        rules={[{ required: Props.required }]}
       />
       <ProFormText.Password
         name="password"

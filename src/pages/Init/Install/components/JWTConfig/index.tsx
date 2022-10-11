@@ -1,6 +1,6 @@
 import { ProForm, ProFormTextArea } from '@ant-design/pro-components';
 
-export default () => {
+export default (Props: { required: boolean }) => {
   return (
     <ProForm.Group>
       <ProFormTextArea
@@ -14,7 +14,7 @@ export default () => {
 				xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 				xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
         -----END PUBLIC KEY-----"
-        rules={[{ required: true }]}
+        rules={[{ required: Props.required }]}
       />
       <ProFormTextArea
         width={'lg'}
@@ -27,7 +27,7 @@ export default () => {
 				xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 				xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
         -----END RSA PRIVATE KEY-----"
-        rules={[{ required: true }]}
+        rules={[{ required: Props.required }]}
       />
     </ProForm.Group>
   );

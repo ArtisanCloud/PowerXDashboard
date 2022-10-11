@@ -20,6 +20,7 @@ import WechatConfig from '@/pages/Init/Install/components/WechatConfig';
 const InstallPage: React.FC = () => {
   const { sysInstalled } = UseApp();
   const formRef = useRef<FormInstance>();
+  const fieldRequired = false;
 
   // 如果系统已经被安装，则直接跳转到系统首页
   useEffect(() => {
@@ -77,31 +78,31 @@ const InstallPage: React.FC = () => {
         >
           <Divider orientation={'center'}>App 配置信息</Divider>
 
-          <AppConfig />
+          <AppConfig required={fieldRequired} />
 
           <Divider orientation={'center'}>服务器启动信息</Divider>
 
-          <ServerConfig />
+          <ServerConfig required={fieldRequired} />
 
           <Divider orientation={'center'}>JWT 配置信息</Divider>
 
-          <JWTConfig />
+          <JWTConfig required={fieldRequired} />
 
           <Divider orientation={'center'}>日志配置</Divider>
 
-          <LogConfig />
+          <LogConfig required={fieldRequired} />
 
           <Divider orientation={'center'}>Postgres 数据库配置</Divider>
 
-          <DatabaseConfig />
+          <DatabaseConfig required={fieldRequired} />
 
           <Divider orientation={'center'}>Redis 缓存配置</Divider>
 
-          <CacheConfig />
+          <CacheConfig required={fieldRequired} />
 
           <Divider orientation={'center'}>微信配置</Divider>
 
-          <WechatConfig />
+          <WechatConfig required={fieldRequired} />
 
           <Divider orientation={'center'}></Divider>
         </ProForm>
