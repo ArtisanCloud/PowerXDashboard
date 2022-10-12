@@ -9,7 +9,7 @@ declare namespace API {
     state?: string;
   }
 
-  export interface RSAuthUser extends APIResponse {
+  export interface ResponseAuthUser extends APIResponse {
     data: Employee | null;
   }
 

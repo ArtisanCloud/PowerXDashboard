@@ -1,5 +1,7 @@
 import { request } from '@umijs/max';
 
 export async function CheckSystemInstalled() {
-  return request<API.RSSystemInstalledStatus>('root/api/system/install/check');
+  return request<API.ResponseSystemInstalledStatus>(
+    'root/api/system/install/check',
+  );
 }

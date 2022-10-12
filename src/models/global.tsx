@@ -27,7 +27,8 @@ export const UseApp = () => {
       }
 
       // 检查远程是否安装成功
-      const rs: API.RSSystemInstalledStatus = await CheckSystemInstalled();
+      const rs: API.ResponseSystemInstalledStatus =
+        await CheckSystemInstalled();
       if (rs.meta.return_code === API_RETURN_CODE_INIT) {
         let sysInstalled = false;
         // check system status

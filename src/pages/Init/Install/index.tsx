@@ -4,7 +4,7 @@ import {
   ProForm,
 } from '@ant-design/pro-components';
 import { Divider, Space } from 'antd';
-import { useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { UseApp } from '@/models/global';
 import { history } from 'umi';
@@ -21,6 +21,14 @@ const InstallPage: React.FC = () => {
   const { sysInstalled } = UseApp();
   const formRef = useRef<FormInstance>();
   const fieldRequired = false;
+  const [formData, setFormData] = useState<API.RequestInstallSystem>({
+    appConfig: {
+      name: 'PowerX后台系统123',
+      env: '',
+      locale: '',
+      timezone: '',
+    },
+  });
 
   // 如果系统已经被安装，则直接跳转到系统首页
   useEffect(() => {
@@ -29,6 +37,12 @@ const InstallPage: React.FC = () => {
       history.push(URIConstant.URI_HOME);
     }
   }, [sysInstalled]);
+
+  const convertFormData = useCallback((values: any) => {
+    console.log(values);
+    formData.appConfig.name = 'test';
+    setFormData(formData);
+  }, []);
 
   return (
     <PageContainer
@@ -50,13 +64,18 @@ const InstallPage: React.FC = () => {
               // render: false,
             }
           }
-          initialValues={{}}
+          initialValues={{ formData }}
           formRef={formRef}
           layout={'horizontal'}
           // labelCol={{ span: 150 }}
           labelAlign={'left'}
+          // onValuesChange={(changedValue, values) => {
+          // 	console.log(changedValue,values);
+          // }}
           onFinish={async (values) => {
             console.log(values);
+            convertFormData(values);
+            console.log(formData);
             // const params = { ...values };
             // const hide = message.loading('处理中');
             // const res: CommonResp = await Create(params);
@@ -78,7 +97,7 @@ const InstallPage: React.FC = () => {
         >
           <Divider orientation={'center'}>App 配置信息</Divider>
 
-          <AppConfig required={fieldRequired} />
+          <AppConfig required={fieldRequired} config={formData.appConfig} />
 
           <Divider orientation={'center'}>服务器启动信息</Divider>
 

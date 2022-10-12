@@ -5,7 +5,7 @@ import * as APIConstant from '@/constants/api';
 import * as WXConstant from '@/constants/web';
 
 const AuthorizedUser: React.FC = () => {
-  const [rs, setRS] = useState<API.RSToken>();
+  const [rs, setResponse] = useState<API.ResponseToken>();
   let location = useLocation();
 
   // 获取回调url的get参数
@@ -23,7 +23,7 @@ const AuthorizedUser: React.FC = () => {
       // 若用户禁止授权，则重定向后不会带上code参数，仅会带上state参数
       // https://developer.work.weixin.qq.com/document/path/91019
       if (queries?.code === '') {
-        setRS({
+        setResponse({
           meta: {
             return_code: APIConstant.API_RETURN_CODE_ERROR,
             result_code: WXConstant.WX_AUTH_CODE_EMPTY,
@@ -37,16 +37,16 @@ const AuthorizedUser: React.FC = () => {
       // 调用后台api，code换token
       try {
         const rs = await LoginByCode(queries!);
-        setRS(rs);
+        setResponse(rs);
       } catch (e: any) {
         console.log(e);
 
         // 后台系统错误信息
         if (e.response.status === APIConstant.API_RETURN_CODE_ERROR) {
-          setRS(e.response.data);
+          setResponse(e.response.data);
         } else {
           // 前台系统错误
-          setRS({
+          setResponse({
             meta: {
               return_code: APIConstant.API_RETURN_CODE_ERROR,
               result_code: WXConstant.SYS_ERR,

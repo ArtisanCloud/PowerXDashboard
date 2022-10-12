@@ -19,7 +19,7 @@ export default () => {
       const jsonAuthUser = localStorage.getItem('auth');
 
       // 解析token
-      let authToken: API.RSToken;
+      let authToken: API.ResponseToken;
       let authUser: API.Employee;
       // console.log( jsonAuthUser)
       if (jsonAuthUser !== null) {

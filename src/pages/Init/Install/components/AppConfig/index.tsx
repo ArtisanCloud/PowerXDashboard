@@ -1,9 +1,8 @@
 import { ProForm, ProFormText } from '@ant-design/pro-components';
 import { Col, Row } from 'antd';
 
-const AppConfig = (Props: { required: boolean }) => {
+const AppConfig = (Props: { required: boolean; config: API.AppConfig }) => {
   const rowGutter = 32;
-
   return (
     <ProForm.Group>
       <Row gutter={rowGutter}>
@@ -13,7 +12,7 @@ const AppConfig = (Props: { required: boolean }) => {
             label={'系统名称'}
             tooltip={'比如 - PowerX后台系统'}
             placeholder={'如：PowerX后台系统'}
-            initialValue={'PowerX后台系统'}
+            initialValue={Props.config.name}
             rules={[{ required: Props.required }]}
           />
         </Col>
