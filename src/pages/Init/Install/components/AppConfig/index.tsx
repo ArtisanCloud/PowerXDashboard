@@ -22,7 +22,7 @@ const AppConfig = (Props: { required: boolean; config: API.AppConfig }) => {
             label={'部署环境'}
             tooltip={'dev | test | production'}
             placeholder={'如：dev'}
-            initialValue={'dev'}
+            initialValue={Props.config.env}
             rules={[{ required: true }]}
           />
         </Col>
@@ -34,7 +34,7 @@ const AppConfig = (Props: { required: boolean; config: API.AppConfig }) => {
             name={'locale'}
             label={'本地化'}
             tooltip={'比如 - zh_CN | en_US'}
-            initialValue={'zh_CN'}
+            initialValue={Props.config.locale}
             placeholder={'当前系统默认zh_CN'}
           />
         </Col>
@@ -43,7 +43,7 @@ const AppConfig = (Props: { required: boolean; config: API.AppConfig }) => {
             name={'timezone'}
             label={'时差'}
             tooltip={"比如 - 'Asia/Shanghai' | 'America/New_York'"}
-            initialValue={'Asia/Shanghai'}
+            initialValue={Props.config.timezone}
             placeholder={"当前系统默认 'Asia/Shanghai'"}
           />
         </Col>

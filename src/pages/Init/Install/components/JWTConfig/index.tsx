@@ -1,6 +1,6 @@
 import { ProForm, ProFormTextArea } from '@ant-design/pro-components';
 
-export default (Props: { required: boolean }) => {
+export default (Props: { required: boolean; config: API.JWTConfig }) => {
   return (
     <ProForm.Group>
       <ProFormTextArea
