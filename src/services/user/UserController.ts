@@ -4,7 +4,7 @@ export async function LoginByCode(
   params: API.QueryOAuthCallback,
   options?: { [key: string]: any },
 ) {
-  return request<API.RSToken>(
+  return request<API.ResponseToken>(
     '/wechat/api/weCom/callback/authorized/qr/employee',
     {
       method: 'GET',
@@ -17,5 +17,5 @@ export async function LoginByCode(
 }
 
 export async function MeDetail() {
-  return request<API.RSAuthUser>('/admin/api/me/detail');
+  return request<API.ResponseAuthUser>('/admin/api/me/detail');
 }

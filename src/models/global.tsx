@@ -2,6 +2,9 @@
 import { DEFAULT_NAME } from '@/constants';
 import { useEffect, useState } from 'react';
 import { useModel } from 'umi';
+import { message } from 'antd';
+import { CheckSystemInstalled } from '@/services/boot/BootController';
+import { API_RETURN_CODE_INIT } from '@/constants/api';
 
 export const UseApp = () => {
   const [sysInstalled, setSystemInstall] = useState<boolean>(false);
@@ -11,18 +14,60 @@ export const UseApp = () => {
   useEffect(() => {
     const HandleCheckSysInstalled = async () => {
       // console.log(queries!)
+      // 读取localstorage的installStatus
+      const jsonSysInstalled = localStorage.getItem('sysInstalled');
+      if (jsonSysInstalled !== null) {
+        const isSysInstalled: boolean = JSON.parse(jsonSysInstalled!);
+        // console.log(authToken)
+        // 如果系统已经安装过，则直接进入系统
+        if (isSysInstalled) {
+          setSystemInstall(sysInstalled);
+          return;
+        }
+      }
+
+      // 检查远程是否安装成功
+      const rs: API.ResponseSystemInstalledStatus =
+        await CheckSystemInstalled();
+      if (rs.meta.return_code === API_RETURN_CODE_INIT) {
+        let sysInstalled = false;
+        // check system status
+        rs.data.forEach(function (value) {
+          if (value.name === 'system' && value.status === 'installed') {
+            sysInstalled = true;
+          }
+        });
+        // console.log(sysInstalled)
+        // set status
+        setSystemInstall(sysInstalled);
+      } else {
+        message.error(rs.meta.result_message);
+        return;
+      }
     };
 
-    HandleCheckSysInstalled();
-
-    // 调用后台code换取用户登陆信息
+    // 检查后台系统是否被安装
     HandleCheckSysInstalled().catch((e) => {
       console.error('HandleCheckSysInstalled', e);
     });
 
     // 返回值
     return () => {};
-  }, []);
+  }, [sysInstalled]);
+
+  useEffect(() => {
+    const HandleCheckRootInitialized = async () => {
+      // console.log(queries!)
+    };
+
+    // 检查root是否被初始化
+    HandleCheckRootInitialized().catch((e) => {
+      console.error('HandleCheckRootInitialized', e);
+    });
+
+    // 返回值
+    return () => {};
+  }, [rootInitialized]);
 
   return {
     name,

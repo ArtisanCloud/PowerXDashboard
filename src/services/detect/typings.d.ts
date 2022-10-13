@@ -1,5 +1,5 @@
 declare namespace API {
-  export interface RSPing extends APIResponse {
+  export interface ResponsePing extends APIResponse {
     data: string;
   }
 }

@@ -15,7 +15,7 @@ declare namespace API {
 
   // ---------------------------------------------------------------------------
 
-  export interface RSToken extends APIResponse {
+  export interface ResponseToken extends APIResponse {
     data: Token | null;
   }
 

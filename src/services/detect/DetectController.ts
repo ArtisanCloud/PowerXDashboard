@@ -1,5 +1,5 @@
 import { request } from '@umijs/max';
 
 export async function Ping() {
-  return request<API.RSPing>('root/api/ping');
+  return request<API.ResponsePing>('root/api/ping');
 }
