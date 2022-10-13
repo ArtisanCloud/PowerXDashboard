@@ -1,5 +1,9 @@
-import { FormInstance, PageContainer } from '@ant-design/pro-components';
-import { Button } from 'antd';
+import {
+  FormInstance,
+  PageContainer,
+  ProForm,
+} from '@ant-design/pro-components';
+import { Divider, Space } from 'antd';
 import { useEffect, useRef, useState } from 'react';
 
 import { UseApp } from '@/models/global';
@@ -12,8 +16,6 @@ import LogConfig from '@/pages/Init/Install/components/LogConfig';
 import DatabaseConfig from '@/pages/Init/Install/components/DatabaseConfig';
 import CacheConfig from '@/pages/Init/Install/components/CacheConfig';
 import WeComConfig from '@/pages/Init/Install/components/WeComConfig';
-import { StepsForm } from '@ant-design/pro-form/es/layouts/StepsForm';
-import { waitTime } from '@/utils/format';
 
 const InstallPage: React.FC = () => {
   const { sysInstalled } = UseApp();
@@ -136,179 +138,103 @@ const InstallPage: React.FC = () => {
         title: '安装PowerX系统',
       }}
     >
-      <StepsForm<{
-        name: string;
-      }>
-        stepsProps={{
-          type: 'default',
-          direction: 'vertical',
-          responsive: false,
-          size: 'small',
+      <Space
+        style={{
+          width: '100%',
+          display: 'flex',
         }}
-        formRef={formRef}
-        onFinish={async (values) => {
-          convertFormData(values);
-          // console.log(formData)
-          // const params = { ...values };
-          // const hide = message.loading('处理中');
-          // const res: CommonResp = await Create(params);
-          // hide();
-          // if (res.code === 0) {
-          // 	history.push('/staff-admin/customer-growth/contact-way');
-          // 	message.success('添加成功');
-          // 	return true;
-          // }
-          //
-          // if (res.message) {
-          // 	message.error(res.message);
-          // 	return false;
-          // }
-          //
-          // message.error('添加失败');
-          return false;
-        }}
-        formProps={{
-          validateMessages: {
-            required: '此项为必填项',
-          },
-        }}
-        submitter={{
-          render: (props) => {
-            if (props.step === 0) {
-              return (
-                <Button type="primary" onClick={() => props.onSubmit?.()}>
-                  下一步 {'>'}
-                </Button>
-              );
-            }
-
-            if (props.step >= 1 && props.step <= 5) {
-              return [
-                <Button key="pre" onClick={() => props.onPre?.()}>
-                  返回上一步
-                </Button>,
-                <Button
-                  type="primary"
-                  key="goToTree"
-                  onClick={() => props.onSubmit?.()}
-                >
-                  下一步 {'>'}
-                </Button>,
-              ];
-            }
-
-            return [
-              <Button key="gotoTwo" onClick={() => props.onPre?.()}>
-                {'<'} 返回第二步
-              </Button>,
-              <Button
-                type="primary"
-                key="goToTree"
-                onClick={() => props.onSubmit?.()}
-              >
-                提交 √
-              </Button>,
-            ];
-          },
-        }}
+        align="baseline"
+        direction="vertical"
       >
-        {/*---- APP Config ----*/}
-        <StepsForm.StepForm<{
-          appConfig: string;
-        }>
-          name="appConfig"
-          title="App 配置信息"
-          onFinish={async ({ appConfig }) => {
-            console.log(appConfig);
-            await waitTime(1000);
-            return true;
+        <ProForm
+          submitter={
+            {
+              // render: false,
+            }
+          }
+          initialValues={{ formData }}
+          formRef={formRef}
+          layout={'horizontal'}
+          // labelCol={{ span: 150 }}
+          labelAlign={'left'}
+          // onValuesChange={(changedValue, values) => {
+          // 	console.log(changedValue,values);
+          // }}
+          onFinish={async (values) => {
+            convertFormData(values);
+            // console.log(formData)
+            // const params = { ...values };
+            // const hide = message.loading('处理中');
+            // const res: CommonResp = await Create(params);
+            // hide();
+            // if (res.code === 0) {
+            // 	history.push('/staff-admin/customer-growth/contact-way');
+            // 	message.success('添加成功');
+            // 	return true;
+            // }
+            //
+            // if (res.message) {
+            // 	message.error(res.message);
+            // 	return false;
+            // }
+            //
+            // message.error('添加失败');
+            return false;
           }}
         >
-          <AppConfig required={fieldRequired} config={formData.appConfig} />
-        </StepsForm.StepForm>
+          <Divider orientation={'center'}>App 配置信息</Divider>
 
-        {/*---- Server Config ----*/}
-        <StepsForm.StepForm<{
-          serverConfig: string;
-        }>
-          name="serverConfig"
-          title="服务器启动信息"
-        >
+          <AppConfig required={fieldRequired} config={formData.appConfig} />
+
+          <Divider orientation={'center'}>服务器启动信息</Divider>
+
           <ServerConfig
             required={fieldRequired}
             config={formData.appConfig.server!}
           />
-        </StepsForm.StepForm>
 
-        {/*---- JWT Config ----*/}
-        <StepsForm.StepForm<{
-          jwtConfig: string;
-        }>
-          name="jwtConfig"
-          title="JWT 配置信息"
-        >
+          <Divider orientation={'center'}>JWT 配置信息</Divider>
+
           <JWTConfig
             required={fieldRequired}
             config={formData.appConfig.jwt!}
           />
-        </StepsForm.StepForm>
 
-        {/*---- Log Config ----*/}
-        <StepsForm.StepForm<{
-          logConfig: string;
-        }>
-          name="logConfig"
-          title="日志配置"
-        >
+          <Divider orientation={'center'}>日志配置</Divider>
+
           <LogConfig
             required={fieldRequired}
             config={formData.appConfig.log!}
           />
-        </StepsForm.StepForm>
 
-        {/*---- Database Config ----*/}
-        <StepsForm.StepForm<{
-          databaseConfig: string;
-        }>
-          name="databaseConfig"
-          title="Postgres 数据库配置"
-        >
+          <Divider orientation={'center'}>Postgres 数据库配置</Divider>
+
           <DatabaseConfig
             required={fieldRequired}
             config={formData.appConfig.database!}
           />
-        </StepsForm.StepForm>
 
-        {/*---- Cache Config ----*/}
-        <StepsForm.StepForm<{
-          cacheConfig: string;
-        }>
-          name="cacheConfig"
-          title="Redis 缓存配置"
-        >
+          <Divider orientation={'center'}>Redis 缓存配置</Divider>
+
           <CacheConfig
             required={fieldRequired}
             config={formData.appConfig.cache!}
           />
-        </StepsForm.StepForm>
 
-        {/*<Divider orientation={'center'}>微信配置</Divider>*/}
+          {/*<Divider orientation={'center'}>微信配置</Divider>*/}
 
-        {/*<WechatConfig required={fieldRequired} config={formData.appConfig.wx!}/>*/}
+          {/*<WechatConfig required={fieldRequired} config={formData.appConfig.wx!}/>*/}
 
-        {/*---- WeCom Config ----*/}
-        <StepsForm.StepForm<{
-          weComConfig: string;
-        }>
-          name="weComConfig"
-          title="企业微信配置"
-        >
+          <Divider orientation={'center'}>企业微信配置</Divider>
+
           <WeComConfig
             required={fieldRequired}
             config={formData.appConfig.wecom!}
           />
-        </StepsForm.StepForm>
-      </StepsForm>
+
+          <Divider orientation={'center'}></Divider>
+        </ProForm>
+      </Space>
     </PageContainer>
   );
 };
