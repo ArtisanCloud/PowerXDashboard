@@ -1,5 +1,6 @@
 import {
   ProForm,
+  ProFormDigit,
   ProFormText,
   ProFormTextArea,
 } from '@ant-design/pro-components';
@@ -33,7 +34,7 @@ export default (Props: { required: boolean; config: API.WeComConfig }) => {
 
       <Row gutter={rowGutter}>
         <Col>
-          <ProFormText
+          <ProFormDigit
             name="weComAgentID"
             label="企微应用账号"
             tooltip="请到微信商户号后台配置获取"

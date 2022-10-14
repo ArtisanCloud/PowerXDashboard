@@ -1,5 +1,5 @@
 import { FormInstance, PageContainer } from '@ant-design/pro-components';
-import { Button } from 'antd';
+import { Alert, Button, message } from 'antd';
 import { useEffect, useRef, useState } from 'react';
 
 import { UseApp } from '@/models/global';
@@ -14,6 +14,9 @@ import CacheConfig from '@/pages/Init/Install/components/CacheConfig';
 import WeComConfig from '@/pages/Init/Install/components/WeComConfig';
 import { StepsForm } from '@ant-design/pro-form/es/layouts/StepsForm';
 import { waitTime } from '@/utils/format';
+import { InstallSystem } from '@/services/boot/BootController';
+import { API_RETURN_CODE_INIT } from '@/constants/api';
+import { URI_ROOT_INIT } from '@/constants/uri';
 
 const InstallPage: React.FC = () => {
   const { sysInstalled } = UseApp();
@@ -77,7 +80,7 @@ const InstallPage: React.FC = () => {
 
   // 转化单层form数据为formData
   const convertFormData = (values: any) => {
-    console.log('convert install system form data to object', values);
+    // console.log('convert install system form data to object', values);
     // app config
     formData.appConfig.name = values.name;
     formData.appConfig.env = values.env;
@@ -93,7 +96,7 @@ const InstallPage: React.FC = () => {
     formData.appConfig.jwt!.private_key = values.privateKey;
 
     // log config
-    formData.appConfig.log!.log_path = values.log_path;
+    formData.appConfig.log!.log_path = values.logPath;
 
     // database config
     formData.appConfig.database!.connections!.pgsql.host = values.dbHost;
@@ -126,8 +129,7 @@ const InstallPage: React.FC = () => {
     formData.appConfig.wecom!.app_message_token = values.appMessageToken;
 
     setFormData(formData);
-
-    console.log(formData);
+    // console.log(formData);
   };
 
   return (
@@ -149,22 +151,26 @@ const InstallPage: React.FC = () => {
         onFinish={async (values) => {
           convertFormData(values);
           // console.log(formData)
-          // const params = { ...values };
-          // const hide = message.loading('处理中');
-          // const res: CommonResp = await Create(params);
-          // hide();
-          // if (res.code === 0) {
-          // 	history.push('/staff-admin/customer-growth/contact-way');
-          // 	message.success('添加成功');
-          // 	return true;
-          // }
-          //
-          // if (res.message) {
-          // 	message.error(res.message);
-          // 	return false;
-          // }
-          //
-          // message.error('添加失败');
+          // console.log(JSON.stringify(formData))
+          const hide = message.loading('处理中');
+          const res: API.ResponseSystemInstalledStatus = await InstallSystem(
+            formData,
+          );
+          hide();
+          if (res.meta.return_code === API_RETURN_CODE_INIT) {
+            let installResult: boolean = true;
+            for (const result of res.data) {
+              if (result.status !== 'success') {
+                <Alert message={result.errMsg} type="error" />;
+                installResult = false;
+              }
+            }
+            if (installResult) {
+              history.push(URI_ROOT_INIT);
+              message.success('安装成功');
+              return true;
+            }
+          }
           return false;
         }}
         formProps={{

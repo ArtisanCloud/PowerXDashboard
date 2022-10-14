@@ -2,6 +2,7 @@ declare namespace API {
   export interface ResponseSystemInstalledStatus extends APIResponse {
     data: SystemInstalledStatus[];
   }
+
   export interface SystemInstalledStatus {
     name: string;
     status: string;
