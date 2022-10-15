@@ -7,21 +7,19 @@ import { CheckSystemInstalled } from '@/services/boot/BootController';
 import { API_RETURN_CODE_INIT } from '@/constants/api';
 
 export const UseApp = () => {
-  const [sysInstalled, setSystemInstall] = useState<boolean>(false);
+  const [sysInstalled, setSystemInstalled] = useState<boolean>(false);
   const [rootInitialized, setRootInitialized] = useState<boolean>(false);
   const [name, setName] = useState<string>(DEFAULT_NAME);
 
   useEffect(() => {
     const HandleCheckSysInstalled = async () => {
-      // console.log(queries!)
       // 读取localstorage的installStatus
       const jsonSysInstalled = localStorage.getItem('sysInstalled');
       if (jsonSysInstalled !== null) {
         const isSysInstalled: boolean = JSON.parse(jsonSysInstalled!);
-        // console.log(authToken)
         // 如果系统已经安装过，则直接进入系统
         if (isSysInstalled) {
-          setSystemInstall(sysInstalled);
+          setSystemInstalled(true);
           return;
         }
       }
@@ -38,8 +36,9 @@ export const UseApp = () => {
           }
         });
         // console.log(sysInstalled)
+        localStorage.setItem('sysInstalled', 'true');
         // set status
-        setSystemInstall(sysInstalled);
+        setSystemInstalled(sysInstalled);
       } else {
         message.error(rs.meta.result_message);
         return;
@@ -73,7 +72,7 @@ export const UseApp = () => {
     name,
     setName,
     sysInstalled,
-    setSystemInstall,
+    setSystemInstalled,
     rootInitialized,
     setRootInitialized,
   };

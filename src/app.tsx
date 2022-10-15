@@ -95,7 +95,7 @@ export const request: RequestConfig = {
     errorHandler: (error: any, opts: any) => {
       if (opts?.skipErrorHandler) throw error;
       if (error.response) {
-        console.log('response err', error);
+        // console.log('response err', error);
         const rs: API.APIResponse = error.response.data;
 
         // 后台服务器未启动
@@ -104,7 +104,8 @@ export const request: RequestConfig = {
         }
         // 显示后台的接口错误
         if (rs && rs.meta) {
-          console.error(rs.meta.result_message);
+          message.error(rs.meta.result_message);
+          console.error(rs);
         }
       } else if (error.request) {
         // 请求已经成功发起，但没有收到响应
@@ -127,7 +128,7 @@ export const request: RequestConfig = {
         config.headers = {
           Authorization: `Bearer ${authToken.data?.access_token}`,
           Accept: 'application/json',
-          'Content-Type': 'application/x-www-form-urlencoded',
+          'Content-Type': 'application/json; charset=utf-8',
         };
       }
       return { ...config };

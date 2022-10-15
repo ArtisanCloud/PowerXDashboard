@@ -5,3 +5,10 @@ export async function CheckSystemInstalled() {
     'root/api/system/install/check',
   );
 }
+
+export async function InstallSystem(data: API.RequestInstallSystem) {
+  return request<API.ResponseSystemInstalledStatus>('root/api/system/install', {
+    method: 'POST',
+    data: data,
+  });
+}
