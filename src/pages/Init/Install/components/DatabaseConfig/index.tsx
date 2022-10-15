@@ -80,6 +80,15 @@ export default (Props: { required: boolean; config: API.DatabaseConfig }) => {
             rules={[{ required: Props.required }]}
           />
         </Col>
+        <Col>
+          <ProFormText
+            name="dbSSLMode"
+            label="SSL模式"
+            tooltip="默认使用prefer"
+            placeholder="如：prefer"
+            initialValue={Props.config.connections!.pgsql.ssl_mode}
+          />
+        </Col>
       </Row>
     </ProForm.Group>
   );

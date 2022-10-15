@@ -1,5 +1,5 @@
 import { FormInstance, PageContainer } from '@ant-design/pro-components';
-import { Alert, Button, message } from 'antd';
+import { Button, message, notification } from 'antd';
 import { useEffect, useRef, useState } from 'react';
 
 import { UseApp } from '@/models/global';
@@ -17,15 +17,16 @@ import { waitTime } from '@/utils/format';
 import { InstallSystem } from '@/services/boot/BootController';
 import { API_RETURN_CODE_INIT } from '@/constants/api';
 import { URI_ROOT_INIT } from '@/constants/uri';
+import ProCard from '@ant-design/pro-card';
 
 const InstallPage: React.FC = () => {
-  const { sysInstalled } = UseApp();
+  const { sysInstalled, setSystemInstalled } = UseApp();
   const formRef = useRef<FormInstance>();
   const fieldRequired = true;
   const [formData, setFormData] = useState<API.RequestInstallSystem>({
     appConfig: {
       name: 'PowerX后台系统',
-      env: 'dev',
+      env: 'local',
       locale: 'zh_CN',
       timezone: 'Asia/Shanghai',
       server: {
@@ -51,6 +52,7 @@ const InstallPage: React.FC = () => {
             schemas: {
               default: 'public',
             },
+            ssl_mode: 'prefer',
           },
         },
       },
@@ -109,6 +111,7 @@ const InstallPage: React.FC = () => {
     formData.appConfig.database!.connections!.pgsql.prefix = values.dbPrefix;
     formData.appConfig.database!.connections!.pgsql.schemas!.default =
       values.dbSchemaDefault;
+    formData.appConfig.database!.connections!.pgsql.ssl_mode = values.dbSSLMode;
 
     // cache config
     formData.appConfig.cache!.connections!.redis.host = values.cacheHost;
@@ -151,7 +154,7 @@ const InstallPage: React.FC = () => {
         onFinish={async (values) => {
           convertFormData(values);
           // console.log(formData)
-          // console.log(JSON.stringify(formData))
+          console.log(JSON.stringify(formData));
           const hide = message.loading('处理中');
           const res: API.ResponseSystemInstalledStatus = await InstallSystem(
             formData,
@@ -161,12 +164,25 @@ const InstallPage: React.FC = () => {
             let installResult: boolean = true;
             for (const result of res.data) {
               if (result.status !== 'success') {
-                <Alert message={result.errMsg} type="error" />;
+                notification['error']({
+                  message: result.name,
+                  description: result.errMsg,
+                  duration: null,
+                });
                 installResult = false;
               }
             }
             if (installResult) {
+              // 设置系统状态在本地
+              setSystemInstalled(true);
+
+              // 跳转初始化root页面
               history.push(URI_ROOT_INIT);
+              notification['success']({
+                message: '安装系统成功',
+                description: '请继续配置Root账号，使用企业微信扫码配置',
+                duration: null,
+              });
               message.success('安装成功');
               return true;
             }
@@ -315,6 +331,10 @@ const InstallPage: React.FC = () => {
           />
         </StepsForm.StepForm>
       </StepsForm>
+
+      <ProCard direction="column" ghost gutter={[0, 16]}>
+        <ProCard style={{ height: 200 }} />
+      </ProCard>
     </PageContainer>
   );
 };
