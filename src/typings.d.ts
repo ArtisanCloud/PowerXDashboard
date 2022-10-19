@@ -1,3 +1,2 @@
 declare const BASE_URL: string;
-declare const APP_OAUTH_URL: string;
-declare const APP_ID: string;
+declare const APP_WX_OAUTH_URL: string;

@@ -3,6 +3,10 @@ declare namespace API {
     data: SystemInstalledStatus[];
   }
 
+  export interface ResponseRootInitStatus extends APIResponse {
+    data: Employee;
+  }
+
   export interface SystemInstalledStatus {
     name: string;
     status: string;

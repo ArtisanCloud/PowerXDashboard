@@ -6,6 +6,10 @@ export async function CheckSystemInstalled() {
   );
 }
 
+export async function CheckRootInitialized() {
+  return request<API.ResponseRootInitStatus>('root/api/system/root/init/check');
+}
+
 export async function InstallSystem(data: API.RequestInstallSystem) {
   return request<API.ResponseSystemInstalledStatus>('root/api/system/install', {
     method: 'POST',

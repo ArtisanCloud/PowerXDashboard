@@ -16,6 +16,7 @@ import { UseAuthUser, UseApp } from '@/models/global';
 import * as URIConstant from '@/constants/uri';
 // import APIResponse = API.APIResponse;
 import { API_RETURN_CODE_INIT } from '@/constants/api';
+// import {BASE_URL} from "@/typings";
 
 // 全局初始化数据配置，用于 Layout 用户信息和权限初始化
 // 更多信息见文档：https://next.umijs.org/docs/api/runtime-config#getinitialstate
@@ -23,6 +24,7 @@ export async function getInitialState(): Promise<{
   name: string;
   avatar?: string;
 }> {
+  // console.log("getInitialState")
   return {
     name: '@ArtisanCloud/PowerX',
     avatar: iconAvatar,
