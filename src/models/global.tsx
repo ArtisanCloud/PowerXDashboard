@@ -7,11 +7,14 @@ import {
   CheckRootInitialized,
   CheckSystemInstalled,
 } from '@/services/boot/BootController';
+import { CheckSystemWXAPIConfig } from '@/services/system/SystemController';
 import { API_RETURN_CODE_INIT } from '@/constants/api';
+// import * as global from "@/typings";
 
 export const UseApp = () => {
   const [sysInstalled, setSystemInstalled] = useState<boolean>(false);
   const [rootInitialized, setRootInitialized] = useState<boolean>(false);
+  const [wxAPIConfig, setWXAPIConfig] = useState<API.WXAPIConfig>();
   const [name, setName] = useState<string>(DEFAULT_NAME);
 
   useEffect(() => {
@@ -96,18 +99,43 @@ export const UseApp = () => {
   }, [rootInitialized]);
 
   useEffect(() => {
-    const HandleCheckRootInitialized = async () => {
-      // console.log(queries!)
+    const HandleCheckSystemWXConfig = async () => {
+      // 读取localstorage的wxAPIConfig
+      const jsonWXAPIConfig = localStorage.getItem('wxAPIConfig');
+      if (jsonWXAPIConfig !== null) {
+        const config: API.WXAPIConfig = JSON.parse(jsonWXAPIConfig!);
+        // 如果系统已经初始化过Root，则直接进入系统
+        if (config) {
+          setWXAPIConfig(config);
+          return;
+        }
+      }
+
+      // 检查远程的微信API配置信息
+      const rs: API.ResponseSystemWXAPIConfig = await CheckSystemWXAPIConfig();
+      if (rs.meta.return_code === API_RETURN_CODE_INIT) {
+        // check system status
+        if (rs.data !== null) {
+          // console.log(sysInstalled)
+          const jsonConfig = JSON.stringify(rs.data);
+          localStorage.setItem('wxAPIConfig', jsonConfig);
+          // set status
+          setWXAPIConfig(rs.data);
+        }
+      } else {
+        message.error(rs.meta.result_message);
+        return;
+      }
     };
 
     // 检查root是否被初始化
-    HandleCheckRootInitialized().catch((e) => {
-      console.error('HandleCheckRootInitialized', e);
+    HandleCheckSystemWXConfig().catch((e) => {
+      console.error('HandleCheckSystemWXConfig', e);
     });
 
     // 返回值
     return () => {};
-  }, [rootInitialized]);
+  }, [sysInstalled]);
 
   return {
     name,
@@ -116,6 +144,8 @@ export const UseApp = () => {
     setSystemInstalled,
     rootInitialized,
     setRootInitialized,
+    wxAPIConfig,
+    setWXAPIConfig,
   };
 };
 

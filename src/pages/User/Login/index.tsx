@@ -2,7 +2,7 @@
 // 获取环境变量中的oauth 地址
 
 export default () => {
-  const oauthURL = '' + APP_OAUTH_URL;
+  const oauthURL = '' + APP_WX_OAUTH_URL;
   // console.log(oauthURL);
   return (window.location.href = oauthURL);
 };

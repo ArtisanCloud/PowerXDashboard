@@ -14,5 +14,10 @@ export default {
       component: './Init/Root',
       layout: false,
     },
+    {
+      name: 'root已被微信授权',
+      path: '/install/root/system/authorized',
+      component: './Init/Authorized',
+    },
   ],
 };

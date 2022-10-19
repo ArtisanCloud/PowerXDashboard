@@ -316,7 +316,7 @@ const InstallPage: React.FC = () => {
 
         {/*<Divider orientation={'center'}>微信配置</Divider>*/}
 
-        {/*<WechatConfig required={fieldRequired} config={formData.appConfig.wx!}/>*/}
+        {/*<WechatConfig required={fieldRequired} config={formData.appConfig.system!}/>*/}
 
         {/*---- WeCom Config ----*/}
         <StepsForm.StepForm<{
