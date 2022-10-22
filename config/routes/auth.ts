@@ -11,7 +11,7 @@ export default {
     },
     {
       name: 'authorized',
-      path: '/user/system/authorized',
+      path: '/user/wx/authorized',
       component: './User/Authorized',
     },
   ],

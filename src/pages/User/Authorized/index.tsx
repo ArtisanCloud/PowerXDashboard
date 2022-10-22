@@ -3,9 +3,12 @@ import { useEffect, useState } from 'react';
 import { LoginByCode } from '@/services/user/UserController';
 import * as APIConstant from '@/constants/api';
 import * as WXConstant from '@/constants/web';
+import { UseAuthUserInfo } from '@/models/global';
 
 const AuthorizedUser: React.FC = () => {
   const [rs, setResponse] = useState<API.ResponseToken>();
+  const { updateGlobalAuthToken } = UseAuthUserInfo();
+
   let location = useLocation();
 
   // 获取回调url的get参数
@@ -37,6 +40,9 @@ const AuthorizedUser: React.FC = () => {
       // 调用后台api，code换token
       try {
         const rs = await LoginByCode(queries!);
+        // console.log('LoginByCode',rs)
+        localStorage.setItem('auth', JSON.stringify(rs));
+        updateGlobalAuthToken(rs.data!);
         setResponse(rs);
       } catch (e: any) {
         console.log(e);
@@ -60,7 +66,7 @@ const AuthorizedUser: React.FC = () => {
 
     // 调用后台code换取用户登陆信息
     HandleLogin().catch((e) => {
-      console.error('HandleCheckSysInstalled', e);
+      console.error('HandleLogin', e);
     });
 
     // 返回值
@@ -68,7 +74,8 @@ const AuthorizedUser: React.FC = () => {
   }, []);
 
   if (rs?.meta.return_code === APIConstant.API_RETURN_CODE_INIT) {
-    localStorage.setItem('auth', JSON.stringify(rs));
+    // localStorage.setItem('auth', JSON.stringify(rs));
+    // updateGlobalAuthToken(rs.data!)
 
     // 跳转首页
     location.pathname = '/';

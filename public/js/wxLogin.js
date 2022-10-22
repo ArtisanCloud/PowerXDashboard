@@ -11,7 +11,7 @@ if (config) {
     agentid: config?.weCom_api_config.weCom_agent_id,
     redirect_uri:
       config?.weCom_api_config.weCom_oauth_api.weCom_oauth_callback_url +
-      '/install/root/wx/authorized',
+      '/install/root/system/authorized',
     state: config?.weCom_api_config.state,
     href: '',
     lang: 'zh',
