@@ -9,13 +9,44 @@ import {
 } from '@/services/boot/BootController';
 import { CheckSystemWXAPIConfig } from '@/services/system/SystemController';
 import { API_RETURN_CODE_INIT } from '@/constants/api';
-// import * as global from "@/typings";
+
+let globalSysInstalled: boolean = false;
+let globalRootInitialized: boolean = false;
+let globalWXAPIConfig: API.WXAPIConfig | undefined = undefined;
+let globalName: string = DEFAULT_NAME;
 
 export const UseApp = () => {
-  const [sysInstalled, setSystemInstalled] = useState<boolean>(false);
-  const [rootInitialized, setRootInitialized] = useState<boolean>(false);
-  const [wxAPIConfig, setWXAPIConfig] = useState<API.WXAPIConfig>();
-  const [name, setName] = useState<string>(DEFAULT_NAME);
+  const [sysInstalled, setSystemInstalled] =
+    useState<boolean>(globalSysInstalled);
+  const [rootInitialized, setRootInitialized] = useState<boolean>(
+    globalRootInitialized,
+  );
+  const [wxAPIConfig, setWXAPIConfig] = useState<API.WXAPIConfig | undefined>(
+    globalWXAPIConfig,
+  );
+  const [name, setName] = useState<string>(globalName);
+
+  // console.log("use app")
+
+  const updateGlobalSystemInstalled = (val: boolean) => {
+    globalSysInstalled = val;
+    setSystemInstalled(val);
+  };
+
+  const updateGlobalRootInitialized = (val: boolean) => {
+    globalRootInitialized = val;
+    setRootInitialized(val);
+  };
+
+  const updateGlobalWXAPIConfig = (val: API.WXAPIConfig) => {
+    globalWXAPIConfig = val;
+    setWXAPIConfig(val);
+  };
+
+  const updateGlobalName = (val: string) => {
+    globalName = val;
+    setName(val);
+  };
 
   useEffect(() => {
     const HandleCheckSysInstalled = async () => {
@@ -25,7 +56,8 @@ export const UseApp = () => {
         const isSysInstalled: boolean = JSON.parse(jsonSysInstalled!);
         // 如果系统已经安装过，则直接进入系统
         if (isSysInstalled) {
-          setSystemInstalled(true);
+          // console.log('updateGlobalSystemInstalled is true')
+          updateGlobalSystemInstalled(true);
           return;
         }
       }
@@ -44,7 +76,7 @@ export const UseApp = () => {
         // console.log(sysInstalled)
         localStorage.setItem('sysInstalled', 'true');
         // set status
-        setSystemInstalled(sysInstalled);
+        updateGlobalSystemInstalled(sysInstalled);
       } else {
         message.error(rs.meta.result_message);
         return;
@@ -68,7 +100,8 @@ export const UseApp = () => {
         const isRootInitialized: boolean = JSON.parse(jsonRootInitialized!);
         // 如果系统已经初始化过Root，则直接进入系统
         if (isRootInitialized) {
-          setRootInitialized(true);
+          // console.log('updateGlobalRootInitialized is true')
+          updateGlobalRootInitialized(true);
           return;
         }
       }
@@ -81,7 +114,7 @@ export const UseApp = () => {
           // console.log(sysInstalled)
           localStorage.setItem('rootInitialized', 'true');
           // set status
-          setSystemInstalled(sysInstalled);
+          updateGlobalRootInitialized(true);
         }
       } else {
         message.error(rs.meta.result_message);
@@ -106,7 +139,7 @@ export const UseApp = () => {
         const config: API.WXAPIConfig = JSON.parse(jsonWXAPIConfig!);
         // 如果系统已经初始化过Root，则直接进入系统
         if (config) {
-          setWXAPIConfig(config);
+          updateGlobalWXAPIConfig(config);
           return;
         }
       }
@@ -120,7 +153,7 @@ export const UseApp = () => {
           const jsonConfig = JSON.stringify(rs.data);
           localStorage.setItem('wxAPIConfig', jsonConfig);
           // set status
-          setWXAPIConfig(rs.data);
+          updateGlobalWXAPIConfig(rs.data);
         }
       } else {
         message.error(rs.meta.result_message);
@@ -137,19 +170,27 @@ export const UseApp = () => {
     return () => {};
   }, [sysInstalled]);
 
+  // console.log("use app sysInstalled",sysInstalled,rootInitialized)
+
   return {
-    name,
-    setName,
     sysInstalled,
-    setSystemInstalled,
+    updateGlobalSystemInstalled,
     rootInitialized,
-    setRootInitialized,
+    updateGlobalRootInitialized,
     wxAPIConfig,
-    setWXAPIConfig,
+    updateGlobalWXAPIConfig,
+    name,
+    updateGlobalName,
   };
 };
 
-export const UseAuthUser = () => {
-  const { AuthUser } = useModel('auth');
-  return AuthUser;
+export const UseAuthUserInfo = () => {
+  const { AuthUser, AuthToken, updateGlobalAuthUser, updateGlobalAuthToken } =
+    useModel('auth');
+  return {
+    AuthUser,
+    updateGlobalAuthUser,
+    AuthToken,
+    updateGlobalAuthToken,
+  };
 };

@@ -10,7 +10,7 @@ import { history } from 'umi';
 import { message } from 'antd';
 
 // import from models
-import { UseAuthUser, UseApp } from '@/models/global';
+import { UseAuthUserInfo, UseApp } from '@/models/global';
 
 // import from constant
 import * as URIConstant from '@/constants/uri';
@@ -35,12 +35,17 @@ export async function getInitialState(): Promise<{
 // https://umijs.org/docs/max/layout-menu
 export const layout = () => {
   const { sysInstalled, rootInitialized } = UseApp();
-  console.log('app layout check system status', sysInstalled, rootInitialized);
+  // console.log('app layout check system status', sysInstalled, rootInitialized);
 
-  let AuthUser: API.Employee | undefined;
+  let isLogin: boolean = false;
   if (sysInstalled && rootInitialized) {
-    AuthUser = UseAuthUser();
+    const { AuthUser } = UseAuthUserInfo();
+    // console.log('page layout authUser ', AuthUser)
+    if (AuthUser) {
+      isLogin = true;
+    }
   }
+  // console.log('page layout login status is', isLogin)
 
   return {
     logo: logo,
@@ -60,11 +65,11 @@ export const layout = () => {
       }
 
       // 如果当前页面是首页，但是用户同时用户未登录，则显示当前页
-      else if (!AuthUser && location.pathname === URIConstant.URI_HOME) {
+      else if (!isLogin && location.pathname === URIConstant.URI_HOME) {
         return;
       }
       // 如果当前页面不是登陆页面，同时用户未登录，则跳转到登陆页面
-      else if (!AuthUser && location.pathname !== URIConstant.URI_LOGIN) {
+      else if (!isLogin && location.pathname !== URIConstant.URI_LOGIN) {
         history.push(URIConstant.URI_LOGIN);
         return;
       }
