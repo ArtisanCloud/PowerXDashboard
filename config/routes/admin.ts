@@ -3,11 +3,15 @@ export default [
     name: '首页',
     path: '/dashboard',
     component: '@/pages/Dashboard',
+  },
+  {
+    name: '引流获客',
+    path: '/customer',
     routes: [
       {
-        name: '一级页面',
-        path: '/dashboard/13',
-        component: '@/pages/Table',
+        name: '渠道活码',
+        path: '/customer/contactWay',
+        component: '@/pages/Customer/ContactWay',
       },
     ],
   },

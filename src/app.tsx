@@ -153,3 +153,12 @@ export const request: RequestConfig = {
     },
   ],
 };
+
+export function patchRoutes({ routes }) {
+  console.log('----patchRoutes', routes);
+}
+
+export function render(oldRoutes) {
+  console.log('----render');
+  oldRoutes();
+}
