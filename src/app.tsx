@@ -16,24 +16,60 @@ import { UseAuthUserInfo, UseApp } from '@/models/global';
 import * as URIConstant from '@/constants/uri';
 // import APIResponse = API.APIResponse;
 import { API_RETURN_CODE_INIT } from '@/constants/api';
+
+import { QueryMenuList } from '@/services/boot/BootController';
+import { MenuDataItem } from '@ant-design/pro-layout';
+
 // import {BASE_URL} from "@/typings";
+
+function parseRoutes(menus: API.Menu[]) {
+  let authRoutes = [];
+  if (menus) {
+    for (const routeModule of menus) {
+      for (const subRouteModule of routeModule.children) {
+        for (const route of subRouteModule.children) {
+          console.log(route.uri);
+          authRoutes.push({
+            name: route.name,
+            path: route.uri,
+            component: '@/' + route.component,
+          });
+        }
+      }
+    }
+  }
+  return authRoutes;
+}
 
 // 全局初始化数据配置，用于 Layout 用户信息和权限初始化
 // 更多信息见文档：https://next.umijs.org/docs/api/runtime-config#getinitialstate
 export async function getInitialState(): Promise<{
   name: string;
   avatar?: string;
+  menuData?: MenuDataItem[];
 }> {
-  // console.log("getInitialState")
+  const rsMenuList: API.ResponseMenuList = await QueryMenuList();
+  const menuData: MenuDataItem[] = parseRoutes(rsMenuList.data);
+
+  console.log('getInitialState', menuData);
   return {
     name: '@ArtisanCloud/PowerX',
     avatar: iconAvatar,
+    menuData: menuData,
   };
 }
 
 // 布局设置
 // https://umijs.org/docs/max/layout-menu
-export const layout = () => {
+export const layout = ({
+  initialState,
+}: {
+  initialState: {
+    name: string;
+    avatar: string;
+    menuData: MenuDataItem[];
+  };
+}) => {
   const { sysInstalled, rootInitialized } = UseApp();
   // console.log('app layout check system status', sysInstalled, rootInitialized);
 
@@ -52,6 +88,8 @@ export const layout = () => {
     menu: {
       locale: false,
     },
+    menuDataRender: (menuData: MenuDataItem[]) =>
+      initialState.menuData || menuData,
     onPageChange: () => {
       // 判断是否系统安装成功
       if (!sysInstalled) {
@@ -153,12 +191,3 @@ export const request: RequestConfig = {
     },
   ],
 };
-
-export function patchRoutes({ routes }) {
-  console.log('----patchRoutes', routes);
-}
-
-export function render(oldRoutes) {
-  console.log('----render');
-  oldRoutes();
-}

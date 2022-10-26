@@ -72,7 +72,20 @@ export default () => {
     // console.log("use auth", sysInstalled, rootInitialized)
     if (sysInstalled && rootInitialized) {
       LoadToken().catch((e) => {
-        console.error('LoadToken', e);
+        console.error('LoadToken', e.response);
+
+        if (
+          e.response &&
+          e.response.data.meta.return_code === APIConstant.API_RETURN_CODE_ERROR
+        ) {
+          // 如果返回是token失效，则先要删除本地的无效token
+          if (
+            e.response.data.meta.result_code ===
+            APIConstant.API_ERR_CODE_ACCOUNT_INVALID_TOKEN
+          ) {
+            localStorage.removeItem('auth');
+          }
+        }
       });
     }
 

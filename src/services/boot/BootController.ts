@@ -32,3 +32,7 @@ export async function InitRootByCode(
     },
   );
 }
+
+export async function QueryMenuList() {
+  return request<API.ResponseMenuList>('root/api/permission/module/list');
+}
