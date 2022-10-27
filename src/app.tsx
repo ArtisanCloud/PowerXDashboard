@@ -14,32 +14,11 @@ import { UseAuthUserInfo, UseApp } from '@/models/global';
 
 // import from constant
 import * as URIConstant from '@/constants/uri';
-// import APIResponse = API.APIResponse;
 import { API_RETURN_CODE_INIT } from '@/constants/api';
 
-import { QueryMenuList } from '@/services/boot/BootController';
 import { MenuDataItem } from '@ant-design/pro-layout';
-
-// import {BASE_URL} from "@/typings";
-
-function parseRoutes(menus: API.Menu[]) {
-  let authRoutes = [];
-  if (menus) {
-    for (const routeModule of menus) {
-      for (const subRouteModule of routeModule.children) {
-        for (const route of subRouteModule.children) {
-          console.log(route.uri);
-          authRoutes.push({
-            name: route.name,
-            path: route.uri,
-            component: '@/' + route.component,
-          });
-        }
-      }
-    }
-  }
-  return authRoutes;
-}
+import { QueryMenuList } from '@/services/boot/BootController';
+import { ParseRoutes } from '@/models/menu';
 
 // 全局初始化数据配置，用于 Layout 用户信息和权限初始化
 // 更多信息见文档：https://next.umijs.org/docs/api/runtime-config#getinitialstate
@@ -48,8 +27,9 @@ export async function getInitialState(): Promise<{
   avatar?: string;
   menuData?: MenuDataItem[];
 }> {
+  // const menuData: MenuDataItem[] = []
   const rsMenuList: API.ResponseMenuList = await QueryMenuList();
-  const menuData: MenuDataItem[] = parseRoutes(rsMenuList.data);
+  const menuData: MenuDataItem[] = ParseRoutes(rsMenuList.data);
 
   console.log('getInitialState', menuData);
   return {
@@ -71,7 +51,7 @@ export const layout = ({
   };
 }) => {
   const { sysInstalled, rootInitialized } = UseApp();
-  // console.log('app layout check system status', sysInstalled, rootInitialized);
+  // console.log('app layout check system status', initialState.name, sysInstalled, rootInitialized);
 
   let isLogin: boolean = false;
   if (sysInstalled && rootInitialized) {
@@ -82,11 +62,13 @@ export const layout = ({
     }
   }
   // console.log('page layout login status is', isLogin)
-
+  // console.log(initialState.menuData)
   return {
     logo: logo,
     menu: {
       locale: false,
+      defaultOpenKeys: ['/customer'],
+      // defaultOpenAll: true
     },
     menuDataRender: (menuData: MenuDataItem[]) =>
       initialState.menuData || menuData,
