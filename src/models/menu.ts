@@ -10,17 +10,35 @@ export function ParseRoutes(menus: API.Menu[]) {
   let authRoutes = [];
   if (menus) {
     for (const routeModule of menus) {
+      let firstMenu = {
+        name: routeModule.name,
+        path: routeModule.uri,
+        routes: [],
+      };
       for (const subRouteModule of routeModule.children) {
+        let secondMenu = {
+          name: subRouteModule.name,
+          path: subRouteModule.uri,
+          routes: [],
+          disabled: true,
+        };
+        if (subRouteModule.children.length === 0) {
+          secondMenu.disabled = false;
+        }
+
         for (const route of subRouteModule.children) {
           // console.log(route.uri);
-          authRoutes.push({
+          const menu = {
             name: route.name,
             path: route.uri,
             component: '@/pages' + route.component,
-            // disabled: true,
-          });
+            disabled: false,
+          };
+          secondMenu.routes.push(menu);
         }
+        firstMenu.routes.push(secondMenu);
       }
+      authRoutes.push(firstMenu);
     }
   }
   return authRoutes;

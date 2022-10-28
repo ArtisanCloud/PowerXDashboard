@@ -67,8 +67,8 @@ export const layout = ({
     logo: logo,
     menu: {
       locale: false,
-      defaultOpenKeys: ['/customer'],
-      // defaultOpenAll: true
+      // defaultOpenKeys: ['key'],
+      defaultOpenAll: true,
     },
     menuDataRender: (menuData: MenuDataItem[]) =>
       initialState.menuData || menuData,
