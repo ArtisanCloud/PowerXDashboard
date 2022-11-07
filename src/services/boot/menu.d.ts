@@ -4,8 +4,8 @@ declare namespace API {
   }
 
   export interface Permission {
-    createdAt: Date;
-    updatedAt: Date;
+    createdAt?: Date;
+    updatedAt?: Date;
     permissionModule?: any;
     permissionID: string;
     objectAlias: string;
@@ -16,15 +16,16 @@ declare namespace API {
   }
 
   export interface Menu {
-    createdAt: Date;
-    updatedAt: Date;
+    createdAt?: Date;
+    updatedAt?: Date;
     parent?: any;
     children: Menu[];
-    permissions: Permission[];
+    permissions?: Permission[];
     permissionModuleID: string;
     name: string;
     uri: string;
     component: string;
+    icon: string;
     description: string;
     parentID: string;
   }

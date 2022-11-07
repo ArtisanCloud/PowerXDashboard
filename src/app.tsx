@@ -30,7 +30,6 @@ export async function getInitialState(): Promise<{
   // const menuData: MenuDataItem[] = []
   const rsMenuList: API.ResponseMenuList = await QueryMenuList();
   const menuData: MenuDataItem[] = ParseRoutes(rsMenuList.data);
-
   console.log('getInitialState', menuData);
   return {
     name: '@ArtisanCloud/PowerX',
@@ -63,6 +62,7 @@ export const layout = ({
   }
   // console.log('page layout login status is', isLogin)
   // console.log(initialState.menuData)
+
   return {
     logo: logo,
     menu: {

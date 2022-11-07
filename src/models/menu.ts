@@ -5,10 +5,12 @@ import { API_RETURN_CODE_INIT } from '@/constants/api';
 import { message } from 'antd';
 
 export let globalMenuData: MenuDataItem[] = [];
+export let globalMenus: API.Menu[] = [];
 
 export function ParseRoutes(menus: API.Menu[]) {
-  let authRoutes = [];
+  let authRoutes: MenuDataItem[] = [];
   if (menus) {
+    globalMenus = menus;
     for (const routeModule of menus) {
       let firstMenu = {
         name: routeModule.name,
@@ -41,6 +43,7 @@ export function ParseRoutes(menus: API.Menu[]) {
       authRoutes.push(firstMenu);
     }
   }
+
   return authRoutes;
 }
 

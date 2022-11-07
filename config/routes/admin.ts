@@ -80,7 +80,6 @@ export default [
   {
     name: '配置中心',
     path: '/setting',
-    key: '123',
     routes: [
       {
         name: '员工管理',
