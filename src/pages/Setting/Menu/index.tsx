@@ -12,6 +12,7 @@ import {
 import { useRef, useState } from 'react';
 import { waitTime } from '@/utils/format';
 import { globalMenus } from '@/models/menu';
+import { GetParentPermissionModule } from '@/utils/Menu';
 
 const LoopPermissionModuleFilter = (
   data: API.Menu[],
@@ -19,6 +20,7 @@ const LoopPermissionModuleFilter = (
 ): any[] => {
   return data
     .map((item) => {
+      // 如果当前查询的id等于遍历的menu.permissionModuleID，则去检查children
       if (item.permissionModuleID !== id) {
         if (item.children) {
           const newChildren = LoopPermissionModuleFilter(item.children, id);
@@ -48,11 +50,6 @@ const SetupMenu: React.FC = () => {
     {
       title: '功能模块名称',
       dataIndex: 'name',
-      // formItemProps: (form, {rowIndex}) => {
-      // 	return {
-      // 		rules: rowIndex > 2 ? [{required: true, message: '此项为必填项'}] : [],
-      // 	};
-      // },
       width: '10%',
     },
     {
@@ -62,33 +59,25 @@ const SetupMenu: React.FC = () => {
       width: '10%',
     },
     {
-      title: '上级模块ID',
-      // key: 'parentID',
+      title: '上级模块名称',
       dataIndex: 'parentID',
-      valueType: 'select',
-      valueEnum: {
-        open: {
-          text: '未解决',
-          status: 'Error',
-        },
+      renderText: (text: any, record: API.Menu) => {
+        // console.log(text, record, index, action)
+        // console.log(record.parentID)
+        const menu: API.Menu | undefined = GetParentPermissionModule(
+          menus,
+          record.parentID,
+        );
+        if (menu === undefined) {
+          return '';
+        } else {
+          return menu.name;
+        }
       },
     },
     {
       title: '描述',
       dataIndex: 'description',
-      fieldProps: (form, { rowKey, rowIndex }) => {
-        if (form.getFieldValue([rowKey || '', 'title']) === '不好玩') {
-          return {
-            disabled: true,
-          };
-        }
-        if (rowIndex > 9) {
-          return {
-            disabled: true,
-          };
-        }
-        return {};
-      },
     },
     {
       title: '创建时间',
