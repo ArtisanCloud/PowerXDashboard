@@ -46,7 +46,7 @@ const SetupMenu: React.FC = () => {
   const actionRef = useRef<ActionType>();
   const columns: ProColumns<API.Menu>[] = [
     {
-      title: '功能模块',
+      title: '功能模块名称',
       dataIndex: 'name',
       // formItemProps: (form, {rowIndex}) => {
       // 	return {
@@ -57,7 +57,7 @@ const SetupMenu: React.FC = () => {
     },
     {
       title: '模块ID',
-      key: 'permissionModuleID',
+      key: 'id',
       dataIndex: 'permissionModuleID',
       width: '10%',
     },
@@ -130,9 +130,9 @@ const SetupMenu: React.FC = () => {
         table: API.Menu[];
       }>
         formRef={formRef}
-        initialValues={{
-          table: menus,
-        }}
+        // initialValues={{
+        //   table: menus,
+        // }}
         validateTrigger="onBlur"
       >
         <EditableProTable<API.Menu>
@@ -152,18 +152,13 @@ const SetupMenu: React.FC = () => {
             position: 'top',
             newRecordType: 'dataSource',
             record: () => ({
-              id: '123',
-              // createdAt: undefined,
-              // updatedAt: undefined,
-              // parent: "",
-              // children: "",
-              permissionModuleID: '456',
-              // name: "",
-              // uri: "",
-              // icon: "",
-              // component: "",
-              // description: "",
-              // parentID: ""
+              permissionModuleID: (Math.random() * 1000000).toFixed(0),
+              name: '',
+              uri: '',
+              icon: '',
+              component: '',
+              description: '',
+              parentID: '',
             }),
           }}
           columns={columns}
@@ -179,20 +174,20 @@ const SetupMenu: React.FC = () => {
             onChange: setEditableRowKeys,
           }}
         />
-        <ProCard title="表格数据" headerBordered collapsible defaultCollapsed>
-          <ProFormField
-            ignoreFormItem
-            fieldProps={{
-              style: {
-                width: '100%',
-              },
-            }}
-            mode="read"
-            valueType="jsonCode"
-            text={JSON.stringify(menus)}
-          />
-        </ProCard>
       </ProForm>
+      <ProCard title="表格数据" headerBordered collapsible defaultCollapsed>
+        <ProFormField
+          ignoreFormItem
+          fieldProps={{
+            style: {
+              width: '100%',
+            },
+          }}
+          mode="read"
+          valueType="jsonCode"
+          text={JSON.stringify(menus)}
+        />
+      </ProCard>
     </PageContainer>
   );
 };
