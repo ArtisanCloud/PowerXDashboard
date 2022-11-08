@@ -20,7 +20,7 @@ import { URI_ROOT_INIT } from '@/constants/uri';
 import ProCard from '@ant-design/pro-card';
 
 const InstallPage: React.FC = () => {
-  const { sysInstalled, setSystemInstalled } = UseApp();
+  const { sysInstalled, updateGlobalSystemInstalled } = UseApp();
   const formRef = useRef<FormInstance>();
   const fieldRequired = true;
   const [formData, setFormData] = useState<API.RequestInstallSystem>({
@@ -174,7 +174,7 @@ const InstallPage: React.FC = () => {
             }
             if (installResult) {
               // 设置系统状态在本地
-              setSystemInstalled(true);
+              updateGlobalSystemInstalled(true);
 
               // 跳转初始化root页面
               history.push(URI_ROOT_INIT);

@@ -76,6 +76,7 @@ export default () => {
 
         if (
           e.response &&
+          e.response.da &&
           e.response.data.meta.return_code === APIConstant.API_RETURN_CODE_ERROR
         ) {
           // 如果返回是token失效，则先要删除本地的无效token
