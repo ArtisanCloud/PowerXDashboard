@@ -15,12 +15,14 @@ export function ParseRoutes(menus: API.Menu[]) {
       let firstMenu = {
         name: routeModule.name,
         path: routeModule.uri,
+        // icon: routeModule.icon,
         routes: [],
       };
       for (const subRouteModule of routeModule.children) {
         let secondMenu = {
           name: subRouteModule.name,
           path: subRouteModule.uri,
+          // icon: subRouteModule.icon,
           routes: [],
           disabled: true,
         };
@@ -29,13 +31,14 @@ export function ParseRoutes(menus: API.Menu[]) {
         }
 
         for (const route of subRouteModule.children) {
-          // console.log(route.uri);
           const menu = {
             name: route.name,
             path: route.uri,
+            // icon: route.icon,
             component: '@/pages' + route.component,
             disabled: false,
           };
+          // console.log(menu)
           secondMenu.routes.push(menu);
         }
         firstMenu.routes.push(secondMenu);

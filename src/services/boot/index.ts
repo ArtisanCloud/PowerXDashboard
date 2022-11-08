@@ -1,4 +1,4 @@
-import * as DetectController from './DetectController';
+import * as DetectController from './bootController';
 
 export default {
   DetectController,

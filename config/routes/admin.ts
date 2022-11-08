@@ -18,16 +18,16 @@ export default [
   },
   {
     name: '客户维护',
-    path: '/crm/notification',
+    path: '/crm/maintenance',
     routes: [
       {
         name: '客户群发',
-        path: '/crm/notification/sendChatMessage',
+        path: '/crm/maintenance/sendChatMessage',
         component: '@/pages/Customer/SendChatMessage',
       },
       {
         name: '客户群群发',
-        path: '/crm/notification/sendGroupChatMessage',
+        path: '/crm/maintenance/sendGroupChatMessage',
         component: '@/pages/Customer/SendGroupChatMessage',
       },
     ],
@@ -102,11 +102,13 @@ export default [
   {
     name: '权限演示',
     path: '/access',
+    icon: 'HomeOutlined',
     component: '@/pages/Access',
   },
   {
     name: ' CRUD 示例',
     path: '/table',
+    icon: 'EditOutlined',
     component: '@/pages/Table',
   },
 ];

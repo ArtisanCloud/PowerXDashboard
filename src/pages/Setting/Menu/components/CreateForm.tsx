@@ -2,38 +2,46 @@ import { PlusOutlined } from '@ant-design/icons';
 import {
   ModalForm,
   ProForm,
-  ProFormDateRangePicker,
-  ProFormSelect,
   ProFormText,
+  ProFormTextArea,
+  ProFormTreeSelect,
 } from '@ant-design/pro-components';
 import { Button, Form, message } from 'antd';
-import { waitTime } from '@/utils/format';
+import { GetMenuSelections } from '@/utils/Menu';
+import { globalMenus } from '@/models/menu';
+import { MenuSelection } from '@/pages/Setting/Menu/typing';
+import { CreatePermissionModule } from '@/services/boot/BootController';
+import { API_RETURN_CODE_INIT } from '@/constants/api';
 
-export default () => {
-  const [form] = Form.useForm<{ name: string; company: string }>();
+const CreateForm = () => {
+  const [form] = Form.useForm<API.Menu>();
   return (
-    <ModalForm<{
-      name: string;
-      company: string;
-    }>
-      title="新建表单"
+    <ModalForm<API.Menu>
+      title="新建菜单功能"
       trigger={
         <Button type="primary">
           <PlusOutlined />
-          新建表单
+          新建菜单功能
         </Button>
       }
       form={form}
       autoFocusFirstInput
       modalProps={{
         destroyOnClose: true,
-        onCancel: () => console.log('run'),
+        onCancel: () => console.log('cancel'),
       }}
       submitTimeout={2000}
       onFinish={async (values) => {
-        await waitTime(2000);
-        console.log(values.name);
-        message.success('提交成功');
+        // console.log(values);
+        const rs: API.ResponsePermissionModule = await CreatePermissionModule(
+          values,
+        );
+        if (rs.meta.return_code === API_RETURN_CODE_INIT) {
+          message.success('提交成功');
+          window.location.reload();
+        } else {
+          message.error(rs.meta.result_message);
+        }
         return true;
       }}
     >
@@ -41,65 +49,63 @@ export default () => {
         <ProFormText
           width="md"
           name="name"
-          label="签约客户名称"
-          tooltip="最长为 24 位"
-          placeholder="请输入名称"
+          label="模块名称"
+          tooltip="菜单需要的模块名称"
+          placeholder="请输入模块名称"
+          rules={[{ required: true }]}
         />
 
         <ProFormText
           width="md"
-          name="company"
-          label="我方公司名称"
-          placeholder="请输入名称"
+          name="uri"
+          label="URI"
+          placeholder="例如：/setting/menu"
+          rules={[{ required: true }]}
         />
       </ProForm.Group>
       <ProForm.Group>
         <ProFormText
           width="md"
-          name="contract"
-          label="合同名称"
-          placeholder="请输入名称"
+          name="component"
+          label="前端组件访问路径"
+          placeholder="例如：/Setting/Menu"
         />
-        <ProFormDateRangePicker name="contractTime" label="合同生效时间" />
+        <ProFormText
+          width="md"
+          name="icon"
+          label="图标"
+          tooltip="ant design的icon"
+          placeholder="例如：EditOutlined"
+        />
       </ProForm.Group>
       <ProForm.Group>
-        <ProFormSelect
-          request={async () => [
-            {
-              value: 'chapter',
-              label: '盖章后生效',
-            },
-          ]}
-          width="xs"
-          name="useMode"
-          label="合同约定生效方式"
-        />
-        <ProFormSelect
-          width="xs"
-          options={[
-            {
-              value: 'time',
-              label: '履行完终止',
-            },
-          ]}
-          name="unusedMode"
-          label="合同约定失效效方式"
+        <ProFormTreeSelect
+          width="md"
+          request={async () => {
+            let menuSelections = GetMenuSelections(globalMenus);
+            const noneSelection: MenuSelection = {
+              title: '无',
+              value: '',
+              children: [],
+            };
+            menuSelections.unshift(noneSelection);
+            return menuSelections;
+          }}
+          name="parentID"
+          label="父模块"
         />
       </ProForm.Group>
-      <ProFormText width="sm" name="id" label="主合同编号" />
-      <ProFormText
-        name="project"
-        disabled
-        label="项目名称"
-        initialValue="xxxx项目"
-      />
-      <ProFormText
-        width="xs"
-        name="mangerName"
-        disabled
-        label="商务经理"
-        initialValue="启途"
-      />
+      <ProForm.Group>
+        <ProFormTextArea
+          width={'lg'}
+          name={'description'}
+          label={'描述'}
+          tooltip={'请输入模块描述'}
+          placeholder=""
+        />
+      </ProForm.Group>
     </ModalForm>
   );
 };
+
+export default CreateForm;

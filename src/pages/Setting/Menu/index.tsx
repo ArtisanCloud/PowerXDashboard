@@ -1,79 +1,50 @@
 import {
-  ActionType,
   EditableProTable,
   PageContainer,
   ProCard,
   ProColumns,
-  ProForm,
   ProFormField,
-  ProFormInstance,
-  useRefFunction,
 } from '@ant-design/pro-components';
-import { useRef, useState } from 'react';
-import { waitTime } from '@/utils/format';
+import { useState } from 'react';
 import { globalMenus } from '@/models/menu';
 import { GetParentPermissionModule } from '@/utils/Menu';
-
-const LoopPermissionModuleFilter = (
-  data: API.Menu[],
-  id: React.Key | undefined,
-): any[] => {
-  return data
-    .map((item) => {
-      // 如果当前查询的id等于遍历的menu.permissionModuleID，则去检查children
-      if (item.permissionModuleID !== id) {
-        if (item.children) {
-          const newChildren = LoopPermissionModuleFilter(item.children, id);
-          return {
-            ...item,
-            children: newChildren.length > 0 ? newChildren : undefined,
-          };
-        }
-        return item;
-      }
-      return null;
-    })
-    .filter(Boolean) as API.Menu[];
-};
+import CreateForm from '@/pages/Setting/Menu/components/CreateForm';
+import UpdateForm from '@/pages/Setting/Menu/components/UpdateForm';
+import styles from '@/pages/Setting/Menu/index.less';
+import { message, Popconfirm } from 'antd';
+import { DeletePermissionModule } from '@/services/boot/BootController';
+import { API_RETURN_CODE_INIT } from '@/constants/api';
 
 const SetupMenu: React.FC = () => {
-  const [editableKeys, setEditableRowKeys] = useState<React.Key[]>();
   const [menus, setMenus] = useState<API.Menu[]>(globalMenus);
 
-  const removeRow = useRefFunction((record: API.Menu) => {
-    console.log('remove id', record.permissionModuleID);
-    setMenus(LoopPermissionModuleFilter(menus, record.permissionModuleID));
-  });
-  const formRef = useRef<ProFormInstance<any>>();
-  const actionRef = useRef<ActionType>();
   const columns: ProColumns<API.Menu>[] = [
     {
       title: '功能模块名称',
       dataIndex: 'name',
-      width: '10%',
-    },
-    {
-      title: '模块ID',
-      key: 'id',
-      dataIndex: 'permissionModuleID',
-      width: '10%',
+      width: '20%',
     },
     {
       title: '上级模块名称',
       dataIndex: 'parentID',
       renderText: (text: any, record: API.Menu) => {
-        // console.log(text, record, index, action)
-        // console.log(record.parentID)
-        const menu: API.Menu | undefined = GetParentPermissionModule(
+        const parentMenu: API.Menu | undefined = GetParentPermissionModule(
           menus,
           record.parentID,
         );
-        if (menu === undefined) {
+        // console.log(record.parentID,parentMenu)
+        if (parentMenu === undefined) {
           return '';
         } else {
-          return menu.name;
+          return parentMenu.name;
         }
       },
+      width: '20%',
+    },
+    {
+      title: 'URI',
+      dataIndex: 'uri',
+      width: '20%',
     },
     {
       title: '描述',
@@ -89,22 +60,27 @@ const SetupMenu: React.FC = () => {
       valueType: 'option',
       width: 200,
       render: (text, record) => [
-        <a
-          key="edit"
-          onClick={() => {
-            actionRef.current?.startEditable(record.permissionModuleID);
-          }}
-        >
-          编辑
-        </a>,
-        <a
+        <UpdateForm key="edit" menu={record} />,
+        <Popconfirm
           key="delete"
-          onClick={() => {
-            removeRow(record);
+          title="确定要删除此模块么？"
+          onConfirm={async () => {
+            const rs: API.APIResponse = await DeletePermissionModule({
+              permissionModuleIDs: [record.permissionModuleID],
+            });
+            if (rs.meta.return_code === API_RETURN_CODE_INIT) {
+              message.success('删除成功');
+              window.location.reload();
+            } else {
+              message.error(rs.meta.result_message);
+            }
           }}
+          // onCancel={cancel}
+          okText="Yes"
+          cancelText="No"
         >
-          删除
-        </a>,
+          <a href="#">删除</a>
+        </Popconfirm>,
       ],
     },
   ];
@@ -115,55 +91,28 @@ const SetupMenu: React.FC = () => {
         title: '配置系统功能菜单',
       }}
     >
-      <ProForm<{
-        table: API.Menu[];
-      }>
-        formRef={formRef}
-        // initialValues={{
-        //   table: menus,
-        // }}
-        validateTrigger="onBlur"
-      >
-        <EditableProTable<API.Menu>
-          params={{}}
-          expandable={{
-            // 使用 request 请求数据时无效
-            defaultExpandAllRows: true,
-          }}
-          scroll={{
-            x: 960,
-          }}
-          rowKey="permissionModuleID"
-          headerTitle="可编辑表格"
-          maxLength={5}
-          // recordCreatorProps={false}
-          recordCreatorProps={{
-            position: 'top',
-            newRecordType: 'dataSource',
-            record: () => ({
-              permissionModuleID: (Math.random() * 1000000).toFixed(0),
-              name: '',
-              uri: '',
-              icon: '',
-              component: '',
-              description: '',
-              parentID: '',
-            }),
-          }}
-          columns={columns}
-          value={menus}
-          onChange={setMenus}
-          editable={{
-            type: 'multiple',
-            editableKeys,
-            onSave: async (rowKey, data, row) => {
-              console.log('onsave', rowKey, data, row);
-              await waitTime(2000);
-            },
-            onChange: setEditableRowKeys,
-          }}
-        />
-      </ProForm>
+      <div className={styles.btnNew}>
+        <CreateForm />
+      </div>
+
+      <EditableProTable<API.Menu>
+        params={{}}
+        expandable={{
+          // 使用 request 请求数据时无效
+          defaultExpandAllRows: true,
+        }}
+        scroll={{
+          x: 960,
+        }}
+        rowKey="permissionModuleID"
+        headerTitle="可编辑表格"
+        maxLength={5}
+        recordCreatorProps={false}
+        columns={columns}
+        value={menus}
+        onChange={setMenus}
+      />
+
       <ProCard title="表格数据" headerBordered collapsible defaultCollapsed>
         <ProFormField
           ignoreFormItem
