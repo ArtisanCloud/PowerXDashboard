@@ -3,4 +3,6 @@ export const URI_INSTALL = '/install';
 export const URI_ROOT_INIT = '/install/root/init';
 export const URI_ROOT_AUTHORIZED = '/install/root/system/authorized';
 
+export const URI_SETTING_ROLE_CREATE = '/setting/permission/role/create';
+
 export const URI_HOME = '/';

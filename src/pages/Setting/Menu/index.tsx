@@ -12,7 +12,7 @@ import CreateForm from '@/pages/Setting/Menu/components/CreateForm';
 import UpdateForm from '@/pages/Setting/Menu/components/UpdateForm';
 import styles from '@/pages/Setting/Menu/index.less';
 import { message, Popconfirm } from 'antd';
-import { DeletePermissionModule } from '@/services/boot/BootController';
+import { DeletePermissionModule } from '@/services/permission/PermissionController';
 import { API_RETURN_CODE_INIT } from '@/constants/api';
 
 const SetupMenu: React.FC = () => {

@@ -27,7 +27,6 @@ export async function getInitialState(): Promise<{
   avatar?: string;
   menuData?: MenuDataItem[];
 }> {
-  // const menuData: MenuDataItem[] = []
   const rsMenuList: API.ResponseMenuList = await QueryMenuList();
   const menuData: MenuDataItem[] = ParseRoutes(rsMenuList.data);
   // console.log('getInitialState', menuData);

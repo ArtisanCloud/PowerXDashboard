@@ -83,31 +83,21 @@ export default [
       {
         name: '员工管理',
         path: '/setting/employee',
+        icon: 'HomeOutlined',
         component: '@/pages/Setting/Employee',
       },
       {
         name: '权限管理',
         path: '/setting/permission',
+        icon: 'HomeOutlined',
         component: '@/pages/Setting/Permission',
       },
       {
         name: '菜单配置',
         path: '/setting/menu',
+        icon: 'HomeOutlined',
         component: '@/pages/Setting/Menu',
       },
     ],
-  },
-
-  {
-    name: '权限演示',
-    path: '/access',
-    icon: 'HomeOutlined',
-    component: '@/pages/Access',
-  },
-  {
-    name: ' CRUD 示例',
-    path: '/table',
-    icon: 'SmileOutlined',
-    component: '@/pages/Table',
   },
 ];
