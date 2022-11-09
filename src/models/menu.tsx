@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { QueryMenuList } from '@/services/boot/BootController';
 import { API_RETURN_CODE_INIT } from '@/constants/api';
 import { message } from 'antd';
+import { SmileOutlined } from '@ant-design/icons';
 
 export let globalMenuData: MenuDataItem[] = [];
 export let globalMenus: API.Menu[] = [];
@@ -12,18 +13,18 @@ export function ParseRoutes(menus: API.Menu[]) {
   if (menus) {
     globalMenus = menus;
     for (const routeModule of menus) {
-      let firstMenu = {
+      let firstMenu: MenuDataItem = {
         name: routeModule.name,
         path: routeModule.uri,
-        // icon: routeModule.icon,
-        routes: [],
+        icon: routeModule.icon,
+        children: [],
       };
       for (const subRouteModule of routeModule.children) {
-        let secondMenu = {
+        let secondMenu: MenuDataItem = {
           name: subRouteModule.name,
           path: subRouteModule.uri,
-          // icon: subRouteModule.icon,
-          routes: [],
+          icon: subRouteModule.icon,
+          children: [],
           disabled: true,
         };
         if (subRouteModule.children.length === 0) {
@@ -31,17 +32,18 @@ export function ParseRoutes(menus: API.Menu[]) {
         }
 
         for (const route of subRouteModule.children) {
-          const menu = {
+          const menu: MenuDataItem = {
             name: route.name,
             path: route.uri,
             // icon: route.icon,
+            icon: <SmileOutlined />,
             component: '@/pages' + route.component,
             disabled: false,
           };
           // console.log(menu)
-          secondMenu.routes.push(menu);
+          secondMenu.children!.push(menu);
         }
-        firstMenu.routes.push(secondMenu);
+        firstMenu.children!.push(secondMenu);
       }
       authRoutes.push(firstMenu);
     }
