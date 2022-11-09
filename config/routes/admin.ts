@@ -35,28 +35,23 @@ export default [
 
   {
     name: '客户管理',
-    path: '/crm/customer/',
+    path: '/crm/customer',
     routes: [
       {
         name: '客户标签',
         path: '/crm/customer/tag',
         component: '@/pages/Customer/Tag',
       },
-      // {
-      // 	name: "标签治理",
-      // 	path: '/crm/customer/tag',
-      // 	component: '@/pages/Customer/tag',
-      // },
-      // {
-      // 	name: "客户管理",
-      // 	path: '/crm/customer/',
-      // 	component: '@/pages/Customer/SendGroupChatMessage',
-      // },
-      // {
-      // 	name: "客户迁移",
-      // 	path: '/crm/customer//',
-      // 	component: '@/pages/Customer/SendGroupChatMessage',
-      // },
+      {
+        name: '客户管理',
+        path: '/crm/customer/index',
+        component: '@/pages/Customer',
+      },
+      {
+        name: '客户迁移',
+        path: '/crm/customer/transfer',
+        component: '@/pages/Customer/Transfer',
+      },
     ],
   },
 
@@ -76,7 +71,11 @@ export default [
       },
     ],
   },
-
+  {
+    name: '标签管理',
+    path: '/crm/tag',
+    component: '@/pages/Tag',
+  },
   {
     name: '配置中心',
     path: '/setting',
@@ -108,7 +107,7 @@ export default [
   {
     name: ' CRUD 示例',
     path: '/table',
-    icon: 'EditOutlined',
+    icon: 'SmileOutlined',
     component: '@/pages/Table',
   },
 ];
