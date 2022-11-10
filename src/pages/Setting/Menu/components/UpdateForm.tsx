@@ -10,8 +10,8 @@ import { Button, Form, message } from 'antd';
 import { GetMenuSelections } from '@/utils/Menu';
 import { globalMenus } from '@/models/menu';
 import { MenuSelection } from '@/pages/Setting/Menu/typing';
-import { UpdatePermissionModule } from '@/services/boot/BootController';
 import { API_RETURN_CODE_INIT } from '@/constants/api';
+import { UpdatePermissionModule } from '@/services/permission/PermissionController';
 
 const UpdateForm = (Props: { menu: API.Menu }) => {
   const [form] = Form.useForm<API.Menu>();

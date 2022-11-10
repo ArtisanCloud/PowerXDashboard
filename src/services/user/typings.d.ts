@@ -13,6 +13,30 @@ declare namespace API {
     data: Employee | null;
   }
 
+  export interface ResponseGetRoleList extends APIResponse {
+    data: Role[];
+  }
+
+  export interface ResponseGetEmployeeList extends APIResponse {
+    data: PaginationEmployees;
+  }
+
+  export interface PaginationEmployees extends PaginationData {
+    data: Employee[];
+  }
+
+  export interface RequestGetRoleList {
+    page: number;
+    pageSize: number;
+    // groupID: string;
+    withEmployees: boolean;
+  }
+
+  export interface RequestGetEmployeeList {
+    page: number;
+    pageSize: number;
+    roleID: string;
+  }
   export interface Employee {
     uuid: string;
     createdAt?: string;
@@ -64,5 +88,6 @@ declare namespace API {
     name: string;
     parentID: string;
     type: number;
+    employees?: Employee[];
   }
 }

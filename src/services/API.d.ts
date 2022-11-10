@@ -13,6 +13,14 @@ declare namespace API {
     timezone?: string;
   }
 
+  export interface PaginationData {
+    limit: number;
+    page: number;
+    sort: string;
+    totalRows: number;
+    totalPages: number;
+  }
+
   // ---------------------------------------------------------------------------
 
   export interface ResponseToken extends APIResponse {

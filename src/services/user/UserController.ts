@@ -19,3 +19,23 @@ export async function LoginByCode(
 export async function MeDetail() {
   return request<API.ResponseAuthUser>('/admin/api/me/detail');
 }
+
+// role
+export async function QueryRoleList(params: API.RequestGetRoleList) {
+  return request<API.ResponseGetRoleList>('/admin/api/role/list', {
+    method: 'GET',
+    params: {
+      ...params,
+    },
+  });
+}
+
+// role
+export async function QueryEmployeeList(params: API.RequestGetEmployeeList) {
+  return request<API.ResponseGetEmployeeList>('/admin/api/employee/list', {
+    method: 'GET',
+    params: {
+      ...params,
+    },
+  });
+}
