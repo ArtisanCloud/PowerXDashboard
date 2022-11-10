@@ -28,7 +28,8 @@ declare namespace API {
   export interface RequestGetRoleList {
     page: number;
     pageSize: number;
-    groupID: string;
+    // groupID: string;
+    withEmployees: boolean;
   }
 
   export interface RequestGetEmployeeList {
@@ -87,5 +88,6 @@ declare namespace API {
     name: string;
     parentID: string;
     type: number;
+    employees?: Employee[];
   }
 }

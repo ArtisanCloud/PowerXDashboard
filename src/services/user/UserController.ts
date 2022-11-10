@@ -21,8 +21,13 @@ export async function MeDetail() {
 }
 
 // role
-export async function QueryRoleList() {
-  return request<API.ResponseGetRoleList>('/admin/api/role/list');
+export async function QueryRoleList(params: API.RequestGetRoleList) {
+  return request<API.ResponseGetRoleList>('/admin/api/role/list', {
+    method: 'GET',
+    params: {
+      ...params,
+    },
+  });
 }
 
 // role

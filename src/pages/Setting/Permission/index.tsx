@@ -6,44 +6,22 @@ import {
   ProTable,
 } from '@ant-design/pro-components';
 import styles from './index.less';
-import { Button, Menu, message, Space, Tabs } from 'antd';
+import { Button, Menu, Space, Tabs } from 'antd';
 import { PlusOutlined, PlusSquareFilled } from '@ant-design/icons';
 import { URI_SETTING_ROLE_CREATE } from '@/constants/uri';
 import { history } from 'umi';
-import { useEffect, useRef, useState } from 'react';
-import { API_RETURN_CODE_INIT } from '@/constants/api';
+import { useRef, useState } from 'react';
 import Search from 'antd/es/input/Search';
 import TabPane from 'antd/es/tabs/TabPane';
-import {
-  QueryEmployeeList,
-  QueryRoleList,
-} from '@/services/user/UserController';
+import { QueryEmployeeList } from '@/services/user/UserController';
 import { DEFAULT_PAGE, MAX_PAGE_SIZE } from '@/constants';
+import { UseRoles } from '@/models/role';
 
 const SetupMenu: React.FC = () => {
-  const [roles, setRoles] = useState<API.Role[]>([]);
+  const { roles } = UseRoles();
   const [currentRole, setCurrentRole] = useState<API.Role>();
   const [activeTabPaneKey, setActiveTabPaneKey] = useState<string>('employee');
   const actionRef = useRef<ActionType>();
-
-  useEffect(() => {
-    const HandleLoadRoleData = async () => {
-      const rs: API.ResponseGetRoleList = await QueryRoleList();
-      if (rs.meta.return_code === API_RETURN_CODE_INIT) {
-        setRoles(rs.data);
-      } else {
-        message.error(rs.meta.result_message);
-      }
-    };
-
-    // 加载后台的菜单数据
-    HandleLoadRoleData().catch((e) => {
-      console.error('HandleLoadRoleData', e);
-    });
-
-    // 返回值
-    return () => {};
-  }, []);
 
   const columns: ProColumns<API.Employee>[] = [
     {
@@ -59,7 +37,7 @@ const SetupMenu: React.FC = () => {
       valueType: 'text',
       hideInSearch: false,
       render: (dom, item) => {
-        console.log(dom, item);
+        // console.log(dom, item);
         return (
           <Space>
             <div className={'tag-like-staff-item'}>
@@ -174,8 +152,9 @@ const SetupMenu: React.FC = () => {
             className={styles.menuList}
           >
             <Menu.Item
-              key="0"
+              key=""
               onClick={() => {
+                // console.log('set null role')
                 setCurrentRole(undefined);
                 setActiveTabPaneKey('employee');
               }}
@@ -192,9 +171,10 @@ const SetupMenu: React.FC = () => {
               >
                 <div className={styles.menuItem}>
                   {item.name}
-                  {/*<span className={styles.count}*/}
-                  {/*			style={{marginRight: 8}}*/}
-                  {/*> {item.children ? item.children.length : 0}</span>*/}
+                  <span className={styles.count} style={{ marginRight: 16 }}>
+                    {' '}
+                    {item.employees ? item.employees.length : 0}
+                  </span>
                 </div>
               </Menu.Item>
             ))}
@@ -247,21 +227,29 @@ const SetupMenu: React.FC = () => {
                 search={false}
                 bordered={true}
                 tableAlertRender={false}
+                // initialValue={currentRole?.employees}
                 params={{
                   roleID: currentRole?.roleID,
                 }}
                 request={async () => {
-                  // console.log('current role:',currentRole)
-                  const rs: API.ResponseGetEmployeeList =
-                    await QueryEmployeeList({
-                      roleID: currentRole!.roleID!,
-                      page: DEFAULT_PAGE,
-                      pageSize: MAX_PAGE_SIZE,
-                    });
-                  // console.log(rs.data)
-                  return {
-                    data: rs.data?.data || [],
-                  };
+                  console.log(currentRole);
+                  if (currentRole) {
+                    return {
+                      data: currentRole?.employees || [],
+                    };
+                  } else {
+                    const roleID = '';
+                    const rs: API.ResponseGetEmployeeList =
+                      await QueryEmployeeList({
+                        roleID: roleID,
+                        page: DEFAULT_PAGE,
+                        pageSize: MAX_PAGE_SIZE,
+                      });
+                    // console.log(rs.data)
+                    return {
+                      data: rs.data?.data || [],
+                    };
+                  }
                 }}
                 dateFormatter="string"
               />

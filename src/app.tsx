@@ -17,8 +17,8 @@ import * as URIConstant from '@/constants/uri';
 import { API_RETURN_CODE_INIT } from '@/constants/api';
 
 import { MenuDataItem } from '@ant-design/pro-layout';
-import { QueryMenuList } from '@/services/boot/BootController';
-import { ParseRoutes } from '@/models/menu';
+// import { QueryMenuList } from '@/services/boot/BootController';
+import { UseMenu } from '@/models/menu';
 
 // 全局初始化数据配置，用于 Layout 用户信息和权限初始化
 // 更多信息见文档：https://next.umijs.org/docs/api/runtime-config#getinitialstate
@@ -27,13 +27,13 @@ export async function getInitialState(): Promise<{
   avatar?: string;
   menuData?: MenuDataItem[];
 }> {
-  const rsMenuList: API.ResponseMenuList = await QueryMenuList();
-  const menuData: MenuDataItem[] = ParseRoutes(rsMenuList.data);
+  // const rsMenuList: API.ResponseMenuList = await QueryMenuList();
+  // const menuData: MenuDataItem[] = ParseRoutes(menuData);
   // console.log('getInitialState', menuData);
   return {
     name: '@ArtisanCloud/PowerX',
     avatar: iconAvatar,
-    menuData: menuData,
+    // menuData: menuData,
   };
 }
 
@@ -62,6 +62,8 @@ export const layout = ({
   // console.log('page layout login status is', isLogin)
   // console.log(initialState.menuData)
 
+  const { menuData } = UseMenu();
+
   return {
     logo: logo,
     menu: {
@@ -69,8 +71,8 @@ export const layout = ({
       // defaultOpenKeys: ['key'],
       // defaultOpenAll: true,
     },
-    menuDataRender: (menuData: MenuDataItem[]) =>
-      initialState.menuData || menuData,
+    menuDataRender: () => initialState.menuData || menuData,
+    // menuDataRender: (menuData: MenuDataItem[]) => initialState.menuData || menuData,
     onPageChange: () => {
       // 判断是否系统安装成功
       if (!sysInstalled) {
