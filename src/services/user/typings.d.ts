@@ -21,6 +21,10 @@ declare namespace API {
     data: PaginationEmployees;
   }
 
+  export interface ResponseGetDepartmentList extends APIResponse {
+    data: Department[];
+  }
+
   export interface PaginationEmployees extends PaginationData {
     data: Employee[];
   }
@@ -37,6 +41,11 @@ declare namespace API {
     pageSize: number;
     roleID: string;
   }
+
+  export interface RequestGetDepartmentList {
+    departmentID?: number;
+  }
+
   export interface Employee {
     uuid: string;
     createdAt?: string;
@@ -89,5 +98,14 @@ declare namespace API {
     parentID: string;
     type: number;
     employees?: Employee[];
+  }
+
+  export interface Department {
+    subDepartments: Department[];
+    id: number;
+    name: string;
+    name_en: string;
+    parentid: number;
+    order: number;
   }
 }

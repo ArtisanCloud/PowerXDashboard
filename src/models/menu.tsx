@@ -64,7 +64,7 @@ export const UseMenu = () => {
       // 检查加载后台的菜单数据
       const rs: API.ResponseMenuList = await QueryMenuList();
       if (rs.meta.return_code === API_RETURN_CODE_INIT) {
-        console.log(rs.data);
+        // console.log(rs.data);
         let localMenuData = ParseRoutes(rs.data);
 
         // set status
