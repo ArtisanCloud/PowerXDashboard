@@ -7,7 +7,7 @@ import {
   ProFormTreeSelect,
 } from '@ant-design/pro-components';
 import { Button, Form, message } from 'antd';
-import { GetMenuSelections } from '@/utils/Menu';
+import { GetMenuSelections } from '@/utils/menu';
 import { globalMenus } from '@/models/menu';
 import { MenuSelection } from '@/pages/Setting/Menu/typing';
 import { API_RETURN_CODE_INIT } from '@/constants/api';

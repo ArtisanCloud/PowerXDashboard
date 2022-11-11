@@ -7,7 +7,7 @@ import {
 } from '@ant-design/pro-components';
 import { useState } from 'react';
 import { globalMenus } from '@/models/menu';
-import { GetParentPermissionModule } from '@/utils/Menu';
+import { GetParentPermissionModule } from '@/utils/menu';
 import CreateForm from '@/pages/Setting/Menu/components/CreateForm';
 import UpdateForm from '@/pages/Setting/Menu/components/UpdateForm';
 import styles from '@/pages/Setting/Menu/index.less';

@@ -30,9 +30,21 @@ export async function QueryRoleList(params: API.RequestGetRoleList) {
   });
 }
 
-// role
+// employee
 export async function QueryEmployeeList(params: API.RequestGetEmployeeList) {
   return request<API.ResponseGetEmployeeList>('/admin/api/employee/list', {
+    method: 'GET',
+    params: {
+      ...params,
+    },
+  });
+}
+
+// department
+export async function QueryDepartmentList(
+  params: API.RequestGetDepartmentList,
+) {
+  return request<API.ResponseGetDepartmentList>('/admin/api/department/list', {
     method: 'GET',
     params: {
       ...params,

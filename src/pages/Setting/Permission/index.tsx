@@ -16,9 +16,14 @@ import TabPane from 'antd/es/tabs/TabPane';
 import { QueryEmployeeList } from '@/services/user/UserController';
 import { DEFAULT_PAGE, MAX_PAGE_SIZE } from '@/constants';
 import { UseRoles } from '@/models/role';
+import { UseDepartments } from '@/models/department';
+import { GetDepartmentByID } from '@/utils/department';
+import { GetRoleByID } from '@/utils/role';
 
 const SetupMenu: React.FC = () => {
   const { roles } = UseRoles();
+  const { departments } = UseDepartments();
+
   const [currentRole, setCurrentRole] = useState<API.Role>();
   const [activeTabPaneKey, setActiveTabPaneKey] = useState<string>('employee');
   const actionRef = useRef<ActionType>();
@@ -53,30 +58,37 @@ const SetupMenu: React.FC = () => {
       dataIndex: 'wxDepartment',
       valueType: 'text',
       hideInSearch: true,
-      // render: (dom) => {
-      // 	// @ts-ignore
-      // 	const arr = dom?.length > 1 ? dom?.slice(1) : dom;
-      // 	return (
-      // 		<Space>
-      // 			{arr?.map((i: any) => (
-      // 				<span key={i.uuid}>{i.name}</span>
-      // 			))}
-      // 		</Space>
-      // 	);
-      // },
+      render: (dom, item) => {
+        // console.log("department:", dom)
+        const arr = JSON.parse(dom!.toString());
+        // console.log(arr)
+
+        return (
+          <Space>
+            {arr?.map((i: number) => {
+              // console.log(item.uuid + i)
+              const dep = GetDepartmentByID(departments, i);
+              return <span key={item.uuid + i}>{dep?.name}</span>;
+            })}
+          </Space>
+        );
+      },
     },
     {
       title: '角色',
       dataIndex: 'role_id',
-      hideInSearch: false,
-      valueType: 'select',
-      // valueEnum: {
-      // 	'': {text: '全部账号', role_type: ''},
-      // 	superAdmin: {text: '超级管理员', role_type: 'superAdmin'},
-      // 	admin: {text: '管理员', role_type: 'admin'},
-      // 	departmentAdmin: {text: '部门管理员', role_type: 'departmentAdmin'},
-      // 	staff: {text: '员工', role_type: 'staff'},
-      // },
+      hideInSearch: true,
+      valueType: 'text',
+      width: 200,
+      render: (dom, item) => {
+        const role = GetRoleByID(roles, item.roleID);
+        // console.log(dom, role)
+        return (
+          <Space>
+            <span>{role ? role.name : ''}</span>
+          </Space>
+        );
+      },
     },
     {
       title: '操作',
@@ -130,7 +142,7 @@ const SetupMenu: React.FC = () => {
         >
           <div className={styles.header}>
             <Button
-              key="1"
+              key="newRole"
               className={styles.button}
               type="text"
               icon={
@@ -152,7 +164,7 @@ const SetupMenu: React.FC = () => {
             className={styles.menuList}
           >
             <Menu.Item
-              key=""
+              key="AllRole"
               onClick={() => {
                 // console.log('set null role')
                 setCurrentRole(undefined);
@@ -218,7 +230,7 @@ const SetupMenu: React.FC = () => {
                 actionRef={actionRef}
                 className={'table'}
                 columns={columns}
-                rowKey="roleID"
+                rowKey="id"
                 pagination={{
                   pageSizeOptions: ['5', '10', '20', '50', '100'],
                   pageSize: 50,
@@ -232,7 +244,7 @@ const SetupMenu: React.FC = () => {
                   roleID: currentRole?.roleID,
                 }}
                 request={async () => {
-                  console.log(currentRole);
+                  // console.log(currentRole);
                   if (currentRole) {
                     return {
                       data: currentRole?.employees || [],
