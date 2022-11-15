@@ -33,3 +33,12 @@ export async function DeletePermissionModule(
     data: data,
   });
 }
+
+export async function BindRoleToEmployees(
+  data: API.RequestBindRoleToEmployees,
+) {
+  return request<API.APIResponse>('admin/api/role/bind/employee', {
+    method: 'POST',
+    data: data,
+  });
+}

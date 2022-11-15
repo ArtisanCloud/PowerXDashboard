@@ -6,7 +6,7 @@ import {
   ProTable,
 } from '@ant-design/pro-components';
 import styles from './index.less';
-import { Button, Menu, Space, Tabs } from 'antd';
+import { Button, Menu, message, Space, Tabs } from 'antd';
 import { PlusOutlined, PlusSquareFilled } from '@ant-design/icons';
 import { URI_SETTING_ROLE_CREATE } from '@/constants/uri';
 import { history } from 'umi';
@@ -20,12 +20,19 @@ import { UseDepartments } from '@/models/department';
 import { GetDepartmentByID } from '@/utils/department';
 import { GetRoleByID } from '@/utils/role';
 
+import { ModalForm, ProFormSelect } from '@ant-design/pro-form';
+import { BindRoleToEmployees } from '@/services/permission/PermissionController';
+import { API_RETURN_CODE_INIT } from '@/constants/api';
+
 const SetupMenu: React.FC = () => {
   const { roles } = UseRoles();
   const { departments } = UseDepartments();
 
   const [currentRole, setCurrentRole] = useState<API.Role>();
+  const [currentEmployee, setCurrentEmployee] = useState<API.Employee>();
   const [activeTabPaneKey, setActiveTabPaneKey] = useState<string>('employee');
+  const [isChangeRoleModalVisible, setChangeRoleModalVisible] =
+    useState<boolean>(false);
   const actionRef = useRef<ActionType>();
 
   const columns: ProColumns<API.Employee>[] = [
@@ -95,13 +102,16 @@ const SetupMenu: React.FC = () => {
       hideInSearch: true,
       width: 100,
       render: (_, item) => {
-        console.log(item.roleID);
+        // console.log(item.roleID);
+        if (item.roleID === '05d869bdf8bc5a74e1d96ad46dc8cd2e') {
+          return '';
+        }
         return (
           <a
             type={'link'}
             onClick={() => {
-              // setCurrentRole(item);
-              // setAssignRoleModalVisible(true);
+              setCurrentEmployee(item);
+              setChangeRoleModalVisible(true);
             }}
           >
             更换角色
@@ -300,6 +310,47 @@ const SetupMenu: React.FC = () => {
           </Tabs>
         </ProCard>
       </ProCard>
+
+      <ModalForm
+        className={'dialog from-item-label-100w'}
+        layout={'horizontal'}
+        width={'560px'}
+        visible={isChangeRoleModalVisible}
+        onVisibleChange={setChangeRoleModalVisible}
+        onFinish={async (params) => {
+          // console.log(params)
+          const rq = {
+            roleID: params.roleID,
+            employeeIDs: [currentEmployee!.wxUserID],
+          };
+          // console.log(rq)
+          const rs: API.APIResponse = await BindRoleToEmployees(rq);
+          if (rs.meta.return_code === API_RETURN_CODE_INIT) {
+            actionRef.current?.reload();
+            return true;
+          } else {
+            message.error(rs.meta.result_message);
+          }
+        }}
+      >
+        <h2 className="dialog-title"> 更换角色 </h2>
+        <ProFormSelect
+          width={'md'}
+          name="roleID"
+          label="设置角色"
+          // @ts-ignore
+          options={roles
+            .map((role) => {
+              if (role.name === '超级管理员') {
+                return '';
+              }
+              return { value: role.roleID, label: role.name };
+            })
+            .filter((role) => role)}
+          placeholder="请选择角色"
+          rules={[{ required: true, message: '请选择角色' }]}
+        />
+      </ModalForm>
     </PageContainer>
   );
 };

@@ -9,6 +9,7 @@ declare namespace API {
     state?: string;
   }
 
+  // ----- response ----
   export interface ResponseAuthUser extends APIResponse {
     data: Employee | null;
   }
@@ -29,6 +30,8 @@ declare namespace API {
     data: Employee[];
   }
 
+  // ----- request ----
+
   export interface RequestGetRoleList {
     page: number;
     pageSize: number;
@@ -46,6 +49,12 @@ declare namespace API {
     departmentID?: number;
   }
 
+  export interface RequestBindRoleToEmployees {
+    roleID: string;
+    employeeIDs: string[];
+  }
+
+  // ----- object ----
   export interface Employee {
     uuid: string;
     createdAt?: string;
