@@ -9,6 +9,7 @@ export let globalRoles: API.Role[] = [];
 export const UseRoles = () => {
   const [roles, setRoles] = useState<API.Role[]>(globalRoles);
   const updateGlobalRoles = (val: API.Role[]) => {
+    globalRoles = val;
     setRoles(val);
   };
 
