@@ -42,3 +42,12 @@ export async function BindRoleToEmployees(
     data: data,
   });
 }
+
+export async function QueryGroupPolicyList(
+  data: API.RequestQueryGroupPolicyList,
+) {
+  return request<API.APIResponse>('admin/api/permission/policy/group/list', {
+    method: 'POST',
+    data: data,
+  });
+}

@@ -23,6 +23,7 @@ import { GetRoleByID } from '@/utils/role';
 import { ModalForm, ProFormSelect } from '@ant-design/pro-form';
 import { BindRoleToEmployees } from '@/services/permission/PermissionController';
 import { API_RETURN_CODE_INIT } from '@/constants/api';
+import PolicyForm from '@/components/Policy';
 
 const SetupMenu: React.FC = () => {
   const { roles } = UseRoles();
@@ -283,29 +284,30 @@ const SetupMenu: React.FC = () => {
               key="permission"
               disabled={!currentRole?.roleID}
             >
-              {/*<RoleForm*/}
-              {/*	mode={'simpleEdit'}*/}
-              {/*	currentItem={currentRole}*/}
-              {/*	// @ts-ignore*/}
-              {/*	formRef={roleForm}*/}
-              {/*	onFinish={async (params) => {*/}
-              {/*		const hide = message.loading('修改中');*/}
-              {/*		const res: CommonResp = await Update(params);*/}
-              {/*		hide();*/}
-              {/*		if (res.code === 0) {*/}
-              {/*			message.success('修改成功');*/}
-              {/*			return true;*/}
-              {/*		}*/}
-
-              {/*		if (res.message) {*/}
-              {/*			message.error(res.message);*/}
-              {/*			return false;*/}
-              {/*		}*/}
-
-              {/*		message.error('修改失败');*/}
-              {/*		return false;*/}
-              {/*	}}*/}
-              {/*/>*/}
+              <PolicyForm
+                mode={'simpleEdit'}
+                currentItem={currentRole}
+                // @ts-ignore
+                // 	formRef={roleForm}
+                // 	onFinish={async (params) => {
+                // 		const hide = message.loading('修改中');
+                // 		const res: CommonResp = await Update(params);
+                // 		hide();
+                // 		if (res.code === 0) {
+                // 			message.success('修改成功');
+                // 			return true;
+                // 		}
+                //
+                // 		if (res.message) {
+                // 			message.error(res.message);
+                // 			return false;
+                // 		}
+                //
+                // 		message.error('修改失败');
+                // 		return false;
+                // 	}
+                // }
+              />
             </TabPane>
           </Tabs>
         </ProCard>

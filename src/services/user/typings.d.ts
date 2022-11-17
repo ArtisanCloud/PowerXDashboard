@@ -54,6 +54,10 @@ declare namespace API {
     employeeIDs: string[];
   }
 
+  export interface RequestQueryGroupPolicyList {
+    roleID: string;
+  }
+
   // ----- object ----
   export interface Employee {
     uuid: string;

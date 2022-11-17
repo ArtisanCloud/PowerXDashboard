@@ -9,6 +9,7 @@ export const UseDepartments = () => {
   const [departments, setDepartments] =
     useState<API.Department[]>(globalDepartments);
   const updateGlobalDepartments = (val: API.Department[]) => {
+    globalDepartments = val;
     setDepartments(val);
   };
 
