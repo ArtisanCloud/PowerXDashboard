@@ -19,3 +19,11 @@ export const GetRoleByID = (
 
   return undefined;
 };
+
+export const GetCompactRoleIDByRole = (role: API.Role): string => {
+  if (!role) {
+    return '';
+  }
+
+  return role!.name + '-' + role!.roleID.substring(0, 5);
+};

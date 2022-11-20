@@ -3,12 +3,12 @@ import { API_RETURN_CODE_INIT } from '@/constants/api';
 import { message } from 'antd';
 import { QueryGroupPolicyList } from '@/services/permission/PermissionController';
 
-export let globalPolicies: PowerDictionary<any>[] = [];
+export let globalPolicies: PowerDictionary<any> = {};
 
 export const UsePolicies = () => {
   const [policies, setPolicies] =
-    useState<PowerDictionary<any>[]>(globalPolicies);
-  const updateGlobalPolicies = (val: PowerDictionary<any>[]) => {
+    useState<PowerDictionary<any>>(globalPolicies);
+  const updateGlobalPolicies = (val: PowerDictionary<any>) => {
     globalPolicies = val;
     setPolicies(val);
   };

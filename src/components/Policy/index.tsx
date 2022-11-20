@@ -9,6 +9,15 @@ import { ProFormText } from '@ant-design/pro-form/es';
 import { defaultSettings } from '@ant-design/pro-layout/es/defaultSettings';
 import { isImg, isUrl } from '@ant-design/pro-utils';
 import { UsePolicies } from '@/models/policy';
+import { useEffect, useState } from 'react';
+import { globalMenus } from '@/models/menu';
+import {
+  RBAC_CONTROL_ALL,
+  RBAC_CONTROL_NONE,
+  RBAC_CONTROL_READ,
+} from '@/constants';
+import { GetCompactRoleIDByRole } from '@/utils/role';
+import { GetCompactPermissionIDByPermission } from '@/utils/policy';
 
 const IconFont = createFromIconfontCN({
   scriptUrl: defaultSettings.iconfontUrl,
@@ -53,9 +62,12 @@ export type RoleFormProps = Omit<
 };
 
 const PolicyForm: React.FC<RoleFormProps> = (props) => {
-  const { currentItem, mode } = props;
+  const { currentItem, mode, formRef } = props;
+  // const {menuData} = UseMenu();
   const { policies } = UsePolicies();
-  const routeColumns: ColumnsType = [
+  const [currentRolePolicies, setCurrentRolePolicies] =
+    useState<PowerDictionary<any>>();
+  const menuColumns: ColumnsType = [
     {
       title: '功能名称',
       dataIndex: 'name',
@@ -72,28 +84,27 @@ const PolicyForm: React.FC<RoleFormProps> = (props) => {
     },
     {
       title: '管理权限',
-      dataIndex: 'authority',
-      key: 'authority',
+      dataIndex: 'control',
+      key: 'control',
       render: (_, item: any) => {
-        const authority = [...item?.authority];
-        const biz = authority.pop()?.split('_')?.shift();
+        const policyKey = GetCompactPermissionIDByPermission(item);
         return (
           <ProFormRadio.Group
             disabled={currentItem?.name === '超级管理员'}
             noStyle={true}
-            name={biz}
+            name={policyKey}
             options={[
               {
                 label: `全权控制`,
-                value: `${biz}_Full`,
+                value: RBAC_CONTROL_ALL,
               },
               {
                 label: `仅查看权限`,
-                value: `${biz}_Read`,
+                value: RBAC_CONTROL_READ,
               },
               {
                 label: '无权限',
-                value: '',
+                value: RBAC_CONTROL_NONE,
               },
             ]}
           />
@@ -101,48 +112,68 @@ const PolicyForm: React.FC<RoleFormProps> = (props) => {
       },
     },
   ];
-  const formatParams = (values: any) => {
-    const params = { ...values };
-    if (mode === 'edit' || mode === 'simpleEdit') {
-      params.id = currentItem?.roleID;
+
+  const refreshFormValueByPolicies = (rolePolicies: PowerDictionary<any>) => {
+    const values = formRef.current?.getFieldsValue();
+    if (values && rolePolicies) {
+      // console.log(values)
+      Object.keys(values).forEach((key) => {
+        // console.log(key)
+        let defaultValue = RBAC_CONTROL_NONE;
+        const control = rolePolicies![key];
+        if (control) {
+          defaultValue = control['control'];
+        }
+        // console.log(currentItem?.name, control, defaultValue)
+
+        values[key] = defaultValue;
+      });
+      formRef.current?.setFieldsValue(values);
     }
-    let permissionIDs: any[] = [];
-    Object.keys(params).forEach((key) => {
-      if (key.startsWith('Biz') && params[key]) {
-        permissionIDs.push(params[key]);
-        delete params[key];
-      }
-    });
-    // permissionIDs = lodash.uniq<string>(permissionIDs);
-    // permissionIDs = lodash.filter<string>(permissionIDs);
-    params.permission_ids = permissionIDs;
-    return params;
   };
 
-  // useEffect(() => {
-  //   const values = formRef.current?.getFieldsValue();
-  //   if (values) {
-  //     Object.keys(values).forEach((key) => {
-  //       if (!key.startsWith('Biz')) {
-  //         return;
-  //       }
-  //       let defaultValue = '';
-  //       if (currentItem?.permission_ids?.includes(`${key}_Full`)) {
-  //         defaultValue = `${key}_Full`;
-  //       } else if (currentItem?.permission_ids?.includes(`${key}_Read`)) {
-  //         defaultValue = `${key}_Read`;
-  //       }
-  //       values[key] = defaultValue;
-  //     });
-  //     formRef.current?.setFieldsValue(values);
-  //   }
-  // }, [currentItem, formRef]);
+  const formatParams = (values: any) => {
+    console.log(values);
+    // const params = {...values};
+    // if (mode === 'edit' || mode === 'simpleEdit') {
+    // 	params.id = currentItem?.roleID;
+    // }
+    // let permissionIDs: any[] = [];
+    // Object.keys(params).forEach((key) => {
+    // 	if (key.startsWith('Biz') && params[key]) {
+    // 		permissionIDs.push(params[key]);
+    // 		delete params[key];
+    // 	}
+    // });
+    // permissionIDs = lodash.uniq<string>(permissionIDs);
+    // permissionIDs = lodash.filter<string>(permissionIDs);
+    // params.permission_ids = permissionIDs;
+    // return params;
+  };
+
+  useEffect(() => {
+    const roleKey: string = GetCompactRoleIDByRole(currentItem!);
+    // console.log(currentItem!.name, currentItem!.roleID.substring(0, 5), roleKey)
+    const rolePolicies: PowerDictionary<any> = policies[roleKey];
+    // console.log(policies)
+    // console.log(rolePolicies)
+    setCurrentRolePolicies(rolePolicies);
+    console.log(
+      'update currentRolePolicies',
+      currentRolePolicies,
+      rolePolicies,
+    );
+
+    // refresh current form value
+    // setCurrentRolePolicies 不能及时更新当前时刻的rolePolicies。。。
+    refreshFormValueByPolicies(rolePolicies);
+  }, [currentItem, policies]);
 
   return (
     <ProForm
       layout={'horizontal'}
       // @ts-ignore
-      // submitter={currentItem?.is_default === False}
+      submitter={currentItem?.name === '超级管理员'}
       formRef={props.formRef}
       onFinish={async (values: any) => {
         return props.onFinish(formatParams(values));
@@ -181,25 +212,54 @@ const PolicyForm: React.FC<RoleFormProps> = (props) => {
           </>
         )}
 
-        <div className={styles.permissionList}>
-          {policies.map((topPolicy: any) => {
+        <div className={styles.policyList}>
+          {globalMenus?.map((TopModule: API.Menu) => {
             return (
-              <div key={topPolicy.key} className={styles.permissionItem}>
+              <div
+                key={TopModule.permissionModuleID}
+                className={styles.policyItem}
+              >
                 <div className={styles.title}>
-                  <span className={styles.icon}>{getIcon(topPolicy.icon)}</span>
-                  <span className={styles.name}>{topPolicy.name}</span>
+                  <span className={styles.icon}>
+                    {' '}
+                    - {getIcon(TopModule.icon)}
+                  </span>
+                  <span className={styles.name}>{TopModule.name}</span>
                 </div>
-                <Table
-                  rowKey={'path'}
-                  className={styles.routeTable}
-                  bordered={true}
-                  pagination={false}
-                  dataSource={topPolicy.routes.filter(
-                    (item: any) => item.name && item.authority,
-                  )}
-                  // @ts-ignore
-                  columns={routeColumns}
-                />
+                {TopModule.children.map((SecondModule: API.Menu) => {
+                  let functionMenus: API.Menu[] = [SecondModule];
+                  if (SecondModule.children.length > 0) {
+                    functionMenus = SecondModule.children;
+                  }
+
+                  return (
+                    <div
+                      key={SecondModule.permissionModuleID}
+                      className={styles.policyItem}
+                    >
+                      <div className={styles.title}>
+                        <span className={styles.icon}>
+                          {getIcon(SecondModule.icon)}
+                        </span>
+                        <span className={styles.name}>{SecondModule.name}</span>
+                      </div>
+                      <Table
+                        rowKey={'path'}
+                        className={styles.routeTable}
+                        bordered={true}
+                        pagination={false}
+                        expandable={{
+                          expandIconColumnIndex: -1,
+                        }}
+                        dataSource={functionMenus.filter(
+                          (item: any) => item.name,
+                        )}
+                        // @ts-ignore
+                        columns={menuColumns}
+                      />
+                    </div>
+                  );
+                })}
               </div>
             );
           })}

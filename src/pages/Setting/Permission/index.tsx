@@ -1,5 +1,6 @@
 import {
   ActionType,
+  FormInstance,
   PageContainer,
   ProCard,
   ProColumns,
@@ -35,6 +36,7 @@ const SetupMenu: React.FC = () => {
   const [isChangeRoleModalVisible, setChangeRoleModalVisible] =
     useState<boolean>(false);
   const actionRef = useRef<ActionType>();
+  const policyForm = useRef<FormInstance>();
 
   const columns: ProColumns<API.Employee>[] = [
     {
@@ -288,7 +290,7 @@ const SetupMenu: React.FC = () => {
                 mode={'simpleEdit'}
                 currentItem={currentRole}
                 // @ts-ignore
-                // 	formRef={roleForm}
+                formRef={policyForm}
                 // 	onFinish={async (params) => {
                 // 		const hide = message.loading('修改中');
                 // 		const res: CommonResp = await Update(params);
