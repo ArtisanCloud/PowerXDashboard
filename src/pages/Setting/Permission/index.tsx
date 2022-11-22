@@ -288,7 +288,7 @@ const SetupMenu: React.FC = () => {
             >
               <PolicyForm
                 mode={'simpleEdit'}
-                currentItem={currentRole}
+                currentRole={currentRole}
                 // @ts-ignore
                 formRef={policyForm}
                 // 	onFinish={async (params) => {

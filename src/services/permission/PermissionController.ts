@@ -51,3 +51,10 @@ export async function QueryGroupPolicyList(
     data: data,
   });
 }
+
+export async function UpdatePolicies(data: API.RequestUpdatePolicies) {
+  return request<API.APIResponse>('admin/api/permission/policy/update', {
+    method: 'PUT',
+    data: data,
+  });
+}
