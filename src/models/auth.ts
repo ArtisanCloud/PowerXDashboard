@@ -5,8 +5,8 @@ import * as URIConstant from '@/constants/uri';
 import { MeDetail } from '@/services/user/UserController';
 import { UseApp } from '@/models/global';
 
-let globalAuthUser: API.Employee | undefined = undefined;
-let globalAuthToken: API.Token | undefined = undefined;
+export let globalAuthUser: API.Employee | undefined = undefined;
+export let globalAuthToken: API.Token | undefined = undefined;
 
 // hook UseAuthUser for handling current auth.js user
 export default () => {

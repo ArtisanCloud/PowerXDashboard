@@ -15,6 +15,7 @@ import {
   RBAC_CONTROL_ALL,
   RBAC_CONTROL_NONE,
   RBAC_CONTROL_READ,
+  ROLE_SUPER_ADMIN_NAME,
 } from '@/constants';
 import { GetCompactRoleIDByRole } from '@/utils/role';
 import {
@@ -23,6 +24,7 @@ import {
 } from '@/utils/policy';
 import { UpdatePolicies } from '@/services/permission/PermissionController';
 import { API_RETURN_CODE_INIT } from '@/constants/api';
+import { globalAuthUser } from '@/models/auth';
 
 const IconFont = createFromIconfontCN({
   scriptUrl: defaultSettings.iconfontUrl,
@@ -95,7 +97,10 @@ const PolicyForm: React.FC<RoleFormProps> = (props) => {
         const policyKey = GetCompactPermissionIDByPermission(item);
         return (
           <ProFormRadio.Group
-            disabled={currentRole?.name === '超级管理员'}
+            disabled={
+              currentRole?.name === ROLE_SUPER_ADMIN_NAME &&
+              globalAuthUser!.role!.name !== ROLE_SUPER_ADMIN_NAME
+            }
             noStyle={true}
             name={policyKey}
             options={[
@@ -144,11 +149,13 @@ const PolicyForm: React.FC<RoleFormProps> = (props) => {
     // console.log(policies)
     // console.log(rolePolicies)
     setCurrentRolePolicies(rolePolicies);
-    console.log(
-      'update currentRolePolicies',
-      currentRolePolicies,
-      rolePolicies,
-    );
+    if (!currentRolePolicies) {
+      console.log(
+        'update currentRolePolicies',
+        // currentRolePolicies,
+        // rolePolicies,
+      );
+    }
 
     // refresh current form value
     // setCurrentRolePolicies 不能及时更新当前时刻的rolePolicies。。。
@@ -160,12 +167,15 @@ const PolicyForm: React.FC<RoleFormProps> = (props) => {
       layout={'horizontal'}
       // @ts-ignore
       submitter={{
-        // currentRole?.name === '超级管理员'
         // 配置按钮文本
         // 完全自定义整个区域
         render: (props) => {
           return [
             <button
+              disabled={
+                currentRole?.name === ROLE_SUPER_ADMIN_NAME &&
+                globalAuthUser!.role!.name !== ROLE_SUPER_ADMIN_NAME
+              }
               type="button"
               key="submit"
               onClick={() => props.form?.submit?.()}
@@ -183,7 +193,7 @@ const PolicyForm: React.FC<RoleFormProps> = (props) => {
 
         const rs: API.APIResponse = await UpdatePolicies(params);
         if (rs.meta.return_code === API_RETURN_CODE_INIT) {
-          window.location.reload();
+          // window.location.reload();
           message.success('修改成功');
         } else {
           message.error(rs.meta.result_message);
@@ -192,14 +202,15 @@ const PolicyForm: React.FC<RoleFormProps> = (props) => {
       }}
     >
       <>
-        {currentRole?.name === '超级管理员' && (
-          <Alert
-            showIcon={true}
-            style={{ maxWidth: '600px', marginBottom: 20 }}
-            type="info"
-            message={'为了保证系统安全性，内置角色不允许修改权限'}
-          />
-        )}
+        {currentRole?.name === ROLE_SUPER_ADMIN_NAME &&
+          globalAuthUser!.role!.name !== ROLE_SUPER_ADMIN_NAME && (
+            <Alert
+              showIcon={true}
+              style={{ maxWidth: '600px', marginBottom: 20 }}
+              type="info"
+              message={'为了保证系统安全性，内置角色不允许修改权限'}
+            />
+          )}
 
         {['create', 'edit'].includes(mode) && (
           <>

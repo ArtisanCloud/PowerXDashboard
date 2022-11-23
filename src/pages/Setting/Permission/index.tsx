@@ -15,7 +15,11 @@ import { useRef, useState } from 'react';
 import Search from 'antd/es/input/Search';
 import TabPane from 'antd/es/tabs/TabPane';
 import { QueryEmployeeList } from '@/services/user/UserController';
-import { DEFAULT_PAGE, MAX_PAGE_SIZE } from '@/constants';
+import {
+  DEFAULT_PAGE,
+  MAX_PAGE_SIZE,
+  ROLE_SUPER_ADMIN_NAME,
+} from '@/constants';
 import { UseRoles } from '@/models/role';
 import { UseDepartments } from '@/models/department';
 import { GetDepartmentByID } from '@/utils/department';
@@ -345,7 +349,7 @@ const SetupMenu: React.FC = () => {
           // @ts-ignore
           options={roles
             .map((role) => {
-              if (role.name === '超级管理员') {
+              if (role.name === ROLE_SUPER_ADMIN_NAME) {
                 return '';
               }
               return { value: role.roleID, label: role.name };
