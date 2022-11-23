@@ -37,7 +37,7 @@ export const ConvertPolicyFormToUpdateParams = (
   };
   const roleID: string = GetCompactRoleIDByRole(role);
   Object.keys(policies).forEach((key) => {
-    console.log(key);
+    // console.log(key);
     const policy: API.Policy = {
       roleID: roleID,
       objectID: key,
