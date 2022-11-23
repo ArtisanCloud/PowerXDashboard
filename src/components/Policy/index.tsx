@@ -1,5 +1,5 @@
 import type { FormInstance } from 'antd';
-import { Alert, Divider, Table } from 'antd';
+import { Alert, Divider, message, Table } from 'antd';
 import ProForm, { ProFormProps, ProFormRadio } from '@ant-design/pro-form';
 import styles from './index.less';
 import type { ColumnsType } from 'antd/es/table';
@@ -17,7 +17,12 @@ import {
   RBAC_CONTROL_READ,
 } from '@/constants';
 import { GetCompactRoleIDByRole } from '@/utils/role';
-import { GetCompactPermissionIDByPermission } from '@/utils/policy';
+import {
+  ConvertPolicyFormToUpdateParams,
+  GetCompactPermissionIDByPermission,
+} from '@/utils/policy';
+import { UpdatePolicies } from '@/services/permission/PermissionController';
+import { API_RETURN_CODE_INIT } from '@/constants/api';
 
 const IconFont = createFromIconfontCN({
   scriptUrl: defaultSettings.iconfontUrl,
@@ -53,7 +58,7 @@ export type RoleFormProps = Omit<
 > & {
   mode: 'create' | 'edit' | 'simpleEdit';
   onFinish: (params: any) => void;
-  currentItem: API.Role | undefined;
+  currentRole: API.Role | undefined;
   formRef: React.MutableRefObject<
     FormInstance & {
       getFieldsFormatValue?: () => any;
@@ -62,7 +67,7 @@ export type RoleFormProps = Omit<
 };
 
 const PolicyForm: React.FC<RoleFormProps> = (props) => {
-  const { currentItem, mode, formRef } = props;
+  const { currentRole, mode, formRef } = props;
   // const {menuData} = UseMenu();
   const { policies } = UsePolicies();
   const [currentRolePolicies, setCurrentRolePolicies] =
@@ -90,7 +95,7 @@ const PolicyForm: React.FC<RoleFormProps> = (props) => {
         const policyKey = GetCompactPermissionIDByPermission(item);
         return (
           <ProFormRadio.Group
-            disabled={currentItem?.name === '超级管理员'}
+            disabled={currentRole?.name === '超级管理员'}
             noStyle={true}
             name={policyKey}
             options={[
@@ -124,7 +129,7 @@ const PolicyForm: React.FC<RoleFormProps> = (props) => {
         if (control) {
           defaultValue = control['control'];
         }
-        // console.log(currentItem?.name, control, defaultValue)
+        // console.log(currentRole?.name, control, defaultValue)
 
         values[key] = defaultValue;
       });
@@ -132,28 +137,9 @@ const PolicyForm: React.FC<RoleFormProps> = (props) => {
     }
   };
 
-  const formatParams = (values: any) => {
-    console.log(values);
-    // const params = {...values};
-    // if (mode === 'edit' || mode === 'simpleEdit') {
-    // 	params.id = currentItem?.roleID;
-    // }
-    // let permissionIDs: any[] = [];
-    // Object.keys(params).forEach((key) => {
-    // 	if (key.startsWith('Biz') && params[key]) {
-    // 		permissionIDs.push(params[key]);
-    // 		delete params[key];
-    // 	}
-    // });
-    // permissionIDs = lodash.uniq<string>(permissionIDs);
-    // permissionIDs = lodash.filter<string>(permissionIDs);
-    // params.permission_ids = permissionIDs;
-    // return params;
-  };
-
   useEffect(() => {
-    const roleKey: string = GetCompactRoleIDByRole(currentItem!);
-    // console.log(currentItem!.name, currentItem!.roleID.substring(0, 5), roleKey)
+    const roleKey: string = GetCompactRoleIDByRole(currentRole!);
+    // console.log(currentRole!.name, currentRole!.roleID.substring(0, 5), roleKey)
     const rolePolicies: PowerDictionary<any> = policies[roleKey];
     // console.log(policies)
     // console.log(rolePolicies)
@@ -167,20 +153,46 @@ const PolicyForm: React.FC<RoleFormProps> = (props) => {
     // refresh current form value
     // setCurrentRolePolicies 不能及时更新当前时刻的rolePolicies。。。
     refreshFormValueByPolicies(rolePolicies);
-  }, [currentItem, policies]);
+  }, [currentRole, policies]);
 
   return (
     <ProForm
       layout={'horizontal'}
       // @ts-ignore
-      submitter={currentItem?.name === '超级管理员'}
+      submitter={{
+        // currentRole?.name === '超级管理员'
+        // 配置按钮文本
+        // 完全自定义整个区域
+        render: (props) => {
+          return [
+            <button
+              type="button"
+              key="submit"
+              onClick={() => props.form?.submit?.()}
+            >
+              提交
+            </button>,
+          ];
+        },
+      }}
       formRef={props.formRef}
       onFinish={async (values: any) => {
-        return props.onFinish(formatParams(values));
+        const params: API.RequestUpdatePolicies =
+          ConvertPolicyFormToUpdateParams(currentRole!, values);
+        // console.log(params);
+
+        const rs: API.APIResponse = await UpdatePolicies(params);
+        if (rs.meta.return_code === API_RETURN_CODE_INIT) {
+          window.location.reload();
+          message.success('修改成功');
+        } else {
+          message.error(rs.meta.result_message);
+        }
+        return true;
       }}
     >
       <>
-        {currentItem?.name === '超级管理员' && (
+        {currentRole?.name === '超级管理员' && (
           <Alert
             showIcon={true}
             style={{ maxWidth: '600px', marginBottom: 20 }}

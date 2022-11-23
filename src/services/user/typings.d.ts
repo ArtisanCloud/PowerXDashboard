@@ -58,6 +58,10 @@ declare namespace API {
     roleID: string;
   }
 
+  export interface RequestUpdatePolicies {
+    policies: Policy[];
+  }
+
   // ----- object ----
   export interface Employee {
     uuid: string;

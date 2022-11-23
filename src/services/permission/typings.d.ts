@@ -10,4 +10,10 @@ declare namespace API {
     description?: any;
     moduleID: string;
   }
+
+  export interface Policy {
+    roleID: string;
+    objectID: string;
+    control: string;
+  }
 }

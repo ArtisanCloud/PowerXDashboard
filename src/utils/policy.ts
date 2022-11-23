@@ -1,3 +1,5 @@
+import { GetCompactRoleIDByRole } from '@/utils/role';
+
 export const GetCompactPermissionIDByPermission = (menu: API.Menu): string => {
   // console.log(menu)
   if (!menu) {
@@ -24,4 +26,25 @@ export const GetObjectControl = (
   }
 
   return policy['control'];
+};
+
+export const ConvertPolicyFormToUpdateParams = (
+  role: API.Role,
+  policies: PowerDictionary<any>,
+): API.RequestUpdatePolicies => {
+  let params: API.RequestUpdatePolicies = {
+    policies: [],
+  };
+  const roleID: string = GetCompactRoleIDByRole(role);
+  Object.keys(policies).forEach((key) => {
+    console.log(key);
+    const policy: API.Policy = {
+      roleID: roleID,
+      objectID: key,
+      control: policies[key],
+    };
+    params.policies.push(policy);
+  });
+
+  return params;
 };
