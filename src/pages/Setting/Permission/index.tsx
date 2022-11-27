@@ -26,9 +26,13 @@ import { GetDepartmentByID } from '@/utils/department';
 import { GetRoleByID } from '@/utils/role';
 
 import { ModalForm, ProFormSelect } from '@ant-design/pro-form';
-import { BindRoleToEmployees } from '@/services/permission/PermissionController';
+import {
+  BindRoleToEmployees,
+  UpdatePolicies,
+} from '@/services/permission/PermissionController';
 import { API_RETURN_CODE_INIT } from '@/constants/api';
 import PolicyForm from '@/components/Policy';
+import { ConvertPolicyFormToUpdateParams } from '@/utils/policy';
 
 const SetupMenu: React.FC = () => {
   const { roles } = UseRoles();
@@ -295,24 +299,20 @@ const SetupMenu: React.FC = () => {
                 currentRole={currentRole}
                 // @ts-ignore
                 formRef={policyForm}
-                // 	onFinish={async (params) => {
-                // 		const hide = message.loading('修改中');
-                // 		const res: CommonResp = await Update(params);
-                // 		hide();
-                // 		if (res.code === 0) {
-                // 			message.success('修改成功');
-                // 			return true;
-                // 		}
-                //
-                // 		if (res.message) {
-                // 			message.error(res.message);
-                // 			return false;
-                // 		}
-                //
-                // 		message.error('修改失败');
-                // 		return false;
-                // 	}
-                // }
+                onFinish={async (values) => {
+                  const params: API.RequestUpdatePolicies =
+                    ConvertPolicyFormToUpdateParams(currentRole!, values);
+                  // console.log(params);
+
+                  const rs: API.APIResponse = await UpdatePolicies(params);
+                  if (rs.meta.return_code === API_RETURN_CODE_INIT) {
+                    // window.location.reload();
+                    message.success('修改成功');
+                  } else {
+                    message.error(rs.meta.result_message);
+                  }
+                  return true;
+                }}
               />
             </TabPane>
           </Tabs>

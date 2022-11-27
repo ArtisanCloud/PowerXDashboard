@@ -93,6 +93,19 @@ export default [
         component: '@/pages/Setting/Permission',
       },
       {
+        name: '角色配置',
+        path: '/setting/role',
+        icon: 'HomeOutlined',
+        routes: [
+          {
+            name: '角色添加',
+            path: '/setting/role/create',
+            icon: 'HomeOutlined',
+            component: '@/pages/Setting/Role/create',
+          },
+        ],
+      },
+      {
         name: '菜单配置',
         path: '/setting/menu',
         icon: 'HomeOutlined',

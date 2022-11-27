@@ -52,8 +52,18 @@ export function ParseRoutes(menus: API.Menu[]) {
   return authRoutes;
 }
 
-export const UseMenu = () => {
+export const UseMenus = () => {
+  const [menus, setMenus] = useState<API.Menu[]>(globalMenus);
+
+  return {
+    menus,
+    setMenus,
+  };
+};
+
+export const UseMenuData = () => {
   const [menuData, setMenuData] = useState<MenuDataItem[]>(globalMenuData);
+  const { setMenus } = UseMenus();
   const updateGlobalMenuData = (val: MenuDataItem[]) => {
     globalMenuData = val;
     setMenuData(val);
@@ -65,8 +75,9 @@ export const UseMenu = () => {
       const rs: API.ResponseMenuList = await QueryMenuList();
       if (rs.meta.return_code === API_RETURN_CODE_INIT) {
         // console.log(rs.data);
-        let localMenuData = ParseRoutes(rs.data);
+        setMenus(rs.data);
 
+        let localMenuData = ParseRoutes(rs.data);
         // set status
         updateGlobalMenuData(localMenuData);
       } else {
