@@ -1,5 +1,5 @@
 import type { FormInstance } from 'antd';
-import { Alert, Divider, message, Table } from 'antd';
+import { Alert, Divider, Table } from 'antd';
 import ProForm, { ProFormProps, ProFormRadio } from '@ant-design/pro-form';
 import styles from './index.less';
 import type { ColumnsType } from 'antd/es/table';
@@ -18,12 +18,7 @@ import {
   ROLE_SUPER_ADMIN_NAME,
 } from '@/constants';
 import { GetCompactRoleIDByRole } from '@/utils/role';
-import {
-  ConvertPolicyFormToUpdateParams,
-  GetCompactPermissionIDByPermission,
-} from '@/utils/policy';
-import { UpdatePolicies } from '@/services/permission/PermissionController';
-import { API_RETURN_CODE_INIT } from '@/constants/api';
+import { GetCompactPermissionIDByPermission } from '@/utils/policy';
 import { globalAuthUser } from '@/models/auth';
 
 const IconFont = createFromIconfontCN({
@@ -70,7 +65,6 @@ export type RoleFormProps = Omit<
 
 const PolicyForm: React.FC<RoleFormProps> = (props) => {
   const { currentRole, mode, formRef } = props;
-  // const {menuData} = UseMenu();
   const { policies } = UsePolicies();
   const [currentRolePolicies, setCurrentRolePolicies] =
     useState<PowerDictionary<any>>();
@@ -125,16 +119,18 @@ const PolicyForm: React.FC<RoleFormProps> = (props) => {
 
   const refreshFormValueByPolicies = (rolePolicies: PowerDictionary<any>) => {
     const values = formRef.current?.getFieldsValue();
-    if (values && rolePolicies) {
+    if (values) {
       // console.log(values)
       Object.keys(values).forEach((key) => {
         // console.log(key)
         let defaultValue = RBAC_CONTROL_NONE;
-        const control = rolePolicies![key];
-        if (control) {
-          defaultValue = control['control'];
+        if (rolePolicies) {
+          const control = rolePolicies![key];
+          if (control) {
+            defaultValue = control['control'];
+          }
         }
-        // console.log(currentRole?.name, control, defaultValue)
+        // console.log(currentRole?.name, defaultValue)
 
         values[key] = defaultValue;
       });
@@ -150,6 +146,8 @@ const PolicyForm: React.FC<RoleFormProps> = (props) => {
     // console.log(rolePolicies)
     setCurrentRolePolicies(rolePolicies);
     if (!currentRolePolicies) {
+      console.log('no currentRolePolicies');
+    } else {
       console.log(
         'update currentRolePolicies',
         // currentRolePolicies,
@@ -159,8 +157,9 @@ const PolicyForm: React.FC<RoleFormProps> = (props) => {
 
     // refresh current form value
     // setCurrentRolePolicies 不能及时更新当前时刻的rolePolicies。。。
+    console.log(globalMenus);
     refreshFormValueByPolicies(rolePolicies);
-  }, [currentRole, policies]);
+  }, [globalMenus, currentRole, policies]);
 
   return (
     <ProForm
@@ -187,18 +186,7 @@ const PolicyForm: React.FC<RoleFormProps> = (props) => {
       }}
       formRef={props.formRef}
       onFinish={async (values: any) => {
-        const params: API.RequestUpdatePolicies =
-          ConvertPolicyFormToUpdateParams(currentRole!, values);
-        // console.log(params);
-
-        const rs: API.APIResponse = await UpdatePolicies(params);
-        if (rs.meta.return_code === API_RETURN_CODE_INIT) {
-          // window.location.reload();
-          message.success('修改成功');
-        } else {
-          message.error(rs.meta.result_message);
-        }
-        return true;
+        return props.onFinish(values);
       }}
     >
       <>
@@ -219,7 +207,7 @@ const PolicyForm: React.FC<RoleFormProps> = (props) => {
 
             <ProFormText
               width={'md'}
-              name="name"
+              name="roleName"
               label="角色名称"
               placeholder="请输入角色名称"
               rules={[

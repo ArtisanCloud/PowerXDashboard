@@ -18,7 +18,7 @@ import { API_RETURN_CODE_INIT } from '@/constants/api';
 
 import { MenuDataItem } from '@ant-design/pro-layout';
 // import { QueryMenuList } from '@/services/boot/BootController';
-import { UseMenu } from '@/models/menu';
+import { UseMenuData } from '@/models/menu';
 
 // 全局初始化数据配置，用于 Layout 用户信息和权限初始化
 // 更多信息见文档：https://next.umijs.org/docs/api/runtime-config#getinitialstate
@@ -62,7 +62,7 @@ export const layout = ({
   // console.log('page layout login status is', isLogin)
   // console.log(initialState.menuData)
 
-  const { menuData } = UseMenu();
+  const { menuData } = UseMenuData();
 
   return {
     logo: logo,

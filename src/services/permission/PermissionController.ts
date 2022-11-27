@@ -52,6 +52,13 @@ export async function QueryGroupPolicyList(
   });
 }
 
+export async function CreateRolePolicies(data: API.RequestCreateRolePolicies) {
+  return request<API.APIResponse>('admin/api/permission/role/policy/create', {
+    method: 'POST',
+    data: data,
+  });
+}
+
 export async function UpdatePolicies(data: API.RequestUpdatePolicies) {
   return request<API.APIResponse>('admin/api/permission/policy/update', {
     method: 'PUT',
