@@ -7,6 +7,11 @@ import PolicyForm from '@/components/Policy';
 import { CreateRolePolicies } from '@/services/permission/PermissionController';
 import { API_RETURN_CODE_INIT } from '@/constants/api';
 import { URI_SETTING_PERMISSION } from '@/constants/uri';
+import {
+  CheckRoleNameIsAvailable,
+  ConvertPolicyFormToCreateRoleParams,
+} from '@/utils/policy';
+import { history } from '@@/core/history';
 
 const Create: React.FC = () => {
   const [currentRole] = useState<API.Role>();
@@ -27,12 +32,23 @@ const Create: React.FC = () => {
           mode={'create'}
           onFinish={async (values) => {
             // console.log(values)
-            const params = { ...values };
+            const result: boolean = CheckRoleNameIsAvailable(
+              values['roleName'],
+            );
+            if (!result) {
+              history.push(URI_SETTING_PERMISSION);
+              message.error('该角色名字已存在');
+              return false;
+            }
+            const formData: API.RequestCreateRolePolicies =
+              ConvertPolicyFormToCreateRoleParams(values);
+            // console.log(formData)
+            // return false
             const hide = message.loading('处理中');
-            const rs: API.APIResponse = await CreateRolePolicies(params);
+            const rs: API.APIResponse = await CreateRolePolicies(formData);
             hide();
             if (rs.meta.return_code === API_RETURN_CODE_INIT) {
-              history.state(URI_SETTING_PERMISSION);
+              history.push(URI_SETTING_PERMISSION);
               message.success('添加成功');
               return true;
             }
