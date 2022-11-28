@@ -1,4 +1,5 @@
 import { GetCompactRoleIDByRole } from '@/utils/role';
+import { globalRoles } from '@/models/role';
 
 export const GetCompactPermissionIDByPermission = (menu: API.Menu): string => {
   // console.log(menu)
@@ -47,4 +48,37 @@ export const ConvertPolicyFormToUpdateParams = (
   });
 
   return params;
+};
+
+export const ConvertPolicyFormToCreateRoleParams = (
+  policiesData: PowerDictionary<any>,
+): API.RequestCreateRolePolicies => {
+  let params: API.RequestCreateRolePolicies = {
+    roleName: policiesData['roleName'],
+    policies: [],
+  };
+
+  delete policiesData['roleName'];
+  Object.keys(policiesData).forEach((key) => {
+    // console.log(key);
+    const policy: API.Policy = {
+      roleID: '',
+      objectID: key,
+      control: policiesData[key],
+    };
+    params.policies.push(policy);
+  });
+
+  return params;
+};
+
+export const CheckRoleNameIsAvailable = (roleName: string): boolean => {
+  for (const role of globalRoles) {
+    // console.log(role.name, roleName)
+    if (role.name === roleName) {
+      return false;
+    }
+  }
+
+  return true;
 };
