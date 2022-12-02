@@ -129,6 +129,6 @@ declare namespace API {
     name_en: string;
     parentid: number;
     order: number;
-    employeeCount: number;
+    employees: Employee[];
   }
 }

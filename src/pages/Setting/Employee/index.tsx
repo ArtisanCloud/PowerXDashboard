@@ -1,13 +1,15 @@
 import React, { useRef, useState } from 'react';
 import { SyncOutlined } from '@ant-design/icons';
 import { PageContainer } from '@ant-design/pro-layout';
-import { Alert, Button, Space } from 'antd';
+import { Alert, Button, message, Space } from 'antd';
 import Text from 'antd/es/typography/Text';
 import styles from './index.less';
 import type { ActionType } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
 import type { ProColumns } from '@ant-design/pro-table/es';
 import DepartmentList from '@/components/Department';
+import { SyncEmployees } from '@/services/user/UserController';
+import { API_RETURN_CODE_INIT } from '@/constants/api';
 
 const EmployeeList: React.FC = () => {
   const [syncLoading, setSyncLoading] = useState<boolean>(false);
@@ -118,16 +120,16 @@ const EmployeeList: React.FC = () => {
           loading={syncLoading}
           onClick={async () => {
             setSyncLoading(true);
-            // const res: CommonResp = await SyncEmployee();
-            // if (res.code === 0) {
-            //   setSyncLoading(false);
-            //   // @ts-ignore
-            //   actionRef?.current.reset();
-            //   message.success('同步成功');
-            // } else {
-            //   setSyncLoading(false);
-            //   message.error(res.message);
-            // }
+            const res: API.APIResponse = await SyncEmployees();
+            if (res.meta.return_code === API_RETURN_CODE_INIT) {
+              setSyncLoading(false);
+              // @ts-ignore
+              actionRef?.current.reset();
+              message.success('同步成功');
+            } else {
+              setSyncLoading(false);
+              message.error(res.meta.result_message);
+            }
           }}
         >
           同步数据

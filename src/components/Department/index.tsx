@@ -36,6 +36,7 @@ const buildDepartmentTree = (
   let nodes: TreeNode[] = []; // 一维节点
   let tree: TreeNode[] = []; // 树形节点
   items.forEach((department: API.Department) => {
+    console.log(department);
     nodes.push({
       title: department.name,
       key: `${department.id}`,
@@ -44,7 +45,7 @@ const buildDepartmentTree = (
       checkable: true,
       selectable: false,
       order: department.order,
-      staff_num: department.employeeCount,
+      staff_num: department.employees ? department.employees.length : 0,
     });
     if (department?.subDepartments) {
       department?.subDepartments.forEach((subDepartment: API.Department) => {
@@ -55,8 +56,10 @@ const buildDepartmentTree = (
           children: [],
           checkable: true,
           selectable: false,
-          order: department.order,
-          staff_num: department.employeeCount,
+          order: subDepartment.order,
+          staff_num: subDepartment.employees
+            ? subDepartment.employees.length
+            : 0,
         });
       });
     }
