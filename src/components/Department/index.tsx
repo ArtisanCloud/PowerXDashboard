@@ -15,7 +15,7 @@ export type DepartmentTreeProps = {
 export interface DepartmentOption extends API.Department {
   key: any;
   label: string;
-  value: string;
+  value: number;
 }
 
 export interface TreeNode {
@@ -36,7 +36,7 @@ const buildDepartmentTree = (
   let nodes: TreeNode[] = []; // 一维节点
   let tree: TreeNode[] = []; // 树形节点
   items.forEach((department: API.Department) => {
-    console.log(department);
+    // console.log(department);
     nodes.push({
       title: department.name,
       key: `${department.id}`,
@@ -97,7 +97,7 @@ const buildDepartmentTree = (
 const DepartmentList = ({
   callback,
 }: {
-  callback: (selectedKey: string) => void;
+  callback: (selectedKey: number) => void;
 }) => {
   const { departments } = UseDepartments();
   const [allDepartments, setAllDepartments] = useState<API.Department[]>([]);
@@ -168,7 +168,7 @@ const DepartmentList = ({
       <div
         onClick={() => {
           // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-          callback && callback(String(node.key));
+          callback && callback(Number(node.key));
         }}
         style={{
           padding: '4px 6px',

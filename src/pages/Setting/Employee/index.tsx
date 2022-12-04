@@ -10,13 +10,21 @@ import type { ProColumns } from '@ant-design/pro-table/es';
 import DepartmentList from '@/components/Department';
 import { SyncEmployees } from '@/services/user/UserController';
 import { API_RETURN_CODE_INIT } from '@/constants/api';
+import { GetEmployeesByDepartmentID } from '@/utils/employee';
+import { globalDepartments } from '@/models/department';
+import { GetDepartmentByID } from '@/utils/department';
+import { GetRoleSelections } from '@/utils/role';
+import { UseRoles } from '@/models/role';
+import { history } from 'umi';
+import { URI_SETTING_PERMISSION } from '@/constants/uri';
 
 const EmployeeList: React.FC = () => {
   const [syncLoading, setSyncLoading] = useState<boolean>(false);
-  const [currentDepartment, setCurrentDepartment] = useState('0');
+  const [currentDepartment, setCurrentDepartment] = useState<number>(1);
+  const { roles } = UseRoles();
   const actionRef = useRef<ActionType>();
 
-  const getDepartmentKey = (key: string) => {
+  const getDepartmentKey = (key: number) => {
     setCurrentDepartment(key);
   };
 
@@ -38,7 +46,7 @@ const EmployeeList: React.FC = () => {
           <Space>
             <div className={'tag-like-staff-item'}>
               <img src={item.wxAvatar} className={'icon'} alt={item.name} />
-              <span className={'text'}>{item.name}</span>
+              <span className={'text'}>{item.wxName}</span>
             </div>
           </Space>
         );
@@ -46,60 +54,85 @@ const EmployeeList: React.FC = () => {
     },
     {
       title: '所在部门',
-      dataIndex: 'departments',
+      dataIndex: 'wxDepartment',
       valueType: 'text',
       hideInSearch: true,
-      render: (dom) => {
+      render: (dom, item) => {
         // @ts-ignore
-        const arr = dom?.length > 1 ? dom?.slice(1) : dom;
+        const arr = JSON.parse(dom!.toString());
+        // console.log(dom, arr)
         return (
           <Space>
-            {arr?.map((i: any) => (
-              <span key={i.id}>{i.name}</span>
-            ))}
+            {arr?.map((i: number) => {
+              // console.log(item.uuid + i)
+              const dep = GetDepartmentByID(globalDepartments, i);
+              return <span key={item.wxUserID + i}>{dep?.name}</span>;
+            })}
           </Space>
         );
       },
     },
     {
       title: '角色',
-      dataIndex: 'role_type',
+      dataIndex: 'roleID',
       order: 100,
       hideInSearch: false,
       valueType: 'select',
-      valueEnum: {
-        // '': {text: '全部账号', role_type: ''},
-        // superAdmin: {text: '超级管理员', role_type: 'superAdmin'},
-        // admin: {text: '管理员', role_type: 'admin'},
-        // departmentAdmin: {text: '部门管理员', role_type: 'departmentAdmin'},
-        // staff: {text: '普通员工', role_type: 'staff'},
-      },
+      valueEnum: GetRoleSelections(roles),
+
+      // valueType: 'text',
+      // render: (dom, item) => {
+      // 	// console.log(roles,item.roleID)
+      // 	const role = GetRoleByID(roles, item.roleID);
+      // 	// console.log(dom, role)
+      // 	return (
+      // 		<Space>
+      // 			<span>{role ? role.name : ''}</span>
+      // 		</Space>
+      // 	);
+      // },
     },
     {
       title: '状态',
       dataIndex: 'external',
       valueType: 'text',
       hideInSearch: true,
+      render: (dom, item) => {
+        // console.log("status:",dom)
+        return (
+          <Space>
+            <span>{item.roleID ? '激活' : '未激活'}</span>
+          </Space>
+        );
+      },
     },
     {
       title: '操作',
       hideInSearch: true,
       width: 180,
-      render: (text, dom) => {
-        console.log(text, dom);
+      render: (text, item) => {
+        // console.log(text, dom);
         return (
           <Space>
-            {
-              // dom.enable_msg_arch === 2 ? <Tooltip placement="topLeft" title="该员工暂未开启消息存档">
-              //     <Button type={'link'} disabled={true}>聊天记录</Button>
-              //   </Tooltip>
-              //   :
-              //   <Button type={'link'}
-              //           onClick={() => history.push(`/staff-admin/corp-risk-control/chat-session?staff=${dom.ext_staff_id}`)}
-              //   >聊天记录</Button>
-            }
-            {/*<Button type={'link'}*/}
-            {/*        onClick={() => history.push(`/staff-admin/company-management/role?ext_staff_id=${dom.ext_staff_id}`)}>管理权限</Button>*/}
+            {/*{*/}
+            {/*	dom.enable_msg_arch === 2 ? <Tooltip placement="topLeft" title="该员工暂未开启消息存档">*/}
+            {/*	    <Button type={'link'} disabled={true}>聊天记录</Button>*/}
+            {/*	  </Tooltip>*/}
+            {/*	  :*/}
+            {/*	  <Button type={'link'}*/}
+            {/*	          onClick={() => history.push(`/staff-admin/corp-risk-control/chat-session?staff=${dom.ext_staff_id}`)}*/}
+            {/*	  >聊天记录</Button>*/}
+            {/*}*/}
+            <Button
+              type={'link'}
+              onClick={() =>
+                history.push(
+                  URI_SETTING_PERMISSION + `?employeeID=${item.wxUserID}`,
+                )
+              }
+            >
+              管理权限
+            </Button>
           </Space>
         );
       },
@@ -186,16 +219,32 @@ const EmployeeList: React.FC = () => {
           </div>
         )}
         params={{
-          ext_department_ids:
-            currentDepartment !== '0' ? currentDepartment : '0',
+          ext_department_ids: currentDepartment !== 0 ? currentDepartment : 0,
         }}
-        // request={async (params, sort, filter) => {
-        //   return ProTableRequestAdapter(params, sort, filter, QueryEmployeesList);
-        // }}
+        request={async (params, sort, filter) => {
+          if (params) {
+            // console.log(params.ext_department_ids)
+          }
+          if (sort) {
+            // console.log(sort.toString())
+          }
+
+          // console.log(currentDepartment,globalDepartments)
+          let employees: API.Employee[] = GetEmployeesByDepartmentID(
+            globalDepartments,
+            currentDepartment,
+          );
+          // console.log(employees)
+          if (filter) {
+            // console.log(filter.toString())
+          }
+          return {
+            data: employees || [],
+          };
+        }}
         dateFormatter="string"
       />
     </PageContainer>
   );
 };
-
 export default EmployeeList;

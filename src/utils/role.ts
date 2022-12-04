@@ -1,3 +1,6 @@
+import { ProSchemaValueEnumType } from '@ant-design/pro-provider';
+import { ProSchemaValueEnumObj } from '@ant-design/pro-utils';
+
 export const GetRoleByID = (
   roles: API.Role[],
   roleID: string,
@@ -26,4 +29,19 @@ export const GetCompactRoleIDByRole = (role: API.Role): string => {
   }
 
   return role!.name + '-' + role!.roleID.substring(0, 5);
+};
+
+export const GetRoleSelections = (
+  roles: API.Role[],
+): ProSchemaValueEnumObj | ProSchemaValueEnumType => {
+  let selections: any = {};
+
+  for (const role of roles) {
+    selections[role.roleID] = {
+      text: role.name,
+      status: role.roleID,
+    };
+  }
+
+  return selections;
 };
