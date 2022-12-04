@@ -51,3 +51,10 @@ export async function QueryDepartmentList(
     },
   });
 }
+
+export async function SyncEmployees() {
+  return request<API.APIResponse>('/root/api/employee/sync', {
+    method: 'POST',
+    timeout: 10000,
+  });
+}
