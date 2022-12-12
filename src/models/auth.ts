@@ -52,6 +52,7 @@ export default () => {
         // 全局token设置好后，请求登陆用户的信息
         // authUser = FakeUser;
         // console.log(authToken)
+        //   console.log(rootInitialized, AuthToken)
         const rsAuthUser = await MeDetail();
         if (rsAuthUser.meta.return_code === APIConstant.API_RETURN_CODE_INIT) {
           authUser = rsAuthUser.data!;
