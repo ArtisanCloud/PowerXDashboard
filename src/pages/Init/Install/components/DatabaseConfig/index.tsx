@@ -74,7 +74,7 @@ export default (Props: { required: boolean; config: API.DatabaseConfig }) => {
           <ProFormText
             name="dbSchemaDefault"
             label="数据库默认摘要"
-            tooltip="如果你的数据库存在schema，请设置"
+            tooltip="如果您的数据库存在schema，请设置"
             placeholder="默认是public"
             initialValue={Props.config.connections!.pgsql.schemas!.default}
             rules={[{ required: Props.required }]}

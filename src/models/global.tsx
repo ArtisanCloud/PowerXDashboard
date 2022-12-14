@@ -74,7 +74,7 @@ export const UseApp = () => {
           }
         });
         // console.log(sysInstalled)
-        localStorage.setItem('sysInstalled', 'true');
+        localStorage.setItem('sysInstalled', '' + sysInstalled);
         // set status
         updateGlobalSystemInstalled(sysInstalled);
       } else {

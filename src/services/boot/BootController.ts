@@ -34,6 +34,13 @@ export async function InitRootByCode(
   );
 }
 
+export async function InitRoot(data: API.RequestInitRoot) {
+  return request<API.ResponseToken>('root/api/system/root/initialize', {
+    method: 'POST',
+    data: data,
+  });
+}
+
 // Menu APIs
 export async function QueryMenuList() {
   return request<API.ResponseMenuList>('root/api/permission/module/list');

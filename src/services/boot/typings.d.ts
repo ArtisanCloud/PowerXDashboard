@@ -16,4 +16,9 @@ declare namespace API {
   export interface RequestInstallSystem {
     appConfig: AppConfig;
   }
+
+  export interface RequestInitRoot {
+    email: string;
+    password: string;
+  }
 }
