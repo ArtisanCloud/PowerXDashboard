@@ -56,7 +56,7 @@ export default (Props: { required: boolean; config: API.WeComConfig }) => {
           <ProFormTextArea
             name="appCertPublicKey"
             label="企微应用证书公钥"
-            tooltip="请到微信商户号后台配置获取"
+            tooltip="请到企业微信后台配置获取"
             placeholder="如：|
     xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
     xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
@@ -81,7 +81,7 @@ export default (Props: { required: boolean; config: API.WeComConfig }) => {
             width={'lg'}
             name="appMessageCallbackURL"
             label="企微应用消息回调地址"
-            tooltip="请保证host替换成你想要的域名，后面URI为 wechat/api/weCom/app"
+            tooltip="请保证host替换成您想要的域名，后面URI为 wechat/api/weCom/app"
             placeholder="https://{host}/wechat/api/weCom/app"
             initialValue={'https://{host}/wechat/api/weCom/app'}
             rules={[{ required: Props.required }]}
@@ -109,7 +109,7 @@ export default (Props: { required: boolean; config: API.WeComConfig }) => {
       {/*  width={'lg'}*/}
       {/*  name="customerMessageCallbackURL"*/}
       {/*  label="企微客户联系人消息回调地址"*/}
-      {/*  tooltip="请保证host替换成你想要的域名，后面URI为 wechat/api/weCom/customer"*/}
+      {/*  tooltip="请保证host替换成您想要的域名，后面URI为 wechat/api/weCom/customer"*/}
       {/*  placeholder="https://{host}/wechat/api/weCom/customer"*/}
       {/*  initialValue={'https://{host}/wechat/api/weCom/customer'}*/}
       {/*  rules={[{ required: Props.required }]}*/}
@@ -133,7 +133,7 @@ export default (Props: { required: boolean; config: API.WeComConfig }) => {
       {/*  width={'lg'}*/}
       {/*  name="employeeMessageCallbackURL"*/}
       {/*  label="企微内部联系人消息回调地址"*/}
-      {/*  tooltip="请保证host替换成你想要的域名，后面URI为 wechat/api/weCom/employee"*/}
+      {/*  tooltip="请保证host替换成您想要的域名，后面URI为 wechat/api/weCom/employee"*/}
       {/*  placeholder="https://{host}/wechat/api/weCom/employee"*/}
       {/*  initialValue={'https://{host}/wechat/api/weCom/employee'}*/}
       {/*  rules={[{ required: Props.required }]}*/}

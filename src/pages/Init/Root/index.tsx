@@ -2,9 +2,9 @@ import { PageContainer } from '@ant-design/pro-components';
 import { UseApp } from '@/models/global';
 import * as URIConstant from '@/constants/uri';
 import { history } from 'umi';
-import ProCard from '@ant-design/pro-card';
+import { ProCard } from '@ant-design/pro-components';
 import useScript from '@/utils/script';
-import { Card } from 'antd';
+import RegisterRootForm from '@/pages/Init/Root/components/RegisterRootForm';
 
 const RootInitPage: React.FC = () => {
   const { rootInitialized } = UseApp();
@@ -16,26 +16,39 @@ const RootInitPage: React.FC = () => {
   useScript(
     'https://wwcdn.weixin.qq.com/node/wework/wwopen/js/wwLogin-1.2.7.js',
   );
-  // useScript("/public/js/wxLoginLib.js")
   useScript('/public/js/wxLogin.js');
 
+  // const bEnableWeComAuth: boolean = false
+  const disableWeComAuth: boolean = BASE_URL
+    ? BASE_URL.includes('localhost')
+    : true;
+  // console.log(BASE_URL,disableWeComAuth)
   return (
-    <PageContainer ghost>
+    <PageContainer
+      header={{
+        title: '初始化系统管理员',
+        ghost: true,
+      }}
+    >
       <ProCard
-        title="初始化系统管理员"
-        extra="请使用企业微信扫码"
-        tooltip="请初始化系统管理员"
-        style={{ maxWidth: 1200, textAlign: 'center' }}
-        headerBordered
+        tabs={{
+          type: 'card',
+        }}
+        title="请初始化系统管理员"
+        extra="系统安装完毕后，需要初始化一个Root级别的超级管理员，可以设置系统权限功能等。"
+        tooltip="如果当前域名是localhost，则不能使用企业微信授权初始化Root"
+        direction="column"
       >
-        <Card>
-          <div>
-            系统安装完毕后，需要初始化一个Root级别的超级管理员，可以设置系统权限功能等。
-          </div>
-        </Card>
-        <Card>
+        <ProCard.TabPane key="base" tab="账号密码注册Root">
+          <RegisterRootForm />
+        </ProCard.TabPane>
+        <ProCard.TabPane
+          key="wecom"
+          tab="微信授权登陆注册Root"
+          disabled={disableWeComAuth}
+        >
           <div id="qrcode-container"></div>
-        </Card>
+        </ProCard.TabPane>
       </ProCard>
     </PageContainer>
   );
