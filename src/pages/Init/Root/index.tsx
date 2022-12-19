@@ -16,7 +16,7 @@ const RootInitPage: React.FC = () => {
   useScript(
     'https://wwcdn.weixin.qq.com/node/wework/wwopen/js/wwLogin-1.2.7.js',
   );
-  useScript('/public/js/wxLogin.js');
+  useScript('/public/js/wxRootAuthorize.js');
 
   // const bEnableWeComAuth: boolean = false
   const disableWeComAuth: boolean = BASE_URL
@@ -47,7 +47,7 @@ const RootInitPage: React.FC = () => {
           tab="微信授权登陆注册Root"
           disabled={disableWeComAuth}
         >
-          <div id="qrcode-container"></div>
+          <div id="root-qrcode-container"></div>
         </ProCard.TabPane>
       </ProCard>
     </PageContainer>

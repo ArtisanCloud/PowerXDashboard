@@ -1,9 +1,4 @@
-import {
-  ProForm,
-  ProFormDigit,
-  ProFormText,
-  ProFormTextArea,
-} from '@ant-design/pro-components';
+import { ProForm, ProFormDigit, ProFormText } from '@ant-design/pro-components';
 import { Col, Row } from 'antd';
 
 export default (Props: { required: boolean; config: API.WeComConfig }) => {
@@ -51,21 +46,21 @@ export default (Props: { required: boolean; config: API.WeComConfig }) => {
           />
         </Col>
       </Row>
-      <Row gutter={rowGutter}>
-        <Col>
-          <ProFormTextArea
-            name="appCertPublicKey"
-            label="企微应用证书公钥"
-            tooltip="请到企业微信后台配置获取"
-            placeholder="如：|
-    xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-    xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-    xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-    xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-            rules={[{ required: Props.required }]}
-          />
-        </Col>
-      </Row>
+      {/*  <Row gutter={rowGutter}>*/}
+      {/*    <Col>*/}
+      {/*      <ProFormTextArea*/}
+      {/*        name="appCertPublicKey"*/}
+      {/*        label="企微应用证书公钥"*/}
+      {/*        tooltip="请到企业微信后台配置获取"*/}
+      {/*        placeholder="如：|*/}
+      {/*xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx*/}
+      {/*xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx*/}
+      {/*xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx*/}
+      {/*xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"*/}
+      {/*        rules={[{ required: Props.required }]}*/}
+      {/*      />*/}
+      {/*    </Col>*/}
+      {/*  </Row>*/}
 
       <Row gutter={rowGutter}>
         <Col>

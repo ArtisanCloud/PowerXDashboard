@@ -42,7 +42,7 @@ export default (Props: { required: boolean; config: API.DatabaseConfig }) => {
         <Col>
           <ProFormText
             name="dbUserName"
-            label="用户名称"
+            label="数据库用户名称"
             tooltip="powerxdev"
             placeholder="如：powerxdev"
             initialValue={Props.config.connections!.pgsql.username}
@@ -66,6 +66,7 @@ export default (Props: { required: boolean; config: API.DatabaseConfig }) => {
             name="dbPrefix"
             label="表前缀设置"
             tooltip="最终表的名称：ac_account, ac_order等"
+            disabled={true}
             placeholder="如：ac_"
             initialValue={Props.config.connections!.pgsql.prefix}
           />
@@ -75,6 +76,7 @@ export default (Props: { required: boolean; config: API.DatabaseConfig }) => {
             name="dbSchemaDefault"
             label="数据库默认摘要"
             tooltip="如果您的数据库存在schema，请设置"
+            disabled={true}
             placeholder="默认是public"
             initialValue={Props.config.connections!.pgsql.schemas!.default}
             rules={[{ required: Props.required }]}
@@ -85,6 +87,7 @@ export default (Props: { required: boolean; config: API.DatabaseConfig }) => {
             name="dbSSLMode"
             label="SSL模式"
             tooltip="默认使用prefer"
+            disabled={true}
             placeholder="如：prefer"
             initialValue={Props.config.connections!.pgsql.ssl_mode}
           />
