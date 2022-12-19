@@ -17,6 +17,7 @@ import { GetRoleSelections } from '@/utils/role';
 import { UseRoles } from '@/models/role';
 import { history } from 'umi';
 import { URI_SETTING_PERMISSION } from '@/constants/uri';
+import avatar from '@/assets/avatar.png';
 
 const EmployeeList: React.FC = () => {
   const [syncLoading, setSyncLoading] = useState<boolean>(false);
@@ -42,10 +43,11 @@ const EmployeeList: React.FC = () => {
       valueType: 'text',
       hideInSearch: false,
       render: (dom, item) => {
+        const imgAvatar: string = item.wxAvatar ? item.wxAvatar : avatar;
         return (
           <Space>
             <div className={'tag-like-staff-item'}>
-              <img src={item.wxAvatar} className={'icon'} alt={item.name} />
+              <img src={imgAvatar} className={'icon'} alt={item.name} />
               <span className={'text'}>{item.wxName}</span>
             </div>
           </Space>

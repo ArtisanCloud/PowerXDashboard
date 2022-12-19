@@ -1,24 +1,29 @@
 import { ProForm, ProFormText } from '@ant-design/pro-components';
 import { Form, message } from 'antd';
-import { API_RETURN_CODE_INIT } from '@/constants/api';
-import { InitRoot } from '@/services/boot/BootController';
 import { HashPlainPassword } from '@/utils/security';
+import { LoginEmployee } from '@/services/user/UserController';
+import * as APIConstant from '@/constants/api';
+import { history } from '@@/core/history';
 
-const RegisterRootForm = () => {
-  const [form] = Form.useForm<API.RequestInitRoot>();
+const LoginEmployeeForm = () => {
+  const [form] = Form.useForm<API.RequestLoginEmployee>();
   return (
-    <ProForm<API.RequestInitRoot>
-      title="初始化Root账号"
+    <ProForm<API.RequestLoginEmployee>
+      title="使用账号登陆"
       form={form}
       autoFocusFirstInput
-      onFinish={async (values: API.RequestInitRoot) => {
+      onFinish={async (values: API.RequestLoginEmployee) => {
         values.password = HashPlainPassword(values.password);
         // console.log(values)
 
-        const rs: API.ResponseToken = await InitRoot(values);
-        if (rs.meta.return_code === API_RETURN_CODE_INIT) {
-          message.success('授权成功');
-          window.location.reload();
+        const rs: API.ResponseToken = await LoginEmployee(values);
+        if (rs?.meta.return_code === APIConstant.API_RETURN_CODE_INIT) {
+          message.success('登陆成功');
+          localStorage.setItem('auth', JSON.stringify(rs));
+
+          // 跳转首页
+          location.pathname = '/';
+          history.push(location.pathname);
         } else {
           message.error(rs.meta.result_message);
         }
@@ -26,14 +31,6 @@ const RegisterRootForm = () => {
       }}
     >
       <ProForm.Group>
-        <ProFormText
-          width="md"
-          name="name"
-          label="名称"
-          tooltip="请使用您的用户名称"
-          placeholder="请使用您的用户名称"
-          rules={[{ required: true }]}
-        />
         <ProFormText
           width="md"
           name="email"
@@ -47,7 +44,7 @@ const RegisterRootForm = () => {
           width="md"
           name="password"
           label="密码"
-          placeholder="请牢记您输入的密码"
+          placeholder="请输入登陆密码"
           rules={[{ required: true }]}
         />
       </ProForm.Group>
@@ -55,4 +52,4 @@ const RegisterRootForm = () => {
   );
 };
 
-export default RegisterRootForm;
+export default LoginEmployeeForm;

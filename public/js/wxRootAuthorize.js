@@ -6,12 +6,12 @@ const config = JSON.parse(jsonWXAPIConfig);
 
 if (config) {
   const wwLogin = new WwLogin({
-    id: 'wx-qrcode-container',
+    id: 'root-qrcode-container',
     appid: config?.weCom_api_config.corp_id,
     agentid: config?.weCom_api_config.weCom_agent_id,
     redirect_uri:
       config?.weCom_api_config.weCom_oauth_api.weCom_oauth_callback_url +
-      '/user/wx/authorized',
+      '/install/root/system/authorized',
     state: config?.weCom_api_config.state,
     href: '',
     lang: 'zh',

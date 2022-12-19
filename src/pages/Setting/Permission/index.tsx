@@ -33,6 +33,7 @@ import {
 import { API_RETURN_CODE_INIT } from '@/constants/api';
 import PolicyForm from '@/components/Policy';
 import { ConvertPolicyFormToUpdateParams } from '@/utils/policy';
+import avatar from '@/assets/avatar.png';
 
 const SetupMenu: React.FC = () => {
   const { roles } = UseRoles();
@@ -61,10 +62,11 @@ const SetupMenu: React.FC = () => {
       hideInSearch: false,
       render: (dom, item) => {
         // console.log(dom, item);
+        const imgAvatar: string = item.wxAvatar ? item.wxAvatar : avatar;
         return (
           <Space>
             <div className={'tag-like-staff-item'}>
-              <img src={item.wxAvatar} className={'icon'} alt={item.name} />
+              <img src={imgAvatar} className={'icon'} alt={item.name} />
               <span className={'text'}>{item.name}</span>
             </div>
           </Space>
@@ -329,7 +331,7 @@ const SetupMenu: React.FC = () => {
           // console.log(params)
           const rq = {
             roleID: params.roleID,
-            employeeIDs: [currentEmployee!.wxUserID],
+            employeeIDs: [currentEmployee!.employeeID],
           };
           // console.log(rq)
           const rs: API.APIResponse = await BindRoleToEmployees(rq);

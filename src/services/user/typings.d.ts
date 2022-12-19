@@ -32,6 +32,11 @@ declare namespace API {
 
   // ----- request ----
 
+  export interface RequestLoginEmployee {
+    email: string;
+    password: string;
+  }
+
   export interface RequestGetRoleList {
     page: number;
     pageSize: number;
@@ -70,6 +75,7 @@ declare namespace API {
   // ----- object ----
   export interface Employee {
     uuid: string;
+    employeeID: string;
     createdAt?: string;
     updatedAt?: string;
     role?: Role;

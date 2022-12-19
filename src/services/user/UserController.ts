@@ -16,6 +16,13 @@ export async function LoginByCode(
   );
 }
 
+export async function LoginEmployee(data: API.RequestLoginEmployee) {
+  return request<API.ResponseToken>('admin/api/auth/employee/login', {
+    method: 'POST',
+    data: data,
+  });
+}
+
 export async function MeDetail() {
   return request<API.ResponseAuthUser>('/admin/api/me/detail');
 }
