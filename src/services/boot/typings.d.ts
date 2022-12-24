@@ -17,6 +17,14 @@ declare namespace API {
     appConfig: AppConfig;
   }
 
+  export interface RequestValidateDatabase {
+    database?: DatabaseConfig;
+  }
+
+  export interface RequestValidateRedis {
+    redis?: RedisConfig;
+  }
+
   export interface RequestInitRoot {
     name: string;
     email: string;
