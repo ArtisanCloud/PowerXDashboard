@@ -165,7 +165,7 @@ export const request: RequestConfig = {
   responseInterceptors: [
     (response) => {
       // console.log(222, response)
-      // 拦截响应数据，进行个性化处理
+      // // 拦截响应数据，进行个性化处理
       // const {data} = response;
       // if (!data.success) {
       // 	message.error('请求失败！');

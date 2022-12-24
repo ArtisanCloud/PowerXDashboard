@@ -7,6 +7,20 @@ export async function CheckSystemInstalled() {
   );
 }
 
+export async function ValidateDatabase(data: API.RequestValidateDatabase) {
+  return request<API.APIResponse>('root/api/system/validate/database', {
+    method: 'POST',
+    data: data,
+  });
+}
+
+export async function ValidateRedis(data: API.RequestValidateRedis) {
+  return request<API.APIResponse>('root/api/system/validate/redis', {
+    method: 'POST',
+    data: data,
+  });
+}
+
 export async function InstallSystem(data: API.RequestInstallSystem) {
   return request<API.ResponseSystemInstalledStatus>('root/api/system/install', {
     method: 'POST',

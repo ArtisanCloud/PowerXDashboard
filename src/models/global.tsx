@@ -29,6 +29,12 @@ export const UseApp = () => {
   // console.log("use app")
 
   const updateGlobalSystemInstalled = (val: boolean) => {
+    // 如果当前系统未安装，则需要重新安装
+    if (!val) {
+      console.log('clear localstorage', val);
+      localStorage.clear();
+    }
+
     globalSysInstalled = val;
     setSystemInstalled(val);
   };

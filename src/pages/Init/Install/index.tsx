@@ -31,7 +31,7 @@ const InstallPage: React.FC = () => {
       timezone: 'Asia/Shanghai',
       server: {
         host: '0.0.0.0',
-        port: '8000',
+        port: '8080',
       },
       jwt: {
         public_key: '',
@@ -82,7 +82,7 @@ const InstallPage: React.FC = () => {
 
   // 转化单层form数据为formData
   const convertFormData = (values: any) => {
-    // console.log('convert install system form data to object', values);
+    console.log('convert install system form data to object', values);
     // app config
     formData.appConfig.name = values.name;
     formData.appConfig.env = values.env;

@@ -3,6 +3,7 @@ import { Col, Row } from 'antd';
 
 export default (Props: { required: boolean; config: API.WeComConfig }) => {
   const rowGutter = 32;
+  const rowWidthSize = 'xl';
   return (
     <ProForm.Group>
       <Row gutter={rowGutter}>
@@ -10,8 +11,9 @@ export default (Props: { required: boolean; config: API.WeComConfig }) => {
           <ProFormText
             name="corpID"
             label="企业微信账号"
-            tooltip="请到微信商户号后台配置获取"
+            tooltip="请到企业微信后台配置获取"
             placeholder="如：ww45xxxxxxxxxxxxxxx"
+            width={rowWidthSize}
             rules={[{ required: Props.required }]}
           />
         </Col>
@@ -19,8 +21,9 @@ export default (Props: { required: boolean; config: API.WeComConfig }) => {
           <ProFormText
             name="appOAuthCallbackURL"
             label="企业微信Oauth回调地址"
-            tooltip="请到微信商户号后台配置获取"
+            tooltip="请到企业微信后台配置获取"
             placeholder="如：http://power.artisancloud.cn"
+            width={rowWidthSize}
             initialValue={Props.config.app_oauth_callback_url}
             rules={[{ required: Props.required }]}
           />
@@ -32,8 +35,9 @@ export default (Props: { required: boolean; config: API.WeComConfig }) => {
           <ProFormDigit
             name="weComAgentID"
             label="企微应用账号"
-            tooltip="请到微信商户号后台配置获取"
+            tooltip="请到企业微信后台配置获取"
             placeholder="如：10000001"
+            width={rowWidthSize}
             rules={[{ required: Props.required }]}
           />
         </Col>
@@ -41,7 +45,8 @@ export default (Props: { required: boolean; config: API.WeComConfig }) => {
           <ProFormText.Password
             name="weComSecret"
             label="企微应用账号密钥"
-            tooltip="请到微信商户号后台配置获取"
+            tooltip="请到企业微信后台配置获取"
+            width={rowWidthSize}
             rules={[{ required: Props.required }]}
           />
         </Col>
@@ -64,16 +69,8 @@ export default (Props: { required: boolean; config: API.WeComConfig }) => {
 
       <Row gutter={rowGutter}>
         <Col>
-          <ProFormText.Password
-            name="appMessageAESKey"
-            label="企微应用AES密钥"
-            tooltip="请到微信商户号后台配置获取"
-            rules={[{ required: Props.required }]}
-          />
-        </Col>
-        <Col>
           <ProFormText
-            width={'lg'}
+            width={rowWidthSize}
             name="appMessageCallbackURL"
             label="企微应用消息回调地址"
             tooltip="请保证host替换成您想要的域名，后面URI为 wechat/api/weCom/app"
@@ -84,10 +81,19 @@ export default (Props: { required: boolean; config: API.WeComConfig }) => {
         </Col>
         <Col>
           <ProFormText.Password
-            width={'lg'}
+            width={rowWidthSize}
             name="appMessageToken"
             label="企微应用消息Token"
-            tooltip="请到微信商户号后台配置获取"
+            tooltip="请到企业微信后台配置获取"
+            rules={[{ required: Props.required }]}
+          />
+        </Col>
+        <Col>
+          <ProFormText.Password
+            width={rowWidthSize}
+            name="appMessageAESKey"
+            label="企微应用AES密钥"
+            tooltip="请到企业微信后台配置获取"
             rules={[{ required: Props.required }]}
           />
         </Col>
@@ -97,7 +103,7 @@ export default (Props: { required: boolean; config: API.WeComConfig }) => {
       {/*  width={'lg'}*/}
       {/*  name="customerMessageAESKey"*/}
       {/*  label="企微客户联系人AES密钥"*/}
-      {/*  tooltip="请到微信商户号后台配置获取"*/}
+      {/*  tooltip="请到企业微信后台配置获取"*/}
       {/*  rules={[{ required: Props.required }]}*/}
       {/*/>*/}
       {/*<ProFormText*/}
@@ -113,7 +119,7 @@ export default (Props: { required: boolean; config: API.WeComConfig }) => {
       {/*  width={'lg'}*/}
       {/*  name="customerMessageToken"*/}
       {/*  label="企微客户联系人消息Token"*/}
-      {/*  tooltip="请到微信商户号后台配置获取"*/}
+      {/*  tooltip="请到企业微信后台配置获取"*/}
       {/*  rules={[{ required: Props.required }]}*/}
       {/*/>*/}
 
@@ -121,7 +127,7 @@ export default (Props: { required: boolean; config: API.WeComConfig }) => {
       {/*  width={'lg'}*/}
       {/*  name="employeeMessageAESKey"*/}
       {/*  label="企微内部联系人AES密钥"*/}
-      {/*  tooltip="请到微信商户号后台配置获取"*/}
+      {/*  tooltip="请到企业微信后台配置获取"*/}
       {/*  rules={[{ required: Props.required }]}*/}
       {/*/>*/}
       {/*<ProFormText*/}
@@ -137,7 +143,7 @@ export default (Props: { required: boolean; config: API.WeComConfig }) => {
       {/*  width={'lg'}*/}
       {/*  name="employeeMessageToken"*/}
       {/*  label="企微内部联系人消息Token"*/}
-      {/*  tooltip="请到微信商户号后台配置获取"*/}
+      {/*  tooltip="请到企业微信后台配置获取"*/}
       {/*  rules={[{ required: Props.required }]}*/}
       {/*/>*/}
 
@@ -168,7 +174,7 @@ export default (Props: { required: boolean; config: API.WeComConfig }) => {
       {/*	<ProFormTextArea*/}
       {/*		name="wxCertPath"*/}
       {/*		label="微信商户号证书配置信息"*/}
-      {/*		tooltip="请到微信商户号后台配置获取"*/}
+      {/*		tooltip="请到企业微信后台配置获取"*/}
       {/*		placeholder="|*/}
       {/*xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx*/}
       {/*xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx*/}
@@ -178,7 +184,7 @@ export default (Props: { required: boolean; config: API.WeComConfig }) => {
       {/*	<ProFormTextArea*/}
       {/*		name="wxKeyPath"*/}
       {/*		label="微信商户号密钥配置信息"*/}
-      {/*		tooltip="请到微信商户号后台配置获取"*/}
+      {/*		tooltip="请到企业微信后台配置获取"*/}
       {/*		placeholder="|*/}
       {/*xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx*/}
       {/*xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx*/}

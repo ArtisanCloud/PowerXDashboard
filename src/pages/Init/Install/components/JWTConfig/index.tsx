@@ -1,10 +1,11 @@
 import { ProForm, ProFormTextArea } from '@ant-design/pro-components';
 
 export default (Props: { required: boolean; config: API.JWTConfig }) => {
+  const rowWidthSize = 'xl';
   return (
     <ProForm.Group>
       <ProFormTextArea
-        width={'lg'}
+        width={rowWidthSize}
         name={'publicKey'}
         label={'公钥'}
         tooltip={'请收入公钥字符串'}
@@ -17,7 +18,7 @@ export default (Props: { required: boolean; config: API.JWTConfig }) => {
         rules={[{ required: Props.required }]}
       />
       <ProFormTextArea
-        width={'lg'}
+        width={rowWidthSize}
         name={'privateKey'}
         label={'密钥'}
         tooltip={'请收入密钥字符串'}
