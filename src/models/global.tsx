@@ -1,5 +1,5 @@
 // 全局共享数据示例
-import { DEFAULT_NAME } from '@/constants';
+import {DEFAULT_NAME, LS_ROOT_INITIALIZED, LS_SYS_INSTALLED, LS_WX_API_CONFIG} from '@/constants';
 import { useEffect, useState } from 'react';
 import { useModel } from 'umi';
 import { message } from 'antd';
@@ -57,7 +57,7 @@ export const UseApp = () => {
   useEffect(() => {
     const HandleCheckSysInstalled = async () => {
       // 读取localstorage的installStatus
-      const jsonSysInstalled = localStorage.getItem('sysInstalled');
+      const jsonSysInstalled = localStorage.getItem(LS_SYS_INSTALLED);
       if (jsonSysInstalled !== null) {
         const isSysInstalled: boolean = JSON.parse(jsonSysInstalled!);
         // 如果系统已经安装过，则直接进入系统
@@ -80,7 +80,7 @@ export const UseApp = () => {
           }
         });
         // console.log(sysInstalled)
-        localStorage.setItem('sysInstalled', '' + sysInstalled);
+        localStorage.setItem(LS_SYS_INSTALLED, '' + sysInstalled);
         // set status
         updateGlobalSystemInstalled(sysInstalled);
       } else {
@@ -101,7 +101,7 @@ export const UseApp = () => {
   useEffect(() => {
     const HandleCheckRootInitialized = async () => {
       // 读取localstorage的rootInitialized
-      const jsonRootInitialized = localStorage.getItem('rootInitialized');
+      const jsonRootInitialized = localStorage.getItem(LS_ROOT_INITIALIZED);
       if (jsonRootInitialized !== null) {
         const isRootInitialized: boolean = JSON.parse(jsonRootInitialized!);
         // 如果系统已经初始化过Root，则直接进入系统
@@ -118,7 +118,7 @@ export const UseApp = () => {
         // check system status
         if (rs.data !== null) {
           // console.log(sysInstalled)
-          localStorage.setItem('rootInitialized', 'true');
+          localStorage.setItem(LS_ROOT_INITIALIZED, 'true');
           // set status
           updateGlobalRootInitialized(true);
         }
@@ -140,7 +140,7 @@ export const UseApp = () => {
   useEffect(() => {
     const HandleCheckSystemWXConfig = async () => {
       // 读取localstorage的wxAPIConfig
-      const jsonWXAPIConfig = localStorage.getItem('wxAPIConfig');
+      const jsonWXAPIConfig = localStorage.getItem(LS_WX_API_CONFIG);
       if (jsonWXAPIConfig !== null) {
         const config: API.WXAPIConfig = JSON.parse(jsonWXAPIConfig!);
         // 如果系统已经初始化过Root，则直接进入系统
@@ -157,7 +157,7 @@ export const UseApp = () => {
         if (rs.data !== null) {
           // console.log(sysInstalled)
           const jsonConfig = JSON.stringify(rs.data);
-          localStorage.setItem('wxAPIConfig', jsonConfig);
+          localStorage.setItem(LS_WX_API_CONFIG, jsonConfig);
           // set status
           updateGlobalWXAPIConfig(rs.data);
         }

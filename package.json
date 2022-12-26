@@ -14,9 +14,12 @@
     "@ant-design/icons": "^4.7.0",
     "@ant-design/pro-components": "^2.0.1",
     "@ant-design/pro-layout": "^7.0.7",
+    "@types/file-saver": "^2.0.5",
     "@umijs/max": "^4.0.21",
     "antd": "^4.20.7",
     "dotenv": "^16.0.2",
+    "file-saver": "^2.0.5",
+    "jszip": "^3.10.1",
     "lodash": "^4.17.21"
   },
   "devDependencies": {

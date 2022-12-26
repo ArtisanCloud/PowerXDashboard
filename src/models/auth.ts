@@ -4,6 +4,7 @@ import * as APIConstant from '@/constants/api';
 import * as URIConstant from '@/constants/uri';
 import { MeDetail } from '@/services/user/UserController';
 import { UseApp } from '@/models/global';
+import {LS_AUTH} from "@/constants";
 
 export let globalAuthUser: API.Employee | undefined = undefined;
 export let globalAuthToken: API.Token | undefined = undefined;
@@ -34,7 +35,7 @@ export default () => {
   useEffect(() => {
     const LoadToken = async () => {
       // 读取localstorage的token
-      const jsonAuthUser = localStorage.getItem('auth');
+      const jsonAuthUser = localStorage.getItem(LS_AUTH);
 
       // 解析token
       let authToken: API.ResponseToken;
@@ -85,7 +86,7 @@ export default () => {
             e.response.data.meta.result_code ===
             APIConstant.API_ERR_CODE_ACCOUNT_INVALID_TOKEN
           ) {
-            localStorage.removeItem('auth');
+            localStorage.removeItem(LS_AUTH);
           }
         }
       });

@@ -19,6 +19,7 @@ import { API_RETURN_CODE_INIT } from '@/constants/api';
 import { MenuDataItem } from '@ant-design/pro-layout';
 // import { QueryMenuList } from '@/services/boot/BootController';
 import { UseMenuData } from '@/models/menu';
+import {LS_AUTH} from "@/constants";
 
 // 全局初始化数据配置，用于 Layout 用户信息和权限初始化
 // 更多信息见文档：https://next.umijs.org/docs/api/runtime-config#getinitialstate
@@ -148,7 +149,7 @@ export const request: RequestConfig = {
   },
   requestInterceptors: [
     (config: any) => {
-      const jsonAuthUser = localStorage.getItem('auth');
+      const jsonAuthUser = localStorage.getItem(LS_AUTH);
       if (jsonAuthUser !== null) {
         const authToken: API.APIResponse = JSON.parse(jsonAuthUser!);
         // console.log(authToken)
