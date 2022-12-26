@@ -4,6 +4,7 @@ import { HashPlainPassword } from '@/utils/security';
 import { LoginEmployee } from '@/services/user/UserController';
 import * as APIConstant from '@/constants/api';
 import { history } from '@@/core/history';
+import {LS_AUTH} from "@/constants";
 
 const LoginEmployeeForm = () => {
   const [form] = Form.useForm<API.RequestLoginEmployee>();
@@ -19,7 +20,7 @@ const LoginEmployeeForm = () => {
         const rs: API.ResponseToken = await LoginEmployee(values);
         if (rs?.meta.return_code === APIConstant.API_RETURN_CODE_INIT) {
           message.success('登陆成功');
-          localStorage.setItem('auth', JSON.stringify(rs));
+          localStorage.setItem(LS_AUTH, JSON.stringify(rs));
 
           // 跳转首页
           location.pathname = '/';

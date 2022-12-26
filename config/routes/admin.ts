@@ -13,6 +13,13 @@ export default [
         name: '渠道活码',
         path: '/crm/channel/contactWay',
         component: '@/pages/Customer/ContactWay',
+        // routes: [
+        //   {
+        //     name: '创建渠道活码',
+        //     path: '/crm/channel/contactWay/create',
+        //     component: '@/pages/Customer/ContactWay/create',
+        //   },
+        // ],
       },
     ],
   },

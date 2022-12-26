@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import * as APIConstant from '@/constants/api';
 import * as WXConstant from '@/constants/web';
 import { InitRootByCode } from '@/services/boot/BootController';
+import {LS_AUTH} from "@/constants";
 
 const AuthorizedRoot: React.FC = () => {
   const [rs, setResponse] = useState<API.ResponseToken>();
@@ -68,7 +69,7 @@ const AuthorizedRoot: React.FC = () => {
   }, []);
 
   if (rs?.meta.return_code === APIConstant.API_RETURN_CODE_INIT) {
-    localStorage.setItem('auth', JSON.stringify(rs));
+    localStorage.setItem(LS_AUTH, JSON.stringify(rs));
 
     // 跳转首页
     location.pathname = '/';

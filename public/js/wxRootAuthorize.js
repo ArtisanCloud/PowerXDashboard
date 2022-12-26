@@ -1,4 +1,6 @@
-const jsonWXAPIConfig = localStorage.getItem('wxAPIConfig');
+import {LS_WX_API_CONFIG} from "../../src/constants";
+
+const jsonWXAPIConfig = localStorage.getItem(LS_WX_API_CONFIG);
 
 const config = JSON.parse(jsonWXAPIConfig);
 
