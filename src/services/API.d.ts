@@ -21,6 +21,15 @@ declare namespace API {
     totalPages: number;
   }
 
+  export interface PageData<T> {
+    limit: number;
+    page: number;
+    sort: string;
+    totalRows: number;
+    totalPages: number;
+    data: T[]
+  }
+
   // ---------------------------------------------------------------------------
 
   export interface ResponseToken extends APIResponse {
