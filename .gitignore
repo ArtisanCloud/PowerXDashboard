@@ -3,14 +3,4 @@ node_modules
 dist
 dist-ssr
 *.local
-.idea/codeStyles/codeStyleConfig.xml
-.idea/codeStyles/Project.xml
-.idea/inspectionProfiles/Project_Default.xml
-.idea/vcs.xml
-.idea/workspace.xml
-.idea/PowerXDashboard.iml
-.idea/modules.xml
-src/.DS_Store
-src/assets/.DS_Store
-src/assets/.DS_Store
-src/.DS_Store
+.idea/*
