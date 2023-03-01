@@ -1,4 +1,4 @@
-import { DEFAULT_LAYOUT } from '../base';
+import { DEFAULT_LAYOUT, EMPTY_LAYOUT } from '../base';
 import { AppRouteRecordRaw } from '../types';
 
 const Admin: AppRouteRecordRaw = {
@@ -15,23 +15,36 @@ const Admin: AppRouteRecordRaw = {
     {
       path: '/admin/employee',
       name: 'Employee',
-      component: () => import('@/views/admin/employee/index.vue'),
+      component: EMPTY_LAYOUT,
+      redirect: '/admin/employee/list',
       meta: {
         locale: 'menu.admin.employee',
         requiresAuth: true,
         roles: ['*'],
+        hideChildrenInMenu: true,
       },
-    },
-    {
-      path: '/admin/employee/detail',
-      name: 'EmployeeDetail',
-      component: () => import('@/views/admin/employee/index.vue'),
-      meta: {
-        locale: 'menu.admin.employee',
-        requiresAuth: true,
-        hideInMenu: true,
-        roles: ['*'],
-      },
+      children: [
+        {
+          path: '/admin/employee/list',
+          name: 'EmployeeList',
+          component: () => import('@/views/admin/employee/index.vue'),
+          meta: {
+            locale: 'menu.admin.employee',
+            requiresAuth: true,
+            roles: ['*'],
+          },
+        },
+        {
+          path: '/admin/employee/:id/detail',
+          name: 'EmployeeDetail',
+          component: () => import('@/views/admin/employee/detail/index.vue'),
+          meta: {
+            locale: 'menu.admin.employee.detail',
+            requiresAuth: true,
+            roles: ['*'],
+          },
+        },
+      ],
     },
     // permission
     {

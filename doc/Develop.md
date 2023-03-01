@@ -52,7 +52,7 @@ export default {
 create src/routes/modules/home.ts  
 配置项请参照[Route Config](https://arco.design/vue/docs/pro/routes-and-menu)
 ```
-// 第一级Route是模块层级, 每个模块的Route层级请勿超过两级
+// 第一级Route是模块层级
 const Home: AppRouteRecordRaw = {
   path: '/home',
   name: 'Home',

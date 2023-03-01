@@ -103,7 +103,6 @@
     drawerVisible.value = !drawerVisible.value;
   });
 
-  // todo breadcrumb
   function getRoutesName(routes: RouteLocationMatched[]) {
     const names = [] as string[];
     routes.forEach((item) => {

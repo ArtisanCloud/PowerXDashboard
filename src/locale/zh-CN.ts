@@ -9,6 +9,7 @@ export default {
   'menu.dashboard': '仪表盘',
   'menu.admin': '管理',
   'menu.admin.employee': '员工管理',
+  'menu.admin.employee.detail': '员工详情',
   'menu.admin.permission': '权限管理',
   'menu.home': '主页',
   'menu.home.index': '首页',

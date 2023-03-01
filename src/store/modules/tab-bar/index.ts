@@ -1,10 +1,6 @@
 import type { RouteLocationNormalized } from 'vue-router';
 import { defineStore } from 'pinia';
-import {
-  DEFAULT_ROUTE,
-  DEFAULT_ROUTE_NAME,
-  REDIRECT_ROUTE_NAME,
-} from '@/router/constants';
+import { DEFAULT_ROUTE, DEFAULT_ROUTE_NAME, EMPTY_LAYOUT_NAME, REDIRECT_ROUTE_NAME } from "@/router/constants";
 import { isString } from '@/utils/is';
 import { TabBarState, TagProps } from './types';
 
@@ -23,7 +19,7 @@ const BAN_LIST = [REDIRECT_ROUTE_NAME];
 
 const useAppStore = defineStore('tabBar', {
   state: (): TabBarState => ({
-    cacheTabList: new Set([DEFAULT_ROUTE_NAME]),
+    cacheTabList: new Set([DEFAULT_ROUTE_NAME, EMPTY_LAYOUT_NAME]),
     tagList: [DEFAULT_ROUTE],
   }),
 
@@ -59,9 +55,9 @@ const useAppStore = defineStore('tabBar', {
       this.cacheTabList.clear();
       // 要先判断ignoreCache
       this.tagList
-        .filter((el) => !el.ignoreCache)
-        .map((el) => el.name)
-        .forEach((x) => this.cacheTabList.add(x));
+          .filter((el) => !el.ignoreCache)
+          .map((el) => el.name)
+          .forEach((x) => this.cacheTabList.add(x));
     },
     resetTabList() {
       this.tagList = [DEFAULT_ROUTE];

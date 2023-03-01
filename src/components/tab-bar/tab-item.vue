@@ -91,7 +91,7 @@
   const tabBarStore = useTabBarStore();
 
   const goto = (tag: TagProps) => {
-    router.push({ ...tag });
+    router.push({ path: tag.fullPath });
   };
   const tagList = computed(() => {
     return tabBarStore.getTabList;
