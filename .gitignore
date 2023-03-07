@@ -1,19 +1,8 @@
-/node_modules
-/.env.local
-/.umirc.local.ts
-/config/config.local.ts
-/src/.umi
-/src/.umi-production
-/src/.umi-test
-/.umi
-/.umi-production
-/.umi-test
-/dist
-/.mfsu
-
-.local
-# local env files
-.env*
-
-.idea
+node_modules
 .DS_Store
+dist
+dist-ssr
+*.local
+.idea/*
+
+package-lock.json
