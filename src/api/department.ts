@@ -4,7 +4,11 @@ import { SimpleEmployee } from '@/api/base';
 export interface DepartmentNode {
   id: number;
   depName: string;
-  leaders: Array<SimpleEmployee>;
+  pId: number;
+  leaderIds: number[];
+  phoneNumber: string;
+  email: string;
+  remark: string;
   children: Array<DepartmentNode>;
 }
 
@@ -22,7 +26,9 @@ export interface CreateDepartmentRequest {
   depName: string;
   leaderIds: Array<number>;
   pId: number;
-  desc: string;
+  phoneNumber?: string;
+  email?: string;
+  remark?: string;
 }
 
 export interface CreateDepartmentReply {
@@ -38,4 +44,24 @@ export function createDepartment(req: CreateDepartmentRequest) {
     `/api/department/v1/departments`,
     req
   );
+}
+
+export interface DeleteDepartmentReply {
+  id: number;
+}
+
+export function deleteDepartment(id: number) {
+  return axios.delete<DeleteDepartmentReply>(
+    `/api/department/v1/departments/${id}`
+  );
+}
+
+export interface UpdateDepartmentRequest {
+  id: number;
+  depName: string;
+  leaderIds: Array<number>;
+  pId: number;
+  phoneNumber?: string;
+  email?: string;
+  remark?: string;
 }

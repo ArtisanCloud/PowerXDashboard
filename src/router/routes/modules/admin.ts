@@ -46,6 +46,45 @@ const Admin: AppRouteRecordRaw = {
         },
       ],
     },
+    // organization
+    {
+      path: '/admin/organization',
+      name: 'Organization',
+      component: EMPTY_LAYOUT,
+      redirect: '/admin/organization/department',
+      meta: {
+        locale: 'menu.admin.organization',
+        requiresAuth: true,
+        roles: ['*'],
+      },
+      children: [
+        {
+          path: '/admin/organization/department',
+          name: 'OrganizationEmployee',
+          component: EMPTY_LAYOUT,
+          redirect: '/admin/organization/department/list',
+          meta: {
+            locale: 'menu.admin.organization.department',
+            requiresAuth: true,
+            roles: ['*'],
+            hideChildrenInMenu: true,
+          },
+          children: [
+            {
+              path: '/admin/organization/department/list',
+              name: 'DepartmentList',
+              component: () =>
+                import('@/views/admin/organization/department/index.vue'),
+              meta: {
+                locale: 'menu.admin.organization.department.list',
+                requiresAuth: true,
+                roles: ['*'],
+              },
+            },
+          ],
+        },
+      ],
+    },
     // permission
     {
       path: '/admin/permission',

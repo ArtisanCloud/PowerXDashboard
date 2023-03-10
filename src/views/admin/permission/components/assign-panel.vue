@@ -19,8 +19,9 @@
         <a-form-item label="授权资源">
           <a-scrollbar style="min-width: 300px; overflow-y: auto">
             <a-tree
-              v-model:checked-keys="model.role.actKeys"
+              v-model:checked-keys="model.role.actIds"
               :data="treeData"
+              checked-strategy="child"
               checkable
             ></a-tree>
           </a-scrollbar>
@@ -97,7 +98,7 @@
     },
     role: {
       roleCodes: [] as string[],
-      actKeys: [] as string[],
+      actIds: [] as number[],
     },
   });
 
@@ -130,8 +131,9 @@
       res.acts.forEach((act: AuthResAct) => {
         v1.children.push({
           title: act.desc,
-          key: `${res.resCode}:${act.action}`,
-          value: act.action,
+          key: act.id,
+          value: act.id,
+          isLeaf: true,
         });
       });
       data.push(v1);
@@ -151,7 +153,7 @@
 
   function assignRolesForEmployees() {
     assignAuth({
-      userAssignRes: {
+      userAssignRole: {
         userIds: model.employee.ids,
         roleCodes: model.employee.roleCodes,
         isReplace: false,
@@ -162,20 +164,10 @@
   }
 
   function assignResForRoles() {
-    const acts = [] as Array<AuthResAct>;
-    model.role.actKeys.forEach((item) => {
-      const s = item.split(':');
-      if (s.length === 2) {
-        acts.push({
-          resCode: s[0],
-          action: s[1],
-        });
-      }
-    });
     assignAuth({
       roleAssignRes: {
         roleCodes: model.role.roleCodes,
-        acts,
+        actIds: model.role.actIds,
         isReplace: false,
       },
     }).then(() => {

@@ -10,18 +10,32 @@ export interface LoginData {
 export interface LoginRes {
   token: string;
 }
+
 export function login(data: LoginData) {
   return axios.post<LoginRes>('/api/auth/v1/op/login/basic', data);
 }
 
 export function logout() {
-  return axios.post<LoginRes>('/api/user/logout');
+  return axios.post<LoginRes>('/api/auth/v1/op/logout');
 }
 
 export function getUserInfo() {
-  return axios.post<UserState>('/api/user/info');
+  return axios.get<UserState>('/api/auth/v1/user-info');
+}
+
+export interface MenuRoles {
+  menuName: string;
+  allowRoleCodes: string[];
+}
+
+export interface GetMenuRolesReply {
+  menuRoles: MenuRoles[];
+}
+
+export function getMenuRoles() {
+  return axios.get<GetMenuRolesReply>('/api/auth/v1/menu-roles');
 }
 
 export function getMenuList() {
-  return axios.post<RouteRecordNormalized[]>('/api/user/menu');
+  return axios.post<RouteRecordNormalized[]>('/api/auth/v1/server-menus');
 }

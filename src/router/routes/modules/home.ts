@@ -9,7 +9,7 @@ const Home: AppRouteRecordRaw = {
   meta: {
     locale: 'menu.home',
     requiresAuth: true,
-    icon: 'icon-dashboard',
+    icon: 'icon-home',
     order: -1,
   },
   children: [

@@ -42,6 +42,14 @@
             key: 'id',
             children: 'children',
           }"
+          checked-strategy="child"
+          multiple
+          @select="
+            (v) => {
+              queryForm.employee.depIds = v;
+              queryChange();
+            }
+          "
         >
           <template #extra="nodeData">
             <a-dropdown position="bl">
@@ -120,7 +128,18 @@
           scrollbar
         >
           <template #columns>
-            <a-table-column title="姓名" data-index="name" :width="100" />
+            <a-table-column title="姓名" :width="100">
+              <template #cell="{ record }">
+                <a-link
+                  @click="
+                    () => {
+                      goDetail(record.id);
+                    }
+                  "
+                  >{{ record.name }}</a-link
+                >
+              </template>
+            </a-table-column>
             <a-table-column title="性别" :width="75">
               <template #cell="{ record }">
                 <span v-if="record.gender === 0">{{
@@ -153,7 +172,14 @@
             />
             <a-table-column title="状态" data-index="mobilePhone" :width="150">
               <template #cell="{ record }">
-                <a-switch :model-value="record.isEnabled" />
+                <a-switch
+                  :model-value="record.isEnabled"
+                  @change="
+                    (v) => {
+                      enableChange(v, record);
+                    }
+                  "
+                />
               </template>
             </a-table-column>
             <!--              <a-table-column title="角色">-->
@@ -230,6 +256,7 @@
 
 <script lang="ts" setup>
   import { onMounted, reactive, ref } from 'vue';
+  // eslint-disable-next-line import/no-cycle
   import {
     deleteEmployee,
     getEmployeeOptions,
@@ -238,6 +265,7 @@
     ListEmployeesReply,
     ListEmployeesRequest,
     syncEmployees,
+    updateEmployee,
     UpdateEmployeeRequest,
   } from '@/api/employee';
   import { getDepartmentTree } from '@/api/department';
@@ -246,6 +274,9 @@
   import { SimpleDepartment } from '@/api/base';
   import { Message } from '@arco-design/web-vue';
   import EditEmployeeModal from '@/views/admin/employee/components/edit-employee-modal.vue';
+  import { useRouter } from 'vue-router';
+
+  const router = useRouter();
 
   const employeePage = ref({} as ListEmployeesReply);
 
@@ -275,6 +306,7 @@
       likePhoneNumber: '',
       roleCodes: [] as string[],
       isEnable: undefined as undefined | boolean,
+      depIds: [],
     } as ListEmployeesRequest,
   });
 
@@ -312,6 +344,14 @@
     view.createDepVisible = true;
   };
 
+  const enableChange = (value: boolean, record: any) => {
+    if (value !== record.isEnabled) {
+      updateEmployee({ status: +value }, record.id).then((res) => {
+        record.isEnabled = value;
+      });
+    }
+  };
+
   function formatDepartments(deps: Array<SimpleDepartment> | null) {
     if (deps === null) {
       return '';
@@ -333,6 +373,7 @@
     syncEmployees(source, target).then((res) => {
       Message.success('同步完成');
       fetchEmployees();
+      fetchDepTree();
     });
   }
 
@@ -357,6 +398,10 @@
       });
   }
 
+  function goDetail(userId: number) {
+    router.push(`/admin/employee/${userId}/detail`);
+  }
+
   onMounted(() => {
     fetchEmployees();
     fetchDepTree();
@@ -366,7 +411,7 @@
 
 <script lang="ts">
   export default {
-    name: 'AdminEmployee',
+    name: 'EmployeeList',
   };
 </script>
 

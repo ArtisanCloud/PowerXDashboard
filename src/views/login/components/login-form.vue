@@ -11,13 +11,13 @@
       @submit="handleSubmit"
     >
       <a-form-item
-        field="username"
+        field="userName"
         :rules="[{ required: true, message: $t('login.form.userName.errMsg') }]"
         :validate-trigger="['change', 'blur']"
         hide-label
       >
         <a-input
-          v-model="userInfo.username"
+          v-model="userInfo.userName"
           :placeholder="$t('login.form.userName.placeholder')"
         >
           <template #prefix>
@@ -83,11 +83,11 @@
 
   const loginConfig = useStorage('login-config', {
     rememberPassword: true,
-    username: 'admin', // 演示默认值
-    password: 'admin', // demo default value
+    userName: 'root',
+    password: 'root',
   });
   const userInfo = reactive({
-    username: loginConfig.value.username,
+    userName: loginConfig.value.userName,
     password: loginConfig.value.password,
   });
 
@@ -101,28 +101,29 @@
     if (loading.value) return;
     if (!errors) {
       setLoading(true);
-      try {
-        userStore.login(values as LoginData).then((res) => {
-          const { redirect, ...othersQuery } = router.currentRoute.value.query;
-          const { rememberPassword } = loginConfig.value;
-          const { username, password } = values;
-          // 实际生产环境需要进行加密存储。
-          // The actual production environment requires encrypted storage.
-          loginConfig.value.username = rememberPassword ? username : '';
-          loginConfig.value.password = rememberPassword ? password : '';
-          router.push({
-            name: (redirect as string) || DEFAULT_ROUTE_NAME,
-            query: {
-              ...othersQuery,
-            },
-          });
+      userStore
+        .login(values as LoginData)
+        .then((res) => {
+          userStore.info().finally(() => {
+            const { redirect, ...othersQuery } = router.currentRoute.value.query;
+            const { rememberPassword } = loginConfig.value;
+            const { userName, password } = values;
+            // todo 实际生产环境需要进行加密存储。
+            loginConfig.value.userName = rememberPassword ? userName : '';
+            loginConfig.value.password = rememberPassword ? password : '';
+            router.push({
+              name: (redirect as string) || DEFAULT_ROUTE_NAME,
+              query: {
+                ...othersQuery,
+              },
+            });
+            setLoading(false);
+            Message.success(t('login.form.login.success'));
+          })
+        })
+        .catch(() => {
           setLoading(false);
-          Message.success(t('login.form.login.success'));
         });
-      } catch (err) {
-        errorMessage.value = (err as Error).message;
-        setLoading(false);
-      }
     }
   };
   const setRememberPassword = (value: boolean) => {

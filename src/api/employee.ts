@@ -1,14 +1,34 @@
 import axios, { AxiosResponse } from 'axios';
 import { SimpleDepartment, SimpleRole } from '@/api/base';
+import Employee from '@/views/admin/employee/index.vue';
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface GetEmployeeRequest {}
-
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface GetEmployeeRequestParams {}
-
-export interface GetEmployeeReply {
+export interface Employee {
   id: number;
+  account: string;
+  name: string;
+  email: string;
+  mobilePhone: string;
+  gender: number;
+  nickName?: string;
+  desc?: string;
+  avatar?: string;
+  externalEmail?: string;
+  depIds: number[];
+  roles: Array<string>;
+  position: string;
+  jobTitle: string;
+  isEnabled: boolean;
+  createdAt: string;
+}
+
+export type GetEmployeeReply = Employee;
+
+/**
+ * @description "查询员工"
+ * @param id
+ */
+export function getEmployee(id: number) {
+  return axios.get<GetEmployeeReply>(`/api/employee/v1/employees/${id}`);
 }
 
 export interface ListEmployeesRequest {
@@ -22,23 +42,6 @@ export interface ListEmployeesRequest {
   isEnable?: boolean;
   pageIndex?: number;
   pageSize?: number;
-}
-
-export interface Employee {
-  id: number;
-  name: string;
-  email: string;
-  mobilePhone: string;
-  gender: number;
-  nickName?: string;
-  desc?: string;
-  avatar?: string;
-  externalEmail?: string;
-  deps: Array<SimpleDepartment>;
-  roles: Array<string>;
-  position: string;
-  isEnabled: boolean;
-  createdAt: string;
 }
 
 export interface ListEmployeesReply {
@@ -58,26 +61,9 @@ export interface SyncEmployeesReply {
  * @param target
  */
 export function syncEmployees(source: string, target: string) {
-  return axios.post<SyncEmployeesReply>(
-    `/api/employee/v1/op/sync-employees/${source}/${target}`,
-    {
-      source,
-      target,
-    }
-  );
-}
-
-/**
- * @description "查询员工"
- * @param params
- * @param id
- */
-export function getEmployee(params: GetEmployeeRequestParams, id: number) {
-  return axios.get<GetEmployeeReply>(`/api/employee/v1/employees/${id}`, {
-    params: {
-      id,
-      ...params,
-    },
+  return axios.post<SyncEmployeesReply>(`/api/employee/v1/op/sync-employees`, {
+    source,
+    target,
   });
 }
 
@@ -148,7 +134,7 @@ export interface UpdateEmployeeRequest {
   externalEmail?: string;
   mobilePhone?: string;
   gender?: number;
-  depIds: Array<number>;
+  depIds?: Array<number>;
   position?: string;
   jobTitle?: string;
   password?: string;
@@ -175,4 +161,19 @@ export interface DeleteEmployeeReply {
 
 export function deleteEmployee(id: number) {
   return axios.delete<DeleteEmployeeReply>(`/api/employee/v1/employees/${id}`);
+}
+
+export interface ResetPasswordRequest {
+  userId: number;
+}
+
+export interface ResetPasswordReply {
+  status: string;
+}
+
+export function resetPassword(req: ResetPasswordRequest) {
+  return axios.post<ResetPasswordReply>(
+    `/api/employee/v1/op/reset-password`,
+    req
+  );
 }

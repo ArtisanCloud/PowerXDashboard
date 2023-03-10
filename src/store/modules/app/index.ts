@@ -3,7 +3,8 @@ import { Notification } from '@arco-design/web-vue';
 import type { NotificationReturn } from '@arco-design/web-vue/es/notification/interface';
 import type { RouteRecordNormalized } from 'vue-router';
 import defaultSettings from '@/config/settings.json';
-import { getMenuList } from '@/api/user';
+import { getMenuList, getMenuRoles } from '@/api/user';
+import { menuRoutes } from '@/router/routes';
 import { AppState } from './types';
 
 const useAppStore = defineStore('app', {
@@ -70,6 +71,52 @@ const useAppStore = defineStore('app', {
     },
     clearServerMenu() {
       this.serverMenu = [];
+    },
+    async fetchServerMenuRoles() {
+      let notifyInstance: NotificationReturn | null = null;
+      try {
+        const { data } = await getMenuRoles();
+        const map = new Map(
+          data.menuRoles.map((v) => {
+            return [v.menuName, v.allowRoleCodes];
+          })
+        );
+        const newMenus = menuRoutes;
+        const setRoles = (menuRoute: RouteRecordNormalized) => {
+          if (map.has(menuRoute.name as string)) {
+            menuRoute.meta.roles = map.get(menuRoute.name as string);
+          } else {
+            menuRoute.meta.roles = undefined;
+          }
+          const rSet = new Set();
+          if (
+            menuRoute.children !== undefined &&
+            menuRoute.children.length > 0
+          ) {
+            menuRoute.children.forEach((v: any) => {
+              setRoles(v);
+              v.meta?.roles?.forEach((r: string) => {
+                rSet.add(r);
+              });
+            });
+            menuRoute.meta?.roles?.forEach((r) => {
+              rSet.add(r);
+            });
+            menuRoute.meta.roles = Array.from(rSet) as string[];
+          }
+        };
+        newMenus.forEach((m) => {
+          setRoles(m);
+        });
+        this.serverMenu = newMenus;
+      } catch (error) {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        notifyInstance = Notification.error({
+          id: 'menuNotice',
+          content: 'error',
+          closable: true,
+        });
+      }
     },
   },
 });

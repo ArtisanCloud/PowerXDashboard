@@ -1,11 +1,14 @@
 <template>
   <div>
-    <!--    <a-card>-->
-    <!--      <a-space>-->
-    <!--        <a-button type="primary">创建资源</a-button>-->
-    <!--      </a-space>-->
-    <!--    </a-card>-->
-    <!--    <div style="height: 8px" />-->
+    <a-card>
+      <a-space>
+        <a-switch v-model="statuses.isDev">
+          <template #checked> Dev </template>
+          <template #unchecked> Normal </template>
+        </a-switch>
+      </a-space>
+    </a-card>
+    <div style="height: 8px" />
     <a-card>
       <a-table :data="resData.list" :expandable="expand" row-key="resCode">
         <template #columns>
@@ -19,7 +22,9 @@
             <span style="font-size: 12px">资源操作: </span>
             <div v-for="(act, index) in record.acts" :key="index">
               <a-tag color="arcoblue">
-                <span>{{ act.action }} : </span>
+                <span v-if="statuses.isDev"
+                  >{{ act.action }} ({{ act.version + act.restPath }}) :
+                </span>
                 <span> {{ act.desc }}</span>
               </a-tag>
             </div>
@@ -41,6 +46,10 @@
     title: 'Action',
     width: 75,
   } as TableExpandable);
+
+  const statuses = reactive({
+    isDev: false,
+  });
 
   function fetchRes() {
     listRecourses().then((res) => {

@@ -9,7 +9,7 @@ export default function setupUserLoginInfoGuard(router: Router) {
     NProgress.start();
     const userStore = useUserStore();
     if (isLogin()) {
-      if (userStore.role) {
+      if (userStore.id !== undefined) {
         next();
       } else {
         try {

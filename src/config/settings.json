@@ -13,5 +13,6 @@
   "device": "desktop",
   "tabBar": false,
   "menuFromServer": false,
+  "menuAccessFromServer": true,
   "serverMenu": []
 }

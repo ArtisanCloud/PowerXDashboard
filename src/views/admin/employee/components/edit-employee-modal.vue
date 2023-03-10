@@ -6,7 +6,11 @@
     @cancel="close"
     @ok="submit"
   >
-    <a-form v-if="defaultEmployee !== undefined" :model="formModel">
+    <a-form
+      v-if="defaultEmployee !== undefined"
+      ref="formRef"
+      :model="formModel"
+    >
       <a-form-item label="姓名" field="name">
         <a-input v-model="formModel.name" />
       </a-form-item>
@@ -17,11 +21,7 @@
         <a-input v-model="formModel.email" />
       </a-form-item>
       <a-form :model="extraModel">
-        <a-form-item
-          label="角色"
-          field="roleCodes"
-          :rules="{ required: true, message: '角色是必填项' }"
-        >
+        <a-form-item label="角色" field="roleCodes">
           <a-select
             v-model="extraModel.roleCodes"
             multiple
@@ -94,6 +94,7 @@
     roles: [] as Array<AuthRole>,
   });
   const formModel = ref({} as UpdateEmployeeRequest);
+  const formRef = ref();
 
   const extraModel = ref(
     {} as {
@@ -113,11 +114,15 @@
   const close = () => {
     emit('update:visible', false);
   };
-  const submit = () => {
+  const submit = async () => {
+    if (await formRef.value.validate()) {
+      Message.warning('请检查输入');
+      return;
+    }
     updateEmployee(formModel.value, defaultEmployee.value.id).then((res) => {
       formModel.value = {} as CreateEmployeeRequest;
       assignAuth({
-        userAssignRes: {
+        userAssignRole: {
           userIds: [res.data.id],
           roleCodes: extraModel.value.roleCodes,
           isReplace: true,

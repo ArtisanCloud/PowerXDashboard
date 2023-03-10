@@ -6,7 +6,7 @@
     @cancel="close"
     @ok="submit"
   >
-    <a-form :model="formModel">
+    <a-form ref="formRef" :model="formModel">
       <a-form-item
         label="账户"
         field="account"
@@ -126,6 +126,8 @@
     visible: Boolean,
   });
 
+  const formRef = ref();
+
   const emit = defineEmits(['update:visible', 'refresh']);
 
   const options = reactive({
@@ -142,13 +144,17 @@
   const close = () => {
     emit('update:visible', false);
   };
-  const submit = () => {
+  const submit = async () => {
+    if (await formRef.value.validate()) {
+      Message.warning('请检查输入');
+      return;
+    }
     createEmployee(formModel.value).then((res) => {
       formModel.value = {} as CreateEmployeeRequest;
       const uid = res.data.id;
 
       assignAuth({
-        userAssignRes: {
+        userAssignRole: {
           userIds: [uid],
           roleCodes: extraModel.value.roleCodes,
           isReplace: true,

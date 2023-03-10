@@ -15,15 +15,11 @@
 
 <script lang="ts" setup>
   import { computed } from 'vue';
-  import { useTabBarStore } from '@/store';
+  import {useTabBarStore, useUserStore} from '@/store';
 
   const tabBarStore = useTabBarStore();
 
-
   const cacheList = computed(() => tabBarStore.getCacheList);
-
-  console.log(cacheList)
-
 </script>
 
 <style scoped lang="less"></style>
