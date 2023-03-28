@@ -1,31 +1,47 @@
 import axios from 'axios';
-import { SimpleEmployee } from '@/api/base';
+
+/**
+ * Department
+ * @description 部门管理
+ * @path /api/admin/department/v1
+ */
+
+export interface DepartmentLeader {
+  id: number;
+  name: string;
+  nickName: string;
+  avatar: string;
+}
 
 export interface DepartmentNode {
   id: number;
   depName: string;
-  pId: number;
-  leaderIds: number[];
+  leader: DepartmentLeader;
   phoneNumber: string;
   email: string;
   remark: string;
-  children: Array<DepartmentNode>;
+  children: DepartmentNode[];
+}
+
+export interface GetDepartmentTreeRequest {
+  depId: number;
 }
 
 export interface GetDepartmentTreeReply {
   depTree: DepartmentNode;
 }
 
-export function getDepartmentTree(depId: number) {
+export function getDepartmentTree(request: GetDepartmentTreeRequest) {
   return axios.get<GetDepartmentTreeReply>(
-    `/api/department/v1/department-tree/${depId}`
+    `/api/admin/department/v1/department-tree/${request.depId}`
   );
 }
 
 export interface CreateDepartmentRequest {
   depName: string;
-  leaderIds: Array<number>;
+  leaderId: number;
   pId: number;
+  desc?: string;
   phoneNumber?: string;
   email?: string;
   remark?: string;
@@ -35,33 +51,46 @@ export interface CreateDepartmentReply {
   id: number;
 }
 
-/**
- * @description "创建新部门"
- * @param req
- */
-export function createDepartment(req: CreateDepartmentRequest) {
+export function createDepartment(request: CreateDepartmentRequest) {
   return axios.post<CreateDepartmentReply>(
-    `/api/department/v1/departments`,
-    req
+    '/api/admin/department/v1/departments',
+    request
   );
+}
+
+export interface DeleteDepartmentRequest {
+  id: number;
 }
 
 export interface DeleteDepartmentReply {
   id: number;
 }
 
-export function deleteDepartment(id: number) {
+export function deleteDepartment(request: DeleteDepartmentRequest) {
   return axios.delete<DeleteDepartmentReply>(
-    `/api/department/v1/departments/${id}`
+    `/api/admin/department/v1/departments/${request.id}`
   );
 }
 
-export interface UpdateDepartmentRequest {
+export interface Department {
   id: number;
   depName: string;
-  leaderIds: Array<number>;
-  pId: number;
-  phoneNumber?: string;
-  email?: string;
-  remark?: string;
+  leader: DepartmentLeader;
+  phoneNumber: string;
+  email: string;
+  remark: string;
+}
+
+export interface GetDepartmentRequest {
+  id: number;
+}
+
+export interface GetDepartmentReply {
+  department: Department;
+}
+
+export function getDepartment(request: GetDepartmentRequest) {
+  return axios.get<GetDepartmentReply>(
+    `/api/admin/department/v1/departments/${request.id}`
+  );
 }
