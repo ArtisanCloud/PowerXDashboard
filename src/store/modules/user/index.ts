@@ -1,12 +1,8 @@
 import { defineStore } from 'pinia';
-import {
-  getUserInfo,
-  login as userLogin,
-  LoginData,
-  logout as userLogout,
-} from '@/api/user';
 import { clearToken, setToken } from '@/utils/auth';
 import { removeRouteListener } from '@/utils/route-listener';
+import { getUserInfo } from '@/api/userinfo';
+import { login, LoginRequest } from '@/api/auth';
 import { UserState } from './types';
 import useAppStore from '../app';
 
@@ -55,9 +51,9 @@ const useUserStore = defineStore('user', {
     },
 
     // Login
-    async login(loginForm: LoginData) {
+    async login(loginForm: LoginRequest) {
       try {
-        const res = await userLogin(loginForm);
+        const res = await login(loginForm);
         setToken(res.data.token);
       } catch (err) {
         clearToken();
@@ -74,7 +70,7 @@ const useUserStore = defineStore('user', {
     // Logout
     async logout() {
       try {
-        await userLogout();
+        // todo logout
       } finally {
         this.logoutCallBack();
       }

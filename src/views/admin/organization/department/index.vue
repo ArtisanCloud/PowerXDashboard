@@ -173,8 +173,8 @@
   } from '@/api/department';
   import { Employee, listEmployees } from '@/api/employee';
   import { Message } from '@arco-design/web-vue';
-  import { SimpleEmployee } from '@/api/base';
   import EmployeeSelect from '@/views/admin/employee/components/employee-select.vue';
+  import { SimpleEmployee } from '@/api/base';
 
   const depPage = ref({} as GetDepartmentTreeReply);
 

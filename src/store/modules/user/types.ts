@@ -4,7 +4,7 @@ export interface UserState {
   name?: string;
   email?: string;
   mobilePhone?: string;
-  gender?: number;
+  gender?: string;
   nickName?: string;
   desc?: string;
   avatar?: string;

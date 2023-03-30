@@ -1,67 +1,16 @@
 import axios from 'axios';
 
-interface ListEmployeesRequest {
-  ids?: number[];
-  likeName?: string;
-  likeEmail?: string;
-  depIds?: number[];
-  positions?: string[];
-  likePhoneNumber?: string;
-  roleCodes?: string[];
-  isEnable?: boolean;
-  pageIndex?: number;
-  pageSize?: number;
-}
+/**
+ * Employee
+ * @description 员工管理
+ */
 
-interface SyncEmployeesRequest {
-  source: string;
-  target: string;
-}
-
-interface CreateEmployeeRequest {
-  account: string;
-  name: string;
-  nickName?: string;
-  desc?: string;
-  email: string;
-  avatar?: string;
-  externalEmail?: string;
-  mobilePhone?: string;
-  gender?: 'male' | 'female' | 'un_know';
-  depId: number;
-  position?: string;
-  jobTitle?: string;
-  password?: string;
-}
-
-interface UpdateEmployeeRequest {
-  id: number;
-  name?: string;
-  nickName?: string;
-  desc?: string;
-  email?: string;
-  avatar?: string;
-  externalEmail?: string;
-  mobilePhone?: string;
-  gender?: 'male' | 'female' | 'un_know';
-  depId?: number;
-  position?: string;
-  jobTitle?: string;
-  password?: string;
-  status?: 'enabled' | 'disabled';
-}
-
-interface ResetPasswordRequest {
-  userId: number;
-}
-
-// 响应参数类型
-interface EmployeeDepartment {
+export interface EmployeeDepartment {
   depId: number;
   depName: string;
 }
 
-interface Employee {
+export interface Employee {
   id: number;
   account: string;
   name: string;
@@ -80,89 +29,150 @@ interface Employee {
   createdAt: string;
 }
 
-interface GetEmployeeReply {
+export interface GetEmployeeRequest {
+  id: number;
+}
+
+export interface GetEmployeeReply {
   employee: Employee;
 }
 
-interface ListEmployeesReply {
+export function getEmployee(request: GetEmployeeRequest) {
+  return axios.get<GetEmployeeReply>(
+    `/api/admin/employee/v1/employees/${request.id}`
+  );
+}
+
+export interface ListEmployeesRequest {
+  ids?: number[];
+  likeName?: string;
+  likeEmail?: string;
+  depIds?: number[];
+  positions?: string[];
+  likePhoneNumber?: string;
+  roleCodes?: string[];
+  isEnable?: boolean;
+  pageIndex?: number;
+  pageSize?: number;
+}
+
+export interface ListEmployeesReply {
   list: Employee[];
   pageIndex: number;
   pageSize: number;
   total: number;
 }
 
-interface SyncEmployeesReply {
+export function listEmployees(request: ListEmployeesRequest) {
+  return axios.get<ListEmployeesReply>('/api/admin/employee/v1/employees', {
+    params: request,
+  });
+}
+
+export interface SyncEmployeesRequest {
+  source: string;
+  target: string;
+}
+
+export interface SyncEmployeesReply {
   status: boolean;
 }
 
-interface CreateEmployeeReply {
-  id: number;
-}
-
-interface UpdateEmployeeReply {
-  employee: Employee;
-}
-
-interface RoleOption {
-  roleCode: string;
-  roleName: string;
-}
-
-interface DepartmentOption {
-  departmentId: number;
-  departmentName: string;
-}
-
-interface GetEmployeeOptionsReply {
-  positions: string[];
-  roles: RoleOption[];
-  departments: DepartmentOption[];
-}
-
-interface DeleteEmployeeReply {
-  id: number;
-}
-
-interface ResetPasswordReply {
-  status: string;
-}
-
-// API 接口定义
-const api = axios.create({
-  baseURL: '/api/admin/employee/v1',
-});
-
-export function getEmployee(id: number) {
-  return api.get<GetEmployeeReply>(`/employees/${id}`);
-}
-
-export function listEmployees(request: ListEmployeesRequest) {
-  return api.get<ListEmployeesReply>('/employees', { params: request });
-}
-
 export function syncEmployees(request: SyncEmployeesRequest) {
-  return api.post<SyncEmployeesReply>('/employees/actions/sync', request);
+  return axios.post<SyncEmployeesReply>(
+    '/api/admin/employee/v1/employees/actions/sync',
+    request
+  );
+}
+
+export interface CreateEmployeeRequest {
+  account: string;
+  name: string;
+  nickName?: string;
+  desc?: string;
+  email: string;
+  avatar?: string;
+  externalEmail?: string;
+  mobilePhone?: string;
+  gender: string;
+  depId: number;
+  position?: string;
+  jobTitle?: string;
+  password?: string;
+}
+
+export interface CreateEmployeeReply {
+  id: number;
 }
 
 export function createEmployee(request: CreateEmployeeRequest) {
-  return api.post<CreateEmployeeReply>('/employees', request);
+  return axios.post<CreateEmployeeReply>(
+    '/api/admin/employee/v1/employees',
+    request
+  );
+}
+
+export interface GetEmployeeOptionsReply {
+  positions: string[];
+  roles: { roleCode: string; roleName: string }[];
+  departments: { departmentId: number; departmentName: string }[];
 }
 
 export function getEmployeeOptions() {
-  return api.get<GetEmployeeOptionsReply>('/options');
+  return axios.get<GetEmployeeOptionsReply>('/api/admin/employee/v1/options');
+}
+
+export interface UpdateEmployeeRequest {
+  id: number;
+  name?: string;
+  nickName?: string;
+  desc?: string;
+  email?: string;
+  avatar?: string;
+  externalEmail?: string;
+  mobilePhone?: string;
+  gender?: string;
+  depId?: number;
+  position?: string;
+  jobTitle?: string;
+  password?: string;
+  status?: string;
+}
+
+export interface UpdateEmployeeReply {
+  employee: Employee;
 }
 
 export function updateEmployee(id: number, request: UpdateEmployeeRequest) {
-  return api.patch<UpdateEmployeeReply>(`/employees/${id}`, request);
-}
-
-export function deleteEmployee(id: number) {
-  return api.delete<DeleteEmployeeReply>(`/employees/${id}`);
-}
-
-export function resetPassword(request: ResetPasswordRequest) {
-  return api.post<ResetPasswordReply>(
-    '/employees/actions/reset-password',
+  return axios.patch<UpdateEmployeeReply>(
+    `/api/admin/employee/v1/employees/${id}`,
     request
+  );
+}
+
+export interface DeleteEmployeeRequest {
+  id: number;
+}
+
+export interface DeleteEmployeeReply {
+  id: number;
+}
+
+export function deleteEmployee(request: DeleteEmployeeRequest) {
+  return axios.delete<DeleteEmployeeReply>(
+    `/api/admin/employee/v1/employees/${request.id}`
+  );
+}
+
+export interface ResetPasswordReply {
+  status: string;
+}
+
+export function resetPassword(userId: number) {
+  return axios.post<ResetPasswordReply>(
+    `/api/admin/employee/v1/employees/actions/reset-password`,
+    {
+      userId,
+    }
   );
 }

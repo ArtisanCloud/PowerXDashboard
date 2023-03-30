@@ -37,8 +37,8 @@
 
 <script lang="ts" setup>
   import { onMounted, reactive, ref } from 'vue';
-  import { listRecourses, ListRecoursesReply } from '@/api/permission';
   import { TableExpandable } from '@arco-design/web-vue';
+  import { listRecourses, ListRecoursesReply } from '@/api/permission';
 
   const resData = ref({} as ListRecoursesReply);
 

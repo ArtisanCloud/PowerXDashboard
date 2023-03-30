@@ -3,8 +3,8 @@ import { Notification } from '@arco-design/web-vue';
 import type { NotificationReturn } from '@arco-design/web-vue/es/notification/interface';
 import type { RouteRecordNormalized } from 'vue-router';
 import defaultSettings from '@/config/settings.json';
-import { getMenuList, getMenuRoles } from '@/api/user';
 import { menuRoutes } from '@/router/routes';
+import { getMenuList, getMenuRoles } from '@/api/userinfo';
 import { AppState } from './types';
 
 const useAppStore = defineStore('app', {

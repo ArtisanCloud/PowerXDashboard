@@ -271,10 +271,10 @@
   import { getDepartmentTree } from '@/api/department';
   import CreateEmployeeModal from '@/views/admin/employee/components/create-employee-modal.vue';
   import DepartmentModal from '@/views/admin/employee/components/department-modal.vue';
-  import { SimpleDepartment } from '@/api/base';
   import { Message } from '@arco-design/web-vue';
   import EditEmployeeModal from '@/views/admin/employee/components/edit-employee-modal.vue';
   import { useRouter } from 'vue-router';
+  import { SimpleDepartment } from '@/api/base';
 
   const router = useRouter();
 

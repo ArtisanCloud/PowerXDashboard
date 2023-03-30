@@ -124,6 +124,12 @@
 </template>
 
 <script lang="ts" setup>
+  import { computed, onMounted, reactive, ref } from 'vue';
+  import EmployeeTransfer from '@/views/admin/employee/components/employee-transfer.vue';
+  import { Message } from '@arco-design/web-vue';
+  import { isEmpty } from 'lodash';
+  import { menuRoutes } from '@/router/routes';
+  import { useI18n } from 'vue-i18n';
   import {
     assignAuth,
     AuthRes,
@@ -137,12 +143,6 @@
     ListRolesReply,
     putRoleDetail,
   } from '@/api/permission';
-  import { computed, onMounted, reactive, ref } from 'vue';
-  import EmployeeTransfer from '@/views/admin/employee/components/employee-transfer.vue';
-  import { Message } from '@arco-design/web-vue';
-  import { isEmpty } from 'lodash';
-  import { menuRoutes } from '@/router/routes';
-  import { useI18n } from 'vue-i18n';
 
   const { t } = useI18n();
 

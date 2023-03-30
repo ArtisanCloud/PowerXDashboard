@@ -72,8 +72,8 @@
   import { useStorage } from '@vueuse/core';
   import { useUserStore } from '@/store';
   import useLoading from '@/hooks/loading';
-  import type { LoginData } from '@/api/user';
   import { DEFAULT_ROUTE_NAME } from '@/router/constants';
+  import type { LoginData } from '@/api/user';
 
   const router = useRouter();
   const { t } = useI18n();
@@ -105,7 +105,8 @@
         .login(values as LoginData)
         .then((res) => {
           userStore.info().finally(() => {
-            const { redirect, ...othersQuery } = router.currentRoute.value.query;
+            const { redirect, ...othersQuery } =
+              router.currentRoute.value.query;
             const { rememberPassword } = loginConfig.value;
             const { userName, password } = values;
             // todo 实际生产环境需要进行加密存储。
@@ -119,7 +120,7 @@
             });
             setLoading(false);
             Message.success(t('login.form.login.success'));
-          })
+          });
         })
         .catch(() => {
           setLoading(false);

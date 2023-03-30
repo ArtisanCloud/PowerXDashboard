@@ -74,6 +74,12 @@
 <script lang="ts" setup>
   import { computed, onMounted, reactive } from 'vue';
   import {
+    Employee,
+    listEmployees,
+    ListEmployeesRequest,
+  } from '@/api/employee';
+  import { Message } from '@arco-design/web-vue';
+  import {
     assignAuth,
     AuthRes,
     AuthResAct,
@@ -82,12 +88,6 @@
     ListRecoursesReply,
     listRoles,
   } from '@/api/permission';
-  import {
-    Employee,
-    listEmployees,
-    ListEmployeesRequest,
-  } from '@/api/employee';
-  import { Message } from '@arco-design/web-vue';
 
   const model = reactive({
     resData: {} as ListRecoursesReply,

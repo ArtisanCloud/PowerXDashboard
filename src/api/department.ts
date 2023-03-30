@@ -3,7 +3,6 @@ import axios from 'axios';
 /**
  * Department
  * @description 部门管理
- * @path /api/admin/department/v1
  */
 
 export interface DepartmentLeader {
