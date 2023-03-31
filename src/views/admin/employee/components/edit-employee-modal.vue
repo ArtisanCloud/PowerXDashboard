@@ -66,32 +66,33 @@
   import { computed, onUpdated, reactive, ref } from 'vue';
   import {
     CreateEmployeeRequest,
+    EmployeeDepartment,
     updateEmployee,
     UpdateEmployeeRequest,
-    Employee,
   } from '@/api/employee';
   import { Message } from '@arco-design/web-vue';
   import { getDepartmentTree } from '@/api/department';
-  import { SimpleDepartment } from '@/api/base';
-  import { assignAuth, AuthRole, listRoles } from '@/api/permission';
+  import { AdminRole } from '@/api/permission';
 
   const props = defineProps({
     visible: Boolean,
-    employee: {
-      type: Object,
-      default: {} as Employee,
+    employeeId: {
+      type: Number,
+      default: 0,
     },
   });
 
   const emit = defineEmits(['update:visible', 'refresh']);
 
+  const
+
   const defaultEmployee = computed(() => {
-    return props.employee;
+    return props.employeeId;
   });
 
   const options = reactive({
     depTree: [] as any[],
-    roles: [] as Array<AuthRole>,
+    roles: [] as Array<AdminRole>,
   });
   const formModel = ref({} as UpdateEmployeeRequest);
   const formRef = ref();
@@ -102,12 +103,12 @@
     }
   );
 
-  function getDepsId(deps?: Array<SimpleDepartment> | null) {
+  function getDepsId(deps?: Array<EmployeeDepartment> | null) {
     if (deps === undefined || deps === null) {
       return [];
     }
     return deps.map((item) => {
-      return item.id;
+      return item.depId;
     }, []);
   }
 

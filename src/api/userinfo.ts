@@ -3,7 +3,7 @@ import axios from 'axios';
 /**
  * PowerX
  * @description 用户中心
- * @path /api/admin/user-center/v1
+ * @path /api/v1/admin/user-center
  */
 
 export interface GetUserInfoReply {
@@ -26,7 +26,7 @@ export interface GetUserInfoReply {
 }
 
 export function getUserInfo() {
-  return axios.get<GetUserInfoReply>('/api/admin/user-center/v1/user-info');
+  return axios.get<GetUserInfoReply>('/api/v1/admin/user-center/user-info');
 }
 
 export interface MenuRoles {
@@ -39,11 +39,11 @@ export interface GetMenuRolesReply {
 }
 
 export function getMenuRoles() {
-  return axios.get<GetMenuRolesReply>('/api/admin/user-center/v1/menu-roles');
+  return axios.get<GetMenuRolesReply>('/api/v1/admin/user-center/menu-roles');
 }
 
 export function getMenuList() {
-  return axios.get<any>('/api/admin/user-center/v1/menu-list');
+  return axios.get<any>('/api/v1/admin/user-center/menu-list');
 }
 
 
@@ -53,7 +53,7 @@ export interface ModifyPasswordRequest {
 
 export function modifyUserPassword(request: ModifyPasswordRequest) {
   return axios.post(
-    '/api/admin/user-center/v1/users/actions/modify-password',
+    '/api/v1/admin/user-center/users/actions/modify-password',
     request
   );
 }

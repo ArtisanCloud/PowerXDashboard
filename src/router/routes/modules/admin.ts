@@ -35,7 +35,7 @@ const Admin: AppRouteRecordRaw = {
           },
         },
         {
-          path: '/admin/employee/:id/detail',
+          path: '/admin/employee/detail/:id',
           name: 'EmployeeDetail',
           component: () => import('@/views/admin/employee/detail/index.vue'),
           meta: {

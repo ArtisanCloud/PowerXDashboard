@@ -24,14 +24,14 @@ export interface ExchangeReply {
 
 export function login(request: LoginRequest) {
   return axios.post<LoginReply>(
-    '/api/admin/auth/v1/access/actions/basic-login',
+    '/api/v1/admin/auth/access/actions/basic-login',
     request
   );
 }
 
 export function exchangeToken(request: ExchangeRequest) {
   return axios.post<ExchangeReply>(
-    '/api/admin/auth/v1/access/actions/exchange-token',
+    '/api/v1/admin/auth/access/actions/exchange-token',
     request
   );
 }

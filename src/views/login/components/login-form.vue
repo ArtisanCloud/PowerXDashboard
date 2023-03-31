@@ -73,7 +73,7 @@
   import { useUserStore } from '@/store';
   import useLoading from '@/hooks/loading';
   import { DEFAULT_ROUTE_NAME } from '@/router/constants';
-  import type { LoginData } from '@/api/user';
+  import { LoginRequest } from '@/api/auth';
 
   const router = useRouter();
   const { t } = useI18n();
@@ -102,7 +102,7 @@
     if (!errors) {
       setLoading(true);
       userStore
-        .login(values as LoginData)
+        .login(values as LoginRequest)
         .then((res) => {
           userStore.info().finally(() => {
             const { redirect, ...othersQuery } =

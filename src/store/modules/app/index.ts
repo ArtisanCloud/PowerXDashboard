@@ -1,11 +1,12 @@
-import { defineStore } from 'pinia';
-import { Notification } from '@arco-design/web-vue';
-import type { NotificationReturn } from '@arco-design/web-vue/es/notification/interface';
-import type { RouteRecordNormalized } from 'vue-router';
+import {defineStore} from 'pinia';
+import {Notification} from '@arco-design/web-vue';
+import type {NotificationReturn} from '@arco-design/web-vue/es/notification/interface';
+import type {RouteRecordNormalized} from 'vue-router';
 import defaultSettings from '@/config/settings.json';
-import { menuRoutes } from '@/router/routes';
-import { getMenuList, getMenuRoles } from '@/api/userinfo';
-import { AppState } from './types';
+import {menuRoutes} from '@/router/routes';
+import {getMenuList, getMenuRoles} from '@/api/userinfo';
+import {isEmpty} from 'lodash';
+import {AppState} from './types';
 
 const useAppStore = defineStore('app', {
   state: (): AppState => ({ ...defaultSettings }),
@@ -73,49 +74,58 @@ const useAppStore = defineStore('app', {
       this.serverMenu = [];
     },
     async fetchServerMenuRoles() {
-      let notifyInstance: NotificationReturn | null = null;
       try {
         const { data } = await getMenuRoles();
+
+        if (data === null || isEmpty(data.menuRoles)) {
+          this.serverMenu = menuRoutes;
+          return;
+        }
+
         const map = new Map(
-          data.menuRoles.map((v) => {
-            return [v.menuName, v.allowRoleCodes];
-          })
+          data.menuRoles.map((v) => [v.menuName, v.allowRoleCodes])
         );
-        const newMenus = menuRoutes;
+
         const setRoles = (menuRoute: RouteRecordNormalized) => {
-          if (map.has(menuRoute.name as string)) {
-            menuRoute.meta.roles = map.get(menuRoute.name as string);
+          const menuName = menuRoute.name as string;
+
+          if (map.has(menuName)) {
+            menuRoute.meta.roles = map.get(menuName);
           } else {
             menuRoute.meta.roles = undefined;
           }
+
           const rSet = new Set();
-          if (
-            menuRoute.children !== undefined &&
-            menuRoute.children.length > 0
-          ) {
+
+          if (menuRoute.children && menuRoute.children.length > 0) {
             menuRoute.children.forEach((v: any) => {
               setRoles(v);
+
               v.meta?.roles?.forEach((r: string) => {
                 rSet.add(r);
               });
             });
+
             menuRoute.meta?.roles?.forEach((r) => {
               rSet.add(r);
             });
+
             menuRoute.meta.roles = Array.from(rSet) as string[];
           }
         };
-        newMenus.forEach((m) => {
+
+        this.serverMenu = menuRoutes.map((m) => {
           setRoles(m);
+          return m;
         });
-        this.serverMenu = newMenus;
+
       } catch (error) {
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        notifyInstance = Notification.error({
+        Notification.error({
           id: 'menuNotice',
-          content: 'error',
+          content: '获取菜单权限失败',
           closable: true,
         });
+        this.serverMenu = menuRoutes;
       }
     },
   },

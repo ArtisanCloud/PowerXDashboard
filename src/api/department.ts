@@ -32,7 +32,7 @@ export interface GetDepartmentTreeReply {
 
 export function getDepartmentTree(request: GetDepartmentTreeRequest) {
   return axios.get<GetDepartmentTreeReply>(
-    `/api/admin/department/v1/department-tree/${request.depId}`
+    `/api/v1/admin/department/department-tree/${request.depId}`
   );
 }
 
@@ -52,7 +52,7 @@ export interface CreateDepartmentReply {
 
 export function createDepartment(request: CreateDepartmentRequest) {
   return axios.post<CreateDepartmentReply>(
-    '/api/admin/department/v1/departments',
+    '/api/v1/admin/department/departments',
     request
   );
 }
@@ -67,7 +67,7 @@ export interface DeleteDepartmentReply {
 
 export function deleteDepartment(request: DeleteDepartmentRequest) {
   return axios.delete<DeleteDepartmentReply>(
-    `/api/admin/department/v1/departments/${request.id}`
+    `/api/v1/admin/department/departments/${request.id}`
   );
 }
 
@@ -90,6 +90,6 @@ export interface GetDepartmentReply {
 
 export function getDepartment(request: GetDepartmentRequest) {
   return axios.get<GetDepartmentReply>(
-    `/api/admin/department/v1/departments/${request.id}`
+    `/api/v1/admin/department/departments/${request.id}`
   );
 }

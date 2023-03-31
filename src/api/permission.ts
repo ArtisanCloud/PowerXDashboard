@@ -28,7 +28,7 @@ export interface ListRolesReply {
 }
 
 export function listRoles() {
-  return axios.get<ListRolesReply>('/api/admin/permission/v1/roles');
+  return axios.get<ListRolesReply>('/api/v1/admin/permission/roles');
 }
 
 export interface CreateRoleRequest {
@@ -44,7 +44,7 @@ export interface CreateRoleReply {
 }
 
 export function createRole(request: CreateRoleRequest) {
-  return axios.post<CreateRoleReply>('/api/admin/permission/v1/roles', request);
+  return axios.post<CreateRoleReply>('/api/v1/admin/permission/roles', request);
 }
 
 export interface GetRoleRequest {
@@ -53,7 +53,7 @@ export interface GetRoleRequest {
 
 export function getRole(request: GetRoleRequest) {
   return axios.get<AdminRole>(
-    `/api/admin/permission/v1/roles/${request.roleCode}`
+    `/api/v1/admin/permission/roles/${request.roleCode}`
   );
 }
 
@@ -67,7 +67,7 @@ export interface PutRoleRequest {
 
 export function putRole(request: PutRoleRequest) {
   return axios.put<AdminRole>(
-    `/api/admin/permission/v1/roles/${request.roleCode}`,
+    `/api/v1/admin/permission/roles/${request.roleCode}`,
     request
   );
 }
@@ -83,7 +83,7 @@ export interface SetRolePermissionsReply {
 
 export function setRolePermissions(request: SetRolePermissionsRequest) {
   return axios.post<SetRolePermissionsReply>(
-    `/api/admin/permission/v1/roles/${request.roleCode}/actions/set-permissions`,
+    `/api/v1/admin/permission/roles/${request.roleCode}/actions/set-permissions`,
     request
   );
 }
@@ -97,7 +97,7 @@ export interface ListAPIReply {
 }
 
 export function listAPI(request: ListAPIRequest) {
-  return axios.get<ListAPIReply>('/api/admin/permission/v1/api-list', {
+  return axios.get<ListAPIReply>('/api/v1/admin/permission/api-list', {
     params: request,
   });
 }
@@ -132,7 +132,7 @@ export interface GetRoleEmployeesReply {
 
 export function getRoleEmployees(request: GetRoleEmployeesRequest) {
   return axios.get<GetRoleEmployeesReply>(
-    `/api/admin/permission/v1/roles/${request.roleCode}/users`,
+    `/api/v1/admin/permission/roles/${request.roleCode}/users`,
     { params: request }
   );
 }
@@ -148,7 +148,7 @@ export interface SetUserRolesReply {
 
 export function setUserRoles(request: SetUserRolesRequest) {
   return axios.post<SetUserRolesReply>(
-    `/api/admin/permission/v1/users/${request.userId}/actions/set-roles`,
+    `/api/v1/admin/permission/users/${request.userId}/actions/set-roles`,
     request
   );
 }

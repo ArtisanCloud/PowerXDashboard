@@ -2,31 +2,9 @@
   <div class="container">
     <a-card>
       <a-space size="large">
-        <a-button
-          type="primary"
-          @click="
-            () => {
-              view.createEmployeeVisible = true;
-            }
-          "
+        <a-button type="primary" @click="view.createEmployeeVisible = true"
           >创建新员工
         </a-button>
-        <a-dropdown position="bl">
-          <a-button type="primary">
-            <span>同步数据</span>
-            <icon-down style="margin-left: 8px" />
-          </a-button>
-          <template #content>
-            <a-doption
-              @click="
-                () => {
-                  sync('wework', 'system');
-                }
-              "
-              >从企业微信同步</a-doption
-            >
-          </template>
-        </a-dropdown>
       </a-space>
     </a-card>
     <div style="height: 8px" />
@@ -153,12 +131,6 @@
                 }}</span>
               </template>
             </a-table-column>
-            <!--              <a-table-column title="职位" data-index="position" />-->
-            <!--              <a-table-column title="部门">-->
-            <!--                <template #cell="{ record }">-->
-            <!--                  {{ formatDepartments(record.deps) }}-->
-            <!--                </template>-->
-            <!--              </a-table-column>-->
             <a-table-column
               title="邮箱"
               data-index="email"
@@ -182,11 +154,6 @@
                 />
               </template>
             </a-table-column>
-            <!--              <a-table-column title="角色">-->
-            <!--                <template #cell="{ record }">-->
-            <!--                  <span>{{ formatRoles(record.roles) }}</span>-->
-            <!--                </template>-->
-            <!--              </a-table-column>-->
             <a-table-column
               title="创建日期"
               data-index="createdAt"
@@ -225,32 +192,6 @@
         </a-table>
       </a-card>
     </div>
-    <CreateEmployeeModal
-      v-model:visible="view.createEmployeeVisible"
-      @refresh="
-        () => {
-          fetchEmployees();
-        }
-      "
-    />
-    <EditEmployeeModal
-      v-model:visible="view.updateEmployeeVisible"
-      :employee="values.updateEmployee"
-      @refresh="
-        () => {
-          fetchEmployees();
-        }
-      "
-    />
-    <DepartmentModal
-      v-model:visible="view.createDepVisible"
-      :parent-id="values.PDepId"
-      @refresh="
-        () => {
-          fetchDepTree();
-        }
-      "
-    />
   </div>
 </template>
 
@@ -264,17 +205,12 @@
     listEmployees,
     ListEmployeesReply,
     ListEmployeesRequest,
-    syncEmployees,
     updateEmployee,
     UpdateEmployeeRequest,
   } from '@/api/employee';
   import { getDepartmentTree } from '@/api/department';
-  import CreateEmployeeModal from '@/views/admin/employee/components/create-employee-modal.vue';
-  import DepartmentModal from '@/views/admin/employee/components/department-modal.vue';
   import { Message } from '@arco-design/web-vue';
-  import EditEmployeeModal from '@/views/admin/employee/components/edit-employee-modal.vue';
   import { useRouter } from 'vue-router';
-  import { SimpleDepartment } from '@/api/base';
 
   const router = useRouter();
 
@@ -288,27 +224,7 @@
     deleteEmployeeLoading: false,
   });
 
-  const options = reactive({
-    depTree: [] as any[],
-    employee: {} as GetEmployeeOptionsReply,
-  });
 
-  const values = reactive({
-    PDepId: 1,
-    updateEmployee: {} as UpdateEmployeeRequest,
-  });
-
-  const queryForm = reactive({
-    employee: {
-      likeName: '',
-      likeEmail: '',
-      positions: [] as string[],
-      likePhoneNumber: '',
-      roleCodes: [] as string[],
-      isEnable: undefined as undefined | boolean,
-      depIds: [],
-    } as ListEmployeesRequest,
-  });
 
   function fetchEmployees(req = {} as ListEmployeesRequest) {
     if (view.fetchEmployeeLoading) {
@@ -328,13 +244,13 @@
   };
 
   function fetchDepTree() {
-    getDepartmentTree(1).then((res) => {
+    getDepartmentTree({ depId: 1 }).then((res) => {
       options.depTree = [res.data.depTree];
     });
   }
 
   function fetchOptions() {
-    getEmployeeOptions({}).then((res) => {
+    getEmployeeOptions().then((res) => {
       options.employee = res.data;
     });
   }
@@ -345,36 +261,22 @@
   };
 
   const enableChange = (value: boolean, record: any) => {
+    const status = value ? 'enabled' : 'disabled';
     if (value !== record.isEnabled) {
-      updateEmployee({ status: +value }, record.id).then((res) => {
+      updateEmployee({
+        id: record.id,
+        status,
+      }).then((res) => {
         record.isEnabled = value;
       });
     }
   };
-
-  function formatDepartments(deps: Array<SimpleDepartment> | null) {
-    if (deps === null) {
-      return '';
-    }
-    const names = deps.map((dep) => {
-      return dep.depName;
-    }, []);
-    return names.join(',');
-  }
 
   function formatRoles(roles: string[] | null) {
     if (roles === null) {
       return '';
     }
     return roles.join(',');
-  }
-
-  function sync(source: string, target: string) {
-    syncEmployees(source, target).then((res) => {
-      Message.success('同步完成');
-      fetchEmployees();
-      fetchDepTree();
-    });
   }
 
   function editEmployee(record: any) {
@@ -388,7 +290,7 @@
       return;
     }
     view.deleteEmployeeLoading = true;
-    deleteEmployee(id)
+    deleteEmployee({ id })
       .then(() => {
         Message.success('删除成功');
         fetchEmployees();

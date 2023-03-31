@@ -33,8 +33,6 @@ export default function setupPermissionGuard(router: Router) {
     };
 
     if (appStore.menuFromServer) {
-      // 针对来自服务端的菜单配置进行处理
-      // 根据需要自行完善来源于服务端的菜单配置的permission逻辑
       if (
         !appStore.appAsyncMenus.length &&
         !WHITE_LIST.find((el) => el.name === to.name)

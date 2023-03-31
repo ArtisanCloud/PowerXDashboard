@@ -39,7 +39,7 @@ export interface GetEmployeeReply {
 
 export function getEmployee(request: GetEmployeeRequest) {
   return axios.get<GetEmployeeReply>(
-    `/api/admin/employee/v1/employees/${request.id}`
+    `/api/v1/admin/employee/employees/${request.id}`
   );
 }
 
@@ -64,7 +64,7 @@ export interface ListEmployeesReply {
 }
 
 export function listEmployees(request: ListEmployeesRequest) {
-  return axios.get<ListEmployeesReply>('/api/admin/employee/v1/employees', {
+  return axios.get<ListEmployeesReply>('/api/v1/admin/employee/employees', {
     params: request,
   });
 }
@@ -80,7 +80,7 @@ export interface SyncEmployeesReply {
 
 export function syncEmployees(request: SyncEmployeesRequest) {
   return axios.post<SyncEmployeesReply>(
-    '/api/admin/employee/v1/employees/actions/sync',
+    '/api/v1/admin/employee/employees/actions/sync',
     request
   );
 }
@@ -107,7 +107,7 @@ export interface CreateEmployeeReply {
 
 export function createEmployee(request: CreateEmployeeRequest) {
   return axios.post<CreateEmployeeReply>(
-    '/api/admin/employee/v1/employees',
+    '/api/v1/admin/employee/employees',
     request
   );
 }
@@ -119,7 +119,7 @@ export interface GetEmployeeOptionsReply {
 }
 
 export function getEmployeeOptions() {
-  return axios.get<GetEmployeeOptionsReply>('/api/admin/employee/v1/options');
+  return axios.get<GetEmployeeOptionsReply>('/api/v1/admin/employee/options');
 }
 
 export interface UpdateEmployeeRequest {
@@ -139,13 +139,11 @@ export interface UpdateEmployeeRequest {
   status?: string;
 }
 
-export interface UpdateEmployeeReply {
-  employee: Employee;
-}
+export type UpdateEmployeeReply = Employee;
 
-export function updateEmployee(id: number, request: UpdateEmployeeRequest) {
+export function updateEmployee(request: UpdateEmployeeRequest) {
   return axios.patch<UpdateEmployeeReply>(
-    `/api/admin/employee/v1/employees/${id}`,
+    `/api/v1/admin/employee/employees/${request.id}`,
     request
   );
 }
@@ -160,7 +158,7 @@ export interface DeleteEmployeeReply {
 
 export function deleteEmployee(request: DeleteEmployeeRequest) {
   return axios.delete<DeleteEmployeeReply>(
-    `/api/admin/employee/v1/employees/${request.id}`
+    `/api/v1/admin/employee/employees/${request.id}`
   );
 }
 
@@ -170,7 +168,7 @@ export interface ResetPasswordReply {
 
 export function resetPassword(userId: number) {
   return axios.post<ResetPasswordReply>(
-    `/api/admin/employee/v1/employees/actions/reset-password`,
+    `/api/v1/admin/employee/employees/actions/reset-password`,
     {
       userId,
     }
