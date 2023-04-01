@@ -33,10 +33,7 @@ export interface GetEmployeeRequest {
   id: number;
 }
 
-export interface GetEmployeeReply {
-  employee: Employee;
-}
-
+export type GetEmployeeReply = Employee;
 export function getEmployee(request: GetEmployeeRequest) {
   return axios.get<GetEmployeeReply>(
     `/api/v1/admin/employee/employees/${request.id}`

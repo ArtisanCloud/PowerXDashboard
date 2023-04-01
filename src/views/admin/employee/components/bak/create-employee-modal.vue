@@ -174,7 +174,7 @@
   };
 
   onUpdated(async () => {
-    getDepartmentTree(1).then((res) => {
+    getDepartmentTree({depId}).then((res) => {
       options.depTree = [res.data.depTree];
     });
     listRoles().then((res) => {

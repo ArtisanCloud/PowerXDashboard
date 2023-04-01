@@ -1,22 +1,19 @@
 <template>
-  <a-card style="width: calc(100% - 258px); margin-left: 8px">
+  <a-card>
     <a-form class="inline-query-form" layout="inline">
       <a-form-item label="用户名">
-        <a-input v-model="queryForm.employee.likeName" @change="queryChange" />
+        <a-input v-model="queryForm.likeName" @change="queryChange" />
       </a-form-item>
       <a-form-item label="邮箱">
-        <a-input v-model="queryForm.employee.likeEmail" @change="queryChange" />
+        <a-input v-model="queryForm.likeEmail" @change="queryChange" />
       </a-form-item>
       <a-form-item label="手机号码">
-        <a-input
-          v-model="queryForm.employee.likePhoneNumber"
-          @change="queryChange"
-        />
+        <a-input v-model="queryForm.likePhoneNumber" @change="queryChange" />
       </a-form-item>
       <a-form-item label="职位">
         <a-select
-          v-model="queryForm.employee.positions"
-          :options="options.employee.positions"
+          v-model="queryForm.positions"
+          :options="option.positions"
           multiple
           allow-clear
           @change="queryChange"
@@ -25,8 +22,8 @@
       </a-form-item>
       <a-form-item label="角色">
         <a-select
-          v-model="queryForm.employee.roleCodes"
-          :options="options.employee.roles"
+          v-model="queryForm.roleCodes"
+          :options="option.roles"
           :field-names="{ label: 'roleName', value: 'roleCode' }"
           multiple
           allow-clear
@@ -36,7 +33,7 @@
       </a-form-item>
       <a-form-item label="状态">
         <a-select
-          v-model="queryForm.employee.isEnable"
+          v-model="queryForm.isEnable"
           allow-clear
           @clear="
             () => {
@@ -72,7 +69,7 @@
         </a-table-column>
         <a-table-column title="邮箱" data-index="email" :width="175" ellipsis />
         <a-table-column title="手机" data-index="mobilePhone" :width="150" />
-        <a-table-column title="状态" data-index="mobilePhone" :width="150">
+        <a-table-column title="状态" :width="150">
           <template #cell="{ record }">
             <a-switch
               :model-value="record.isEnabled"
@@ -93,29 +90,29 @@
         <a-table-column title="操作" :width="200">
           <template #cell="{ record }">
             <a-space>
-              <a-link
-                @click="
-                  () => {
-                    editEmployee(record);
-                  }
-                "
-                >编辑
-              </a-link>
+              <a-link @click="openEditEmployeeModal(record.id)">编辑 </a-link>
               <a-popconfirm content="确定要强退用户吗?">
                 <a-link disabled>强退</a-link>
               </a-popconfirm>
               <a-popconfirm
                 content="确定要删除用户吗?"
-                :ok-loading="view.deleteEmployeeLoading"
-                @ok="
-                  () => {
-                    deleteEmployeeById(record.id);
-                  }
-                "
+                :ok-loading="state.deleteEmployeeLoading"
+                @ok="deleteEmployeeById(record.id)"
               >
                 <a-link status="danger">删除</a-link>
               </a-popconfirm>
             </a-space>
+            <a-drawer
+              v-if="
+                state.editEmployee.visible &&
+                state.editEmployee.employeeId === record.id
+              "
+              v-model:visible="state.editEmployee.visible"
+              title="编辑员工"
+              width="500px"
+            >
+              <EditEmployee :id="state.editEmployee.employeeId" />
+            </a-drawer>
           </template>
         </a-table-column>
       </template>
@@ -124,9 +121,10 @@
 </template>
 
 <script lang="ts" setup>
-  import { reactive, ref } from 'vue';
+  import { onMounted, reactive, ref } from 'vue';
   import {
     deleteEmployee,
+    getEmployeeOptions,
     GetEmployeeOptionsReply,
     listEmployees,
     ListEmployeesReply,
@@ -135,37 +133,48 @@
   } from '@/api/employee';
   import { useI18n } from 'vue-i18n';
   import { useRouter } from 'vue-router';
+  import EditEmployee from '@/views/admin/employee/components/edit-employee.vue';
 
   const { t } = useI18n();
   const router = useRouter();
 
-  const option = reactive({} as GetEmployeeOptionsReply);
+  const option = ref({} as GetEmployeeOptionsReply);
 
   const queryForm = reactive({
-    employee: {
-      likeName: '',
-      likeEmail: '',
-      positions: [] as string[],
-      likePhoneNumber: '',
-      roleCodes: [] as string[],
-      isEnable: undefined as undefined | boolean,
-      depIds: [],
-    } as ListEmployeesRequest,
-  });
+    likeName: '',
+    likeEmail: '',
+    positions: [] as string[],
+    likePhoneNumber: '',
+    roleCodes: [] as string[],
+    isEnable: undefined as undefined | boolean,
+    depIds: [],
+  } as ListEmployeesRequest);
 
   const state = reactive({
     tableLoading: false,
     deleteEmployeeLoading: false,
+    editEmployee: {
+      visible: false,
+      loading: false,
+      employeeId: 0,
+    },
   });
 
   const pageData = ref({} as ListEmployeesReply);
+
+  function fetchOption() {
+    getEmployeeOptions().then((res) => {
+      option.value = res.data;
+      console.log(option.value);
+    });
+  }
 
   const queryChange = () => {
     if (state.tableLoading) {
       return;
     }
     state.tableLoading = true;
-    listEmployees(queryForm.employee)
+    listEmployees(queryForm)
       .then((res) => {
         pageData.value = res.data;
       })
@@ -221,6 +230,16 @@
         state.deleteEmployeeLoading = false;
       });
   };
+
+  function openEditEmployeeModal(id: number) {
+    state.editEmployee.employeeId = id;
+    state.editEmployee.visible = true;
+  }
+
+  onMounted(() => {
+    fetchOption();
+    queryChange();
+  });
 </script>
 
 <style scoped></style>

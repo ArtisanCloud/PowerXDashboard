@@ -3,8 +3,8 @@
 </template>
 
 <script lang="ts" setup>
-  import { computed, onMounted, PropType, reactive } from 'vue';
-  import { Employee, listEmployees } from '@/api/employee';
+import {computed, onMounted, PropType, reactive, ref} from 'vue';
+  import {Employee, GetEmployeeOptionsReply, listEmployees} from '@/api/employee';
   import { TransferItem } from '@arco-design/web-vue/es/transfer/interface';
 
   const prop = defineProps({
@@ -18,13 +18,11 @@
 
   const emit = defineEmits(['update:modelValue']);
 
-  const option = reactive({
-    employee: [] as Employee[],
-  });
+  const option = ref({} as GetEmployeeOptionsReply);
 
   const data = computed(() => {
     const items = [] as TransferItem[];
-    option.employee.forEach((item) => {
+    option.value..forEach((item) => {
       items.push({
         label: item.name,
         value: item.id.toString(),

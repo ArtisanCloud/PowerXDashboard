@@ -98,11 +98,25 @@ body {
 }
 
 .inline-query-form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 16px;
   label {
-    width: 72px !important;
+    width: 72px;
     text-align: right;
+    grid-column: span 1;
   }
   > div {
-    width: 250px !important;
+    min-width: 250px;
+  }
+}
+
+@media (max-width: 768px) {
+  .inline-query-form label {
+    width: auto;
+  }
+
+  .inline-query-form > div {
+    width: 100%;
   }
 }
