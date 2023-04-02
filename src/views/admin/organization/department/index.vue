@@ -169,12 +169,9 @@
     DepartmentNode,
     getDepartmentTree,
     GetDepartmentTreeReply,
-    UpdateDepartmentRequest,
   } from '@/api/department';
   import { Employee, listEmployees } from '@/api/employee';
   import { Message } from '@arco-design/web-vue';
-  import EmployeeSelect from '@/views/admin/employee/components/employee-select.vue';
-  import { SimpleEmployee } from '@/api/base';
 
   const depPage = ref({} as GetDepartmentTreeReply);
 
@@ -198,7 +195,7 @@
     userOptions: [] as Employee[],
   });
 
-  const depDetailModel = ref({} as UpdateDepartmentRequest);
+  const depDetailModel = ref({} as );
 
   function fetchDepTree() {
     view.tableLoading = true;

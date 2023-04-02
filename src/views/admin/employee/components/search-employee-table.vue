@@ -111,7 +111,10 @@
               title="编辑员工"
               width="500px"
             >
-              <EditEmployee :id="state.editEmployee.employeeId" />
+              <EditEmployee
+                :id="state.editEmployee.employeeId"
+                @submit-success="queryChange()"
+              />
             </a-drawer>
           </template>
         </a-table-column>
@@ -124,8 +127,6 @@
   import { onMounted, reactive, ref } from 'vue';
   import {
     deleteEmployee,
-    getEmployeeOptions,
-    GetEmployeeOptionsReply,
     listEmployees,
     ListEmployeesReply,
     ListEmployeesRequest,
@@ -134,11 +135,15 @@
   import { useI18n } from 'vue-i18n';
   import { useRouter } from 'vue-router';
   import EditEmployee from '@/views/admin/employee/components/edit-employee.vue';
+  import {
+    getEmployeeQueryOptions,
+    GetEmployeeQueryOptionsReply,
+  } from '@/api/common';
 
   const { t } = useI18n();
   const router = useRouter();
 
-  const option = ref({} as GetEmployeeOptionsReply);
+  const option = ref({} as GetEmployeeQueryOptionsReply);
 
   const queryForm = reactive({
     likeName: '',
@@ -163,9 +168,8 @@
   const pageData = ref({} as ListEmployeesReply);
 
   function fetchOption() {
-    getEmployeeOptions().then((res) => {
+    getEmployeeQueryOptions().then((res) => {
       option.value = res.data;
-      console.log(option.value);
     });
   }
 
@@ -199,7 +203,7 @@
   }
 
   function gotoEmployeeDetail(id: number) {
-    router.push(`/employee/detail/${id}`);
+    router.push(`/admin/employee/detail/${id}`);
   }
 
   function changeEmployeeStatus(id: number, value: boolean) {

@@ -54,12 +54,14 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, onMounted, onUpdated, ref} from 'vue';
+  import { computed, onMounted, ref } from 'vue';
   import { FieldRule, Message } from '@arco-design/web-vue';
   import {
+    getEmployeeQueryOptions,
+    GetEmployeeQueryOptionsReply,
+  } from '@/api/common';
+  import {
     getEmployee,
-    getEmployeeOptions,
-    GetEmployeeOptionsReply,
     updateEmployee,
     UpdateEmployeeRequest,
   } from '@/api/employee';
@@ -130,10 +132,10 @@ import {computed, onMounted, onUpdated, ref} from 'vue';
     ],
   } as Record<string, FieldRule[]>;
 
-  const option = ref({} as GetEmployeeOptionsReply);
+  const option = ref({} as GetEmployeeQueryOptionsReply);
 
   function fetchOption() {
-    getEmployeeOptions().then((res) => {
+    getEmployeeQueryOptions().then((res) => {
       option.value = res.data;
     });
   }
@@ -141,6 +143,7 @@ import {computed, onMounted, onUpdated, ref} from 'vue';
   function fetchEmployee() {
     getEmployee({ id: employeeId.value }).then((res) => {
       formModel.value = res.data;
+      formModel.value.depId = res.data.department?.depId;
     });
   }
 

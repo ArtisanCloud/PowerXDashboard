@@ -10,8 +10,18 @@
     <br />
     <a-card>
       <a-row :gutter="{ xs: 8, sm: 16, md: 24, lg: 32 }">
-        <a-col :xs="24" :sm="24" :md="12" :lg="8" :style="{ minWidth: '300px', maxWidth: '30%' }">
-          <DepartmentSide/>
+        <a-col
+          :xs="24"
+          :sm="24"
+          :md="12"
+          :lg="8"
+          :style="{ minWidth: '300px', maxWidth: '20%' }"
+        >
+          <a-card>
+            <a-scrollbar style="width: 100%; height: 100%; overflow: auto">
+              <DepartmentSide style="min-height: 60vh"/>
+            </a-scrollbar>
+          </a-card>
         </a-col>
         <a-col :xs="24" :sm="24" :md="12" :lg="16">
           <SearchEmployeeTable />

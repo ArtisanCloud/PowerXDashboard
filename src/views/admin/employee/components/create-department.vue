@@ -5,10 +5,18 @@
         <a-input v-model="formModel.depName" />
       </a-form-item>
       <a-form-item label="部门负责人" field="leaderId">
-        <a-select v-model="formModel.leaderId" />
+        <a-select
+          v-model="formModel.leaderId"
+          :options="option.leaderOptions"
+          :field-names="{ label: 'name', value: 'id' }"
+        />
       </a-form-item>
       <a-form-item label="父部门" field="pId">
-        <a-select v-model="formModel.pId" />
+        <a-select
+          v-model="formModel.pId"
+          :options="option.parentOptions"
+          :field-names="{ label: 'name', value: 'id' }"
+        />
       </a-form-item>
       <a-form-item label="描述" field="desc">
         <a-input v-model="formModel.desc" />
@@ -33,9 +41,15 @@
 </template>
 
 <script lang="ts" setup>
-  import { computed, reactive, ref } from 'vue';
+  import { computed, onMounted, reactive, ref } from 'vue';
   import { FieldRule, Message } from '@arco-design/web-vue';
   import { createDepartment, CreateDepartmentRequest } from '@/api/department';
+  import {
+    DepartmentOption,
+    EmployeeOption,
+    getDepartmentOptions,
+    getEmployeeOptions,
+  } from '@/api/common';
 
   const prop = defineProps({
     id: {
@@ -58,7 +72,7 @@
   const formRef = ref();
   const formModel = ref({
     depName: '',
-    leaderId: 0,
+    leaderId: 1,
     pId: parentId.value,
     desc: '',
     phoneNumber: '',
@@ -86,6 +100,23 @@
 
   const state = reactive({ submitLoading: false });
 
+  const option = reactive({
+    leaderOptions: [] as Array<EmployeeOption>,
+    parentOptions: [] as Array<DepartmentOption>,
+  });
+
+  function fetchLeaderOptions(likeName = '') {
+    return getEmployeeOptions({ likeName }).then((res) => {
+      option.leaderOptions = res.data.list;
+    });
+  }
+
+  function fetchParentOptions({ id, likeName } = { id: 0, likeName: '' }) {
+    return getDepartmentOptions({ ids: [id], likeName }).then((res) => {
+      option.parentOptions = res.data.list;
+    });
+  }
+
   const onSubmit = async () => {
     if (state.submitLoading) {
       return;
@@ -107,4 +138,9 @@
         state.submitLoading = false;
       });
   };
+
+  onMounted(() => {
+    fetchLeaderOptions();
+    fetchParentOptions({ id: parentId.value, likeName: '' });
+  });
 </script>

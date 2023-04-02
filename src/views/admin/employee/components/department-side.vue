@@ -1,49 +1,43 @@
 <template>
-  <a-card style="width: 100%; height: 100%">
-    <a-scrollbar style="width: 100%; height: 100%; overflow: auto">
-      <a-tree
-        v-if="data.depTree.length > 0"
-        :data="data.depTree"
-        block-node
-        :show-line="true"
-        :field-names="{
-          title: 'depName',
-          key: 'id',
-          children: 'children',
-        }"
-        checked-strategy="child"
-        @select="onSelect"
+  <a-tree
+    v-if="data.depTree.length > 0"
+    :data="data.depTree"
+    :show-line="true"
+    :field-names="{
+      title: 'depName',
+      key: 'id',
+      children: 'children',
+    }"
+    checked-strategy="child"
+    @select="onSelect"
+  >
+    <template #title="nodeData">
+      <span>{{ nodeData.depName }}</span>
+    </template>
+    <template #extra="nodeData">
+      <a-dropdown position="bl">
+        <a-button type="text" style="margin-right: 16px">···</a-button>
+        <template #content>
+          <a-doption @click="openAddDepDrawer(nodeData.id)"
+            >添加子部门</a-doption
+          >
+        </template>
+      </a-dropdown>
+      <a-drawer
+        v-if="
+          nodeData.id === state.addDepDrawer.pId && state.addDepDrawer.visible
+        "
+        v-model:visible="state.addDepDrawer.visible"
+        title="添加子部门"
+        width="500px"
       >
-        <template #title="nodeData">
-          <span>{{ nodeData.depName }}</span>
-        </template>
-        <template #extra="nodeData">
-          <a-dropdown position="bl" style="background-color: white">
-            <a-link type="text">···</a-link>
-            <template #content>
-              <a-doption @click="openAddDepDrawer(nodeData.id)"
-                >添加子部门</a-doption
-              >
-              <a-drawer
-                v-if="
-                  nodeData.id === state.addDepDrawer.pId &&
-                  state.addDepDrawer.visible
-                "
-                v-model:visible="state.addDepDrawer.visible"
-                title="添加子部门"
-                width="500px"
-              >
-                <CreateDepartment :id="state.addDepDrawer.pId" />
-              </a-drawer>
-            </template>
-          </a-dropdown>
-        </template>
-        <template #drag-icon>
-          <a-icon type="menu" />
-        </template>
-      </a-tree>
-    </a-scrollbar>
-  </a-card>
+        <CreateDepartment :id="state.addDepDrawer.pId" @submit-success="fetch()"/>
+      </a-drawer>
+    </template>
+    <template #switcher-icon>
+      <icon-user-group />
+    </template>
+  </a-tree>
 </template>
 
 <script lang="ts" setup>
@@ -100,6 +94,4 @@
   });
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

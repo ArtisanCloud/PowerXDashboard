@@ -32,8 +32,12 @@
           <a-radio value="un_know">未知</a-radio>
         </a-radio-group>
       </a-form-item>
-      <a-form-item label="部门 ID" field="depId">
-        <a-select v-model="formModel.depId" :options="option.departments" :field-names="{label: 'departmentName', value: 'departmentId'}"/>
+      <a-form-item label="部门" field="depId">
+        <a-select
+          v-model="formModel.depId"
+          :options="option.departments"
+          :field-names="{ label: 'departmentName', value: 'departmentId' }"
+        />
       </a-form-item>
       <a-form-item label="职位" field="position">
         <a-input v-model="formModel.position" />
@@ -58,10 +62,10 @@
   import { onMounted, reactive, ref } from 'vue';
   import { FieldRule, Message } from '@arco-design/web-vue';
   import {
-    createEmployee,
-    getEmployeeOptions,
-    GetEmployeeOptionsReply,
-  } from '@/api/employee';
+    getEmployeeQueryOptions,
+    GetEmployeeQueryOptionsReply,
+  } from '@/api/common';
+  import { createEmployee } from '@/api/employee';
 
   const emit = defineEmits(['submitSuccess', 'submitFailed']);
 
@@ -125,10 +129,10 @@
     ],
   } as Record<string, FieldRule[]>;
 
-  const option = ref({} as GetEmployeeOptionsReply);
+  const option = ref({} as GetEmployeeQueryOptionsReply);
 
   function fetchOption() {
-    getEmployeeOptions().then((res) => {
+    getEmployeeQueryOptions().then((res) => {
       option.value = res.data;
     });
   }

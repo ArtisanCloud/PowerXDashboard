@@ -109,15 +109,6 @@ export function createEmployee(request: CreateEmployeeRequest) {
   );
 }
 
-export interface GetEmployeeOptionsReply {
-  positions: string[];
-  roles: { roleCode: string; roleName: string }[];
-  departments: { departmentId: number; departmentName: string }[];
-}
-
-export function getEmployeeOptions() {
-  return axios.get<GetEmployeeOptionsReply>('/api/v1/admin/employee/options');
-}
 
 export interface UpdateEmployeeRequest {
   id: number;
