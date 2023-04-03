@@ -11,6 +11,8 @@ export interface AdminAPI {
   api: string;
   method: string;
   name: string;
+  groupId: number;
+  groupName: string;
   desc: string;
 }
 
@@ -89,7 +91,7 @@ export function setRolePermissions(request: SetRolePermissionsRequest) {
 }
 
 export interface ListAPIRequest {
-  groupId: number;
+  groupId?: number;
 }
 
 export interface ListAPIReply {
