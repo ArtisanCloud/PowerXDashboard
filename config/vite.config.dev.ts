@@ -12,7 +12,7 @@ export default mergeConfig(
       },
       proxy: {
         '/api': {
-          target: 'http://localhost:8888',
+          target: 'http://localhost:8889',
           changeOrigin: true,
         },
       },
