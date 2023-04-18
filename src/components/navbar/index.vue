@@ -7,7 +7,7 @@
           :style="{ margin: 0, fontSize: '18px' }"
           :heading="5"
         >
-          PowerX
+          816沙龙
         </a-typography-title>
         <icon-menu-fold
           v-if="!topMenu && appStore.device === 'mobile'"

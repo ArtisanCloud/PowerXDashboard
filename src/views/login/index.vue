@@ -2,7 +2,7 @@
   <div class="container">
     <div class="logo">
       <img width="32" alt="logo" src="/src/assets/images/logo.png" />
-      <div class="logo-text">PowerX</div>
+      <div class="logo-text">816沙龙</div>
     </div>
     <!--    <LoginBanner />-->
     <div class="content">
