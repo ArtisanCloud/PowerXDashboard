@@ -7,6 +7,8 @@ import axios from 'axios';
  * @version v1
  */
 
+export const PREFIX_URI_ADMIN_API = '/api/v1/admin'
+
 export interface EmployeeOption {
 	id: number;
 	avatar: string;
@@ -60,6 +62,11 @@ export function getEmployeeQueryOptions() {
 	return axios.get<GetEmployeeQueryOptionsReply>(
 		'/api/v1/admin/common/options/employee-query'
 	);
+}
+
+export interface ParentOption{
+	id: number;
+	name: string;
 }
 
 export interface DepartmentOption {

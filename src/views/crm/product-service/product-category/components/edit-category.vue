@@ -1,17 +1,17 @@
 <template>
   <div>
     <a-form ref="formRef" :model="formModel" :rules="rules" @submit="onSubmit">
-      <a-form-item label="部门名称" field="depName">
+      <a-form-item label="产品品类名称" field="depName">
         <a-input v-model="formModel.depName" />
       </a-form-item>
-      <a-form-item label="部门负责人" field="leaderId">
+      <a-form-item label="上级品类" field="leaderId">
         <a-select
           v-model="formModel.leaderId"
           :options="option.leaderOptions"
           :field-names="{ label: 'name', value: 'id' }"
         />
       </a-form-item>
-      <a-form-item label="父部门" field="pId">
+      <a-form-item label="父产品品类" field="pId">
         <a-select
           v-model="formModel.pId"
           :options="option.parentOptions"
@@ -43,11 +43,8 @@
 <script lang="ts" setup>
   import { computed, onMounted, reactive, ref } from 'vue';
   import { FieldRule, Message } from '@arco-design/web-vue';
-  import { createCategory, CreateCategoryRequest } from '@/api/category';
+  import { createCategory, CreateCategoryRequest } from '@/api/crm/product-service/category';
   import {
-    CategoryOption,
-    EmployeeOption,
-    getCategoryOptions,
     getEmployeeOptions,
   } from '@/api/common';
 
@@ -71,22 +68,24 @@
 
   const formRef = ref();
   const formModel = ref({
-    depName: '',
-    leaderId: 1,
+    name: '',
     pId: parentId.value,
-    desc: '',
-    phoneNumber: '',
-    email: '',
-    remark: '',
+    sort: 0,
+    viceName: '',
+    description: '',
+    icon: '',
+    backgroundColor: '',
+    imageURL: '',
+
   } as CreateCategoryRequest);
 
   const rules = {
     depName: [
-      { required: true, message: '请输入部门名称' },
-      { max: 50, message: '部门名称长度不能超过 50 个字符' },
+      { required: true, message: '请输入产品品类名称' },
+      { max: 50, message: '产品品类名称长度不能超过 50 个字符' },
     ],
-    leaderId: [{ required: true, message: '请选择部门负责人' }],
-    pId: [{ required: true, message: '请选择父部门' }],
+    leaderId: [{ required: true, message: '请选择产品品类负责人' }],
+    pId: [{ required: true, message: '请选择父产品品类' }],
     desc: [{ max: 100, message: '描述长度不能超过 100 个字符' }],
     phoneNumber: [
       {
@@ -101,20 +100,20 @@
   const state = reactive({ submitLoading: false });
 
   const option = reactive({
-    leaderOptions: [] as Array<EmployeeOption>,
-    parentOptions: [] as Array<CategoryOption>,
+    // leaderOptions: [] as Array<EmployeeOption>,
+    // parentOptions: [] as Array<CategoryOption>,
   });
 
   function fetchLeaderOptions(likeName = '') {
     return getEmployeeOptions({ likeName }).then((res) => {
-      option.leaderOptions = res.data.list;
+      // option.leaderOptions = res.data.list;
     });
   }
 
   function fetchParentOptions({ id, likeName } = { id: 0, likeName: '' }) {
-    return getCategoryOptions({ ids: [id], likeName }).then((res) => {
-      option.parentOptions = res.data.list;
-    });
+    // return getCategoryOptions({ ids: [id], likeName }).then((res) => {
+    //   option.parentOptions = res.data.list;
+    // });
   }
 
   const onSubmit = async () => {
