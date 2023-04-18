@@ -6,7 +6,7 @@ export default function usePermission() {
   const userStore = useUserStore();
   return {
     accessRouter(route: RouteLocationNormalized | RouteRecordRaw) {
-      console.log(JSON.stringify(userStore.userInfo));
+      // console.log(JSON.stringify(userStore.userInfo));
       return (
         // root 特殊放行
         userStore.account === 'root' ||
