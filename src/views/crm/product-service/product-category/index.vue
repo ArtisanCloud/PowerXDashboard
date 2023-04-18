@@ -9,22 +9,25 @@
     </a-card>
     <br/>
     <a-card>
-      <CategoryTree/>
+      <CategoryTree ref="treeRef"/>
     </a-card>
-    <a-drawer v-model:visible="state.createCategory.visible" width="500px">
-      <CreateCategory v-if="state.createCategory.visible"/>
+    <a-drawer
+        v-model:visible="state.createCategory.visible" width="500px">
+      <CreateCategory
+          @submitSuccess="refreshTree"
+          v-if="state.createCategory.visible"/>
     </a-drawer>
   </div>
 </template>
 
 <script lang="ts" setup>
-import {reactive} from 'vue';
+import {reactive, ref} from 'vue';
 import CategoryTree from '@/views/crm/product-service/product-category/components/category-tree.vue';
 import CreateCategory from '@/views/crm/product-service/product-category/components/create-category.vue';
 
-const openAddCategory = () => {
+const treeRef = ref<any>();
 
-  // state.createCategory.parentNode = {name: '无', id: 0}
+const openAddCategory = () => {
   state.createCategory.visible = true;
 };
 
@@ -34,6 +37,11 @@ const state = reactive({
     parentNode: {}
   },
 });
+
+const refreshTree = () =>{
+  treeRef.value.fetchCategoryTree()
+}
+
 </script>
 
 <script lang="ts">

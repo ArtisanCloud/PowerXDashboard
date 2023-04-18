@@ -100,7 +100,7 @@ export function getDepartmentOptions(request: GetDepartmentOptionsRequest) {
 
 
 export interface PowerModel {
-	id: bigint
+	id: number
 	createdAt: Date
 	updatedAt: Date
 	deletedAt: Date

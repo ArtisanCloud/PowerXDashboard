@@ -1,5 +1,5 @@
 <template>
-  <a-layout-footer class="footer">PowerX</a-layout-footer>
+  <a-layout-footer class="footer">Powered by ArtisanCloud</a-layout-footer>
 </template>
 
 <script lang="ts" setup></script>

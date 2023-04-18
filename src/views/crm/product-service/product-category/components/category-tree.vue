@@ -40,19 +40,19 @@
                 </a-button>
               </a-popconfirm>
 
-              <!--排序靠前品类-->
-              <a-button>
-                <template #icon>
-                  <icon-caret-up :style="{fontSize:'16px'}"/>
-                </template>
-              </a-button>
+<!--              &lt;!&ndash;排序靠前品类&ndash;&gt;-->
+<!--              <a-button>-->
+<!--                <template #icon>-->
+<!--                  <icon-caret-up :style="{fontSize:'16px'}"/>-->
+<!--                </template>-->
+<!--              </a-button>-->
 
-              <!--排序靠后品类-->
-              <a-button>
-                <template #icon>
-                  <icon-caret-down :style="{fontSize:'16px'}"/>
-                </template>
-              </a-button>
+<!--              &lt;!&ndash;排序靠后品类&ndash;&gt;-->
+<!--              <a-button>-->
+<!--                <template #icon>-->
+<!--                  <icon-caret-down :style="{fontSize:'16px'}"/>-->
+<!--                </template>-->
+<!--              </a-button>-->
 
             </a-space>
           </template>
@@ -61,14 +61,17 @@
     </a-table>
     <a-drawer v-model:visible="state.createSubCategory.visible" width="500px">
       <CreateCategory
+          @submitSuccess="fetchCategoryTree"
           v-if="state.createSubCategory.visible"
           :parentNode="state.createSubCategory.parentNode"
+
       />
     </a-drawer>
     <a-drawer v-model:visible="state.editCategory.visible" width="500px">
       <EditCategory
+          @submitSuccess="fetchCategoryTree"
           v-if="state.editCategory.visible"
-          :id="state.editCategory.categoryId"
+          :node="state.editCategory.node"
       />
     </a-drawer>
   </a-card>
@@ -84,6 +87,7 @@ import CreateCategory from '@/views/crm/product-service/product-category/compone
 import EditCategory from '@/views/crm/product-service/product-category/components/edit-category.vue';
 import {ParentOption} from "@/api/common";
 
+
 const categoryTree = ref<ProductCategory[]>([]);
 
 const state = reactive({
@@ -98,7 +102,7 @@ const state = reactive({
   },
   editCategory: {
     visible: false,
-    categoryId: 0,
+    node: {},
   },
 });
 
@@ -115,13 +119,13 @@ const fetchCategoryTree = async () => {
 };
 
 
-const FindCategoryFromTreeById = (tree: ProductCategory[], id: bigint): ProductCategory | undefined => {
+const FindCategoryFromTreeById = (tree: ProductCategory[], id: number): ProductCategory | undefined => {
   if (!tree) {
     return undefined;
   }
 
   for (let i = 0; i < tree.length; i += 1) {
-    // console.log(id, tree[i].id)
+    console.log(id, tree[i].id)
     if (id === tree[i].id) {
       return tree[i]
     }
@@ -147,8 +151,9 @@ const openAddSubCategory = (cat: ProductCategory) => {
   state.createSubCategory.visible = true;
 };
 
-const openEditCategory = (catId: number) => {
-  state.editCategory.categoryId = catId;
+const openEditCategory = (cat: ProductCategory) => {
+  // console.log(cat)
+  state.editCategory.node = cat;
   state.editCategory.visible = true;
 };
 
@@ -160,6 +165,9 @@ const deleteCategoryById = async (catId: number) => {
     console.error(error);
   }
 };
+
+
+defineExpose({fetchCategoryTree})
 
 onMounted(() => {
   fetchCategoryTree();
