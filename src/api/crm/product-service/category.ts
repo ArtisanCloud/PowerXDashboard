@@ -4,7 +4,7 @@ import {URI_PRODUCT_API} from "@/api/crm/product-service/product";
 
 
 export interface ProductCategory extends PowerModel, imageAbleInfo {
-	pId: bigint
+	pId: number
 	name: string
 	sort: number
 	viceName: string
@@ -15,6 +15,7 @@ export interface ProductCategory extends PowerModel, imageAbleInfo {
 
 export interface GetCategoryTreeRequest {
 	Id: number;
+
 
 }
 
@@ -29,7 +30,7 @@ export function getCategoryTree(request: GetCategoryTreeRequest) {
 }
 
 export interface CreateCategoryRequest extends imageAbleInfo {
-	pId: bigint
+	pId: number
 	name: string
 	sort: number
 	viceName: string
@@ -37,7 +38,7 @@ export interface CreateCategoryRequest extends imageAbleInfo {
 }
 
 export interface CreateCategoryReply extends imageAbleInfo {
-	pId: bigint
+	pId: number
 	name: string
 	sort: number
 	viceName: string
@@ -61,7 +62,7 @@ export interface DeleteCategoryReply {
 }
 
 export function deleteCategory(request: DeleteCategoryRequest) {
-	return axios.get<DeleteCategoryReply>(
+	return axios.delete<DeleteCategoryReply>(
 		`${PREFIX_URI_ADMIN_API + URI_PRODUCT_API}/product-categories/${request.id}`
 	);
 }

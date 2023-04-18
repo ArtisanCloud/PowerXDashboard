@@ -1,34 +1,38 @@
 <template>
   <div>
     <a-form ref="formRef" :model="formModel" :rules="rules" @submit="onSubmit">
-      <a-form-item label="产品品类名称" field="depName">
-        <a-input v-model="formModel.depName" />
+      <a-form-item label="品类名称" field="name">
+        <a-input v-model="formModel.name"/>
       </a-form-item>
-      <a-form-item label="上级品类" field="leaderId">
+      <a-form-item label="上级品类" field="pId">
         <a-select
-          v-model="formModel.leaderId"
-          :options="option.leaderOptions"
-          :field-names="{ label: 'name', value: 'id' }"
+            v-model="formModel.pId"
+            :options="option.parentCategoryOptions"
+            :field-names="{ label: 'name', value: 'id' }"
         />
       </a-form-item>
-      <a-form-item label="父产品品类" field="pId">
-        <a-select
-          v-model="formModel.pId"
-          :options="option.parentOptions"
-          :field-names="{ label: 'name', value: 'id' }"
-        />
+      <a-form-item label="副标题" field="viceName">
+        <a-input v-model="formModel.viceName"/>
       </a-form-item>
       <a-form-item label="描述" field="desc">
-        <a-input v-model="formModel.desc" />
+        <a-textarea v-model="formModel.description"/>
       </a-form-item>
-      <a-form-item label="电话号码" field="phoneNumber">
-        <a-input v-model="formModel.phoneNumber" />
+      <a-form-item label="排序" field="sort">
+        <a-input-number v-model="formModel.sort"/>
       </a-form-item>
-      <a-form-item label="邮箱" field="email">
-        <a-input v-model="formModel.email" />
+      <a-form-item label="图标" field="icon">
+        <a-input v-model="formModel.icon"/>
       </a-form-item>
-      <a-form-item label="备注" field="remark">
-        <a-input v-model="formModel.remark" />
+      <a-form-item label="背景颜色" field="backgroundColor">
+        <a-input v-model="formModel.backgroundColor"/>
+      </a-form-item>
+      <a-form-item label="头图上传" field="imageUrl">
+        <a-upload
+            list-type="picture-card"
+            action="/"
+            :default-file-list="fileList"
+            image-preview
+        />
       </a-form-item>
       <a-form-item>
         <a-space size="large">
@@ -41,105 +45,115 @@
 </template>
 
 <script lang="ts" setup>
-  import { computed, onMounted, reactive, ref } from 'vue';
-  import { FieldRule, Message } from '@arco-design/web-vue';
-  import { createCategory, CreateCategoryRequest } from '@/api/crm/product-service/category';
-  import {
-    getEmployeeOptions,
-  } from '@/api/common';
+import {computed, onMounted, PropType, reactive, ref} from 'vue';
+import {FieldRule, Message} from '@arco-design/web-vue';
+import {createCategory, CreateCategoryRequest, ProductCategory} from '@/api/crm/product-service/category';
+import {
+  getEmployeeOptions, ParentOption,
+} from '@/api/common';
 
-  const prop = defineProps({
-    id: {
-      type: Number,
-      default: 1,
+const prop = defineProps({
+  parentNode: {
+    type: Object as PropType<ProductCategory>,
+    default() {
+      return {};
     },
-  });
-
-  const emit = defineEmits(['submitSuccess', 'submitFailed', 'update:id']);
-
-  const parentId = computed({
-    get() {
-      return prop.id;
+  },
+  node: {
+    type: Object as PropType<ProductCategory>,
+    default() {
+      return {};
     },
-    set(val) {
-      emit('update:id', val);
-    },
-  });
-
-  const formRef = ref();
-  const formModel = ref({
-    name: '',
-    pId: parentId.value,
-    sort: 0,
-    viceName: '',
-    description: '',
-    icon: '',
-    backgroundColor: '',
-    imageURL: '',
-
-  } as CreateCategoryRequest);
-
-  const rules = {
-    depName: [
-      { required: true, message: '请输入产品品类名称' },
-      { max: 50, message: '产品品类名称长度不能超过 50 个字符' },
-    ],
-    leaderId: [{ required: true, message: '请选择产品品类负责人' }],
-    pId: [{ required: true, message: '请选择父产品品类' }],
-    desc: [{ max: 100, message: '描述长度不能超过 100 个字符' }],
-    phoneNumber: [
-      {
-        match: /^1[3-9]\d{9}$/,
-        message: '请输入正确的手机号',
-      },
-    ],
-    email: [{ type: 'email', message: '请输入正确的邮箱格式' }],
-    remark: [{ max: 100, message: '备注长度不能超过 100 个字符' }],
-  } as Record<string, FieldRule[]>;
-
-  const state = reactive({ submitLoading: false });
-
-  const option = reactive({
-    // leaderOptions: [] as Array<EmployeeOption>,
-    // parentOptions: [] as Array<CategoryOption>,
-  });
-
-  function fetchLeaderOptions(likeName = '') {
-    return getEmployeeOptions({ likeName }).then((res) => {
-      // option.leaderOptions = res.data.list;
-    });
   }
+});
 
-  function fetchParentOptions({ id, likeName } = { id: 0, likeName: '' }) {
-    // return getCategoryOptions({ ids: [id], likeName }).then((res) => {
-    //   option.parentOptions = res.data.list;
-    // });
+const emits = defineEmits(['submitSuccess', 'submitFailed', 'update:id']);
+
+// const parentId = computed({
+//   get() {
+//     return prop.parentNode?.id;
+//   },
+//   set(val) {
+//     emits('update:id', val);
+//   },
+// });
+
+const fileList = [
+  // prop.node?.imageURL,
+]
+
+const formRef = ref();
+const formModel = ref({
+  id: prop.node.id,
+  name: prop.node?.name,
+  pId: prop.node?.pId,
+  sort: prop.node?.sort,
+  viceName: prop.node?.viceName,
+  description: prop.node?.description,
+  icon: prop.node?.icon,
+  backgroundColor: prop.node?.backgroundColor,
+  imageURL: prop.node?.imageURL,
+
+} as CreateCategoryRequest);
+
+const rules = {
+  name: [
+    {required: true, message: '请输入品类名称'},
+    {max: 10, message: '品类名称长度不能超过 10 个字符'},
+  ],
+  pId: [{required: true, message: '请选择上级品类'}],
+  description: [{max: 100, message: '描述长度不能超过 100 个字符'}],
+
+
+} as Record<string, FieldRule[]>;
+
+const state = reactive({submitLoading: false});
+
+const option = reactive({
+  parentCategoryOptions: [] as Array<ParentOption>,
+});
+
+function fetchLeaderOptions(likeName = '') {
+  return getEmployeeOptions({likeName}).then((res) => {
+    // option.leaderOptions = res.data.list;
+  });
+}
+
+function fetchParentOptions() {
+
+  option.parentCategoryOptions = [{
+    id: Number(prop.parentNode.id ? prop.parentNode.id : 0),
+    name: (prop.parentNode.name ? prop.parentNode.name : "无")
+  }];
+
+  console.log(option.parentCategoryOptions[0].name)
+
+
+}
+
+const onSubmit = async () => {
+  if (state.submitLoading) {
+    return;
   }
-
-  const onSubmit = async () => {
-    if (state.submitLoading) {
-      return;
-    }
-    const err = await formRef.value.validate();
-    if (err) {
-      return;
-    }
-    state.submitLoading = true;
-    createCategory(formModel.value)
+  const err = await formRef.value.validate();
+  if (err) {
+    return;
+  }
+  state.submitLoading = true;
+  createCategory(formModel.value)
       .then(() => {
         Message.success('创建成功');
-        emit('submitSuccess');
+        emits('submitSuccess');
       })
       .catch(() => {
-        emit('submitFailed');
+        emits('submitFailed');
       })
       .finally(() => {
         state.submitLoading = false;
       });
-  };
+};
 
-  onMounted(() => {
-    fetchLeaderOptions();
-    fetchParentOptions({ id: parentId.value, likeName: '' });
-  });
+onMounted(() => {
+  fetchParentOptions();
+});
 </script>

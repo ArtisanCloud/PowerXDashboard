@@ -18,7 +18,10 @@
         <a-textarea v-model="formModel.description"/>
       </a-form-item>
       <a-form-item label="排序" field="sort">
-        <a-input v-model="formModel.sort" model-value="0"/>
+        <a-input-number v-model="formModel.sort" default-value="0"/>
+      </a-form-item>
+      <a-form-item label="图标" field="icon">
+        <a-input v-model="formModel.icon"/>
       </a-form-item>
       <a-form-item label="背景颜色" field="backgroundColor">
         <a-input v-model="formModel.backgroundColor"/>
@@ -58,14 +61,15 @@ const prop = defineProps({
   },
 });
 
-const emit = defineEmits(['submitSuccess', 'submitFailed', 'update:id']);
+const emits = defineEmits(['submitSuccess', 'submitFailed', 'update:id']);
+
 
 const parentId = computed({
   get() {
     return prop.parentNode?.id;
   },
   set(val) {
-    emit('update:id', val);
+    emits('update:id', val);
   },
 });
 
@@ -126,10 +130,10 @@ const onSubmit = async () => {
   createCategory(formModel.value)
       .then(() => {
         Message.success('创建成功');
-        emit('submitSuccess');
+        emits('submitSuccess');
       })
       .catch(() => {
-        emit('submitFailed');
+        emits('submitFailed');
       })
       .finally(() => {
         state.submitLoading = false;
