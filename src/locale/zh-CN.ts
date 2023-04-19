@@ -8,7 +8,7 @@ import localeSettings from './zh-CN/settings';
 export default {
   'menu.home': '主页',
   'menu.home.index': '首页',
-  'menu.dashboard': '仪表盘',
+  'menu.dashboard': '看板',
   'menu.list': '列表页',
   'menu.result': '结果页',
   'menu.exception': '异常页',
@@ -24,7 +24,7 @@ export default {
   'navbar.docs': '文档中心',
   'navbar.action.locale': '切换为中文',
 
-  'menu.admin': '管理',
+  'menu.admin': '系统管理',
   'menu.admin.employee': '员工管理',
   'menu.admin.employee.detail': '员工详情',
   'menu.admin.permission': '权限管理',

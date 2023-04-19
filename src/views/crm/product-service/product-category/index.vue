@@ -9,7 +9,7 @@
     </a-card>
     <br/>
     <a-card>
-      <CategoryTree ref="treeRef"/>
+      <CategoryTree ref="RefTree"/>
     </a-card>
     <a-drawer
         v-model:visible="state.createCategory.visible" width="500px">
@@ -25,7 +25,7 @@ import {reactive, ref} from 'vue';
 import CategoryTree from '@/views/crm/product-service/product-category/components/category-tree.vue';
 import CreateCategory from '@/views/crm/product-service/product-category/components/create-category.vue';
 
-const treeRef = ref<any>();
+const RefTree = ref<any>();
 
 const openAddCategory = () => {
   state.createCategory.visible = true;
@@ -39,7 +39,7 @@ const state = reactive({
 });
 
 const refreshTree = () =>{
-  treeRef.value.fetchCategoryTree()
+  RefTree.value.fetchCategoryTree()
 }
 
 </script>
