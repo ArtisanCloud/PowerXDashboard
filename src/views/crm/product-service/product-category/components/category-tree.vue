@@ -109,8 +109,8 @@ const state = reactive({
 const fetchCategoryTree = async () => {
   state.loading = true;
   try {
-    const res = await getCategoryTree({Id: 0});
-    categoryTree.value = res.data.Tree;
+    const res = await getCategoryTree({id: 0});
+    categoryTree.value = res.data.tree;
     // console.log(categoryTree)
 
   } finally {

@@ -8,7 +8,7 @@ const Admin: AppRouteRecordRaw = {
   meta: {
     locale: 'menu.admin',
     requiresAuth: true,
-    icon: 'icon-dashboard',
+    icon: 'icon-tool',
   },
   children: [
     // employee
@@ -18,6 +18,7 @@ const Admin: AppRouteRecordRaw = {
       component: EMPTY_LAYOUT,
       redirect: '/admin/employee/list',
       meta: {
+        icon: 'icon-user',
         locale: 'menu.admin.employee',
         requiresAuth: true,
         roles: ['*'],
@@ -53,6 +54,7 @@ const Admin: AppRouteRecordRaw = {
       component: EMPTY_LAYOUT,
       redirect: '/admin/organization/department',
       meta: {
+        icon: 'icon-relation',
         locale: 'menu.admin.organization',
         requiresAuth: true,
         roles: ['*'],
@@ -92,6 +94,7 @@ const Admin: AppRouteRecordRaw = {
       component: EMPTY_LAYOUT,
       redirect: '/admin/permission/role',
       meta: {
+        icon: 'icon-safe',
         locale: 'menu.admin.permission',
         requiresAuth: true,
         roles: ['*'],
