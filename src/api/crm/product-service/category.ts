@@ -14,13 +14,13 @@ export interface ProductCategory extends PowerModel, imageAbleInfo {
 
 
 export interface GetCategoryTreeRequest {
-	Id: number;
+	id: number;
 
 
 }
 
 export interface GetCategoryTreeReply {
-	Tree: ProductCategory[];
+	tree: ProductCategory[];
 }
 
 export function getCategoryTree(request: GetCategoryTreeRequest) {

@@ -8,7 +8,7 @@ const CRM: AppRouteRecordRaw = {
   meta: {
     locale: 'menu.crm',
     requiresAuth: true,
-    icon: 'icon-dashboard',
+    icon: 'icon-user-group',
   },
   children: [
     // domain management
@@ -18,6 +18,7 @@ const CRM: AppRouteRecordRaw = {
       component: EMPTY_LAYOUT,
       redirect: '/crm/domain/public-leads',
       meta: {
+        icon: 'icon-user',
         locale: 'menu.crm.domain',
         requiresAuth: true,
         roles: ['*'],
@@ -53,6 +54,7 @@ const CRM: AppRouteRecordRaw = {
       component: EMPTY_LAYOUT,
       redirect: '/crm/product-service/product-management',
       meta: {
+        icon: 'icon-gift',
         locale: 'menu.crm.productService',
         requiresAuth: true,
         roles: ['*'],
@@ -100,6 +102,7 @@ const CRM: AppRouteRecordRaw = {
       component: EMPTY_LAYOUT,
       redirect: '/crm/marketing/mgm',
       meta: {
+        icon: 'icon-live-broadcast',
         locale: 'menu.crm.marketing',
         requiresAuth: true,
         roles: ['*'],

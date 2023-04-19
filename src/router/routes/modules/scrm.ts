@@ -8,7 +8,7 @@ const Scrm: AppRouteRecordRaw = {
   meta: {
     locale: 'menu.scrm',
     requiresAuth: true,
-    icon: 'icon-dashboard',
+    icon: 'icon-wechat',
   },
   children: [
     // customer management
