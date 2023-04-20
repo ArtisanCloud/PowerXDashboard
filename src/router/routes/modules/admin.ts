@@ -112,6 +112,18 @@ const Admin: AppRouteRecordRaw = {
         },
       ],
     },
+    // data dictionary
+    {
+      path: '/admin/dictionary',
+      name: 'DataDictionary',
+      component: () => import('@/views/admin/dictionary/index.vue'),
+      meta: {
+        icon: 'icon-book',
+        locale: 'menu.admin.dictionary',
+        requiresAuth: true,
+        roles: ['*'],
+      }
+    },
   ],
 };
 
