@@ -29,6 +29,7 @@ export default {
   'menu.admin.employee.detail': 'Employee Detail',
   'menu.admin.permission': 'Permission Management',
   'menu.admin.permission.role': 'Role Management',
+  'menu.admin.dictionary': 'Data Dictionary',
   'menu.admin.organization': 'Organization Management',
   'menu.admin.organization.department': 'Department Management',
   'menu.admin.organization.department.list': 'Department List',

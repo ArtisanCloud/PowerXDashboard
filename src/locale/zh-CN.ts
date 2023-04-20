@@ -29,6 +29,7 @@ export default {
   'menu.admin.employee.detail': '员工详情',
   'menu.admin.permission': '权限管理',
   'menu.admin.permission.role': '角色管理',
+  'menu.admin.dictionary': '数据字典',
   'menu.admin.organization': '组织管理',
   'menu.admin.organization.department': '部门管理',
   'menu.admin.organization.department.list': '部门列表',
