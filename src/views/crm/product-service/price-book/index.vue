@@ -35,7 +35,7 @@ const openAddPriceBook = () => {
 const pagination = reactive({
   total:0,
   currentPage: 0,
-  "pageSize": 6,
+  "pageSize": 10,
   "show-more": true,
   "show-total": true,
   "show-jumper": true,
