@@ -18,7 +18,7 @@
         <a-textarea v-model="formModel.description"/>
       </a-form-item>
       <a-form-item label="排序" field="sort">
-        <a-input-number v-model="formModel.sort" default-value="0"/>
+        <a-input-number v-model="formModel.sort"/>
       </a-form-item>
       <a-form-item label="图标" field="icon">
         <a-input v-model="formModel.icon"/>
