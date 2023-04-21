@@ -46,19 +46,21 @@
 
     </a-table>
 
-    <!--    <a-drawer v-model:visible="state.createDictionaryType.visible" width="500px">-->
-    <!--      <CreateDictionaryType-->
-    <!--          @submitSuccess="fetchDictionaryTypeList"-->
-    <!--          v-if="state.createDictionaryType.visible"-->
-    <!--      />-->
-    <!--    </a-drawer>-->
-    <!--    <a-drawer v-model:visible="state.editDictionaryType.visible" width="500px">-->
-    <!--      <EditDictionaryType-->
-    <!--          @submitSuccess="fetchDictionaryTypeList"-->
-    <!--          v-if="state.editDictionaryType.visible"-->
-    <!--          :node="state.editDictionaryType.node"-->
-    <!--      />-->
-    <!--    </a-drawer>-->
+    <a-drawer v-model:visible="state.createDictionaryItem.visible" width="500px">
+      <CreateDictionaryItem
+          @submitSuccess="fetchDictionaryTypeList"
+          v-if="state.createDictionaryItem.visible"
+          :parentNode="state.createDictionaryItem.parentNode"
+      />
+    </a-drawer>
+
+    <a-drawer v-model:visible="state.editDictionaryType.visible" width="500px">
+      <EditDictionaryType
+          @submitSuccess="fetchDictionaryTypeList"
+          v-if="state.editDictionaryType.visible"
+          :node="state.editDictionaryType.node"
+      />
+    </a-drawer>
   </a-card>
 </template>
 
@@ -76,11 +78,10 @@ import {
   DictionaryItem
 } from "@/api/dictionary";
 
-import CreateDictionaryType from '@/views/admin/dictionary/components/create-dictionary-type.vue'
 import EditDictionaryType from '@/views/admin/dictionary/components/edit-dictionary-type.vue'
 import DictionaryItemTable from '@/views/admin/dictionary/components/dictionary-item-table.vue'
 import {Message} from "@arco-design/web-vue";
-import {each} from "lodash";
+import CreateDictionaryItem from "@/views/admin/dictionary/components/create-dictionary-item.vue";
 
 const dictionaryTypeList = ref<DictionaryType[]>([]);
 
@@ -111,8 +112,14 @@ const expandable = reactive({
   title: '展开数据项',
   width: 100,
   expandedRowRender: (record: DictionaryType) => {
-    if (record.items && record.items.length >0){
-      return <DictionaryItemTable dictionaryType={record} />
+    if (record.items && record.items.length > 0) {
+      const tbItems = <DictionaryItemTable
+          submitUpdateSuccess = {() => {
+            alert(123)
+          }}
+          dictionaryType={record}/>
+
+      return tbItems
 
     }
     return null
@@ -122,7 +129,7 @@ const expandable = reactive({
 const pagination = reactive({
   total: 0,
   currentPage: 0,
-  "pageSize": 6,
+  pageSize: 10,
   "show-more": true,
   "show-total": true,
   "show-jumper": true,
@@ -166,6 +173,12 @@ const fetchDictionaryTypeList = async (req: ListDictionaryTypesRequest) => {
   }
 };
 
+const openCreateDictionaryItem = (cat: DictionaryType) => {
+  // console.log(cat)
+  state.createDictionaryItem.parentNode = cat;
+  state.createDictionaryItem.visible = true;
+};
+
 
 const openEditDictionaryType = (cat: DictionaryType) => {
   // console.log(cat)
@@ -188,12 +201,12 @@ const deleteDictionaryTypeByType = async (type: string) => {
 };
 
 const pageChanged = (page: number) => {
-  // console.log("page",page)
+  console.log("page",page)
   fetchDictionaryTypeList({pageIndex: page, pageSize: pagination.pageSize})
 }
 
 const pageSizeChanged = (pageSize: number) => {
-  // console.log("pagesize",pageSize)
+  console.log("pagesize",pageSize)
   fetchDictionaryTypeList({pageIndex: pagination.currentPage, pageSize})
 }
 

@@ -1,18 +1,19 @@
 <template>
   <a-card>
 
-    <a-table :data="dictionaryType.items"
+    <a-table :data="dictionaryItemList"
              :loading="state.loading"
              row-key="key"
              :columns="columns"
              column-resizable
+             :pagination=false
              :bordered="{cell:true}">
 
       <template #optional="{ record }">
         <a-space align="center">
 
           <!--编辑字典按钮-->
-          <a-button @click="openEditDictionaryType(record)">
+          <a-button @click="openEditDictionaryItem(record)">
             <template #icon>
               <icon-edit :style="{fontSize:'16px', color:'green'}"/>
             </template>
@@ -21,7 +22,7 @@
           <!--删除字典按钮-->
           <a-popconfirm
               content="该操作会删除相关子字典,确定要删除此字典吗？"
-              @ok="deleteDictionaryTypeByType(record.type)"
+              @ok="deleteDictionaryItemBy(record.type, record.key)"
           >
             <a-button v-if="!record.isStandard">
               <template #icon>
@@ -34,25 +35,18 @@
       </template>
 
     </a-table>
-
-        <a-drawer v-model:visible="state.createDictionaryItem.visible" width="500px">
-          <CreateDictionaryType
-              @submitSuccess="fetchDictionaryTypeList"
-              v-if="state.createDictionaryType.visible"
-          />
-        </a-drawer>
         <a-drawer v-model:visible="state.editDictionaryItem.visible" width="500px">
-          <EditDictionaryType
-              @submitSuccess="fetchDictionaryTypeList"
-              v-if="state.editDictionaryType.visible"
-              :node="state.editDictionaryType.node"
+          <EditDictionaryItem
+              @submitSuccess="refreshDictionaryItemList"
+              v-if="state.editDictionaryItem.visible"
+              :node="state.editDictionaryItem.node"
           />
         </a-drawer>
   </a-card>
 </template>
 
 
-<script lang="ts" setup>
+<script lang="tsx" setup>
 
 
 import {onMounted, PropType, reactive, ref} from "vue";
@@ -61,11 +55,11 @@ import {
   deleteDictionaryType,
   DictionaryType,
   ListDictionaryTypesRequest,
-  DictionaryItem
+  DictionaryItem, ListDictionaryItemsRequest, listDictionaryItems, deleteDictionaryItem
 } from "@/api/dictionary";
 
-// import CreateDictionaryType from '@/views/admin/dictionary/components/create-dictionary-type.vue'
-// import EditDictionaryType from '@/views/admin/dictionary/components/edit-dictionary-type.vue'
+import CreateDictionaryItem from '@/views/admin/dictionary/components/create-dictionary-item.vue'
+import EditDictionaryItem from '@/views/admin/dictionary/components/edit-dictionary-item.vue'
 import {Message} from "@arco-design/web-vue";
 
 const prop = defineProps({
@@ -76,9 +70,9 @@ const prop = defineProps({
     },
   }
 });
-const emits = defineEmits(['submitSuccess', 'submitFailed', 'update:id']);
+const emits = defineEmits(['submitUpdateSuccess', 'submitFailed', 'update:id']);
 
-
+const dictionaryItemList = ref<DictionaryItem[]>([]);
 
 const columns = reactive([
   {
@@ -124,6 +118,21 @@ const state = reactive({
 
 
 
+const fetchDictionaryItemList = async (req: ListDictionaryItemsRequest) => {
+  state.loading = true;
+  try {
+    const res = await listDictionaryItems(req);
+    dictionaryItemList.value = res.data.list;
+    // console.log(dictionaryTypeList)
+
+  } finally {
+    state.loading = false;
+  }
+};
+
+const refreshDictionaryItemList = () =>{
+  fetchDictionaryItemList({type:prop.dictionaryType?.type});
+}
 
 const openCreateDictionaryItem = (cat: DictionaryType) => {
   // console.log(cat)
@@ -136,13 +145,13 @@ const openEditDictionaryItem = (cat: DictionaryType) => {
   state.editDictionaryItem.visible = true;
 };
 
-const deleteDictionaryTypeByType = async (type: string) => {
+const deleteDictionaryItemBy = async (type: string, key: string) => {
   try {
-    const rep = await deleteDictionaryType({type});
-    // if (rep.data.type !== "") {
-    //   Message.success('删除成功');
-    //   await fetchDictionaryTypeList({pageIndex: pagination.currentPage, pageSize: pagination.pageSize});
-    // }
+    const rep = await deleteDictionaryItem({type,key});
+    if (rep.data.type !== "") {
+      Message.success('删除成功');
+      refreshDictionaryItemList();
+    }
 
   } catch (error) {
     console.error(error);
@@ -151,8 +160,9 @@ const deleteDictionaryTypeByType = async (type: string) => {
 
 
 
+
 onMounted(() => {
-  console.log(123)
+  dictionaryItemList.value = prop.dictionaryType?.items
 });
 
 </script>

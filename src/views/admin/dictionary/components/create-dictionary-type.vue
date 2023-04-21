@@ -1,7 +1,7 @@
 <template>
   <div>
     <a-form ref="formRef" auto-label-width :model="formModel" :rules="rules" @submit="onSubmit">
-      <a-form-item  label="字典类型" field="type">
+      <a-form-item label="字典类型" field="type">
         <a-input v-model="formModel.type"/>
       </a-form-item>
       <a-form-item label="显示名称" field="name">
@@ -25,19 +25,18 @@
 
 
 import {onMounted, reactive, ref} from "vue";
-import {CreatePriceBookRequest,createPriceBook} from "@/api/crm/product-service/priceBook";
+import {createDictionaryType, CreateDictionaryTypeRequest} from "@/api/dictionary";
 import {FieldRule, Message} from "@arco-design/web-vue";
 
 const emits = defineEmits(['submitSuccess', 'submitFailed', 'update:id']);
 
 const formRef = ref();
 const formModel = ref({
-  isStandard: false,
+  type: '',
   name: '',
-  description: '',
-  storeId: 0
+  description: ''
 
-} as CreatePriceBookRequest);
+} as CreateDictionaryTypeRequest);
 
 const rules = {
   type: [
@@ -65,7 +64,7 @@ const onSubmit = async () => {
     return;
   }
   state.submitLoading = true;
-  createPriceBook(formModel.value)
+  createDictionaryType(formModel.value)
       .then(() => {
         Message.success('创建成功');
         emits('submitSuccess');
