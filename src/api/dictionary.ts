@@ -9,6 +9,7 @@ export interface DictionaryItem extends PowerModel {
 	type: string
 	name: string
 	value: string
+	sort: number
 	description: string
 
 }
@@ -68,6 +69,21 @@ export function createDictionaryType(request: CreateDictionaryTypeRequest) {
 }
 
 
+export interface UpdateDictionaryTypeRequest {
+	type: string
+	name: string
+	description?: string
+}
+
+export type UpdateDictionaryTypeReply = DictionaryType
+
+export function updateDictionaryType(request: UpdateDictionaryTypeRequest) {
+	return axios.put<UpdateDictionaryTypeReply>(
+		`${PREFIX_URI_ADMIN_API + URI_DATE_DICTIONARY_API}/types/${request.type}`,
+		request
+	);
+}
+
 export interface DeleteDictionaryTypeRequest {
 	type: string;
 }
@@ -86,17 +102,17 @@ export function deleteDictionaryType(request: DeleteDictionaryTypeRequest) {
 
 
 export interface ListDictionaryItemsRequest {
-	key: string;
+	type: string;
 
 }
 
 export interface ListDictionaryItemsReply {
-	list: DictionaryType[];
+	list: DictionaryItem[];
 }
 
 export function listDictionaryItems(request: ListDictionaryItemsRequest) {
 	return axios.get<ListDictionaryItemsReply>(
-		`${PREFIX_URI_ADMIN_API + URI_DATE_DICTIONARY_API}/items/${request.key}`,
+		`${PREFIX_URI_ADMIN_API + URI_DATE_DICTIONARY_API}/items`,
 		{
 			params: request,
 		}
@@ -108,6 +124,7 @@ export interface CreateDictionaryItemRequest {
 	type: string
 	name: string
 	value: string
+	sort?: number
 	description?: string
 }
 
@@ -116,16 +133,36 @@ export interface CreateDictionaryItemReply {
 	type: string
 	name: string
 	value: string
+	sort?: number
 	description?: string
 }
 
 export function createDictionaryItem(request: CreateDictionaryItemRequest) {
 	return axios.post<CreateDictionaryItemReply>(
-		`${PREFIX_URI_ADMIN_API + URI_DATE_DICTIONARY_API}/types`,
+		`${PREFIX_URI_ADMIN_API + URI_DATE_DICTIONARY_API}/items/`,
 		request
 	);
 }
 
+
+
+export interface UpdateDictionaryItemRequest {
+	key: string
+	type: string
+	name: string
+	value: string
+	sort?: number
+	description?: string
+}
+
+export type UpdateDictionaryItemReply = DictionaryItem
+
+export function updateDictionaryItem(request: UpdateDictionaryItemRequest) {
+	return axios.put<UpdateDictionaryItemReply>(
+		`${PREFIX_URI_ADMIN_API + URI_DATE_DICTIONARY_API}/items/${request.type}/${request.key}`,
+		request
+	);
+}
 
 export interface DeleteDictionaryItemRequest {
 	type:string;
