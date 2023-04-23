@@ -125,7 +125,7 @@ const FindCategoryFromTreeById = (tree: ProductCategory[], id: number): ProductC
   }
 
   for (let i = 0; i < tree.length; i += 1) {
-    console.log(id, tree[i].id)
+    // console.log(id, tree[i].id)
     if (id === tree[i].id) {
       return tree[i]
     }
@@ -142,7 +142,7 @@ const FindCategoryFromTreeById = (tree: ProductCategory[], id: number): ProductC
 
 
 const openAddSubCategory = (cat: ProductCategory) => {
-  const pCategory = FindCategoryFromTreeById(categoryTree.value, cat.pId)!;
+  const pCategory = FindCategoryFromTreeById(categoryTree.value, cat.id)!;
   let parentNode: ParentOption = {name: '无', id: 0}
   if (pCategory) {
     parentNode = {name: pCategory.name, id: Number(pCategory.id)}

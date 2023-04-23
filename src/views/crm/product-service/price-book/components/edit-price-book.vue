@@ -32,7 +32,7 @@
 
 
 import {onMounted, PropType, reactive, ref} from "vue";
-import {CreatePriceBookRequest, createPriceBook, PriceBook} from "@/api/crm/product-service/priceBook";
+import { createPriceBook, PriceBook} from "@/api/crm/product-service/priceBook";
 import {FieldRule, Message} from "@arco-design/web-vue";
 
 const prop = defineProps({
@@ -53,7 +53,7 @@ const formModel = ref({
   description: prop.node?.description,
   storeId: prop.node?.storeId
 
-} as CreatePriceBookRequest);
+} as PriceBook);
 
 const rules = {
   name: [

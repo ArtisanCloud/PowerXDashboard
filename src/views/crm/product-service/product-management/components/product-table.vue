@@ -1,0 +1,188 @@
+<template>
+  <a-card>
+
+    <a-table :data="productList"
+             :loading="state.loading"
+             row-key="id" :columns="columns"
+             column-resizable
+             :pagination="pagination"
+             @page-change="pageChanged"
+             @page-size-change="pageSizeChanged"
+             :bordered="{cell:true}">
+
+      <template #isStandard="{ record }">
+        <a-typography-text>{{ options.GetOptionById(options.productTypes,record.type)?.name }}</a-typography-text>
+      </template>
+
+      <template #optional="{ record }">
+        <a-space align="center">
+
+          <!--编辑品类按钮-->
+          <a-button @click="openEditProduct(record)">
+            <template #icon>
+              <icon-edit :style="{fontSize:'16px', color:'green'}"/>
+            </template>
+          </a-button>
+
+          <!--配置价格按钮-->
+          <a-button @click="openEditProduct(record)">
+            <template #icon>
+              <icon-book :style="{fontSize:'16px', color:'#d7ee8f'}"/>
+            </template>
+          </a-button>
+
+          <!--删除品类按钮-->
+          <a-popconfirm
+              content="该操作会删除相关子品类,确定要删除此品类吗？"
+              @ok="deleteProductById(record.id)"
+          >
+            <a-button v-if="!record.isStandard">
+              <template #icon>
+                <icon-delete :style="{fontSize:'16px', color:'red'}"/>
+              </template>
+            </a-button>
+          </a-popconfirm>
+
+        </a-space>
+      </template>
+
+    </a-table>
+
+    <a-drawer v-model:visible="state.editProduct.visible" width="800px">
+      <EditProduct
+          @submitSuccess="fetchProductList"
+          v-if="state.editProduct.visible"
+          :node="state.editProduct.node"
+      />
+    </a-drawer>
+  </a-card>
+</template>
+
+
+<script lang="ts" setup>
+
+
+import {onMounted, reactive, ref} from "vue";
+import {listProducts, deleteProduct, Product, ListProductPageRequest} from "@/api/crm/product-service/product";
+
+import CreateProduct from '@/views/crm/product-service/product-management/components/create-product.vue'
+import EditProduct from '@/views/crm/product-service/product-management/components/edit-product.vue'
+import {Message} from "@arco-design/web-vue";
+
+import useOptionsStore from "@/store/modules/data-dictionary";
+
+const options = useOptionsStore()
+
+const productList = ref<Product[]>([]);
+
+const columns = reactive([
+  {
+    title: '品类名称',
+    dataIndex: 'name',
+    width: 150,
+  },
+  {
+    title: '类型',
+    dataIndex: 'isStandard',
+    width: 120,
+    slotName: 'isStandard'
+  },
+  {
+    title: '描述',
+    dataIndex: 'description',
+    width: 300,
+  },
+  {
+    title: '操作',
+    slotName: 'optional'
+  },
+]);
+
+const pagination = reactive({
+  total: 0,
+  currentPage: 0,
+  "pageSize": 10,
+  "show-more": true,
+  "show-total": true,
+  "show-jumper": true,
+  "show-page-size": true,
+
+})
+
+const state = reactive({
+  loading: false,
+  createProduct: {
+    visible: false,
+    parentNode: {},
+  },
+  editProduct: {
+    visible: false,
+    node: {},
+  },
+  submitLoading: false
+});
+
+
+
+
+const fetchProductList = async (req: ListProductPageRequest) => {
+  state.loading = true;
+  try {
+    const res = await listProducts(req);
+    productList.value = res.data.list;
+    pagination.currentPage = res.data.pageIndex
+    pagination.pageSize = res.data.pageSize
+    pagination.total = res.data.total
+    // console.log(categoryTree)
+
+  } finally {
+    state.loading = false;
+  }
+};
+
+
+const openEditProduct = (cat: Product) => {
+  // console.log(cat)
+  state.editProduct.node = cat;
+  state.editProduct.visible = true;
+};
+
+const deleteProductById = async (bookId: number) => {
+  try {
+    const rep = await deleteProduct({id: bookId});
+    if (rep.data.id && rep.data.id > 0) {
+      Message.success('删除成功');
+      await fetchProductList({pageIndex: pagination.currentPage, pageSize: pagination.pageSize});
+    }
+
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+const pageChanged = (page: number) => {
+  console.log("page",page)
+  fetchProductList({pageIndex: page, pageSize: pagination.pageSize})
+}
+
+const pageSizeChanged = (pageSize: number) => {
+  console.log("pagesize",pageSize)
+  fetchProductList({pageIndex: pagination.currentPage, pageSize})
+}
+
+
+defineExpose({fetchProductList})
+
+onMounted(() => {
+
+  options.fetchProductTypeOptions()
+  options.fetchProductPlanOptions()
+
+  fetchProductList({});
+
+});
+
+</script>
+
+
+<style scoped></style>

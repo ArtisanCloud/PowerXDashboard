@@ -32,7 +32,7 @@
 
 
 import {onMounted, reactive, ref} from "vue";
-import {CreatePriceBookRequest,createPriceBook} from "@/api/crm/product-service/priceBook";
+import {createPriceBook, PriceBook} from "@/api/crm/product-service/priceBook";
 import {FieldRule, Message} from "@arco-design/web-vue";
 
 const emits = defineEmits(['submitSuccess', 'submitFailed', 'update:id']);
@@ -44,7 +44,7 @@ const formModel = ref({
   description: '',
   storeId: 0
 
-} as CreatePriceBookRequest);
+} as PriceBook);
 
 const rules = {
   name: [
