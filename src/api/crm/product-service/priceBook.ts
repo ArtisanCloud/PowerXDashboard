@@ -38,22 +38,8 @@ export function listPriceBooks(request: ListPriceBooksRequest) {
 	);
 }
 
-export interface CreatePriceBookRequest {
-	isStandard?: boolean
-	name: string
-	description?: string
-	storeId?: number
-}
-
-export interface CreatePriceBookReply {
-	isStandard?: boolean
-	name: string
-	description?: string
-	storeId?: number
-}
-
-export function createPriceBook(request: CreatePriceBookRequest) {
-	return axios.post<CreatePriceBookReply>(
+export function createPriceBook(request: PriceBook) {
+	return axios.post<PriceBook>(
 		`${PREFIX_URI_ADMIN_API + URI_PRODUCT_API}/price-books`,
 		request
 	);
