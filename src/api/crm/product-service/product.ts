@@ -3,35 +3,64 @@ import axios from "axios";
 
 export const URI_PRODUCT_API = '/product'
 
-export interface Product extends PowerModel, imageAbleInfo {
-	pId: bigint
-	name: string
-	sort: number
-	viceName: string
-	description: string
-	children: Product[]
+
+export interface ProductSpecific {
+	Inventory: number
+	Weight: number
+	Volume: number
+	Encode: string
+	BarCode: string
+	Extra: string
+}
+
+export interface Product extends PowerModel, ProductSpecific {
+	name: string,
+	type: number,
+	plan: number,
+	accountingCategory: string,
+	canSellOnline: boolean,
+	canUseForDeduct: boolean,
+	approvalStatus: number,
+	isActivated: boolean,
+	description: string,
+	coverURL: string,
+	purchasedQuantity: number,
+	validityPeriodDays: number,
+	saleStartDate: Date,
+	saleEndDate: Date,
+
 }
 
 
-export interface GetProductListRequest {
-	Id: number;
+export interface ListProductPageRequest {
+	ids?: number[];
+	likeName?: string;
+	storeIds?: number[];
+	pageIndex?: number;
+	pageSize?: number;
 }
 
-export interface GetProductListReply {
-	Tree: Product[];
+export interface ListProductPageReply {
+	list: Product[];
+	pageIndex: number;
+	pageSize: number;
+	total: number;
 }
 
-export function getProductList(request: GetProductListRequest) {
-	return axios.get<GetProductListReply>(
-		`${PREFIX_URI_ADMIN_API + URI_PRODUCT_API}/products`
+export function listProducts(request: ListProductPageRequest) {
+	return axios.get<ListProductPageReply>(
+		`${PREFIX_URI_ADMIN_API + URI_PRODUCT_API}/products`,
+		{
+			params: request,
+		}
 	);
 }
 
 
-
-export function CreateProductRequest(request: Product) {
-	return axios.get<GetProductListReply>(
-		`${PREFIX_URI_ADMIN_API + URI_PRODUCT_API}/products`
+export function createProduct(request: Product) {
+	return axios.post<Product>(
+		`${PREFIX_URI_ADMIN_API + URI_PRODUCT_API}/products`,
+		request
 	);
 }
 
@@ -45,7 +74,7 @@ export interface DeleteProductReply {
 }
 
 export function deleteProduct(request: DeleteProductRequest) {
-	return axios.get<DeleteProductReply>(
+	return axios.delete<DeleteProductReply>(
 		`${PREFIX_URI_ADMIN_API + URI_PRODUCT_API}/products/${request.id}`
 	);
 }
