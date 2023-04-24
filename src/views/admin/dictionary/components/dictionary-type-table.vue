@@ -115,7 +115,7 @@ const expandable = reactive({
     if (record.items && record.items.length > 0) {
       const tbItems = <DictionaryItemTable
           submitUpdateSuccess = {() => {
-            alert(123)
+
           }}
           dictionaryType={record}/>
 

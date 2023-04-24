@@ -61,6 +61,34 @@
           </a-form-item>
         </a-col>
       </a-row>
+
+      <a-row :gutter="32">
+        <a-col :span="12">
+          <a-form-item label="可销售渠道" field="salesChannelsItemIds">
+            <a-select multiple
+                      :options="options.salesChannels"
+                      v-model="formModel.salesChannelsItemIds"
+                      :field-names="{ label: 'name', value: 'id' }"
+                      placeholder="请选择可销售渠道"/>
+          </a-form-item>
+          <a-form-item label="可推广渠道" field="promoteChannelsItemIds">
+            <a-select multiple
+                      :options="options.promoteChannels"
+                      v-model="formModel.promoteChannelsItemIds"
+                      :field-names="{ label: 'name', value: 'id' }"
+                      placeholder="请选择可推广渠道"/>
+          </a-form-item>
+        </a-col>
+        <a-col :span="12">
+          <a-form-item label="销售开始时间" field="saleStartDate">
+            <a-date-picker v-model="formModel.saleStartDate"/>
+          </a-form-item>
+          <a-form-item label="销售结束时间" field="saleEndDate">
+            <a-date-picker v-model="formModel.saleEndDate"/>
+          </a-form-item>
+        </a-col>
+      </a-row>
+
       <a-row :gutter="32">
         <a-col :span="12">
           <a-form-item label="允许购买数量上限" field="purchasedQuantity">
@@ -77,18 +105,6 @@
             />
           </a-form-item>
         </a-col>
-
-      </a-row>
-      <a-row :gutter="32">
-        <a-col :span="12">
-          <a-form-item label="销售开始时间" field="saleStartDate">
-            <a-date-picker v-model="formModel.saleStartDate"/>
-          </a-form-item>
-          <a-form-item label="销售结束时间" field="saleEndDate">
-            <a-date-picker v-model="formModel.saleEndDate"/>
-          </a-form-item>
-        </a-col>
-
       </a-row>
 
       <a-form-item>
@@ -106,7 +122,7 @@
 
 
 import {onMounted, PropType, reactive, ref} from "vue";
-import {createProduct,} from "@/api/crm/product-service/product";
+import {updateProduct,} from "@/api/crm/product-service/product";
 import {FieldRule, Message} from "@arco-design/web-vue";
 import {Product} from "@/api/crm/product-service/product";
 
@@ -130,10 +146,13 @@ const fileList = []
 
 const formRef = ref();
 const formModel = ref({
+  id:prop.node?.id,
   name: prop.node.name,
   accountingCategory: prop.node.accountingCategory,
   type: prop.node.type,
   plan: prop.node.plan,
+  salesChannelsItemIds: prop.node.salesChannelsItemIds,
+  promoteChannelsItemIds: prop.node.promoteChannelsItemIds,
   approvalStatus: prop.node.approvalStatus,
   canSellOnline: prop.node.canSellOnline,
   canUseForDeduct: prop.node.canUseForDeduct,
@@ -182,7 +201,7 @@ const onSubmit = async () => {
     return;
   }
   state.submitLoading = true;
-  createProduct(formModel.value)
+  updateProduct(formModel.value)
       .then(() => {
         Message.success('更新成功');
         emits('submitSuccess');

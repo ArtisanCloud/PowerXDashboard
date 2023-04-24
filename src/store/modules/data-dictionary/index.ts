@@ -4,7 +4,7 @@ import {
 	DictionaryItem,
 	listDictionaryItems,
 	ProductPlanDDType,
-	ProductTypesDDType
+	ProductTypesDDType, PromoteChannelsDDType, SalesChannelsDDType, SourceTypesDDType
 } from "@/api/dictionary";
 import {OptionsState} from "@/store/modules/data-dictionary/type";
 
@@ -14,6 +14,9 @@ const useOptionsStore = defineStore('options', {
 		productTypes: [],
 		productPlans: [],
 		approvalStatus: [],
+		salesChannels: [],
+		promoteChannels: [],
+		sourceTypes: []
 	}),
 
 	getters: {},
@@ -55,6 +58,36 @@ const useOptionsStore = defineStore('options', {
 			try {
 				const res = await listDictionaryItems({type: ApprovalStatusDDType});
 				this.approvalStatus = res.data.list;
+				// console.log(dictionaryTypeList)
+			} finally {
+				// console.log("fetch approval status options")
+			}
+		},
+
+		async fetchSalesChannelsOptions() {
+			try {
+				const res = await listDictionaryItems({type: SalesChannelsDDType});
+				this.salesChannels = res.data.list;
+				// console.log(this.salesChannels)
+			} finally {
+				// console.log("fetch approval status options")
+			}
+		},
+
+		async fetchPromoteChannelsOptions() {
+			try {
+				const res = await listDictionaryItems({type: PromoteChannelsDDType});
+				this.promoteChannels = res.data.list;
+				// console.log(dictionaryTypeList)
+			} finally {
+				// console.log("fetch approval status options")
+			}
+		},
+
+		async fetchSourceTypesOptions() {
+			try {
+				const res = await listDictionaryItems({type: SourceTypesDDType});
+				this.sourceTypes = res.data.list;
 				// console.log(dictionaryTypeList)
 			} finally {
 				// console.log("fetch approval status options")
