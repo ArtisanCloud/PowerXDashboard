@@ -26,5 +26,8 @@
   });
   const options = useOptionsStore();
   options.fetchApprovalStatusOptions()
+  options.fetchSalesChannelsOptions()
+  options.fetchPromoteChannelsOptions()
+  options.fetchSourceTypesOptions()
 
 </script>

@@ -1,5 +1,6 @@
-import {imageAbleInfo, PowerModel, PREFIX_URI_ADMIN_API} from '@/api/common';
+import {PowerModel, PREFIX_URI_ADMIN_API} from '@/api/common';
 import axios from "axios";
+import DataDictionary from "@/store/modules/data-dictionary";
 
 export const URI_PRODUCT_API = '/product'
 
@@ -26,6 +27,8 @@ export interface Product extends PowerModel, ProductSpecific {
 	coverURL: string,
 	purchasedQuantity: number,
 	validityPeriodDays: number,
+	salesChannelsItemIds: number[]
+	promoteChannelsItemIds: number[]
 	saleStartDate: Date,
 	saleEndDate: Date,
 
@@ -64,6 +67,13 @@ export function createProduct(request: Product) {
 	);
 }
 
+
+export function updateProduct(request: Product) {
+	return axios.put<Product>(
+		`${PREFIX_URI_ADMIN_API + URI_PRODUCT_API}/products/${request.id}`,
+		request
+	);
+}
 
 export interface DeleteProductRequest {
 	id: number;

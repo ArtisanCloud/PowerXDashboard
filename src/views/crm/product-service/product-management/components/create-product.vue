@@ -61,6 +61,34 @@
           </a-form-item>
         </a-col>
       </a-row>
+
+      <a-row :gutter="32">
+        <a-col :span="12">
+          <a-form-item label="可销售渠道" field="salesChannelsItemIds">
+            <a-select multiple
+                      :options="options.salesChannels"
+                      v-model="formModel.salesChannelsItemIds"
+                      :field-names="{ label: 'name', value: 'id' }"
+                      placeholder="请选择可销售渠道"/>
+          </a-form-item>
+          <a-form-item label="可推广渠道" field="promoteChannelsItemIds">
+            <a-select multiple
+                      :options="options.promoteChannels"
+                      v-model="formModel.promoteChannelsItemIds"
+                      :field-names="{ label: 'name', value: 'id' }"
+                      placeholder="请选择可推广渠道"/>
+          </a-form-item>
+        </a-col>
+        <a-col :span="12">
+          <a-form-item label="销售开始时间" field="saleStartDate">
+            <a-date-picker v-model="formModel.saleStartDate"/>
+          </a-form-item>
+          <a-form-item label="销售结束时间" field="saleEndDate">
+            <a-date-picker v-model="formModel.saleEndDate"/>
+          </a-form-item>
+        </a-col>
+      </a-row>
+
       <a-row :gutter="32">
         <a-col :span="12">
           <a-form-item label="允许购买数量上限" field="purchasedQuantity">
@@ -77,18 +105,6 @@
             />
           </a-form-item>
         </a-col>
-
-      </a-row>
-      <a-row :gutter="32">
-        <a-col :span="12">
-          <a-form-item label="销售开始时间" field="saleStartDate">
-            <a-date-picker v-model="formModel.saleStartDate"/>
-          </a-form-item>
-          <a-form-item label="销售结束时间" field="saleEndDate">
-            <a-date-picker v-model="formModel.saleEndDate"/>
-          </a-form-item>
-        </a-col>
-
       </a-row>
 
       <a-form-item>

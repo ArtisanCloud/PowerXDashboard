@@ -10,8 +10,8 @@
              @page-size-change="pageSizeChanged"
              :bordered="{cell:true}">
 
-      <template #isStandard="{ record }">
-        <a-typography-text>{{ options.GetOptionById(options.productTypes,record.type)?.name }}</a-typography-text>
+      <template #type="{ record }">
+        <a-typography-text>{{ options.GetOptionById(options.productTypes, record.type)?.name }}</a-typography-text>
       </template>
 
       <template #optional="{ record }">
@@ -70,6 +70,7 @@ import EditProduct from '@/views/crm/product-service/product-management/componen
 import {Message} from "@arco-design/web-vue";
 
 import useOptionsStore from "@/store/modules/data-dictionary";
+import {dayjs} from "@arco-design/web-vue/es/_utils/date";
 
 const options = useOptionsStore()
 
@@ -77,20 +78,53 @@ const productList = ref<Product[]>([]);
 
 const columns = reactive([
   {
+    title: 'ID',
+    dataIndex: 'id',
+    width: 60,
+  },
+    {
     title: '品类名称',
     dataIndex: 'name',
     width: 150,
   },
   {
     title: '类型',
-    dataIndex: 'isStandard',
+    dataIndex: 'type',
     width: 120,
-    slotName: 'isStandard'
+    slotName: 'type'
   },
   {
     title: '描述',
     dataIndex: 'description',
-    width: 300,
+    width: 200,
+  },
+  {
+    title: '销售开始时间',
+    dataIndex: 'saleStartDate',
+    width: 100,
+    slotName: 'saleStartDate',
+    render: (object: any) => {
+      const jsDate = dayjs(object.record.saleStartDate)
+      if (jsDate.isValid()) {
+        // console.log(jsDate)
+        return jsDate.format("YY-MM-DD")
+      }
+      return "未设置"
+    },
+  },
+  {
+    title: '销售结束时间',
+    dataIndex: 'saleEndDate',
+    width: 100,
+    slotName: 'saleEndDate',
+    render: (object: any) => {
+      const jsDate = dayjs(object.record.saleEndDate)
+      if (jsDate.isValid()) {
+        // console.log(jsDate)
+        return jsDate.format("YY-MM-DD")
+      }
+      return "未设置"
+    },
   },
   {
     title: '操作',
@@ -121,8 +155,6 @@ const state = reactive({
   },
   submitLoading: false
 });
-
-
 
 
 const fetchProductList = async (req: ListProductPageRequest) => {
@@ -161,12 +193,12 @@ const deleteProductById = async (bookId: number) => {
 };
 
 const pageChanged = (page: number) => {
-  console.log("page",page)
+  console.log("page", page)
   fetchProductList({pageIndex: page, pageSize: pagination.pageSize})
 }
 
 const pageSizeChanged = (pageSize: number) => {
-  console.log("pagesize",pageSize)
+  console.log("pagesize", pageSize)
   fetchProductList({pageIndex: pagination.currentPage, pageSize})
 }
 
