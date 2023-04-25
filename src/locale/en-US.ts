@@ -40,6 +40,8 @@ export default {
   'menu.crm.domain.publicLeads': 'Public Leads Pool',
   'menu.crm.domain.customerManagement': 'Customer Management',
   'menu.crm.productService': 'Product Service',
+  'menu.crm.productService.store': 'Store',
+  'menu.crm.productService.artisan': 'Artisan',
   'menu.crm.productService.productManagement': 'Product Management',
   'menu.crm.productService.productCategory': 'Product Category',
   'menu.crm.productService.priceBook': 'Price Book',

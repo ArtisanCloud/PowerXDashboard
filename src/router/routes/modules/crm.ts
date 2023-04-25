@@ -61,6 +61,28 @@ const CRM: AppRouteRecordRaw = {
       },
       children: [
         {
+          path: '/crm/product-service/store',
+          name: 'Store Management',
+          component: () =>
+            import('@/views/crm/product-service/store/index.vue'),
+          meta: {
+            locale: 'menu.crm.productService.store',
+            requiresAuth: true,
+            roles: ['*'],
+          },
+        },
+        {
+          path: '/crm/product-service/artisan',
+          name: 'Artisan Management',
+          component: () =>
+            import('@/views/crm/product-service/artisan/index.vue'),
+          meta: {
+            locale: 'menu.crm.productService.artisan',
+            requiresAuth: true,
+            roles: ['*'],
+          },
+        },
+        {
           path: '/crm/product-service/product-management',
           name: 'ProductManagement',
           component: () =>
