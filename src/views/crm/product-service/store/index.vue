@@ -12,22 +12,19 @@
       <StoreTable ref="RefStoreTable"/>
     </a-card>
     <a-drawer
-        v-model:visible="state.createStore.visible" width="800px">
+        v-model:visible="state.createStore.visible" width="500px">
       <CreateStore
           @submitSuccess="refreshStoreList"
           v-if="state.createStore.visible"/>
-    </a-drawer>
-  </div>
+    </a-drawer></div>
 </template>
-
-
 
 <script lang="ts" setup>
 
 
 import {reactive, ref} from 'vue';
-// import StoreTable from '@/views/crm/product-service/product-management/components/product-table.vue';
-// import CreateStore from '@/views/crm/product-service/product-management/components/create-product.vue';
+import StoreTable from '@/views/crm/product-service/store/components/store-table.vue';
+import CreateStore from '@/views/crm/product-service/store/components/create-store.vue';
 
 const RefStoreTable = ref<any>();
 
@@ -66,9 +63,9 @@ const refreshStoreList = () =>{
 
 
 <script lang="ts">
-export default {
-  name: '门店管理',
-};
+  export default {
+    name: '门店',
+  };
 </script>
 
 <style scoped></style>

@@ -42,6 +42,8 @@ export default {
   'menu.crm.domain.publicLeads': '公域线索池',
   'menu.crm.domain.customerManagement': '客户管理',
   'menu.crm.productService': '产品服务',
+  'menu.crm.productService.store': '门店',
+  'menu.crm.productService.artisan': '元匠',
   'menu.crm.productService.productManagement': '商品管理',
   'menu.crm.productService.productCategory': '商品品类',
   'menu.crm.productService.priceBook': '价格手册',
