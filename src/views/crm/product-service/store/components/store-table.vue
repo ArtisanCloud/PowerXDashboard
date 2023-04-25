@@ -5,19 +5,15 @@
              :loading="state.loading"
              row-key="id" :columns="columns"
              column-resizable
-             :pagination="pagination"
-             @page-change="pageChanged"
-             @page-size-change="pageSizeChanged"
              :bordered="{cell:true}">
-
-      <template #isStandard="{ record }">
-        <a-typography-text>{{ record.isStandard ? "标准" : "普通" }}</a-typography-text>
-      </template>
+<!--             :pagination="pagination"-->
+<!--             @page-change="pageChanged"-->
+<!--             @page-size-change="pageSizeChanged"-->
 
       <template #optional="{ record }">
         <a-space align="center">
 
-          <!--编辑品类按钮-->
+          <!--编辑店铺按钮-->
           <a-button @click="openEditStore(record)">
             <template #icon>
               <icon-edit :style="{fontSize:'16px', color:'green'}"/>
@@ -31,9 +27,9 @@
             </template>
           </a-button>
 
-          <!--删除品类按钮-->
+          <!--删除店铺按钮-->
           <a-popconfirm
-              content="该操作会删除相关子品类,确定要删除此品类吗？"
+              content="该操作会删除相关子店铺,确定要删除此店铺吗？"
               @ok="deleteStoreById(record.id)"
           >
             <a-button v-if="!record.isStandard">
@@ -69,7 +65,7 @@
 
 
 import {onMounted, reactive, ref} from "vue";
-import {listStores, deleteStore, Store, ListStoresRequest} from "@/api/crm/product-service/store";
+import {listStores, deleteStore, Store, ListStoreRequest} from "@/api/crm/product-service/store";
 
 import CreateStore from '@/views/crm/product-service/price-book/components/create-price-book.vue'
 import EditStore from '@/views/crm/product-service/price-book/components/edit-price-book.vue'
@@ -79,15 +75,15 @@ const storeList = ref<Store[]>([]);
 
 const columns = reactive([
   {
-    title: '品类名称',
+    title: '店铺名称',
     dataIndex: 'name',
     width: 150,
   },
   {
     title: '类型',
-    dataIndex: 'isStandard',
+    dataIndex: 'type',
     width: 120,
-    slotName: 'isStandard'
+    slotName: 'type'
   },
   {
     title: '描述',
@@ -124,14 +120,14 @@ const state = reactive({
 });
 
 
-const fetchStoreList = async (req: ListStoresRequest) => {
+const fetchStoreList = async (req: ListStoreRequest) => {
   state.loading = true;
   try {
     const res = await listStores(req);
     storeList.value = res.data.list;
-    pagination.currentPage = res.data.pageIndex
-    pagination.pageSize = res.data.pageSize
-    pagination.total = res.data.total
+    // pagination.currentPage = res.data.pageIndex
+    // pagination.pageSize = res.data.pageSize
+    // pagination.total = res.data.total
     // console.log(categoryTree)
 
   } finally {
