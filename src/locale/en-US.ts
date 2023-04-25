@@ -3,6 +3,8 @@ import localeLogin from '@/views/login/locale/en-US';
 
 import localeEmployee from '@/views/admin/employee/locale/en-US';
 
+import customLocal from '@/views/custom/locale/en-US';
+
 import localeSettings from './en-US/settings';
 
 export default {
@@ -70,4 +72,6 @@ export default {
   ...localeMessageBox,
   ...localeLogin,
   ...localeEmployee,
+
+  ...customLocal
 };

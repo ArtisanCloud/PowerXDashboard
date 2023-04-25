@@ -3,6 +3,8 @@ import localeLogin from '@/views/login/locale/zh-CN';
 
 import localeEmployee from '@/views/admin/employee/locale/zh-CN';
 
+import customLocal from '@/views/custom/locale/zh-CN';
+
 import localeSettings from './zh-CN/settings';
 
 export default {
@@ -70,4 +72,7 @@ export default {
   ...localeMessageBox,
   ...localeLogin,
   ...localeEmployee,
+
+  ...customLocal
+
 };
