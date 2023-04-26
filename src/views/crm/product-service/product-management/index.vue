@@ -2,20 +2,20 @@
   <div class="container">
     <a-card>
       <a-space size="large">
-        <a-button type="primary" @click="openAddStore()"
-        >新增门店
+        <a-button type="primary" @click="openAddProduct()"
+        >新增商品
         </a-button>
       </a-space>
     </a-card>
     <br/>
     <a-card>
-      <StoreTable ref="RefStoreTable"/>
+      <ProductTable ref="RefProductTable"/>
     </a-card>
     <a-drawer
-        v-model:visible="state.createStore.visible" width="800px">
-      <CreateStore
-          @submitSuccess="refreshStoreList"
-          v-if="state.createStore.visible"/>
+        v-model:visible="state.createProduct.visible" width="800px">
+      <CreateProduct
+          @submitSuccess="refreshProductList"
+          v-if="state.createProduct.visible"/>
     </a-drawer>
   </div>
 </template>
@@ -26,13 +26,13 @@
 
 
 import {reactive, ref} from 'vue';
-// import StoreTable from '@/views/crm/product-service/product-management/components/product-table.vue';
-// import CreateStore from '@/views/crm/product-service/product-management/components/create-product.vue';
+import ProductTable from '@/views/crm/product-service/product-management/components/product-table.vue';
+import CreateProduct from '@/views/crm/product-service/product-management/components/create-product.vue';
 
-const RefStoreTable = ref<any>();
+const RefProductTable = ref<any>();
 
-const openAddStore = () => {
-  state.createStore.visible = true;
+const openAddProduct = () => {
+  state.createProduct.visible = true;
 };
 
 const pagination = reactive({
@@ -47,14 +47,14 @@ const pagination = reactive({
 })
 
 const state = reactive({
-  createStore: {
+  createProduct: {
     visible: false,
     parentNode: {}
   },
 });
 
-const refreshStoreList = () =>{
-  RefStoreTable.value.fetchStoreList({
+const refreshProductList = () =>{
+  RefProductTable.value.fetchProductList({
     pageIndex: pagination.currentPage,
     pageSize: pagination.pageSize
   })
@@ -67,7 +67,7 @@ const refreshStoreList = () =>{
 
 <script lang="ts">
 export default {
-  name: '门店管理',
+  name: '商品管理',
 };
 </script>
 

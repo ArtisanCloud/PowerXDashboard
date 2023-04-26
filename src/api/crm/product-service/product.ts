@@ -6,12 +6,12 @@ export const URI_PRODUCT_API = '/product'
 
 
 export interface ProductSpecific {
-	Inventory: number
-	Weight: number
-	Volume: number
-	Encode: string
-	BarCode: string
-	Extra: string
+	inventory: number
+	weight: number
+	volume: number
+	encode: string
+	barCode: string
+	extra: string
 }
 
 export interface Product extends PowerModel, ProductSpecific {
