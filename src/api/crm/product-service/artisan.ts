@@ -8,19 +8,19 @@ export interface ArtisanSpecific {
 }
 
 export interface Artisan extends PowerModel, ArtisanSpecific {
-	EmployeeId : number,
-	Name : string,
-	Level : number,
-	Gender : string,
+	employeeId : number,
+	name : string,
+	level : number,
+	gender : string,
 	birthday : string,
-	PhoneNumber : string,
-	CoverURL : string,
-	WorkNo : string,
-	Email : string,
-	Experience : number,
-	Specialty : string,
-	Certificate : string,
-	Address : string
+	phoneNumber : string,
+	coverURL : string,
+	workNo : string,
+	email : string,
+	experience : number,
+	specialty : string,
+	certificate : string,
+	address : string
 
 }
 

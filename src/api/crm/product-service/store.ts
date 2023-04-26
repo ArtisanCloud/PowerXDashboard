@@ -4,17 +4,14 @@ import DataDictionary from "@/store/modules/data-dictionary";
 import {URI_PRODUCT_API} from '@/api/crm/product-service/product';
 
 export interface Store extends PowerModel {
-	Id:  number,
-	Name:  string,
-	EmployeeId:  number,
-	ContactNumber:  string,
-	CoverURL:  string,
-	Address:  string,
-	Longitude:  number,
-	Latitude:  number,
-	Artisans:  [],
-	CreatedAt:  string,
-
+	name:  string,
+	employeeId:  number,
+	contactNumber:  string,
+	coverURL:  string,
+	address:  string,
+	longitude:  number,
+	latitude:  number,
+	artisans:  [],
 }
 
 
