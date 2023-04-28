@@ -16,7 +16,7 @@ const CRM: AppRouteRecordRaw = {
       path: '/crm/domain',
       name: 'Domain',
       component: EMPTY_LAYOUT,
-      redirect: '/crm/domain/public-leads',
+      redirect: '/crm/domain/leads',
       meta: {
         icon: 'icon-user',
         locale: 'menu.crm.domain',
@@ -25,9 +25,9 @@ const CRM: AppRouteRecordRaw = {
       },
       children: [
         {
-          path: '/crm/domain/public-leads',
+          path: '/crm/domain/leads',
           name: 'PublicLeads',
-          component: () => import('@/views/crm/domain/public-leads/index.vue'),
+          component: () => import('@/views/crm/customer-domain/lead/index.vue'),
           meta: {
             locale: 'menu.crm.domain.publicLeads',
             requiresAuth: true,
@@ -38,7 +38,7 @@ const CRM: AppRouteRecordRaw = {
           path: '/crm/domain/customer-management',
           name: 'CustomerManagement',
           component: () =>
-            import('@/views/crm/domain/customer-management/index.vue'),
+            import('@/views/crm/customer-domain/customer/index.vue'),
           meta: {
             locale: 'menu.crm.domain.customerManagement',
             requiresAuth: true,
