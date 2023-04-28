@@ -1,6 +1,5 @@
 import {PowerModel, PREFIX_URI_ADMIN_API} from '@/api/common';
 import axios from "axios";
-import DataDictionary from "@/store/modules/data-dictionary";
 
 export const URI_PRODUCT_API = '/product'
 
