@@ -10,6 +10,7 @@ export const SalesChannelsDDType = '_sales_channel'
 export const PromoteChannelsDDType = '_promote_channel'
 export const SourceTypesDDType = '_approval_status'
 
+export const ScheduleStatusDDType = '_schedule_status'
 
 export interface DictionaryItem extends PowerModel {
 

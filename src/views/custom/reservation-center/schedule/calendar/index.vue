@@ -65,6 +65,7 @@ const fetchStoreList = async (req: ListStoreRequest) => {
 
 const changeSelectedStore = (storeId: number) => {
   if (storeId > 0) {
+    RefScheduleCalendarTable.value.clearCalendar()
     RefScheduleCalendarTable.value.fetchScheduleList({storeId});
   }
 }

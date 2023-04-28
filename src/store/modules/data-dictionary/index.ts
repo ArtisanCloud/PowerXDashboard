@@ -4,7 +4,7 @@ import {
 	DictionaryItem,
 	listDictionaryItems,
 	ProductPlanDDType,
-	ProductTypesDDType, PromoteChannelsDDType, SalesChannelsDDType, SourceTypesDDType
+	ProductTypesDDType, PromoteChannelsDDType, SalesChannelsDDType, ScheduleStatusDDType, SourceTypesDDType
 } from "@/api/dictionary";
 import {OptionsState} from "@/store/modules/data-dictionary/type";
 
@@ -16,7 +16,8 @@ const useOptionsStore = defineStore('options', {
 		approvalStatus: [],
 		salesChannels: [],
 		promoteChannels: [],
-		sourceTypes: []
+		sourceTypes: [],
+		scheduleStatus: []
 	}),
 
 	getters: {},
@@ -87,6 +88,16 @@ const useOptionsStore = defineStore('options', {
 		async fetchSourceTypesOptions() {
 			try {
 				const res = await listDictionaryItems({type: SourceTypesDDType});
+				this.sourceTypes = res.data.list;
+				// console.log(dictionaryTypeList)
+			} finally {
+				// console.log("fetch approval status options")
+			}
+		},
+
+		async fetchScheduleStatusOptions() {
+			try {
+				const res = await listDictionaryItems({type: ScheduleStatusDDType});
 				this.sourceTypes = res.data.list;
 				// console.log(dictionaryTypeList)
 			} finally {

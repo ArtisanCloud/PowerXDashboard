@@ -1,7 +1,18 @@
 import {PowerModel, PREFIX_URI_ADMIN_API} from '@/api/common';
 import axios from "axios";
-import {URI_RESERVATION_CENTER_API} from "@/api/custom/reservation-center/reservation";
+import {Reservation, URI_RESERVATION_CENTER_API} from "@/api/custom/reservation-center/reservation";
 
+
+export const ScheduleStatusIdle = "_idle"
+export const ScheduleStatusNormal = "_normal"
+export const ScheduleStatusWarning = "_warning"
+export const ScheduleStatusFull = "_full"
+
+export interface PivotScheduleToArtisan {
+	scheduleId: number,
+	artisanId: number,
+	isAvailable: boolean,
+}
 
 export interface Schedule extends PowerModel {
 
@@ -12,11 +23,11 @@ export interface Schedule extends PowerModel {
 	name: string,
 	description: string,
 	isActive: string,
-	status: string,
+	status: number,
 	startTime: string,
 	endTime: string,
-
-
+	reservations: Reservation[],
+	pivotScheduleToArtisan: PivotScheduleToArtisan[],
 }
 
 

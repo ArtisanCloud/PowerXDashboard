@@ -1,27 +1,7 @@
 <template>
   <a-card>
     <FullCalendar ref="RefCalendar" :options='calendarOptions'/>
-    <a-list>
-      <a-list-item v-for="idx in 4" :key="idx">
-        <a-list-item-meta
-            title="预约项目"
-            description="当前状态"
-        >
-          <template #avatar>
-            <a-avatar shape="square">
-              <img
-                  alt="avatar"
-                  src="https://p1-arco.byteimg.com/tos-cn-i-uwbnlip3yd/3ee5f13fb09879ecb5185e440cef6eb9.png~tplv-uwbnlip3yd-webp.webp"
-              />
-            </a-avatar>
-          </template>
-        </a-list-item-meta>
-        <template #actions>
-          <icon-edit/>
-          <icon-delete/>
-        </template>
-      </a-list-item>
-    </a-list>
+    <ReservationList ref="RefReservationList" :schedule="calEvents.currentSchedule"/>
     <!--    <a-drawer v-model:visible="state.createSchedule.visible" width="500px">-->
     <!--      <CreateSchedule-->
     <!--          @submitSuccess="fetchScheduleList"-->
@@ -52,12 +32,21 @@ import zhLocale from '@fullcalendar/core/locales/zh-cn'
 
 // import CreateSchedule from '@/views/crm/product-service/price-book/components/create-price-book.vue'
 // import EditSchedule from '@/views/crm/product-service/price-book/components/edit-price-book.vue'
+import ReservationList from '@/views/custom/reservation-center/schedule/calendar/components/reservation-list.vue'
 import {Message} from "@arco-design/web-vue";
 
 
-import {deleteSchedule, ListScheduleRequest, listSchedules, Schedule} from "@/api/custom/reservation-center/schedule";
+import {
+  deleteSchedule,
+  ListScheduleRequest,
+  listSchedules, PivotScheduleToArtisan,
+  Schedule, ScheduleStatusFull,
+  ScheduleStatusIdle, ScheduleStatusNormal, ScheduleStatusWarning
+} from "@/api/custom/reservation-center/schedule";
 import {convertCSTDateToUTCDate, initDayJs} from "@/utils/dayjs";
 import convert from "lodash/fp/convert";
+import useOptionsStore from "@/store/modules/data-dictionary";
+import {Reservation} from "@/api/custom/reservation-center/reservation";
 
 
 const props = defineProps({
@@ -69,22 +58,114 @@ const props = defineProps({
 
 
 const RefCalendar = ref<any>();
+const RefReservationList = ref<any>();
 const currentDate = ref<Date>();
 const scheduleList = ref<Schedule[]>([]);
 
+const options = useOptionsStore();
 
-// const today = computed(() => {
-//
-// });
-//
+
+const calEvents = reactive({
+  selectedEvent: Object as any,
+  currentSchedule: {} as Schedule,
+})
+
+
+const colors = reactive({
+  idle: {
+    backgroundColor: '#9deeee',
+    borderColor: '#c3c6e3',
+  },
+  normal: {
+    backgroundColor: '#9cf04e',
+    borderColor: '#14d22f',
+  },
+  warning: {
+    backgroundColor: '#F0AD4E',
+    borderColor: '#e79113',
+  },
+  full: {
+    backgroundColor: '#e52448',
+    borderColor: '#a10f0f',
+  },
+  selected: {
+    backgroundColor: '#e5d2b4',
+    borderColor: '#c49292',
+  }
+})
+const drawScheduleBuckets = (info: any) => {
+  const scheduleStatus = info?.event?.extendedProps?.status; // Optional chaining to avoid TypeError
+  // console.log(info.event)
+  if (info.el) {
+    // Check if scheduleStatus is not undefined or null before proceeding
+    // Set reminder color
+    let bgColor = colors.idle.backgroundColor
+    let bgBorderColor = colors.idle.borderColor
+    let opacity = 0.8
+
+    switch (scheduleStatus) {
+      case ScheduleStatusNormal:
+        bgColor = colors.normal.backgroundColor
+        bgBorderColor = colors.normal.borderColor
+        break;
+      case ScheduleStatusWarning:
+        bgColor = colors.warning.backgroundColor
+        bgBorderColor = colors.warning.borderColor
+        break;
+      case ScheduleStatusFull:
+        bgColor = colors.full.backgroundColor
+        bgBorderColor = colors.full.borderColor
+        break;
+      default:
+        opacity = 0.5
+        break;
+    }
+
+
+    // console.log(bgColor, bgBorderColor)
+    info.el.style.backgroundColor = bgColor; // Set background color
+    info.el.style.borderColor = bgBorderColor; // Set border color
+    info.el.style.opacity = opacity; // Set opacity
+  }
+
+}
 
 
 const handleDateSelect = (selectInfo: any) => {
   // console.log("selectInfo:", selectInfo)
 };
-const handleEventClick = (clickInfo: any) => {
-  console.log("clickInfo:",clickInfo)
+
+const handleEventReRender = (clickInfo: any) => {
+  // console.log("clickInfo:", clickInfo)
+
+  if (calEvents.selectedEvent !== undefined) {
+    // console.log("selectedEvent:", calEvents.selectedEvent)
+    drawScheduleBuckets(calEvents.selectedEvent)
+  }
+
+
+  // // 将当前点击的事件背景颜色更改为选中颜色
+  // clickInfo.el.style.backgroundColor = colors.selected.backgroundColor; // Set background color
+  clickInfo.el.style.borderColor = colors.selected.borderColor; // Set border color
+  clickInfo.el.style.opacity = 1
+
+  calEvents.selectedEvent = clickInfo
+  // console.log("after selectedEvent:", calEvents.selectedEvent)
+
 };
+
+const handleChangeReservationList = (clickInfo: any) => {
+
+  const curEvent = calEvents.selectedEvent.event
+
+  // console.log(curEvent.id, curEvent.extendedProps.index)
+  calEvents.currentSchedule = scheduleList.value[curEvent.extendedProps.index]
+
+  RefReservationList.value.fetchReservationList({scheduleId:calEvents.currentSchedule.id})
+
+};
+
+
 const handleEvents = (events: any) => {
   // console.log("events:",events)
 };
@@ -109,18 +190,25 @@ const calendarOptions = reactive({
     right: 'today timeGridWeek timeGridDay'
   },
   editable: false,
-  selectable: true,
+  selectable: false,
   selectMirror: true,
   dayMaxEvents: true,
-  select: (e: any) => {
-    handleDateSelect(e)
-  },
   eventClick: (e: any) => {
-    handleEventClick(e)
+    // console.log('eventClick：', e.el,e.event);
+
+    // 重新渲染格子
+    handleEventReRender(e)
+
+    // 刷新列表
+    handleChangeReservationList(e)
   },
   eventsSet: (e: any) => {
     handleEvents(e)
   },
+  eventDidMount: (e: any) => {
+    // console.log('eventDidMount：', e.el,e.event);
+    drawScheduleBuckets(e)
+  }
 })
 
 
@@ -162,8 +250,6 @@ const state = reactive({
 
 
 const renderSchedulesToEvents = (schedules: Schedule[]) => {
-
-
   for (let i = 0; i < schedules.length; i += 1) {
     const startD = schedules[i].startTime
     const endD = schedules[i].endTime
@@ -173,19 +259,35 @@ const renderSchedulesToEvents = (schedules: Schedule[]) => {
     const endDayJS = convertCSTDateToUTCDate(endD)
     // console.log(startDayJS, endDayJS)
 
+    const scheduleStatus = options.GetOptionById(options.scheduleStatus, schedules[i].status)
+
     const event = {
       id: schedules[i].id,
-      title: schedules[i].name,
+      title: `已预约人数：${schedules[i].reservations.length}`,
       start: startDayJS,
       end: endDayJS,
-      backgroundColor: '#F0AD4E',
-      borderColor: '#e79113'
+      textColor: 'black',
+      extendedProps: {
+        status: scheduleStatus,
+        index: i
+      }
     }
     const cal = RefCalendar.value.calendar.currentData.viewApi.calendar
     cal.addEvent(event)
+
+
   }
 
 }
+
+const clearCalendar = async () => {
+
+  const cal = RefCalendar.value.calendar.currentData.viewApi.calendar
+  cal.removeAllEventSources();
+  cal.removeAllEvents();
+
+}
+
 
 const fetchScheduleList = async (req: ListScheduleRequest) => {
   state.loading = true;
@@ -225,11 +327,14 @@ const deleteScheduleById = async (bookId: number) => {
 };
 
 
-defineExpose({fetchScheduleList})
+defineExpose({fetchScheduleList, clearCalendar})
 
 onMounted(() => {
 
   initDayJs()
+
+
+  options.fetchScheduleStatusOptions()
 
 
 });
