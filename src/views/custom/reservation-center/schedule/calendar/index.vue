@@ -8,18 +8,19 @@
         <a-button type="primary" @click="openAddStore()"
         >新增客户线索
         </a-button>
+
         <a-select
             ref="RefCurrentStore"
-            v-model="currentStoreId"
+            v-model="state.currentStoreId"
             :options="storeList"
-            :field-names="{ label: 'name', value: 'id' }"
+            :field-names="{ label: 'name', value: 'id'  }"
             @change="changeSelectedStore"
         />
       </a-space>
     </a-card>
     <a-card>
       <ScheduleCalendarTable
-          :currentStoreId="currentStoreId"
+          :currentStore="state.currentStore"
           ref="RefScheduleCalendarTable"/>
     </a-card>
   </div>
@@ -34,13 +35,13 @@ import ScheduleCalendarTable
 import {dayjs} from "@arco-design/web-vue/es/_utils/date";
 
 const storeList = ref<Store[]>([]);
-
-const currentStoreId = ref();
 const RefCurrentStore = ref();
 const RefScheduleCalendarTable = ref();
 
 
 const state = reactive({
+  currentStore: {} as Store,
+  currentStoreId: 1,
   loading: false,
 });
 
@@ -53,7 +54,8 @@ const fetchStoreList = async (req: ListStoreRequest) => {
 
     // 设置当前选中的店铺
     const defaultStore = storeList.value[0]
-    currentStoreId.value = defaultStore.id
+    state.currentStore = defaultStore
+    state.currentStoreId = defaultStore.id
 
     // 刷新日程表
     RefScheduleCalendarTable.value.fetchScheduleList({storeId: defaultStore.id});
@@ -63,11 +65,27 @@ const fetchStoreList = async (req: ListStoreRequest) => {
   }
 };
 
-const changeSelectedStore = (storeId: number) => {
-  if (storeId > 0) {
-    RefScheduleCalendarTable.value.clearCalendar()
-    RefScheduleCalendarTable.value.fetchScheduleList({storeId});
+const getStoreById = (stores: Store[], id: number): Store | undefined => {
+  for (let i = 0; i < stores.length; i += 1) {
+    if (stores[i].id === id) {
+      return stores[i]
+    }
   }
+
+  return undefined
+}
+
+const changeSelectedStore = (storeId: number) => {
+
+  const store = getStoreById(storeList.value, storeId)
+  if (store) {
+
+    state.currentStore = store
+
+    RefScheduleCalendarTable.value.clearCalendar()
+    RefScheduleCalendarTable.value.fetchScheduleList({storeId: store.id});
+  }
+
 }
 
 onMounted(() => {

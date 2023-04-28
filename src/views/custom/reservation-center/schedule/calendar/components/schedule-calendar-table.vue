@@ -2,19 +2,19 @@
   <a-card>
     <FullCalendar ref="RefCalendar" :options='calendarOptions'/>
     <ReservationList ref="RefReservationList" :schedule="calEvents.currentSchedule"/>
-    <!--    <a-drawer v-model:visible="state.createSchedule.visible" width="500px">-->
-    <!--      <CreateSchedule-->
-    <!--          @submitSuccess="fetchScheduleList"-->
-    <!--          v-if="state.createSchedule.visible"-->
-    <!--      />-->
-    <!--    </a-drawer>-->
-    <!--    <a-drawer v-model:visible="state.editSchedule.visible" width="500px">-->
-    <!--      <EditSchedule-->
-    <!--          @submitSuccess="fetchScheduleList"-->
-    <!--          v-if="state.editSchedule.visible"-->
-    <!--          :node="state.editSchedule.node"-->
-    <!--      />-->
-    <!--    </a-drawer>-->
+    <a-drawer v-model:visible="state.createReservation.visible" width="500px">
+      <CreateSchedule
+          @submitSuccess="fetchScheduleList"
+          v-if="state.createSchedule.visible"
+      />
+    </a-drawer>
+    <a-drawer v-model:visible="state.createCustomer.visible" width="500px">
+      <EditSchedule
+          @submitSuccess="fetchScheduleList"
+          v-if="state.editSchedule.visible"
+          :node="state.editSchedule.node"
+      />
+    </a-drawer>
   </a-card>
 </template>
 
@@ -46,11 +46,11 @@ import {
 import {convertCSTDateToUTCDate, initDayJs} from "@/utils/dayjs";
 import convert from "lodash/fp/convert";
 import useOptionsStore from "@/store/modules/data-dictionary";
-import {Reservation} from "@/api/custom/reservation-center/reservation";
+import {Store} from "@/api/crm/product-service/store";
 
 
 const props = defineProps({
-  currentStoreId: Number,
+  currentStore: Object as PropType<Store>,
   initDate: {
     type: Date
   }
@@ -161,7 +161,7 @@ const handleChangeReservationList = (clickInfo: any) => {
   // console.log(curEvent.id, curEvent.extendedProps.index)
   calEvents.currentSchedule = scheduleList.value[curEvent.extendedProps.index]
 
-  RefReservationList.value.fetchReservationList({scheduleId:calEvents.currentSchedule.id})
+  RefReservationList.value.fetchReservationList({scheduleId: calEvents.currentSchedule.id})
 
 };
 
@@ -238,15 +238,44 @@ const columns = reactive([
 
 const state = reactive({
   loading: false,
-  createSchedule: {
+  createReservation: {
     visible: false,
-    parentNode: {},
   },
-  editSchedule: {
+  createCustomer: {
     visible: false,
-    node: {},
   },
 });
+
+const calScheduleStatus = (schedule: Schedule): string => {
+
+  if (!props.currentStore) {
+    return ScheduleStatusFull
+  }
+
+  const totalArtisan = props.currentStore.artisans.length
+  const totalPivot = schedule.pivotScheduleToArtisan.length
+  let notAvailableCount = 0
+  for (let i = 0; i < totalPivot; i += 1) {
+    const pivot = schedule.pivotScheduleToArtisan[i]
+    if (!pivot.isAvailable) {
+      notAvailableCount += 1
+    }
+  }
+
+  let status = ScheduleStatusIdle
+  const percentage = notAvailableCount / totalArtisan
+  // console.log(totalArtisan, notAvailableCount, totalArtisan, percentage)
+  if (percentage >= 1) {
+    status = ScheduleStatusFull
+  } else if (percentage > 0.75 && percentage < 1) {
+    status = ScheduleStatusWarning
+  } else if (percentage > 0.25 && percentage <= 0.75) {
+    status = ScheduleStatusNormal
+  }
+  return status
+
+
+}
 
 
 const renderSchedulesToEvents = (schedules: Schedule[]) => {
@@ -259,11 +288,12 @@ const renderSchedulesToEvents = (schedules: Schedule[]) => {
     const endDayJS = convertCSTDateToUTCDate(endD)
     // console.log(startDayJS, endDayJS)
 
-    const scheduleStatus = options.GetOptionById(options.scheduleStatus, schedules[i].status)
+    // const scheduleStatus = options.GetOptionById(options.scheduleStatus, schedules[i].status)
+    const scheduleStatus = calScheduleStatus(schedules[i])
 
     const event = {
       id: schedules[i].id,
-      title: `已预约人数：${schedules[i].reservations.length}`,
+      title: `已预约人数：${schedules[i].reservations.length} 发型师人数：${props.currentStore?.artisans.length}`,
       start: startDayJS,
       end: endDayJS,
       textColor: 'black',
@@ -316,7 +346,7 @@ const deleteScheduleById = async (bookId: number) => {
     if (rep.data.id && rep.data.id > 0) {
       Message.success('删除成功');
       await fetchScheduleList({
-        storeId: props.currentStoreId,
+        storeId: props.currentStore?.id,
         currentDate: currentDate.value
       });
     }

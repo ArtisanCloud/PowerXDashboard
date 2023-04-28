@@ -3,8 +3,8 @@
     <template #item="{ item }">
       <a-list-item>
         <a-list-item-meta
-            :title="item.reservedTime"
-            :description="item.description"
+            :title="`预约时间：${new Date(item.reservedTime).toLocaleString('zh-CN', { month: '2-digit', day: '2-digit',hour12: false, hour: '2-digit', minute: '2-digit' })}  ---  预约发型师：${item.reservedArtisan.name}`"
+            :description="`服务名称：${item.reservedService.name}    需用时:${item.reservedService.duration}分钟`"
         >
           <template #avatar>
             <a-avatar shape="square">
@@ -16,9 +16,11 @@
             </a-avatar>
           </template>
         </a-list-item-meta>
+
         <template #actions>
-          <icon-edit/>
-          <icon-delete/>
+          <icon-check-square/>
+          <icon-clock-circle/>
+          <icon-minus-circle-fill/>
         </template>
       </a-list-item>
     </template>
