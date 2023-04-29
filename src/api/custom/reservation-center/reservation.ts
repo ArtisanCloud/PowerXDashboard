@@ -7,6 +7,12 @@ import {ServiceSpecific} from "@/api/custom/product-service/serviceSpecific";
 
 export const URI_RESERVATION_CENTER_API = '/reservation-center'
 
+export const ReservationTypesType = "_reservation_type"
+
+export const ReservationTypeOnSite = "_reserved_by_onsite" // 现场预约
+export const ReservationTypeOnline = "_reserved_by_online" // 线上预约
+export const ReservationTypePhone = "_reserved_by_phone"   // 电话预约
+
 export interface Reservation extends PowerModel {
 
 	scheduleId: number,

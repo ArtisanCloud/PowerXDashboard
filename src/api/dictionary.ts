@@ -27,8 +27,6 @@ export const ChannelDingDing = '_ding_ding' // 钉钉
 export const ChannelDouYin = '_dou_yin'     // 抖音
 export const ChannelAlipay = '_alipay'      // 支付宝
 
-export const ScheduleStatusDDType = '_schedule_status'
-
 export interface DictionaryItem extends PowerModel {
 
 	key: string

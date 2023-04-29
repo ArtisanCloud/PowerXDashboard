@@ -2,17 +2,36 @@
   <div>
     <a-form ref="formRef" auto-label-width :model="formModel" :rules="rules" @submit="onSubmit">
 
-      <a-form-item label="预约日程段" :field="['scheduleId']">
+      <a-form-item label="预约日程段" field="scheduleId">
         <a-typography-text>{{ formattedSchedule }}</a-typography-text>
       </a-form-item>
+<!--      <a-form-item label="客户" field="customerId">-->
+<!--        <a-select :style="{width:'320px'}" :loading="loading" placeholder="Please select ..." multiple-->
+<!--                  @search="handleSearch" :filter-option="false">-->
+<!--          &lt;!&ndash;          <a-option v-for="item of options" :value="item">{{ item }}</a-option>&ndash;&gt;-->
+<!--        </a-select>-->
+<!--      </a-form-item>-->
       <a-form-item label="发型师" field="reservedArtisanId">
-        <a-select :options="props.currentStore.artisans" />
+        <a-select
+            :options="props.currentStore.artisans"
+            :field-names="{ label: 'name', value: 'id' }"
+            placeholder="请选择发型师"/>
       </a-form-item>
-      <a-form-item label="发型师" field="reservedArtisanId">
-        <a-select :options="props.currentStore.artisans" />
+      <a-form-item label="服务项目" field="serviceId">
+        <a-select
+            v-model="formModel.serviceId"
+            :options="serviceList"
+            placeholder="请选择服务项目"/>
       </a-form-item>
-      <a-form-item label="服务项目" field="reservedArtisanId">
-        <a-select :options="props.currentStore.artisans" />
+      <a-form-item label="预约类型" field="type">
+        <a-select
+            v-model="formModel.type"
+            :options="options.reservationTypes"
+            :field-names="{ label: 'name', value: 'id' }"
+            placeholder="请选择约单类型"/>
+      </a-form-item>
+      <a-form-item label="相关描述" field="description">
+        <a-textarea v-model="formModel.description"/>
       </a-form-item>
 
       <a-form-item>
@@ -36,6 +55,8 @@ import {FieldRule, Message} from "@arco-design/web-vue";
 import useOptionsStore from "@/store/modules/data-dictionary";
 import {Schedule} from "@/api/custom/reservation-center/schedule";
 import {ListStoreRequest, listStores, Store} from "@/api/crm/product-service/store";
+import {ChannelDirect} from "@/api/dictionary";
+import {ServiceSpecific} from "@/api/custom/product-service/serviceSpecific";
 
 const props = defineProps({
   currentStore: Object as PropType<Store>,
@@ -57,6 +78,8 @@ const formattedSchedule = computed(() => {
   return `${formattedStartDate}-${formattedEndDate}`;
 });
 
+const serviceList = ref<ServiceSpecific[]>([]);
+
 const emits = defineEmits(['submitSuccess', 'submitFailed', 'update:id']);
 
 const options = useOptionsStore()
@@ -66,30 +89,27 @@ const fileList = []
 const formRef = ref();
 const formModel = ref({
   scheduleId: props.currentSchedule?.id,
+  // reservedArtisanId: 0,
+  // serviceId: 0,
+  sourceChannelId: options.GetOptionByKey(options.sourceTypes, ChannelDirect)?.id,
+  type: 0,
   description: '',
-  sourceChannelId:  options.GetOptionByKey(options.sourceTypes, Channel),
-  type:0,
-  description:,
 
 } as Reservation);
 
 const rules = {
-  name: [
-    {required: true, message: '请输入商品手册名称'},
-    {max: 10, message: '商品名称长度不能超过 10 个字符'},
+
+  // customerId: [
+  //   {required: true, message: '请选择选中客户'},
+  // ],
+  reservedArtisanId: [
+    {required: true, message: '请选择发型师'},
   ],
-  mobile: [
-    {required: true, message: '请输入手机号码'},
-    {max: 10, message: '手机号码长度不能超过 10 个字符'},
-  ],
+  // serviceId: [
+  //   {required: true, message: '请选择服务项目'},
+  // ],
   type: [
-    {required: true, message: '请输入客户类型名称'},
-  ],
-  source: [
-    {required: true, message: '请输入客户来源'},
-  ],
-  isActivated: [
-    {required: true, message: '请输入客户状态'},
+    {required: true, message: '请选择约单类型'},
   ],
 
 
@@ -134,7 +154,6 @@ const onSubmit = async () => {
 // };
 
 onMounted(() => {
-
 
 
 });

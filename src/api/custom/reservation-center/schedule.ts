@@ -3,6 +3,8 @@ import axios from "axios";
 import {Reservation, URI_RESERVATION_CENTER_API} from "@/api/custom/reservation-center/reservation";
 
 
+export const ScheduleStatusDDType = '_schedule_status'
+
 export const ScheduleStatusIdle = "_idle"
 export const ScheduleStatusNormal = "_normal"
 export const ScheduleStatusWarning = "_warning"

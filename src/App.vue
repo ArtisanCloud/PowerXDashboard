@@ -30,5 +30,6 @@
   options.fetchPromoteChannelsOptions()
   options.fetchSourceTypesOptions()
   options.fetchCustomerTypesOptions()
+  options.fetchReservationTypesOptions()
 
 </script>

@@ -4,9 +4,11 @@ import {
 	DictionaryItem,
 	listDictionaryItems,
 	ProductPlanDDType,
-	ProductTypesDDType, PromoteChannelsDDType, SalesChannelsDDType, ScheduleStatusDDType, SourceTypesDDType
+	ProductTypesDDType, PromoteChannelsDDType, SalesChannelsDDType, SourceTypesDDType
 } from "@/api/dictionary";
 import {OptionsState} from "@/store/modules/data-dictionary/type";
+import {ReservationTypesType} from "@/api/custom/reservation-center/reservation";
+import {ScheduleStatusDDType} from "@/api/custom/reservation-center/schedule";
 
 
 const useOptionsStore = defineStore('options', {
@@ -18,7 +20,10 @@ const useOptionsStore = defineStore('options', {
 		salesChannels: [],
 		promoteChannels: [],
 		sourceTypes: [],
-		scheduleStatus: []
+
+		// custom
+		scheduleStatus: [],
+		reservationTypes:[]
 	}),
 
 	getters: {},
@@ -119,7 +124,16 @@ const useOptionsStore = defineStore('options', {
 		async fetchScheduleStatusOptions() {
 			try {
 				const res = await listDictionaryItems({type: ScheduleStatusDDType});
-				this.sourceTypes = res.data.list;
+				this.scheduleStatus = res.data.list;
+				// console.log(dictionaryTypeList)
+			} finally {
+				// console.log("fetch approval status options")
+			}
+		},
+		async fetchReservationTypesOptions() {
+			try {
+				const res = await listDictionaryItems({type: ReservationTypesType});
+				this.reservationTypes = res.data.list;
 				// console.log(dictionaryTypeList)
 			} finally {
 				// console.log("fetch approval status options")

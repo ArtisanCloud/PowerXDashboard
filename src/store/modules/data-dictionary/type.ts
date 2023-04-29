@@ -8,5 +8,8 @@ export interface OptionsState {
 	salesChannels: DictionaryItem[],
 	promoteChannels: DictionaryItem[],
 	sourceTypes: DictionaryItem[],
+
+	// custom
 	scheduleStatus: DictionaryItem[],
+	reservationTypes: DictionaryItem[],
 }
