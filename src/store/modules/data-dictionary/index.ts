@@ -37,7 +37,7 @@ const useOptionsStore = defineStore('options', {
 		async fetchCustomerTypesOptions() {
 			try {
 				const res = await listDictionaryItems({type: CustomerTypesDDType});
-				this.sourceTypes = res.data.list;
+				this.customerTypes = res.data.list;
 				// console.log(dictionaryTypeList)
 			} finally {
 				// console.log("fetch approval status options")

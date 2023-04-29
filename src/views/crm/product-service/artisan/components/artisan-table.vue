@@ -161,12 +161,12 @@ const deleteArtisanById = async (bookId: number) => {
 };
 
 const pageChanged = (page: number) => {
-  console.log("page", page)
+  // console.log("page", page)
   fetchArtisanList({pageIndex: page, pageSize: pagination.pageSize})
 }
 
 const pageSizeChanged = (pageSize: number) => {
-  console.log("pagesize", pageSize)
+  // console.log("pagesize", pageSize)
   fetchArtisanList({pageIndex: pagination.currentPage, pageSize})
 }
 

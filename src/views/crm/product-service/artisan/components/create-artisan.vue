@@ -137,16 +137,17 @@ const fileList = []
 const formRef = ref();
 const formModel = ref({
   name: '',
-  accountingCategory: '',
-  canSellOnline: true,
-  canUseForDeduct: false,
-  isActivated: false,
-  description: '',
+  level: 0,
+  gender: '',
+  birthday: '',
+  phoneNumber: '',
   coverURL: '',
-  purchasedQuantity: -1,
-  validityPeriodDays: 0,
-  saleStartDate: new Date(),
-  saleEndDate: new Date(),
+  workNo: '',
+  email: '',
+  experience: '',
+  specialty: '',
+  certificate: '',
+  address: '',
 } as Artisan);
 
 const rules = {

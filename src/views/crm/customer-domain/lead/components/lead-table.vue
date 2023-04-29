@@ -10,26 +10,34 @@
              @page-size-change="pageSizeChanged"
              :bordered="{cell:true}">
 
+      <template #type="{ record }">
+        <a-typography-text>{{ options.GetOptionById(options.customerTypes, record.type)?.name }}</a-typography-text>
+      </template>
+
+      <template #isActivated="{ record }">
+        <a-typography-text>{{ record.isActivated ? "激活" : "禁用" }}</a-typography-text>
+      </template>
+
       <template #optional="{ record }">
         <a-space align="center">
 
-          <!--编辑品类按钮-->
+          <!--编辑线索按钮-->
           <a-button @click="openEditLead(record)">
             <template #icon>
               <icon-edit :style="{fontSize:'16px', color:'green'}"/>
             </template>
           </a-button>
 
-          <!--配置价格按钮-->
-          <a-button @click="openEditLead(record)">
+          <!--转化客户按钮-->
+          <a-button @click="openCovertToCustomer(record)">
             <template #icon>
-              <icon-book :style="{fontSize:'16px', color:'#d7ee8f'}"/>
+              <icon-user :style="{fontSize:'16px'}"/>
             </template>
           </a-button>
 
-          <!--删除品类按钮-->
+          <!--删除线索按钮-->
           <a-popconfirm
-              content="该操作会删除相关子品类,确定要删除此品类吗？"
+              content="该操作会删除相关子线索,确定要删除此线索吗？"
               @ok="deleteLeadById(record.id)"
           >
             <a-button v-if="!record.isStandard">
@@ -44,7 +52,7 @@
 
     </a-table>
 
-    <a-drawer v-model:visible="state.editLead.visible" width="800px">
+    <a-drawer v-model:visible="state.editLead.visible" width="500px">
       <EditLead
           @submitSuccess="fetchLeadList"
           v-if="state.editLead.visible"
@@ -61,8 +69,8 @@
 import {onMounted, reactive, ref} from "vue";
 import {listLeads, deleteLead, Lead, ListLeadPageRequest} from "@/api/crm/customer-domain/lead";
 
-// import CreateLead from '@/views/crm/lead-service/lead-management/components/create-lead.vue'
-// import EditLead from '@/views/crm/lead-service/lead-management/components/edit-lead.vue'
+import CreateLead from '@/views/crm/customer-domain/lead/components/create-lead.vue'
+import EditLead from '@/views/crm/customer-domain/lead/components/edit-lead.vue'
 import {Message} from "@arco-design/web-vue";
 
 import useOptionsStore from "@/store/modules/data-dictionary";
@@ -78,7 +86,7 @@ const columns = reactive([
     width: 60,
   },
     {
-    title: '品类名称',
+    title: '线索名称',
     dataIndex: 'name',
     width: 150,
   },
@@ -89,9 +97,16 @@ const columns = reactive([
     slotName: 'type'
   },
   {
-    title: '描述',
-    dataIndex: 'description',
+    title: '小程序OpenId',
+    dataIndex: 'openIdInMiniProgram',
     width: 200,
+    slotName: 'openIdInMiniProgram'
+  },
+  {
+    title: '状态',
+    dataIndex: 'isActivated',
+    width: 120,
+    slotName: 'isActivated'
   },
   {
     title: '操作',
@@ -132,7 +147,7 @@ const fetchLeadList = async (req: ListLeadPageRequest) => {
     pagination.currentPage = res.data.pageIndex
     pagination.pageSize = res.data.pageSize
     pagination.total = res.data.total
-    // console.log(categoryTree)
+    // console.log(leadList)
 
   } finally {
     state.loading = false;
@@ -140,9 +155,9 @@ const fetchLeadList = async (req: ListLeadPageRequest) => {
 };
 
 
-const openEditLead = (cat: Lead) => {
-  // console.log(cat)
-  state.editLead.node = cat;
+const openEditLead = (lead: Lead) => {
+  // console.log(lead)
+  state.editLead.node = lead;
   state.editLead.visible = true;
 };
 
@@ -160,12 +175,12 @@ const deleteLeadById = async (bookId: number) => {
 };
 
 const pageChanged = (page: number) => {
-  console.log("page", page)
+  // console.log("page", page)
   fetchLeadList({pageIndex: page, pageSize: pagination.pageSize})
 }
 
 const pageSizeChanged = (pageSize: number) => {
-  console.log("pagesize", pageSize)
+  // console.log("pagesize", pageSize)
   fetchLeadList({pageIndex: pagination.currentPage, pageSize})
 }
 
@@ -173,8 +188,6 @@ const pageSizeChanged = (pageSize: number) => {
 defineExpose({fetchLeadList})
 
 onMounted(() => {
-
-  options.fetchCustomerTypesOptions()
 
   fetchLeadList({});
 

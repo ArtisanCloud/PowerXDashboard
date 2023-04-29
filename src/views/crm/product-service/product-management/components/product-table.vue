@@ -193,12 +193,12 @@ const deleteProductById = async (bookId: number) => {
 };
 
 const pageChanged = (page: number) => {
-  console.log("page", page)
+  // console.log("page", page)
   fetchProductList({pageIndex: page, pageSize: pagination.pageSize})
 }
 
 const pageSizeChanged = (pageSize: number) => {
-  console.log("pagesize", pageSize)
+  // console.log("pagesize", pageSize)
   fetchProductList({pageIndex: pagination.currentPage, pageSize})
 }
 

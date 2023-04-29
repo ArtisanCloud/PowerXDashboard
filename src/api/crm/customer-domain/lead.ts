@@ -13,7 +13,7 @@ export interface Lead extends PowerModel, CustomerExternalId {
 	inviterId: number,
 	source: number,
 	type: number,
-	isActivated: number,
+	isActivated: boolean,
 
 
 }

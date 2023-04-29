@@ -12,7 +12,7 @@
       <LeadTable ref="RefLeadTable"/>
     </a-card>
     <a-drawer
-        v-model:visible="state.createLead.visible" width="800px">
+        v-model:visible="state.createLead.visible" width="500px">
       <CreateLead
           @submitSuccess="refreshLeadList"
           v-if="state.createLead.visible"/>
