@@ -17,7 +17,7 @@ export interface Customer extends PowerModel, CustomerExternalId {
 	inviterId: number,
 	source: number,
 	type: number,
-	isActivated: string,
+	isActivated: boolean,
 
 }
 
@@ -39,7 +39,7 @@ export interface ListCustomerPageReply {
 
 export function listCustomers(request: ListCustomerPageRequest) {
 	return axios.get<ListCustomerPageReply>(
-		`${PREFIX_URI_ADMIN_API + URI_CUSTOMER_DOMAIN_API}/customers`,
+		`${PREFIX_URI_ADMIN_API + URI_CUSTOMER_DOMAIN_API}/customers/page-list`,
 		{
 			params: request,
 		}
