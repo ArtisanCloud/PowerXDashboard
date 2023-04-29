@@ -1,7 +1,7 @@
 import {PowerModel, PREFIX_URI_ADMIN_API} from '@/api/common';
 import axios from "axios";
 import {Artisan} from "@/api/crm/product-service/artisan";
-import {Customer} from "@/api/crm/customerdomain/customer";
+import {Customer} from "@/api/crm/customer-domain/customer";
 import {ServiceSpecific} from "@/api/custom/product-service/serviceSpecific";
 
 
