@@ -17,7 +17,7 @@ export interface Artisan extends PowerModel, ArtisanSpecific {
 	coverURL : string,
 	workNo : string,
 	email : string,
-	experience : number,
+	experience : string,
 	specialty : string,
 	certificate : string,
 	address : string

@@ -1,6 +1,6 @@
 import {defineStore} from 'pinia';
 import {
-	ApprovalStatusDDType,
+	ApprovalStatusDDType, CustomerTypesDDType,
 	DictionaryItem,
 	listDictionaryItems,
 	ProductPlanDDType,
@@ -11,6 +11,7 @@ import {OptionsState} from "@/store/modules/data-dictionary/type";
 
 const useOptionsStore = defineStore('options', {
 	state: (): OptionsState => ({
+		customerTypes: [],
 		productTypes: [],
 		productPlans: [],
 		approvalStatus: [],
@@ -31,6 +32,16 @@ const useOptionsStore = defineStore('options', {
 				}
 			}
 			return undefined
+		},
+
+		async fetchCustomerTypesOptions() {
+			try {
+				const res = await listDictionaryItems({type: CustomerTypesDDType});
+				this.customerTypes = res.data.list;
+				// console.log(dictionaryTypeList)
+			} finally {
+				// console.log("fetch approval status options")
+			}
 		},
 
 		async fetchProductTypeOptions() {

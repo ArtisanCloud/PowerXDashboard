@@ -29,5 +29,6 @@
   options.fetchSalesChannelsOptions()
   options.fetchPromoteChannelsOptions()
   options.fetchSourceTypesOptions()
+  options.fetchCustomerTypesOptions()
 
 </script>

@@ -3,12 +3,13 @@ import {PowerModel, PREFIX_URI_ADMIN_API} from '@/api/common';
 
 const URI_DATE_DICTIONARY_API = '/dictionary'
 
+export const CustomerTypesDDType = '_customer_type'
 export const ProductTypesDDType = '_product_type'
 export const ProductPlanDDType = '_product_plan'
 export const ApprovalStatusDDType = '_approval_status'
 export const SalesChannelsDDType = '_sales_channel'
 export const PromoteChannelsDDType = '_promote_channel'
-export const SourceTypesDDType = '_approval_status'
+export const SourceTypesDDType = '_source_channel'
 
 
 export interface DictionaryItem extends PowerModel {
