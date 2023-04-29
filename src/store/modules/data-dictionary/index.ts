@@ -35,6 +35,16 @@ const useOptionsStore = defineStore('options', {
 			return undefined
 		},
 
+		GetOptionByKey(options: DictionaryItem[], key:string): DictionaryItem | undefined {
+			for (let i = 0; i < options.length; i += 1) {
+				// console.log(options[i].key, key)
+				if (options[i].key === key) {
+					return options[i]
+				}
+			}
+			return undefined
+		},
+
 		async fetchCustomerTypesOptions() {
 			try {
 				const res = await listDictionaryItems({type: CustomerTypesDDType});

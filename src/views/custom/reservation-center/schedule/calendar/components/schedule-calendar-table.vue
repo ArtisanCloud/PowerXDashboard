@@ -2,19 +2,6 @@
   <a-card>
     <FullCalendar ref="RefCalendar" :options='calendarOptions'/>
     <ReservationList ref="RefReservationList" :schedule="calEvents.currentSchedule"/>
-    <a-drawer v-model:visible="state.createReservation.visible" width="500px">
-      <CreateSchedule
-          @submitSuccess="fetchScheduleList"
-          v-if="state.createSchedule.visible"
-      />
-    </a-drawer>
-    <a-drawer v-model:visible="state.createCustomer.visible" width="500px">
-      <EditSchedule
-          @submitSuccess="fetchScheduleList"
-          v-if="state.editSchedule.visible"
-          :node="state.editSchedule.node"
-      />
-    </a-drawer>
   </a-card>
 </template>
 
@@ -22,7 +9,7 @@
 <script lang="ts" setup>
 
 
-import {computed, onMounted, PropType, reactive, ref} from "vue";
+import {onMounted, PropType, reactive, ref} from "vue";
 import FullCalendar from '@fullcalendar/vue3'
 import dayGridPlugin from '@fullcalendar/daygrid'
 import timeGridPlugin from '@fullcalendar/timegrid'
@@ -30,8 +17,6 @@ import interactionPlugin from '@fullcalendar/interaction'
 import zhLocale from '@fullcalendar/core/locales/zh-cn'
 
 
-// import CreateSchedule from '@/views/crm/product-service/price-book/components/create-price-book.vue'
-// import EditSchedule from '@/views/crm/product-service/price-book/components/edit-price-book.vue'
 import ReservationList from '@/views/custom/reservation-center/schedule/calendar/components/reservation-list.vue'
 import {Message} from "@arco-design/web-vue";
 
@@ -44,7 +29,6 @@ import {
   ScheduleStatusIdle, ScheduleStatusNormal, ScheduleStatusWarning
 } from "@/api/custom/reservation-center/schedule";
 import {convertCSTDateToUTCDate, initDayJs} from "@/utils/dayjs";
-import convert from "lodash/fp/convert";
 import useOptionsStore from "@/store/modules/data-dictionary";
 import {Store} from "@/api/crm/product-service/store";
 
@@ -238,12 +222,6 @@ const columns = reactive([
 
 const state = reactive({
   loading: false,
-  createReservation: {
-    visible: false,
-  },
-  createCustomer: {
-    visible: false,
-  },
 });
 
 const calScheduleStatus = (schedule: Schedule): string => {
@@ -310,6 +288,10 @@ const renderSchedulesToEvents = (schedules: Schedule[]) => {
 
 }
 
+const getCurrentSchedule = (): Schedule => {
+  return calEvents.currentSchedule
+}
+
 const clearCalendar = async () => {
 
   const cal = RefCalendar.value.calendar.currentData.viewApi.calendar
@@ -333,12 +315,12 @@ const fetchScheduleList = async (req: ListScheduleRequest) => {
   }
 };
 
-
-const openEditSchedule = (cat: Schedule) => {
-  // console.log(cat)
-  state.editSchedule.node = cat;
-  state.editSchedule.visible = true;
-};
+//
+// const openEditSchedule = (cat: Schedule) => {
+//   // console.log(cat)
+//   state.editSchedule.node = cat;
+//   state.editSchedule.visible = true;
+// };
 
 const deleteScheduleById = async (bookId: number) => {
   try {
@@ -357,7 +339,7 @@ const deleteScheduleById = async (bookId: number) => {
 };
 
 
-defineExpose({fetchScheduleList, clearCalendar})
+defineExpose({fetchScheduleList, clearCalendar, getCurrentSchedule})
 
 onMounted(() => {
 

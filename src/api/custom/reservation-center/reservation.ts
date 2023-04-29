@@ -8,21 +8,25 @@ import {ServiceSpecific} from "@/api/custom/product-service/serviceSpecific";
 export const URI_RESERVATION_CENTER_API = '/reservation-center'
 
 export interface Reservation extends PowerModel {
-	id: number
-	storeId: number,
-	approvalStatus: string,
-	capacity: number,
-	copyFromReservationId: number,
-	name: string,
-	reservedTime: string
+
+	scheduleId: number,
+	customerId: number,
+	reservedArtisanId: number,
+	serviceId: number,
+	serviceDuration: number,
+	sourceChannelId: number
+	type: number,
+	reservedTime: string,
+	cancelTime: string,
+	checkinTime: string,
 	description: string,
-	isActive: string,
-	status: string,
-	startTime: string,
-	endTime: string,
+	consumedPoints: number,
+	consumeMembershipId: number,
+	operationStatus: number,
+	reservationStatus: number,
 	reservedCustomer: Customer,
 	reservedArtisan: Artisan,
-	reservedService: ServiceSpecific,
+	reservedService:  ServiceSpecific,
 
 }
 
