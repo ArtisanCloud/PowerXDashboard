@@ -2,12 +2,8 @@ import {PowerModel, PREFIX_URI_ADMIN_API} from '@/api/common';
 import axios from "axios";
 import {URI_PRODUCT_API} from '@/api/crm/product-service/product';
 
-export interface ArtisanSpecific {
-	Id: number
-	
-}
 
-export interface Artisan extends PowerModel, ArtisanSpecific {
+export interface Artisan extends PowerModel {
 	employeeId : number,
 	name : string,
 	level : number,

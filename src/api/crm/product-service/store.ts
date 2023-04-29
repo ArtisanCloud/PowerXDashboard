@@ -2,6 +2,7 @@ import {PowerModel, PREFIX_URI_ADMIN_API} from '@/api/common';
 import axios from "axios";
 import DataDictionary from "@/store/modules/data-dictionary";
 import {URI_PRODUCT_API} from '@/api/crm/product-service/product';
+import {Artisan} from "@/api/crm/product-service/artisan";
 
 export interface Store extends PowerModel {
 	name:  string,
@@ -11,7 +12,7 @@ export interface Store extends PowerModel {
 	address:  string,
 	longitude:  number,
 	latitude:  number,
-	artisans:  [],
+	artisans:  Artisan[],
 }
 
 

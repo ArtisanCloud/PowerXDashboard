@@ -271,7 +271,8 @@ const renderSchedulesToEvents = (schedules: Schedule[]) => {
 
     const event = {
       id: schedules[i].id,
-      title: `已预约人数：${schedules[i].reservations.length} 发型师人数：${props.currentStore?.artisans.length}`,
+      title: `已预约人数：${schedules[i].reservations.length} `,
+      // 发型师人数：${props.currentStore?.artisans.length}
       start: startDayJS,
       end: endDayJS,
       textColor: 'black',

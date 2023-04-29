@@ -5,16 +5,19 @@
       <a-form-item label="预约日程段" field="scheduleId">
         <a-typography-text>{{ formattedSchedule }}</a-typography-text>
       </a-form-item>
-<!--      <a-form-item label="客户" field="customerId">-->
-<!--        <a-select :style="{width:'320px'}" :loading="loading" placeholder="Please select ..." multiple-->
-<!--                  @search="handleSearch" :filter-option="false">-->
-<!--          &lt;!&ndash;          <a-option v-for="item of options" :value="item">{{ item }}</a-option>&ndash;&gt;-->
-<!--        </a-select>-->
-<!--      </a-form-item>-->
+      <a-form-item label="客户" field="customerId">
+        <a-select :style="{width:'320px'}" :loading="loading" placeholder="Please select ..." multiple
+                  @search="handleSearch" :filter-option="false">
+          <!--          <a-option v-for="item of options" :value="item">{{ item }}</a-option>-->
+        </a-select>
+      </a-form-item>
+
       <a-form-item label="发型师" field="reservedArtisanId">
         <a-select
+            v-model="formModel.reservedArtisanId"
             :options="props.currentStore.artisans"
             :field-names="{ label: 'name', value: 'id' }"
+            @change="selectChange"
             placeholder="请选择发型师"/>
       </a-form-item>
       <a-form-item label="服务项目" field="serviceId">
@@ -25,7 +28,6 @@
       </a-form-item>
       <a-form-item label="预约类型" field="type">
         <a-select
-            v-model="formModel.type"
             :options="options.reservationTypes"
             :field-names="{ label: 'name', value: 'id' }"
             placeholder="请选择约单类型"/>
@@ -102,9 +104,9 @@ const rules = {
   // customerId: [
   //   {required: true, message: '请选择选中客户'},
   // ],
-  reservedArtisanId: [
-    {required: true, message: '请选择发型师'},
-  ],
+  // reservedArtisanId: [
+  //   {required: true, message: '请选择发型师'},
+  // ],
   // serviceId: [
   //   {required: true, message: '请选择服务项目'},
   // ],
@@ -141,6 +143,10 @@ const onSubmit = async () => {
       });
 };
 
+const selectChange =(value:any)=>{
+  console.log('Selected artisan id:', value);
+}
+
 
 // const fetchServiceList = async (req: ListServiceRequest) => {
 //   state.loading = true;
@@ -155,7 +161,7 @@ const onSubmit = async () => {
 
 onMounted(() => {
 
-
+  console.log(props.currentStore)
 });
 
 </script>
