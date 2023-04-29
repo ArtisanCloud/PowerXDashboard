@@ -11,6 +11,22 @@ export const SalesChannelsDDType = '_sales_channel'
 export const PromoteChannelsDDType = '_promote_channel'
 export const SourceTypesDDType = '_source_channel'
 
+export const StatusDraft = '_draft'
+export const StatusActive = '_active'
+export const StatusCanceled = '_canceled'
+export const StatusPending = '_pending'
+export const StatusInactive = '_inactive'
+
+
+export const ChannelDirect = '_direct'      // 品牌自营
+export const ChannelWechat = '_wechat'      // 微信
+export const ChannelTaoBao = '_tao_bao'     // 淘宝
+export const ChannelJD = '_jd'              // 京东
+export const ChannelDianPing = '_dian_ping' // 点评
+export const ChannelMeiTuan = '_mei_tuan'   // 美团
+export const ChannelDingDing = '_ding_ding' // 钉钉
+export const ChannelDouYin = '_dou_yin'     // 抖音
+export const ChannelAlipay = '_alipay'      // 支付宝
 
 export interface DictionaryItem extends PowerModel {
 
@@ -108,8 +124,6 @@ export function deleteDictionaryType(request: DeleteDictionaryTypeRequest) {
 }
 
 
-
-
 export interface ListDictionaryItemsRequest {
 	type: string;
 
@@ -154,7 +168,6 @@ export function createDictionaryItem(request: CreateDictionaryItemRequest) {
 }
 
 
-
 export interface UpdateDictionaryItemRequest {
 	key: string
 	type: string
@@ -174,13 +187,13 @@ export function updateDictionaryItem(request: UpdateDictionaryItemRequest) {
 }
 
 export interface DeleteDictionaryItemRequest {
-	type:string;
-	key:string;
+	type: string;
+	key: string;
 }
 
 export interface DeleteDictionaryItemReply {
-	type:string;
-	key:string;
+	type: string;
+	key: string;
 }
 
 export function deleteDictionaryItem(request: DeleteDictionaryItemRequest) {
