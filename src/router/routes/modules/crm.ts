@@ -35,7 +35,7 @@ const CRM: AppRouteRecordRaw = {
           },
         },
         {
-          path: '/crm/domain/customer-management',
+          path: '/crm/domain/customer',
           name: 'CustomerManagement',
           component: () =>
             import('@/views/crm/customer-domain/customer/index.vue'),

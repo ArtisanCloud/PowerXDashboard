@@ -1,7 +1,7 @@
 <template>
   <a-card>
 
-    <a-table :data="leadList"
+    <a-table :data="customerList"
              :loading="state.loading"
              row-key="id" :columns="columns"
              column-resizable
@@ -21,24 +21,17 @@
       <template #optional="{ record }">
         <a-space align="center">
 
-          <!--编辑线索按钮-->
-          <a-button @click="openEditLead(record)">
+          <!--编辑客户按钮-->
+          <a-button @click="openEditCustomer(record)">
             <template #icon>
               <icon-edit :style="{fontSize:'16px', color:'green'}"/>
             </template>
           </a-button>
 
-          <!--转化客户按钮-->
-          <a-button @click="openCovertToCustomer(record)">
-            <template #icon>
-              <icon-user :style="{fontSize:'16px'}"/>
-            </template>
-          </a-button>
-
-          <!--删除线索按钮-->
+          <!--删除客户按钮-->
           <a-popconfirm
-              content="该操作会删除相关子线索,确定要删除此线索吗？"
-              @ok="deleteLeadById(record.id)"
+              content="该操作会删除相关子客户,确定要删除此客户吗？"
+              @ok="deleteCustomerById(record.id)"
           >
             <a-button v-if="!record.isStandard">
               <template #icon>
@@ -52,11 +45,11 @@
 
     </a-table>
 
-    <a-drawer v-model:visible="state.editLead.visible" width="500px">
-      <EditLead
-          @submitSuccess="fetchLeadList"
-          v-if="state.editLead.visible"
-          :node="state.editLead.node"
+    <a-drawer v-model:visible="state.editCustomer.visible" width="500px">
+      <EditCustomer
+          @submitSuccess="fetchCustomerList"
+          v-if="state.editCustomer.visible"
+          :node="state.editCustomer.node"
       />
     </a-drawer>
   </a-card>
@@ -67,16 +60,16 @@
 
 
 import {onMounted, reactive, ref} from "vue";
-import {listLeads, deleteLead, Lead, ListLeadPageRequest} from "@/api/crm/customer-domain/lead";
+import {listCustomers, deleteCustomer, Customer, ListCustomerPageRequest} from "@/api/crm/customer-domain/customer";
 
-import EditLead from '@/views/crm/customer-domain/lead/components/edit-lead.vue'
+import EditCustomer from '@/views/crm/customer-domain/customer/components/edit-customer.vue'
 import {Message} from "@arco-design/web-vue";
 
 import useOptionsStore from "@/store/modules/data-dictionary";
 
 const options = useOptionsStore()
 
-const leadList = ref<Lead[]>([]);
+const customerList = ref<Customer[]>([]);
 
 const columns = reactive([
   {
@@ -85,7 +78,7 @@ const columns = reactive([
     width: 60,
   },
     {
-    title: '线索名称',
+    title: '客户名称',
     dataIndex: 'name',
     width: 150,
   },
@@ -126,11 +119,11 @@ const pagination = reactive({
 
 const state = reactive({
   loading: false,
-  createLead: {
+  createCustomer: {
     visible: false,
     parentNode: {},
   },
-  editLead: {
+  editCustomer: {
     visible: false,
     node: {},
   },
@@ -138,15 +131,15 @@ const state = reactive({
 });
 
 
-const fetchLeadList = async (req: ListLeadPageRequest) => {
+const fetchCustomerList = async (req: ListCustomerPageRequest) => {
   state.loading = true;
   try {
-    const res = await listLeads(req);
-    leadList.value = res.data.list;
+    const res = await listCustomers(req);
+    customerList.value = res.data.list;
     pagination.currentPage = res.data.pageIndex
     pagination.pageSize = res.data.pageSize
     pagination.total = res.data.total
-    // console.log(leadList)
+    // console.log(customerList)
 
   } finally {
     state.loading = false;
@@ -154,18 +147,18 @@ const fetchLeadList = async (req: ListLeadPageRequest) => {
 };
 
 
-const openEditLead = (lead: Lead) => {
-  // console.log(lead)
-  state.editLead.node = lead;
-  state.editLead.visible = true;
+const openEditCustomer = (customer: Customer) => {
+  // console.log(customer)
+  state.editCustomer.node = customer;
+  state.editCustomer.visible = true;
 };
 
-const deleteLeadById = async (bookId: number) => {
+const deleteCustomerById = async (bookId: number) => {
   try {
-    const rep = await deleteLead({id: bookId});
+    const rep = await deleteCustomer({id: bookId});
     if (rep.data.id && rep.data.id > 0) {
       Message.success('删除成功');
-      await fetchLeadList({pageIndex: pagination.currentPage, pageSize: pagination.pageSize});
+      await fetchCustomerList({pageIndex: pagination.currentPage, pageSize: pagination.pageSize});
     }
 
   } catch (error) {
@@ -175,20 +168,20 @@ const deleteLeadById = async (bookId: number) => {
 
 const pageChanged = (page: number) => {
   // console.log("page", page)
-  fetchLeadList({pageIndex: page, pageSize: pagination.pageSize})
+  fetchCustomerList({pageIndex: page, pageSize: pagination.pageSize})
 }
 
 const pageSizeChanged = (pageSize: number) => {
   // console.log("pagesize", pageSize)
-  fetchLeadList({pageIndex: pagination.currentPage, pageSize})
+  fetchCustomerList({pageIndex: pagination.currentPage, pageSize})
 }
 
 
-defineExpose({fetchLeadList})
+defineExpose({fetchCustomerList})
 
 onMounted(() => {
 
-  fetchLeadList({});
+  fetchCustomerList({});
 
 });
 
