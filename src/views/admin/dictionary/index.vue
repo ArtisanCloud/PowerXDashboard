@@ -26,6 +26,7 @@ import {reactive, ref} from "vue";
 
 import DictionaryTypeTable from '@/views/admin/dictionary/components/dictionary-type-table.vue';
 import CreateDictionaryType from '@/views/admin/dictionary/components/create-dictionary-type.vue';
+import {DefaultPageSize} from "@/api/common";
 
 
 const RefDictionaryTypeTable = ref<any>();
@@ -45,7 +46,7 @@ const openAddDictionaryType = () => {
 const pagination = reactive({
   total: 0,
   currentPage: 0,
-  "pageSize": 10,
+  "pageSize": DefaultPageSize,
   "show-more": true,
   "show-total": true,
   "show-jumper": true,

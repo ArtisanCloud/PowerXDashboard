@@ -28,6 +28,7 @@
 import {reactive, ref} from 'vue';
 import ArtisanTable from '@/views/crm/product-service/artisan/components/artisan-table.vue';
 import CreateArtisan from '@/views/crm/product-service/artisan/components/create-artisan.vue';
+import {DefaultPageSize} from "@/api/common";
 
 const RefArtisanTable = ref<any>();
 
@@ -38,7 +39,7 @@ const openAddArtisan = () => {
 const pagination = reactive({
   total:0,
   currentPage: 0,
-  "pageSize": 10,
+  "pageSize": DefaultPageSize,
   "show-more": true,
   "show-total": true,
   "show-jumper": true,
