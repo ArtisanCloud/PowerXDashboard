@@ -25,6 +25,7 @@
 import {reactive, ref} from 'vue';
 import StoreTable from '@/views/crm/product-service/store/components/store-table.vue';
 import CreateStore from '@/views/crm/product-service/store/components/create-store.vue';
+import {DefaultPageSize} from "@/api/common";
 
 const RefStoreTable = ref<any>();
 
@@ -35,7 +36,7 @@ const openAddStore = () => {
 const pagination = reactive({
   total:0,
   currentPage: 0,
-  "pageSize": 10,
+  "pageSize": DefaultPageSize,
   "show-more": true,
   "show-total": true,
   "show-jumper": true,

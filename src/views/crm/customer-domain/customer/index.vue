@@ -28,6 +28,7 @@
 import {reactive, ref} from 'vue';
 import CustomerTable from '@/views/crm/customer-domain/customer/components/customer-table.vue';
 import CreateCustomer from '@/views/crm/customer-domain/customer/components/create-customer.vue';
+import {DefaultPageSize} from "@/api/common";
 
 const RefCustomerTable = ref<any>();
 
@@ -38,7 +39,7 @@ const openAddCustomer = () => {
 const pagination = reactive({
   total:0,
   currentPage: 0,
-  "pageSize": 10,
+  "pageSize": DefaultPageSize,
   "show-more": true,
   "show-total": true,
   "show-jumper": true,
