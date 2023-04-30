@@ -28,6 +28,7 @@
 import {reactive, ref} from 'vue';
 import ProductTable from '@/views/crm/product-service/product-management/components/product-table.vue';
 import CreateProduct from '@/views/crm/product-service/product-management/components/create-product.vue';
+import {DefaultPageSize} from "@/api/common";
 
 const RefProductTable = ref<any>();
 
@@ -38,7 +39,7 @@ const openAddProduct = () => {
 const pagination = reactive({
   total:0,
   currentPage: 0,
-  "pageSize": 10,
+  "pageSize": DefaultPageSize,
   "show-more": true,
   "show-total": true,
   "show-jumper": true,

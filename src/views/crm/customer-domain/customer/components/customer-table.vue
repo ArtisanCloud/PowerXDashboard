@@ -66,6 +66,7 @@ import EditCustomer from '@/views/crm/customer-domain/customer/components/edit-c
 import {Message} from "@arco-design/web-vue";
 
 import useOptionsStore from "@/store/modules/data-dictionary";
+import {DefaultPageSize} from "@/api/common";
 
 const options = useOptionsStore()
 
@@ -109,7 +110,7 @@ const columns = reactive([
 const pagination = reactive({
   total: 0,
   currentPage: 0,
-  "pageSize": 10,
+  "pageSize": DefaultPageSize,
   "show-more": true,
   "show-total": true,
   "show-jumper": true,

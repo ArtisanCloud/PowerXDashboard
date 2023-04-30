@@ -28,6 +28,7 @@
 import {reactive, ref} from 'vue';
 import LeadTable from '@/views/crm/customer-domain/lead/components/lead-table.vue';
 import CreateLead from '@/views/crm/customer-domain/lead/components/create-lead.vue';
+import {DefaultPageSize} from "@/api/common";
 
 const RefLeadTable = ref<any>();
 
@@ -38,7 +39,7 @@ const openAddLead = () => {
 const pagination = reactive({
   total:0,
   currentPage: 0,
-  "pageSize": 10,
+  "pageSize": DefaultPageSize,
   "show-more": true,
   "show-total": true,
   "show-jumper": true,

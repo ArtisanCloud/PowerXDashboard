@@ -74,6 +74,7 @@ import {listPriceBooks, deletePriceBook, PriceBook, ListPriceBooksRequest} from 
 import CreatePriceBook from '@/views/crm/product-service/price-book/components/create-price-book.vue'
 import EditPriceBook from '@/views/crm/product-service/price-book/components/edit-price-book.vue'
 import {Message} from "@arco-design/web-vue";
+import {DefaultPageSize} from "@/api/common";
 
 const priceBookList = ref<PriceBook[]>([]);
 
@@ -103,7 +104,7 @@ const columns = reactive([
 const pagination = reactive({
   total: 0,
   currentPage: 0,
-  "pageSize": 10,
+  "pageSize": DefaultPageSize,
   "show-more": true,
   "show-total": true,
   "show-jumper": true,

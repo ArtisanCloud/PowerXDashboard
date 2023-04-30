@@ -70,6 +70,7 @@ import {listStores, deleteStore, Store, ListStoreRequest} from "@/api/crm/produc
 import CreateStore from '@/views/crm/product-service/price-book/components/create-price-book.vue'
 import EditStore from '@/views/crm/product-service/price-book/components/edit-price-book.vue'
 import {Message} from "@arco-design/web-vue";
+import {DefaultPageSize} from "@/api/common";
 
 const storeList = ref<Store[]>([]);
 
@@ -99,7 +100,7 @@ const columns = reactive([
 const pagination = reactive({
   total: 0,
   currentPage: 0,
-  "pageSize": 10,
+  "pageSize": DefaultPageSize,
   "show-more": true,
   "show-total": true,
   "show-jumper": true,
