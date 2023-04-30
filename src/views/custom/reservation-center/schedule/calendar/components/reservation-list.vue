@@ -3,20 +3,20 @@
     <template #item="{ item }">
       <a-list-item>
         <a-list-item-meta
-            :title="`预约时间：${new Date(item.reservedTime).toLocaleString('zh-CN', { month: '2-digit', day: '2-digit',hour12: false, hour: '2-digit', minute: '2-digit' })}  ---  预约发型师：${item.reservedArtisan.name}`"
+            :title="`预约时间：${formatReservedTime(item.reservedTime)}  ---  预约发型师：${item.reservedArtisan.name}`"
             :description="`服务名称：${item.reservedService.name}    需用时:${item.reservedService.duration}分钟`"
         >
           <template #avatar>
-            <a-avatar shape="square">
-              <img
-                  alt="avatar"
-                  width="512"
-                  src="/src/assets/images/default-avatar.webp"
-              />
-            </a-avatar>
+              <a-avatar shape="square">
+                <img
+                    alt="avatar"
+                    width="512"
+                    src="/src/assets/images/default-avatar.webp"
+                />
+              </a-avatar>
           </template>
         </a-list-item-meta>
-
+        <a-typography-text style="margin: 0;">客户：{{ item.reservedCustomer.name }}</a-typography-text>
         <template #actions>
           <icon-check-square/>
           <icon-clock-circle/>
@@ -33,6 +33,7 @@
 import {onMounted, PropType, reactive, ref} from "vue";
 import {Schedule} from "@/api/custom/reservation-center/schedule";
 import {ListReservationRequest, listReservations, Reservation} from "@/api/custom/reservation-center/reservation";
+import dayjs from "dayjs";
 
 defineProps({
   schedule: {
@@ -57,6 +58,11 @@ const state = reactive({
   },
 });
 
+
+const formatReservedTime = (reservedTime: string) => {
+  // console.log(reservedTime)
+  return dayjs(reservedTime).utc().format('MM-DD HH:mm');
+}
 
 const fetchReservationList = async (req: ListReservationRequest) => {
   state.loading = true;

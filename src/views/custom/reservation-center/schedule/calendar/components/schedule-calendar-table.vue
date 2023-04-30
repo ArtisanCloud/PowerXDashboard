@@ -242,7 +242,7 @@ const calScheduleStatus = (schedule: Schedule): string => {
 
   let status = ScheduleStatusIdle
   const percentage = notAvailableCount / totalArtisan
-  // console.log(totalArtisan, notAvailableCount, totalArtisan, percentage)
+  console.log(totalArtisan, notAvailableCount, totalArtisan, percentage)
   if (percentage >= 1) {
     status = ScheduleStatusFull
   } else if (percentage > 0.75 && percentage < 1) {
@@ -309,7 +309,9 @@ const fetchScheduleList = async (req: ListScheduleRequest) => {
     scheduleList.value = res.data.list;
 
     renderSchedulesToEvents(scheduleList.value)
-
+    if (calEvents.currentSchedule.id>0) {
+      RefReservationList.value.fetchReservationList({scheduleId: calEvents.currentSchedule.id})
+    }
 
   } finally {
     state.loading = false;

@@ -112,6 +112,7 @@ const fetchStoreList = async (req: ListStoreRequest) => {
 
 const refreshScheduleList = () => {
   // 刷新日程表
+  RefScheduleCalendarTable.value.clearCalendar()
   RefScheduleCalendarTable.value.fetchScheduleList({
     storeId: state.currentStoreId,
   });
