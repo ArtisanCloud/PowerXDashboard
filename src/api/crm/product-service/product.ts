@@ -51,7 +51,7 @@ export interface ListProductPageReply {
 
 export function listProducts(request: ListProductPageRequest) {
 	return axios.get<ListProductPageReply>(
-		`${PREFIX_URI_ADMIN_API + URI_PRODUCT_API}/products`,
+		`${PREFIX_URI_ADMIN_API + URI_PRODUCT_API}/products/page-list`,
 		{
 			params: request,
 		}
