@@ -31,7 +31,7 @@ export interface ListPriceBooksReply {
 
 export function listPriceBooks(request: ListPriceBooksRequest) {
 	return axios.get<ListPriceBooksReply>(
-		`${PREFIX_URI_ADMIN_API + URI_PRODUCT_API}/price-books`,
+		`${PREFIX_URI_ADMIN_API + URI_PRODUCT_API}/price-books/page-list`,
 		{
 			params: request,
 		}
