@@ -36,7 +36,7 @@ export interface Schedule extends PowerModel {
 export interface ListScheduleRequest {
 	ids?: number[];
 	storeId?: number;
-	currentDate?: Date;
+	currentDate?: string;
 	pageIndex?: number;
 	pageSize?: number;
 }

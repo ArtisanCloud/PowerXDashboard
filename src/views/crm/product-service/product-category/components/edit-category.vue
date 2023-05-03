@@ -126,7 +126,7 @@ function fetchParentOptions() {
     name: (prop.parentNode.name ? prop.parentNode.name : "无")
   }];
 
-  console.log(option.parentCategoryOptions[0].name)
+  // console.log(option.parentCategoryOptions[0].name)
 
 
 }

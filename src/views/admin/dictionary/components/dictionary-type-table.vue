@@ -201,12 +201,12 @@ const deleteDictionaryTypeByType = async (type: string) => {
 };
 
 const pageChanged = (page: number) => {
-  console.log("page",page)
+  // console.log("page",page)
   fetchDictionaryTypeList({pageIndex: page, pageSize: pagination.pageSize})
 }
 
 const pageSizeChanged = (pageSize: number) => {
-  console.log("pagesize",pageSize)
+  // console.log("pagesize",pageSize)
   fetchDictionaryTypeList({pageIndex: pagination.currentPage, pageSize})
 }
 

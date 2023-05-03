@@ -12,4 +12,6 @@ export interface OptionsState {
 	// custom
 	scheduleStatus: DictionaryItem[],
 	reservationTypes: DictionaryItem[],
+	reservationStatus: DictionaryItem[],
+	reservationOperationStatus: DictionaryItem[],
 }

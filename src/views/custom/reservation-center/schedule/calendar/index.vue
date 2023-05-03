@@ -29,11 +29,11 @@
           :currentStore="state.currentStore"
           ref="RefScheduleCalendarTable"/>
     </a-card>
-    <!--    <a-drawer v-model:visible="state.createCustomer.visible" width="500px">-->
-    <!--      <CreateCustomer-->
-    <!--          v-if="state.createCustomer.visible"-->
-    <!--      />-->
-    <!--    </a-drawer>-->
+        <a-drawer v-model:visible="state.createCustomer.visible" width="500px">
+          <CreateCustomer
+              v-if="state.createCustomer.visible"
+          />
+        </a-drawer>
     <a-drawer v-model:visible="state.createReservation.visible" width="500px">
       <CreateReservation
           @submitSuccess="refreshScheduleList"
@@ -53,6 +53,7 @@ import ScheduleCalendarTable
   from "@/views/custom/reservation-center/schedule/calendar/components/schedule-calendar-table.vue";
 import {Schedule} from "@/api/custom/reservation-center/schedule";
 
+import CreateCustomer from "@/views/crm/customer-domain/customer/components/create-customer.vue"
 import CreateReservation from "@/views/custom/reservation-center/reservation/compoments/create-reservation.vue"
 import {Message} from "@arco-design/web-vue";
 

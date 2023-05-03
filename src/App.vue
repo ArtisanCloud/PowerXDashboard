@@ -30,6 +30,9 @@
   options.fetchPromoteChannelsOptions()
   options.fetchSourceTypesOptions()
   options.fetchCustomerTypesOptions()
+  options.fetchScheduleStatusOptions()
   options.fetchReservationTypesOptions()
+  options.fetchReservationStatusOptions()
+  options.fetchReservationOperationStatusOptions()
 
 </script>

@@ -138,63 +138,6 @@ const handleEventReRender = (clickInfo: any) => {
 
 };
 
-const handleChangeReservationList = (clickInfo: any) => {
-
-  const curEvent = calEvents.selectedEvent.event
-
-  // console.log(curEvent.id, curEvent.extendedProps.index)
-  calEvents.currentSchedule = scheduleList.value[curEvent.extendedProps.index]
-
-  RefReservationList.value.fetchReservationList({scheduleId: calEvents.currentSchedule.id})
-
-};
-
-
-const handleEvents = (events: any) => {
-  // console.log("events:",events)
-};
-
-const calendarOptions = reactive({
-  // refer to: https://github.com/fullcalendar/fullcalendar-examples/blob/main/vue3/src/DemoApp.vue
-  plugins: [dayGridPlugin, timeGridPlugin, interactionPlugin],
-  initialView: 'timeGridWeek',
-  locales: [zhLocale],
-  locale: 'zh',
-  // timeZone: 'local',
-  weekends: true,
-  views: {
-    week: {
-      // options apply to dayGridWeek and timeGridWeek views
-      // titleFormat: { year: 'numeric', month: '2-digit', day: '2-digit' }
-    },
-  },
-  headerToolbar: {
-    left: 'prev,next',
-    center: 'title',
-    right: 'today timeGridWeek timeGridDay'
-  },
-  editable: false,
-  selectable: false,
-  selectMirror: true,
-  dayMaxEvents: true,
-  eventClick: (e: any) => {
-    // console.log('eventClick：', e.el,e.event);
-
-    // 重新渲染格子
-    handleEventReRender(e)
-
-    // 刷新列表
-    handleChangeReservationList(e)
-  },
-  eventsSet: (e: any) => {
-    handleEvents(e)
-  },
-  eventDidMount: (e: any) => {
-    // console.log('eventDidMount：', e.el,e.event);
-    drawScheduleBuckets(e)
-  }
-})
-
 
 const columns = reactive([
   {
@@ -242,7 +185,7 @@ const calScheduleStatus = (schedule: Schedule): string => {
 
   let status = ScheduleStatusIdle
   const percentage = notAvailableCount / totalArtisan
-  console.log(totalArtisan, notAvailableCount, totalArtisan, percentage)
+  // console.log(totalArtisan, notAvailableCount, totalArtisan, percentage)
   if (percentage >= 1) {
     status = ScheduleStatusFull
   } else if (percentage > 0.75 && percentage < 1) {
@@ -305,11 +248,12 @@ const clearCalendar = async () => {
 const fetchScheduleList = async (req: ListScheduleRequest) => {
   state.loading = true;
   try {
+    req.pageSize = 500
     const res = await listSchedules(req);
     scheduleList.value = res.data.list;
 
     renderSchedulesToEvents(scheduleList.value)
-    if (calEvents.currentSchedule.id>0) {
+    if (calEvents.currentSchedule.id > 0) {
       RefReservationList.value.fetchReservationList({scheduleId: calEvents.currentSchedule.id})
     }
 
@@ -330,9 +274,10 @@ const deleteScheduleById = async (bookId: number) => {
     const rep = await deleteSchedule({id: bookId});
     if (rep.data.id && rep.data.id > 0) {
       Message.success('删除成功');
+      await clearCalendar()
       await fetchScheduleList({
         storeId: props.currentStore?.id,
-        currentDate: currentDate.value
+        currentDate: currentDate.value?.toLocaleString()
       });
     }
 
@@ -342,14 +287,81 @@ const deleteScheduleById = async (bookId: number) => {
 };
 
 
+const handleChangeReservationList = (clickInfo: any) => {
+
+  const curEvent = calEvents.selectedEvent.event
+
+  // console.log(curEvent.id, curEvent.extendedProps.index)
+  calEvents.currentSchedule = scheduleList.value[curEvent.extendedProps.index]
+
+  RefReservationList.value.fetchReservationList({scheduleId: calEvents.currentSchedule.id})
+
+};
+
+
+const handleEvents = (events: any) => {
+  // console.log("events:",events)
+};
+
+const calendarOptions = reactive({
+  // refer to: https://github.com/fullcalendar/fullcalendar-examples/blob/main/vue3/src/DemoApp.vue
+  plugins: [dayGridPlugin, timeGridPlugin, interactionPlugin],
+  initialView: 'timeGridWeek',
+  locales: [zhLocale],
+  locale: 'zh',
+  // timeZone: 'local',
+  weekends: true,
+  views: {
+    week: {
+      // options apply to dayGridWeek and timeGridWeek views
+      // titleFormat: { year: 'numeric', month: '2-digit', day: '2-digit' }
+    },
+  },
+  headerToolbar: {
+    left: 'prev,next',
+    center: 'title',
+    right: 'today timeGridWeek timeGridDay'
+  },
+  datesSet: (arg: any) => {
+    // 切换日期范围
+    currentDate.value = arg.start
+    if (props.currentStore && props.currentStore.id > 0 && currentDate.value) {
+      clearCalendar()
+      fetchScheduleList({
+        storeId: props.currentStore?.id,
+        currentDate: currentDate.value?.toLocaleDateString()
+      });
+    }
+
+  },
+  editable: false,
+  selectable: false,
+  selectMirror: true,
+  dayMaxEvents: true,
+  eventClick: (e: any) => {
+    // console.log('eventClick：', e.el,e.event);
+
+    // 重新渲染格子
+    handleEventReRender(e)
+
+    // 刷新列表
+    handleChangeReservationList(e)
+  },
+  eventsSet: (e: any) => {
+    handleEvents(e)
+  },
+  eventDidMount: (e: any) => {
+    // console.log('eventDidMount：', e.el,e.event);
+    drawScheduleBuckets(e)
+  }
+})
+
+
 defineExpose({fetchScheduleList, clearCalendar, getCurrentSchedule})
 
 onMounted(() => {
 
   initDayJs()
-
-
-  options.fetchScheduleStatusOptions()
 
 
 });

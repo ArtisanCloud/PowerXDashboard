@@ -172,7 +172,7 @@ const fetchCustomerList = async (req: ListCustomerPageRequest) => {
 
 
 const handleSearchCustomer = (value: any) => {
-  console.log(value)
+  // console.log(value)
   if (value) {
     fetchCustomerList({likeName: value})
   }

@@ -7,11 +7,35 @@ import {ServiceSpecific} from "@/api/custom/product-service/serviceSpecific";
 
 export const URI_RESERVATION_CENTER_API = '/reservation-center'
 
-export const ReservationTypesType = "_reservation_type"
+
 
 export const ReservationTypeOnSite = "_reserved_by_onsite" // 现场预约
 export const ReservationTypeOnline = "_reserved_by_online" // 线上预约
 export const ReservationTypePhone = "_reserved_by_phone"   // 电话预约
+
+
+// data dictionary types
+export const OperationStatusType = "_operation_status"     // 预约操作字典类型
+export const ReservationTypesType = "_reservation_type"    // 预约类型字典类型
+export const ReservationStatusType = "_reservation_status" // 预约状态字典类型
+
+// data dictionary items
+export const OperationStatusNone = "_none"                    // 无操作
+export const OperationStatusCancelling = "_cancelling"        // 取消中
+export const OperationStatusCancelled = "_cancelled"          // 已取消
+export const OperationStatusCancelFailed = "_cancel_failed"   // 取消失败
+export const OperationStatusLateCancelled = "_late_cancelled" // 事后取消
+export const OperationStatusAutoCancelled = "_auto_cancelled" // 自动取消
+export const OperationStatusNoShow = "_no_show"               // 未到场
+export const OperationStatusCheckIn = "_checkin"              // 到场
+export const OperationStatusSuccess = "_success"              // 完成服务
+
+
+export const ReservationStatusDraft = "_draft"         // 状态草稿
+export const ReservationStatusConfirmed = "_confirmed" // 预约状态成功
+export const ReservationStatusCancelled = "_cancelled" // 预约状态取消
+export const ReservationStatusFailed = "_failed"       // 预约状态失败
+
 
 export interface Reservation extends PowerModel {
 

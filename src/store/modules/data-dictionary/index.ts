@@ -7,7 +7,11 @@ import {
 	ProductTypesDDType, PromoteChannelsDDType, SalesChannelsDDType, SourceTypesDDType
 } from "@/api/dictionary";
 import {OptionsState} from "@/store/modules/data-dictionary/type";
-import {ReservationTypesType} from "@/api/custom/reservation-center/reservation";
+import {
+	OperationStatusType,
+	ReservationStatusType,
+	ReservationTypesType
+} from "@/api/custom/reservation-center/reservation";
 import {ScheduleStatusDDType} from "@/api/custom/reservation-center/schedule";
 
 
@@ -23,7 +27,9 @@ const useOptionsStore = defineStore('options', {
 
 		// custom
 		scheduleStatus: [],
-		reservationTypes:[]
+		reservationTypes: [],
+		reservationStatus: [],
+		reservationOperationStatus: []
 	}),
 
 	getters: {},
@@ -40,7 +46,7 @@ const useOptionsStore = defineStore('options', {
 			return undefined
 		},
 
-		GetOptionByKey(options: DictionaryItem[], key:string): DictionaryItem | undefined {
+		GetOptionByKey(options: DictionaryItem[], key: string): DictionaryItem | undefined {
 			for (let i = 0; i < options.length; i += 1) {
 				// console.log(options[i].key, key)
 				if (options[i].key === key) {
@@ -135,6 +141,24 @@ const useOptionsStore = defineStore('options', {
 				const res = await listDictionaryItems({type: ReservationTypesType});
 				this.reservationTypes = res.data.list;
 				// console.log(dictionaryTypeList)
+			} finally {
+				// console.log("fetch approval status options")
+			}
+		},
+		async fetchReservationStatusOptions() {
+			try {
+				const res = await listDictionaryItems({type: ReservationStatusType});
+				this.reservationStatus = res.data.list;
+				// console.log(this.reservationStatus)
+			} finally {
+				// console.log("fetch approval status options")
+			}
+		},
+		async fetchReservationOperationStatusOptions() {
+			try {
+				const res = await listDictionaryItems({type: OperationStatusType});
+				this.reservationOperationStatus = res.data.list;
+				// console.log(this.reservationOperationStatus)
 			} finally {
 				// console.log("fetch approval status options")
 			}

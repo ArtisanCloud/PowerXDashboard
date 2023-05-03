@@ -7,20 +7,47 @@
             :description="`服务名称：${item.reservedService.name}    需用时:${item.reservedService.duration}分钟`"
         >
           <template #avatar>
-              <a-avatar shape="square">
-                <img
-                    alt="avatar"
-                    width="512"
-                    src="/src/assets/images/default-avatar.webp"
-                />
-              </a-avatar>
+            <a-avatar shape="square">
+              <img
+                  alt="avatar"
+                  width="512"
+                  src="/src/assets/images/default-avatar.webp"
+              />
+            </a-avatar>
           </template>
         </a-list-item-meta>
         <a-typography-text style="margin: 0;">客户：{{ item.reservedCustomer.name }}</a-typography-text>
         <template #actions>
-          <icon-check-square/>
-          <icon-clock-circle/>
-          <icon-minus-circle-fill/>
+
+          <a-space>
+            <template #split>
+              <a-divider direction="vertical"/>
+            </template>
+
+            <icon-check-square v-if="isConfirmed(item)" :size="24"/>
+            <icon-minus-circle-fill v-if="isConfirmed(item)" :size="24"/>
+
+
+            <a-typography-text
+                v-if="isConfirmed(item)"
+                style="color:#d3ac0e"
+            >已预约
+            </a-typography-text>
+            <a-typography-text
+                v-else-if="isCheckedIn(item)"
+                style="color:#077707"
+            >已签到
+            </a-typography-text>
+
+            <a-typography-text
+                v-else-if="isCancelled(item)"
+                style="color:#ce051f"
+            >已取消
+            </a-typography-text>
+
+
+          </a-space>
+
         </template>
       </a-list-item>
     </template>
@@ -30,10 +57,16 @@
 <script lang="ts" setup>
 
 
-import {onMounted, PropType, reactive, ref} from "vue";
+import {computed, onMounted, PropType, reactive, ref} from "vue";
 import {Schedule} from "@/api/custom/reservation-center/schedule";
-import {ListReservationRequest, listReservations, Reservation} from "@/api/custom/reservation-center/reservation";
+import {
+  ListReservationRequest,
+  listReservations,
+  Reservation,
+  OperationStatusCancelled, OperationStatusNone, ReservationStatusConfirmed, OperationStatusCheckIn
+} from "@/api/custom/reservation-center/reservation";
 import dayjs from "dayjs";
+import useOptionsStore from "@/store/modules/data-dictionary";
 
 defineProps({
   schedule: {
@@ -57,6 +90,39 @@ const state = reactive({
     // node: {},
   },
 });
+
+const options = useOptionsStore();
+
+const isConfirmed = (item: Reservation): boolean => {
+  // console.log(item)
+  const operationDD = options.GetOptionByKey(options.reservationOperationStatus, OperationStatusNone)
+  const statusDD = options.GetOptionByKey(options.reservationStatus, ReservationStatusConfirmed)
+  if (operationDD && statusDD) {
+    return (item.reservationStatus === statusDD.id && item.operationStatus === operationDD.id)
+  }
+
+  return false
+}
+
+const isCheckedIn = (item: Reservation): boolean => {
+  const operationDD = options.GetOptionByKey(options.reservationOperationStatus, OperationStatusCheckIn)
+  const statusDD = options.GetOptionByKey(options.reservationStatus, ReservationStatusConfirmed)
+  if (operationDD && statusDD) {
+    return (item.reservationStatus === statusDD.id && item.operationStatus === operationDD.id)
+  }
+
+  return false
+}
+
+
+const isCancelled = (item: Reservation): boolean => {
+  const dd = options.GetOptionByKey(options.reservationStatus, OperationStatusCancelled)
+  if (dd) {
+    return (item.reservationStatus === dd.id)
+  }
+
+  return false
+}
 
 
 const formatReservedTime = (reservedTime: string) => {
