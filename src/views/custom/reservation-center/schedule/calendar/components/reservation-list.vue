@@ -25,7 +25,13 @@
             </template>
 
             <icon-check-square v-if="isConfirmed(item)" :size="24"/>
-            <icon-minus-circle-fill v-if="isConfirmed(item)" :size="24"/>
+
+            <a-popconfirm
+                content="该操作会取消该客户的约单,确定要取消吗？"
+                @ok="cancelReservationByItem(item)"
+            >
+              <icon-minus-circle-fill v-if="isConfirmed(item)" :size="24"/>
+            </a-popconfirm>
 
 
             <a-typography-text
@@ -58,15 +64,16 @@
 
 
 import {computed, onMounted, PropType, reactive, ref} from "vue";
-import {Schedule} from "@/api/custom/reservation-center/schedule";
+import {deleteSchedule, Schedule} from "@/api/custom/reservation-center/schedule";
 import {
   ListReservationRequest,
   listReservations,
   Reservation,
-  OperationStatusCancelled, OperationStatusNone, ReservationStatusConfirmed, OperationStatusCheckIn
+  OperationStatusCancelled, OperationStatusNone, ReservationStatusConfirmed, OperationStatusCheckIn, cancelReservation
 } from "@/api/custom/reservation-center/reservation";
 import dayjs from "dayjs";
 import useOptionsStore from "@/store/modules/data-dictionary";
+import {Message} from "@arco-design/web-vue";
 
 defineProps({
   schedule: {
@@ -130,6 +137,8 @@ const formatReservedTime = (reservedTime: string) => {
   return dayjs(reservedTime).utc().format('MM-DD HH:mm');
 }
 
+
+
 const fetchReservationList = async (req: ListReservationRequest) => {
   state.loading = true;
   try {
@@ -138,6 +147,20 @@ const fetchReservationList = async (req: ListReservationRequest) => {
 
   } finally {
     state.loading = false;
+  }
+};
+
+const cancelReservationByItem = async (reservation: Reservation) => {
+  try {
+    const rep = await cancelReservation({id: reservation.id});
+    if (rep.data.id && rep.data.id > 0) {
+      Message.success('取消成功成功');
+      await fetchReservationList({scheduleId:reservation.scheduleId})
+
+    }
+
+  } catch (error) {
+    console.error(error);
   }
 };
 

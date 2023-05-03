@@ -8,7 +8,6 @@ import {ServiceSpecific} from "@/api/custom/product-service/serviceSpecific";
 export const URI_RESERVATION_CENTER_API = '/reservation-center'
 
 
-
 export const ReservationTypeOnSite = "_reserved_by_onsite" // 现场预约
 export const ReservationTypeOnline = "_reserved_by_online" // 线上预约
 export const ReservationTypePhone = "_reserved_by_phone"   // 电话预约
@@ -56,7 +55,7 @@ export interface Reservation extends PowerModel {
 	reservationStatus: number,
 	reservedCustomer: Customer,
 	reservedArtisan: Artisan,
-	reservedService:  ServiceSpecific,
+	reservedService: ServiceSpecific,
 
 }
 
@@ -109,3 +108,18 @@ export function deleteReservation(request: DeleteReservationRequest) {
 }
 
 
+export interface CancelReservationRequest {
+	id: number;
+}
+
+export interface CancelReservationReply{
+	id: number;
+	operationStatus: number;
+	reservationStatus: number;
+}
+
+export function cancelReservation(request: CancelReservationRequest) {
+	return axios.post<CancelReservationReply>(
+		`${PREFIX_URI_ADMIN_API + URI_RESERVATION_CENTER_API}/reservations/${request.id}`
+	);
+}

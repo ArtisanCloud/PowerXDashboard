@@ -272,22 +272,7 @@ const fetchScheduleList = async (req: ListScheduleRequest) => {
 //   state.editSchedule.visible = true;
 // };
 
-const deleteScheduleById = async (bookId: number) => {
-  try {
-    const rep = await deleteSchedule({id: bookId});
-    if (rep.data.id && rep.data.id > 0) {
-      Message.success('删除成功');
-      await clearCalendar()
-      await fetchScheduleList({
-        storeId: props.currentStore?.id,
-        currentDate: currentDate.value?.toLocaleDateString()
-      });
-    }
 
-  } catch (error) {
-    console.error(error);
-  }
-};
 
 
 const handleChangeReservationList = (clickInfo: any) => {
