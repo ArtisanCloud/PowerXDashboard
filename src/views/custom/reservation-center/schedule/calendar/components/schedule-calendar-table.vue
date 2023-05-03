@@ -235,6 +235,9 @@ const renderSchedulesToEvents = (schedules: Schedule[]) => {
 const getCurrentSchedule = (): Schedule => {
   return calEvents.currentSchedule
 }
+const getCurrentDate = (): Date|undefined => {
+  return currentDate.value
+}
 
 const clearCalendar = async () => {
 
@@ -254,7 +257,7 @@ const fetchScheduleList = async (req: ListScheduleRequest) => {
 
     renderSchedulesToEvents(scheduleList.value)
     if (calEvents.currentSchedule.id > 0) {
-      RefReservationList.value.fetchReservationList({scheduleId: calEvents.currentSchedule.id})
+      await RefReservationList.value.fetchReservationList({scheduleId: calEvents.currentSchedule.id})
     }
 
   } finally {
@@ -277,7 +280,7 @@ const deleteScheduleById = async (bookId: number) => {
       await clearCalendar()
       await fetchScheduleList({
         storeId: props.currentStore?.id,
-        currentDate: currentDate.value?.toLocaleString()
+        currentDate: currentDate.value?.toLocaleDateString()
       });
     }
 
@@ -326,6 +329,7 @@ const calendarOptions = reactive({
     // 切换日期范围
     currentDate.value = arg.start
     if (props.currentStore && props.currentStore.id > 0 && currentDate.value) {
+      // console.log(currentDate.value)
       clearCalendar()
       fetchScheduleList({
         storeId: props.currentStore?.id,
@@ -357,7 +361,7 @@ const calendarOptions = reactive({
 })
 
 
-defineExpose({fetchScheduleList, clearCalendar, getCurrentSchedule})
+defineExpose({fetchScheduleList, clearCalendar, getCurrentSchedule, getCurrentDate})
 
 onMounted(() => {
 

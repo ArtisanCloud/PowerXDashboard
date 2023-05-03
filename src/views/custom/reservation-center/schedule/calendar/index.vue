@@ -92,6 +92,17 @@ const openAddReservation = () => {
   state.createReservation.node = currentSelectSchedule
 };
 
+const refreshScheduleList = () => {
+  // 刷新日程表
+  console.log(123,RefScheduleCalendarTable.value.currentDate)
+  RefScheduleCalendarTable.value.clearCalendar()
+  RefScheduleCalendarTable.value.fetchScheduleList({
+    storeId: state.currentStoreId,
+    currentDate: RefScheduleCalendarTable.value.getCurrentDate().toLocaleDateString()
+  });
+}
+
+
 const fetchStoreList = async (req: ListStoreRequest) => {
   state.loading = true;
   try {
@@ -104,21 +115,14 @@ const fetchStoreList = async (req: ListStoreRequest) => {
     state.currentStoreId = defaultStore.id
 
     // 刷新日程表
-    await RefScheduleCalendarTable.value.fetchScheduleList({storeId: defaultStore.id});
+    refreshScheduleList()
 
   } finally {
     state.loading = false;
   }
 };
 
-const refreshScheduleList = () => {
-  // 刷新日程表
-  RefScheduleCalendarTable.value.clearCalendar()
-  RefScheduleCalendarTable.value.fetchScheduleList({
-    storeId: state.currentStoreId,
-  });
 
-}
 
 
 const getStoreById = (stores: Store[], id: number): Store | undefined => {
@@ -131,6 +135,7 @@ const getStoreById = (stores: Store[], id: number): Store | undefined => {
   return undefined
 }
 
+
 const changeSelectedStore = (storeId: number) => {
 
   const store = getStoreById(storeList.value, storeId)
@@ -138,11 +143,11 @@ const changeSelectedStore = (storeId: number) => {
 
     state.currentStore = store
 
-    RefScheduleCalendarTable.value.clearCalendar()
-    RefScheduleCalendarTable.value.fetchScheduleList({storeId: store.id});
+    refreshScheduleList()
   }
 
 }
+
 
 onMounted(() => {
 
