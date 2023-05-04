@@ -24,7 +24,13 @@
               <a-divider direction="vertical"/>
             </template>
 
-            <icon-check-square v-if="isConfirmed(item)" :size="24"/>
+            <a-popconfirm
+                content="该操作会将约单签到状态,确定要签到吗？"
+                @ok="checkinReservationByItem(item)"
+            >
+              <icon-check-square v-if="isConfirmed(item)" :size="24"/>
+            </a-popconfirm>
+
 
             <a-popconfirm
                 content="该操作会取消该客户的约单,确定要取消吗？"
@@ -69,7 +75,12 @@ import {
   ListReservationRequest,
   listReservations,
   Reservation,
-  OperationStatusCancelled, OperationStatusNone, ReservationStatusConfirmed, OperationStatusCheckIn, cancelReservation
+  OperationStatusCancelled,
+  OperationStatusNone,
+  ReservationStatusConfirmed,
+  OperationStatusCheckIn,
+  cancelReservation,
+  checkinReservation
 } from "@/api/custom/reservation-center/reservation";
 import dayjs from "dayjs";
 import useOptionsStore from "@/store/modules/data-dictionary";
@@ -150,11 +161,27 @@ const fetchReservationList = async (req: ListReservationRequest) => {
   }
 };
 
+
+
+const checkinReservationByItem = async (reservation: Reservation) => {
+  try {
+    const rep = await checkinReservation({id: reservation.id});
+    if (rep.data.id && rep.data.id > 0) {
+      Message.success('签到成功');
+      await fetchReservationList({scheduleId:reservation.scheduleId})
+
+    }
+
+  } catch (error) {
+    console.error(error);
+  }
+};
+
 const cancelReservationByItem = async (reservation: Reservation) => {
   try {
     const rep = await cancelReservation({id: reservation.id});
     if (rep.data.id && rep.data.id > 0) {
-      Message.success('取消成功成功');
+      Message.success('取消成功');
       await fetchReservationList({scheduleId:reservation.scheduleId})
 
     }

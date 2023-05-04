@@ -108,6 +108,22 @@ export function deleteReservation(request: DeleteReservationRequest) {
 }
 
 
+export interface CheckinReservationRequest {
+	id: number;
+}
+
+export interface CheckinReservationReply{
+	id: number;
+	operationStatus: number;
+	reservationStatus: number;
+}
+
+export function checkinReservation(request: CheckinReservationRequest) {
+	return axios.post<CheckinReservationReply>(
+		`${PREFIX_URI_ADMIN_API + URI_RESERVATION_CENTER_API}/reservations/checkin/${request.id}`
+	);
+}
+
 export interface CancelReservationRequest {
 	id: number;
 }
@@ -120,6 +136,6 @@ export interface CancelReservationReply{
 
 export function cancelReservation(request: CancelReservationRequest) {
 	return axios.post<CancelReservationReply>(
-		`${PREFIX_URI_ADMIN_API + URI_RESERVATION_CENTER_API}/reservations/${request.id}`
+		`${PREFIX_URI_ADMIN_API + URI_RESERVATION_CENTER_API}/reservations/cancel/${request.id}`
 	);
 }
