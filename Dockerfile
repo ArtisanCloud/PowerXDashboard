@@ -1,5 +1,6 @@
 # 第一阶段
-FROM node:16 AS builder
+FROM node:19 AS builder
+
 
 # 拷贝项目文件到容器中
 WORKDIR /app
