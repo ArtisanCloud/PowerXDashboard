@@ -38,6 +38,7 @@ export interface ListCustomerPageReply {
 }
 
 export function listCustomers(request: ListCustomerPageRequest) {
+	console.log(request)
 	return axios.get<ListCustomerPageReply>(
 		`${PREFIX_URI_ADMIN_API + URI_CUSTOMER_DOMAIN_API}/customers/page-list`,
 		{

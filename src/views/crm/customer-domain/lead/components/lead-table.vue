@@ -97,6 +97,12 @@ const columns = reactive([
     slotName: 'type'
   },
   {
+    title: '手机号码',
+    dataIndex: 'mobile',
+    width: 120,
+    slotName: 'mobile'
+  },
+  {
     title: '小程序OpenId',
     dataIndex: 'openIdInMiniProgram',
     width: 200,

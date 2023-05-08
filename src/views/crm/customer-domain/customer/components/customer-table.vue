@@ -90,6 +90,12 @@ const columns = reactive([
     slotName: 'type'
   },
   {
+    title: '手机号码',
+    dataIndex: 'mobile',
+    width: 120,
+    slotName: 'mobile'
+  },
+  {
     title: '小程序OpenId',
     dataIndex: 'openIdInMiniProgram',
     width: 200,
@@ -168,12 +174,12 @@ const deleteCustomerById = async (bookId: number) => {
 };
 
 const pageChanged = (page: number) => {
-  // console.log("page", page)
+  console.log("page", page)
   fetchCustomerList({pageIndex: page, pageSize: pagination.pageSize})
 }
 
 const pageSizeChanged = (pageSize: number) => {
-  // console.log("pagesize", pageSize)
+  console.log("pagesize", pageSize)
   fetchCustomerList({pageIndex: pagination.currentPage, pageSize})
 }
 
