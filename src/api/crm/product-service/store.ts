@@ -32,7 +32,7 @@ export interface ListStoreReply {
 
 export function listStores(request: ListStoreRequest) {
 	return axios.get<ListStoreReply>(
-		`${PREFIX_URI_ADMIN_API + URI_PRODUCT_API}/stores`,
+		`${PREFIX_URI_ADMIN_API + URI_PRODUCT_API}/stores/page-list`,
 		{
 			params: request,
 		}
