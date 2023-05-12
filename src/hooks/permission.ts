@@ -1,6 +1,5 @@
 import { RouteLocationNormalized, RouteRecordRaw } from 'vue-router';
 import { useUserStore } from '@/store';
-import { WHITE_LIST } from '@/router/constants';
 
 export default function usePermission() {
   const userStore = useUserStore();

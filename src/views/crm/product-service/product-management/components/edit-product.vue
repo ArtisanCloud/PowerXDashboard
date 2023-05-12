@@ -122,11 +122,11 @@
 
 
 import {onMounted, PropType, reactive, ref} from "vue";
-import {updateProduct,} from "@/api/crm/product-service/product";
+import {updateProduct,} from '@/api/crm/product-service/product';
 import {FieldRule, Message} from "@arco-design/web-vue";
-import {Product} from "@/api/crm/product-service/product";
+import type {Product} from '@/api/crm/product-service/product';
 
-import useOptionsStore from "@/store/modules/data-dictionary";
+import useOptionsStore from '@/store/modules/data-dictionary';
 import {PriceBook} from "@/api/crm/product-service/priceBook";
 
 const prop = defineProps({

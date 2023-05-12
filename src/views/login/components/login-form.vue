@@ -103,7 +103,7 @@
       setLoading(true);
       userStore
         .login(values as LoginRequest)
-        .then((res) => {
+        .then(() => {
           userStore.info().finally(() => {
             const { redirect, ...othersQuery } =
               router.currentRoute.value.query;

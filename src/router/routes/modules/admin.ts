@@ -122,7 +122,7 @@ const Admin: AppRouteRecordRaw = {
         locale: 'menu.admin.dictionary',
         requiresAuth: true,
         roles: ['*'],
-      }
+      },
     },
   ],
 };
