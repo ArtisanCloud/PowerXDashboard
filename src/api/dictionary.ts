@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { PowerModel, PREFIX_URI_ADMIN_API } from '@/api/common';
+import { PowerModel, PrefixUriAdminApi } from '@/api/common';
 
 const URI_DATE_DICTIONARY_API = '/dictionary';
 
@@ -59,7 +59,7 @@ export interface ListDictionaryTypesReply {
 
 export function listDictionaryTypes(request: ListDictionaryTypesRequest) {
   return axios.get<ListDictionaryTypesReply>(
-    `${PREFIX_URI_ADMIN_API + URI_DATE_DICTIONARY_API}/types`,
+    `${PrefixUriAdminApi + URI_DATE_DICTIONARY_API}/types`,
     {
       params: request,
     }
@@ -80,7 +80,7 @@ export interface CreateDictionaryTypeReply {
 
 export function createDictionaryType(request: CreateDictionaryTypeRequest) {
   return axios.post<CreateDictionaryTypeReply>(
-    `${PREFIX_URI_ADMIN_API + URI_DATE_DICTIONARY_API}/types`,
+    `${PrefixUriAdminApi + URI_DATE_DICTIONARY_API}/types`,
     request
   );
 }
@@ -95,7 +95,7 @@ export type UpdateDictionaryTypeReply = DictionaryType;
 
 export function updateDictionaryType(request: UpdateDictionaryTypeRequest) {
   return axios.put<UpdateDictionaryTypeReply>(
-    `${PREFIX_URI_ADMIN_API + URI_DATE_DICTIONARY_API}/types/${request.type}`,
+    `${PrefixUriAdminApi + URI_DATE_DICTIONARY_API}/types/${request.type}`,
     request
   );
 }
@@ -110,7 +110,7 @@ export interface DeleteDictionaryTypeReply {
 
 export function deleteDictionaryType(request: DeleteDictionaryTypeRequest) {
   return axios.delete<DeleteDictionaryTypeReply>(
-    `${PREFIX_URI_ADMIN_API + URI_DATE_DICTIONARY_API}/types/${request.type}`
+    `${PrefixUriAdminApi + URI_DATE_DICTIONARY_API}/types/${request.type}`
   );
 }
 
@@ -124,7 +124,7 @@ export interface ListDictionaryItemsReply {
 
 export function listDictionaryItems(request: ListDictionaryItemsRequest) {
   return axios.get<ListDictionaryItemsReply>(
-    `${PREFIX_URI_ADMIN_API + URI_DATE_DICTIONARY_API}/items`,
+    `${PrefixUriAdminApi + URI_DATE_DICTIONARY_API}/items`,
     {
       params: request,
     }
@@ -151,7 +151,7 @@ export interface CreateDictionaryItemReply {
 
 export function createDictionaryItem(request: CreateDictionaryItemRequest) {
   return axios.post<CreateDictionaryItemReply>(
-    `${PREFIX_URI_ADMIN_API + URI_DATE_DICTIONARY_API}/items/`,
+    `${PrefixUriAdminApi + URI_DATE_DICTIONARY_API}/items/`,
     request
   );
 }
@@ -169,7 +169,7 @@ export type UpdateDictionaryItemReply = DictionaryItem;
 
 export function updateDictionaryItem(request: UpdateDictionaryItemRequest) {
   return axios.put<UpdateDictionaryItemReply>(
-    `${PREFIX_URI_ADMIN_API + URI_DATE_DICTIONARY_API}/items/${request.type}/${
+    `${PrefixUriAdminApi + URI_DATE_DICTIONARY_API}/items/${request.type}/${
       request.key
     }`,
     request
@@ -188,7 +188,7 @@ export interface DeleteDictionaryItemReply {
 
 export function deleteDictionaryItem(request: DeleteDictionaryItemRequest) {
   return axios.delete<DeleteDictionaryItemReply>(
-    `${PREFIX_URI_ADMIN_API + URI_DATE_DICTIONARY_API}/items/${request.type}/${
+    `${PrefixUriAdminApi + URI_DATE_DICTIONARY_API}/items/${request.type}/${
       request.key
     }`
   );

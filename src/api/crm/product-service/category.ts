@@ -1,6 +1,6 @@
-import {DepartmentOption, imageAbleInfo, PowerModel, PREFIX_URI_ADMIN_API} from '@/api/common';
+import {DepartmentOption, imageAbleInfo, PowerModel, PrefixUriAdminApi} from '@/api/common';
 import axios from "axios";
-import {URI_PRODUCT_API} from "@/api/crm/product-service/product";
+import {UriProductApi} from "@/api/crm/product-service/product";
 
 
 export interface ProductCategory extends PowerModel, imageAbleInfo {
@@ -25,7 +25,7 @@ export interface GetCategoryTreeReply {
 
 export function getCategoryTree(request: GetCategoryTreeRequest) {
 	return axios.get<GetCategoryTreeReply>(
-		`${PREFIX_URI_ADMIN_API + URI_PRODUCT_API}/product-category-tree`
+		`${PrefixUriAdminApi + UriProductApi}/product-category-tree`
 	);
 }
 
@@ -47,7 +47,7 @@ export interface CreateCategoryReply extends imageAbleInfo {
 
 export function createCategory(request: CreateCategoryRequest) {
 	return axios.post<CreateCategoryReply>(
-		`${PREFIX_URI_ADMIN_API + URI_PRODUCT_API}/product-categories`,
+		`${PrefixUriAdminApi + UriProductApi}/product-categories`,
 		request
 	);
 }
@@ -63,7 +63,7 @@ export interface DeleteCategoryReply {
 
 export function deleteCategory(request: DeleteCategoryRequest) {
 	return axios.delete<DeleteCategoryReply>(
-		`${PREFIX_URI_ADMIN_API + URI_PRODUCT_API}/product-categories/${request.id}`
+		`${PrefixUriAdminApi + UriProductApi}/product-categories/${request.id}`
 	);
 }
 

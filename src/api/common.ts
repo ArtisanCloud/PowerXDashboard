@@ -7,7 +7,7 @@ import axios from 'axios';
  * @version v1
  */
 
-export const PREFIX_URI_ADMIN_API = '/api/v1/admin';
+export const PrefixUriAdminApi = '/api/v1/admin';
 export const DefaultPageSize = 10;
 export const MaxPageSize = 9999;
 

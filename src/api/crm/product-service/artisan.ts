@@ -1,6 +1,6 @@
-import {PowerModel, PREFIX_URI_ADMIN_API} from '@/api/common';
+import {PowerModel, PrefixUriAdminApi} from '@/api/common';
 import axios from "axios";
-import {URI_PRODUCT_API} from '@/api/crm/product-service/product';
+import {UriProductApi} from '@/api/crm/product-service/product';
 
 export interface ArtisanSpecific {
 	Id: number
@@ -42,7 +42,7 @@ export interface ListArtisanPageReply {
 
 export function listArtisans(request: ListArtisanPageRequest) {
 	return axios.get<ListArtisanPageReply>(
-		`${PREFIX_URI_ADMIN_API + URI_PRODUCT_API}/artisans`,
+		`${PrefixUriAdminApi + UriProductApi}/artisans`,
 		{
 			params: request,
 		}
@@ -52,7 +52,7 @@ export function listArtisans(request: ListArtisanPageRequest) {
 
 export function createArtisan(request: Artisan) {
 	return axios.post<Artisan>(
-		`${PREFIX_URI_ADMIN_API + URI_PRODUCT_API}/artisans`,
+		`${PrefixUriAdminApi + UriProductApi}/artisans`,
 		request
 	);
 }
@@ -60,7 +60,7 @@ export function createArtisan(request: Artisan) {
 
 export function updateArtisan(request: Artisan) {
 	return axios.put<Artisan>(
-		`${PREFIX_URI_ADMIN_API + URI_PRODUCT_API}/artisans/${request.id}`,
+		`${PrefixUriAdminApi + UriProductApi}/artisans/${request.id}`,
 		request
 	);
 }
@@ -75,7 +75,7 @@ export interface DeleteArtisanReply {
 
 export function deleteArtisan(request: DeleteArtisanRequest) {
 	return axios.delete<DeleteArtisanReply>(
-		`${PREFIX_URI_ADMIN_API + URI_PRODUCT_API}/artisans/${request.id}`
+		`${PrefixUriAdminApi + UriProductApi}/artisans/${request.id}`
 	);
 }
 

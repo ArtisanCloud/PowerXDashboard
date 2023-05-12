@@ -1,7 +1,7 @@
-import {PowerModel, PREFIX_URI_ADMIN_API} from '@/api/common';
+import {PowerModel, PrefixUriAdminApi} from '@/api/common';
 import axios from "axios";
 import DataDictionary from "@/store/modules/data-dictionary";
-import {URI_PRODUCT_API} from '@/api/crm/product-service/product';
+import {UriProductApi} from '@/api/crm/product-service/product';
 
 export interface Store extends PowerModel {
 	name:  string,
@@ -32,7 +32,7 @@ export interface ListStoreReply {
 
 export function listStores(request: ListStoreRequest) {
 	return axios.get<ListStoreReply>(
-		`${PREFIX_URI_ADMIN_API + URI_PRODUCT_API}/stores/page-list`,
+		`${PrefixUriAdminApi + UriProductApi}/stores/page-list`,
 		{
 			params: request,
 		}
@@ -42,7 +42,7 @@ export function listStores(request: ListStoreRequest) {
 
 export function createStore(request: Store) {
 	return axios.post<Store>(
-		`${PREFIX_URI_ADMIN_API + URI_PRODUCT_API}/stores`,
+		`${PrefixUriAdminApi + UriProductApi}/stores`,
 		request
 	);
 }
@@ -50,7 +50,7 @@ export function createStore(request: Store) {
 
 export function updateStore(request: Store) {
 	return axios.put<Store>(
-		`${PREFIX_URI_ADMIN_API + URI_PRODUCT_API}/stores/${request.id}`,
+		`${PrefixUriAdminApi + UriProductApi}/stores/${request.id}`,
 		request
 	);
 }
@@ -65,7 +65,7 @@ export interface DeleteStoreReply {
 
 export function deleteStore(request: DeleteStoreRequest) {
 	return axios.delete<DeleteStoreReply>(
-		`${PREFIX_URI_ADMIN_API + URI_PRODUCT_API}/stores/${request.id}`
+		`${PrefixUriAdminApi + UriProductApi}/stores/${request.id}`
 	);
 }
 

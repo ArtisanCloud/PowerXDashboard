@@ -1,7 +1,7 @@
-import {PowerModel, PREFIX_URI_ADMIN_API} from '@/api/common';
+import {PowerModel, PrefixUriAdminApi} from '@/api/common';
 import axios from "axios";
 
-export const URI_PRODUCT_API = '/product'
+export const UriProductApi = '/product'
 
 
 export interface ProductSpecific {
@@ -51,7 +51,7 @@ export interface ListProductPageReply {
 
 export function listProducts(request: ListProductPageRequest) {
 	return axios.get<ListProductPageReply>(
-		`${PREFIX_URI_ADMIN_API + URI_PRODUCT_API}/products/page-list`,
+		`${PrefixUriAdminApi + UriProductApi}/products/page-list`,
 		{
 			params: request,
 		}
@@ -61,7 +61,7 @@ export function listProducts(request: ListProductPageRequest) {
 
 export function createProduct(request: Product) {
 	return axios.post<Product>(
-		`${PREFIX_URI_ADMIN_API + URI_PRODUCT_API}/products`,
+		`${PrefixUriAdminApi + UriProductApi}/products`,
 		request
 	);
 }
@@ -69,7 +69,7 @@ export function createProduct(request: Product) {
 
 export function updateProduct(request: Product) {
 	return axios.put<Product>(
-		`${PREFIX_URI_ADMIN_API + URI_PRODUCT_API}/products/${request.id}`,
+		`${PrefixUriAdminApi + UriProductApi}/products/${request.id}`,
 		request
 	);
 }
@@ -84,7 +84,7 @@ export interface DeleteProductReply {
 
 export function deleteProduct(request: DeleteProductRequest) {
 	return axios.delete<DeleteProductReply>(
-		`${PREFIX_URI_ADMIN_API + URI_PRODUCT_API}/products/${request.id}`
+		`${PrefixUriAdminApi + UriProductApi}/products/${request.id}`
 	);
 }
 

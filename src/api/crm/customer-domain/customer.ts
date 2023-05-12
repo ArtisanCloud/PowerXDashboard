@@ -1,4 +1,4 @@
-import {PowerModel, PREFIX_URI_ADMIN_API} from '@/api/common';
+import {PowerModel, PrefixUriAdminApi} from '@/api/common';
 import axios from "axios";
 
 export const URI_CUSTOMER_DOMAIN_API = '/customer-domain'
@@ -41,7 +41,7 @@ export interface ListCustomerPageReply {
 export function listCustomers(request: ListCustomerPageRequest) {
 	console.log(request)
 	return axios.get<ListCustomerPageReply>(
-		`${PREFIX_URI_ADMIN_API + URI_CUSTOMER_DOMAIN_API}/customers/page-list`,
+		`${PrefixUriAdminApi + URI_CUSTOMER_DOMAIN_API}/customers/page-list`,
 		{
 			params: request,
 		}
@@ -51,7 +51,7 @@ export function listCustomers(request: ListCustomerPageRequest) {
 
 export function createCustomer(request: Customer) {
 	return axios.post<Customer>(
-		`${PREFIX_URI_ADMIN_API + URI_CUSTOMER_DOMAIN_API}/customers`,
+		`${PrefixUriAdminApi + URI_CUSTOMER_DOMAIN_API}/customers`,
 		request
 	);
 }
@@ -59,7 +59,7 @@ export function createCustomer(request: Customer) {
 
 export function updateCustomer(request: Customer) {
 	return axios.put<Customer>(
-		`${PREFIX_URI_ADMIN_API + URI_CUSTOMER_DOMAIN_API}/customers/${request.id}`,
+		`${PrefixUriAdminApi + URI_CUSTOMER_DOMAIN_API}/customers/${request.id}`,
 		request
 	);
 }
@@ -74,7 +74,7 @@ export interface DeleteCustomerReply {
 
 export function deleteCustomer(request: DeleteCustomerRequest) {
 	return axios.delete<DeleteCustomerReply>(
-		`${PREFIX_URI_ADMIN_API + URI_CUSTOMER_DOMAIN_API}/customers/${request.id}`
+		`${PrefixUriAdminApi + URI_CUSTOMER_DOMAIN_API}/customers/${request.id}`
 	);
 }
 
