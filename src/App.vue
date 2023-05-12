@@ -11,7 +11,7 @@
   import zhCN from '@arco-design/web-vue/es/locale/lang/zh-cn';
   import GlobalSetting from '@/components/global-setting/index.vue';
   import useLocale from '@/hooks/locale';
-  import useOptionsStore from "@/store/modules/data-dictionary";
+  import useOptionsStore from '@/store/modules/data-dictionary';
 
   const { currentLocale } = useLocale();
   const locale = computed(() => {
@@ -25,10 +25,9 @@
     }
   });
   const options = useOptionsStore();
-  options.fetchApprovalStatusOptions()
-  options.fetchSalesChannelsOptions()
-  options.fetchPromoteChannelsOptions()
-  options.fetchSourceTypesOptions()
-  options.fetchCustomerTypesOptions()
-
+  options.fetchApprovalStatusOptions();
+  options.fetchSalesChannelsOptions();
+  options.fetchPromoteChannelsOptions();
+  options.fetchSourceTypesOptions();
+  options.fetchCustomerTypesOptions();
 </script>

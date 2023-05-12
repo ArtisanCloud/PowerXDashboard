@@ -46,7 +46,6 @@ export function getMenuList() {
   return axios.get<any>('/api/v1/admin/user-center/menu-list');
 }
 
-
 export interface ModifyPasswordRequest {
   password: string;
 }

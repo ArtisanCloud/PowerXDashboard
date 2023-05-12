@@ -7,109 +7,107 @@ import axios from 'axios';
  * @version v1
  */
 
-export const PREFIX_URI_ADMIN_API = '/api/v1/admin'
-export const DefaultPageSize = 10
-export const MaxPageSize = 9999
+export const PREFIX_URI_ADMIN_API = '/api/v1/admin';
+export const DefaultPageSize = 10;
+export const MaxPageSize = 9999;
 
 export interface EmployeeOption {
-	id: number;
-	avatar: string;
-	account: string;
-	name: string;
-	email: string;
-	phoneNumber: string;
+  id: number;
+  avatar: string;
+  account: string;
+  name: string;
+  email: string;
+  phoneNumber: string;
 }
 
 export interface GetEmployeeOptionsRequest {
-	likeName?: string;
-	likeEmail?: string;
-	likePhoneNumber?: string;
-	pageIndex?: number;
-	pageSize?: number;
+  likeName?: string;
+  likeEmail?: string;
+  likePhoneNumber?: string;
+  pageIndex?: number;
+  pageSize?: number;
 }
 
 export interface GetEmployeeOptionsReply {
-	list: EmployeeOption[];
-	pageIndex: number;
-	pageSize: number;
-	total: number;
+  list: EmployeeOption[];
+  pageIndex: number;
+  pageSize: number;
+  total: number;
 }
 
 export function getEmployeeOptions(request: GetEmployeeOptionsRequest) {
-	return axios.get<GetEmployeeOptionsReply>(
-		'/api/v1/admin/common/options/employees',
-		{
-			params: request,
-		}
-	);
+  return axios.get<GetEmployeeOptionsReply>(
+    '/api/v1/admin/common/options/employees',
+    {
+      params: request,
+    }
+  );
 }
 
 export interface EmployeeQueryRoleOption {
-	roleCode: string;
-	roleName: string;
+  roleCode: string;
+  roleName: string;
 }
 
 export interface EmployeeQueryDepartmentOption {
-	departmentId: number;
-	departmentName: string;
+  departmentId: number;
+  departmentName: string;
 }
 
 export interface GetEmployeeQueryOptionsReply {
-	positions: string[];
-	roles: EmployeeQueryRoleOption[];
-	departments: EmployeeQueryDepartmentOption[];
+  positions: string[];
+  roles: EmployeeQueryRoleOption[];
+  departments: EmployeeQueryDepartmentOption[];
 }
 
 export function getEmployeeQueryOptions() {
-	return axios.get<GetEmployeeQueryOptionsReply>(
-		'/api/v1/admin/common/options/employee-query'
-	);
+  return axios.get<GetEmployeeQueryOptionsReply>(
+    '/api/v1/admin/common/options/employee-query'
+  );
 }
 
-export interface ParentOption{
-	id: number;
-	name: string;
+export interface ParentOption {
+  id: number;
+  name: string;
 }
 
 export interface DepartmentOption {
-	id: number;
-	name: string;
+  id: number;
+  name: string;
 }
 
 export interface GetDepartmentOptionsRequest {
-	ids?: number[];
-	likeName?: string;
-	pageIndex?: number;
-	pageSize?: number;
+  ids?: number[];
+  likeName?: string;
+  pageIndex?: number;
+  pageSize?: number;
 }
 
 export interface GetDepartmentOptionsReply {
-	list: DepartmentOption[];
-	pageIndex: number;
-	pageSize: number;
-	total: number;
+  list: DepartmentOption[];
+  pageIndex: number;
+  pageSize: number;
+  total: number;
 }
 
 export function getDepartmentOptions(request: GetDepartmentOptionsRequest) {
-	return axios.get<GetDepartmentOptionsReply>(
-		'/api/v1/admin/common/options/departments',
-		{
-			params: request,
-		}
-	);
+  return axios.get<GetDepartmentOptionsReply>(
+    '/api/v1/admin/common/options/departments',
+    {
+      params: request,
+    }
+  );
 }
-
-
 
 export interface PowerModel {
-	id: number
-	createdAt: Date
-	updatedAt: Date
-	deletedAt: Date
+  id: number;
+  createdAt: Date;
+  updatedAt: Date;
+  deletedAt: Date;
 }
 
-export interface imageAbleInfo{
-	icon: string
-	backgroundColor: string
-	imageURL: string
+export interface imageAbleInfo {
+  icon: string;
+  backgroundColor: string;
+  imageURL: string;
 }
