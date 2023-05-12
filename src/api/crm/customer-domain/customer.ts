@@ -25,6 +25,7 @@ export interface Customer extends PowerModel, CustomerExternalId {
 export interface ListCustomerPageRequest {
 	ids?: number[];
 	likeName?: string;
+	likeMobile?: string;
 	storeIds?: number[];
 	pageIndex?: number;
 	pageSize?: number;
