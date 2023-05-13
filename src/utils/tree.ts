@@ -1,6 +1,6 @@
 type TreeNode = {
-	id: bigint;
-	children?: TreeNode[];
+  id: bigint;
+  children?: TreeNode[];
 };
 
 // function FindNodeById<T extends TreeNode>(tree: T[], id: bigint): T | undefined {

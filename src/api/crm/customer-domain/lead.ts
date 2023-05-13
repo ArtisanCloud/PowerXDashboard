@@ -1,76 +1,71 @@
-import {PowerModel, PrefixUriAdminApi} from '@/api/common';
-import axios from "axios";
+import { PowerModel, PrefixUriAdminApi } from '@/api/common';
+import axios from 'axios';
 
-import {Customer, CustomerExternalId, URI_CUSTOMER_DOMAIN_API} from '@/api/crm/customer-domain/customer';
-
+import {
+  Customer,
+  CustomerExternalId,
+  URI_CUSTOMER_DOMAIN_API,
+} from '@/api/crm/customer-domain/customer';
 
 export interface Lead extends PowerModel, CustomerExternalId {
-
-	name: string,
-	mobile: string,
-	email: string,
-	inviter: Customer,
-	inviterId: number,
-	source: number,
-	type: number,
-	isActivated: boolean,
-
-
+  name: string;
+  mobile: string;
+  email: string;
+  inviter: Customer;
+  inviterId: number;
+  source: number;
+  type: number;
+  isActivated: boolean;
 }
 
-
 export interface ListLeadPageRequest {
-	ids?: number[];
-	likeName?: string;
-	storeIds?: number[];
-	pageIndex?: number;
-	pageSize?: number;
+  ids?: number[];
+  likeName?: string;
+  storeIds?: number[];
+  pageIndex?: number;
+  pageSize?: number;
 }
 
 export interface ListLeadPageReply {
-	list: Lead[];
-	pageIndex: number;
-	pageSize: number;
-	total: number;
+  list: Lead[];
+  pageIndex: number;
+  pageSize: number;
+  total: number;
 }
 
 export function listLeads(request: ListLeadPageRequest) {
-	return axios.get<ListLeadPageReply>(
-		`${PrefixUriAdminApi + URI_CUSTOMER_DOMAIN_API}/leads/page-list`,
-		{
-			params: request,
-		}
-	);
+  return axios.get<ListLeadPageReply>(
+    `${PrefixUriAdminApi + URI_CUSTOMER_DOMAIN_API}/leads/page-list`,
+    {
+      params: request,
+    }
+  );
 }
-
 
 export function createLead(request: Lead) {
-	return axios.post<Lead>(
-		`${PrefixUriAdminApi + URI_CUSTOMER_DOMAIN_API}/leads`,
-		request
-	);
+  return axios.post<Lead>(
+    `${PrefixUriAdminApi + URI_CUSTOMER_DOMAIN_API}/leads`,
+    request
+  );
 }
 
-
 export function updateLead(request: Lead) {
-	return axios.put<Lead>(
-		`${PrefixUriAdminApi + URI_CUSTOMER_DOMAIN_API}/leads/${request.id}`,
-		request
-	);
+  return axios.put<Lead>(
+    `${PrefixUriAdminApi + URI_CUSTOMER_DOMAIN_API}/leads/${request.id}`,
+    request
+  );
 }
 
 export interface DeleteLeadRequest {
-	id: number;
+  id: number;
 }
 
 export interface DeleteLeadReply {
-	id: number;
+  id: number;
 }
 
 export function deleteLead(request: DeleteLeadRequest) {
-	return axios.delete<DeleteLeadReply>(
-		`${PrefixUriAdminApi + URI_CUSTOMER_DOMAIN_API}/leads/${request.id}`
-	);
+  return axios.delete<DeleteLeadReply>(
+    `${PrefixUriAdminApi + URI_CUSTOMER_DOMAIN_API}/leads/${request.id}`
+  );
 }
-
-

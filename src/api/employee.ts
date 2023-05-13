@@ -109,7 +109,6 @@ export function createEmployee(request: CreateEmployeeRequest) {
   );
 }
 
-
 export interface UpdateEmployeeRequest {
   id: number;
   name?: string;
