@@ -29,6 +29,7 @@ export interface Product extends PowerModel, ProductSpecific {
   promoteChannelsItemIds: number[];
   saleStartDate: Date;
   saleEndDate: Date;
+  categoryIds: number[];
 }
 
 export interface ListProductPageRequest {

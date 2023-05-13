@@ -127,8 +127,8 @@
       if (id === tree[i].id) {
         return tree[i];
       }
-      if (tree[i].children && tree[i].children.length > 0) {
-        const foundNode = FindCategoryFromTreeById(tree[i].children, id);
+      if (tree[i].children && tree[i].children!.length > 0) {
+        const foundNode = FindCategoryFromTreeById(tree[i].children!, id);
         if (foundNode !== undefined) {
           return foundNode;
         }

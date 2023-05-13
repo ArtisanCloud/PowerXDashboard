@@ -8,11 +8,11 @@ import axios from 'axios';
 import { UriProductApi } from '@/api/crm/product-service/product';
 
 export interface ProductCategory extends PowerModel, imageAbleInfo {
-  pId: number;
+  pId?: number;
   name: string;
-  sort: number;
-  viceName: string;
-  description: string;
+  sort?: number;
+  viceName?: string;
+  description?: string;
   children: ProductCategory[];
 }
 
