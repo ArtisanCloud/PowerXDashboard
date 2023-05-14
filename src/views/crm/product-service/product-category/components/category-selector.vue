@@ -1,6 +1,10 @@
 <template>
   <div>
-    <a-transfer :data="state.transferData" :default-value="state.defaultValue">
+    <a-transfer
+      :data="state.transferData"
+      :default-value="defaultValue"
+      @change="changeCategory"
+    >
       <template #source="{ data, selectedKeys, onSelect }">
         <a-tree
           :checkable="true"
@@ -8,7 +12,6 @@
           :checked-keys="selectedKeys"
           :data="getTreeData(data)"
           @check="onSelect"
-          @change="changeValue"
         />
       </template>
     </a-transfer>
@@ -22,13 +25,23 @@
     ProductCategory,
   } from '@/api/crm/product-service/category';
 
+  const props = defineProps({
+    defaultValue: {
+      type: Array,
+      default: () => [],
+    },
+  });
+
   const loading = ref(false);
   const state = reactive({
     categoryTree: [] as ProductCategory[],
     transferData: [] as any[],
     loading: false,
-    defaultValue: [6],
+    defaultValue: [],
+    categoryIds: [],
   });
+
+  const emits = defineEmits(['update:category-ids']);
 
   const getTransferData = (
     treeData: any[] = [],
@@ -78,8 +91,8 @@
     }
   };
 
-  const changeValue = (value: string) => {
-    console.log(value);
+  const changeCategory = (e: number[]) => {
+    emits('update:category-ids', e);
   };
 
   onMounted(async () => {

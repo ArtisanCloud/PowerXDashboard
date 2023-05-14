@@ -1,5 +1,6 @@
 import { PowerModel, PrefixUriAdminApi } from '@/api/common';
 import axios from 'axios';
+import type { ProductCategory } from '@/api/crm/product-service/category';
 
 export const UriProductApi = '/product';
 
@@ -29,6 +30,7 @@ export interface Product extends PowerModel, ProductSpecific {
   promoteChannelsItemIds: number[];
   saleStartDate: Date;
   saleEndDate: Date;
+  productCategories: ProductCategory[];
   categoryIds: number[];
 }
 

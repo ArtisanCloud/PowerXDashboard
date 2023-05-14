@@ -133,6 +133,8 @@
             <category-selector
               ref="RefCategorySelector"
               v-model="formModel.categoryIds"
+              :value="formModel.categoryIds"
+              @update:category-ids="updateCategoryIds"
             ></category-selector>
           </a-form-item>
         </a-col>
@@ -214,6 +216,11 @@
       .finally(() => {
         state.submitLoading = false;
       });
+  };
+
+  const updateCategoryIds = (categoryIds: number[]) => {
+    // console.log('update:categoryIds', categoryIds);
+    formModel.value.categoryIds = categoryIds;
   };
 
   onMounted(() => {});
