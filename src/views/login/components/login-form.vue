@@ -112,14 +112,16 @@
             // todo 实际生产环境需要进行加密存储。
             loginConfig.value.userName = rememberPassword ? userName : '';
             loginConfig.value.password = rememberPassword ? password : '';
-            router.push({
-              name: (redirect as string) || DEFAULT_ROUTE_NAME,
-              query: {
-                ...othersQuery,
-              },
-            });
-            setLoading(false);
-            Message.success(t('login.form.login.success'));
+            router
+              .push({
+                name: (redirect as string) || DEFAULT_ROUTE_NAME,
+                query: {
+                  ...othersQuery,
+                },
+              })
+              .then(() => {
+                Message.success(t('login.form.login.success'));
+              });
           });
         })
         .catch(() => {
