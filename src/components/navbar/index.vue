@@ -141,11 +141,21 @@
       <li>
         <a-dropdown trigger="click">
           <a-avatar
+            v-if="avatar !== ''"
             :size="32"
             :style="{ marginRight: '8px', cursor: 'pointer' }"
           >
-            <img v-if="avatar === ''" alt="avatar" :src="avatar" />
-            <a-avatar v-else>{{ userStore.name }}</a-avatar>
+            <img alt="avatar" :src="avatar" />
+          </a-avatar>
+          <a-avatar
+            v-else
+            :style="{
+              marginRight: '8px',
+              cursor: 'pointer',
+              backgroundColor: '#00d0b6',
+            }"
+          >
+            {{ userStore.name }}
           </a-avatar>
           <template #content>
             <a-doption>
@@ -269,9 +279,11 @@
     display: flex;
     padding-right: 20px;
     list-style: none;
+
     :deep(.locale-select) {
       border-radius: 20px;
     }
+
     li {
       display: flex;
       align-items: center;
@@ -282,16 +294,19 @@
       color: var(--color-text-1);
       text-decoration: none;
     }
+
     .nav-btn {
       border-color: rgb(var(--gray-2));
       color: rgb(var(--gray-8));
       font-size: 16px;
     }
+
     .trigger-btn,
     .ref-btn {
       position: absolute;
       bottom: 14px;
     }
+
     .trigger-btn {
       margin-left: 14px;
     }
