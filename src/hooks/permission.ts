@@ -3,41 +3,52 @@ import { useUserStore } from '@/store';
 
 export default function usePermission() {
   const userStore = useUserStore();
+
+  function hasAccess(
+    userRoles: string[] | undefined,
+    routeRoles: string[]
+  ): boolean {
+    return (
+      routeRoles.includes('*') ||
+      routeRoles.some((role) => userRoles?.includes(role))
+    );
+  }
+
+  function findAccessibleRoute(
+    routes: RouteRecordRaw[],
+    userRoles: string[]
+  ): RouteRecordRaw | null {
+    return routes.reduce((route) => {
+      if (route.children) {
+        const foundRoute = findAccessibleRoute(route.children, userRoles);
+        if (foundRoute) return foundRoute;
+      }
+
+      if (route.meta?.roles && hasAccess(userRoles, route.meta.roles)) {
+        return route;
+      }
+
+      return null;
+    }, null as any);
+  }
+
   return {
-    accessRouter(route: RouteLocationNormalized | RouteRecordRaw) {
-      // console.log(JSON.stringify(userStore.userInfo));
+    accessRouter(route: RouteLocationNormalized | RouteRecordRaw): boolean {
+      const { account, roles } = userStore;
+
       return (
-        // root 特殊放行
-        userStore.account === 'root' ||
+        account === 'root' ||
         !route.meta?.requiresAuth ||
         !route.meta?.roles ||
-        route.meta?.roles?.includes('*') ||
-        route.meta?.roles?.filter((v) => {
-          return userStore.roles?.includes(v);
-        }).length > 0
+        hasAccess(roles, route.meta.roles)
       );
     },
-    findFirstPermissionRoute(_routers: any, userRoles: string[] = []) {
-      const cloneRouters = [..._routers];
-      while (cloneRouters.length) {
-        const firstElement = cloneRouters.shift();
-        if (
-          firstElement?.meta?.roles?.find((el: string[]) => {
-            return (
-              el.includes('*') ||
-              el.filter((v) => {
-                return userRoles.includes(v);
-              }).length > 0
-            );
-          })
-        )
-          return { name: firstElement.name };
-        if (firstElement?.children) {
-          cloneRouters.push(...firstElement.children);
-        }
-      }
-      return null;
+
+    findFirstPermissionRoute(
+      routers: RouteRecordRaw[],
+      userRoles: string[] = []
+    ): RouteRecordRaw | null {
+      return findAccessibleRoute(routers, userRoles || userStore.roles);
     },
-    // You can add any rules you want
   };
 }
