@@ -104,21 +104,10 @@
           </a-form-item>
         </a-col>
       </a-row>
-
       <a-row :gutter="32">
         <a-col :span="12">
           <a-form-item label="允许购买数量上限" field="purchasedQuantity">
             <a-input-number v-model="formModel.purchasedQuantity" />
-          </a-form-item>
-        </a-col>
-        <a-col :span="12">
-          <a-form-item label="上传头图" field="coverURL">
-            <a-upload
-              list-type="picture-card"
-              action="/"
-              :default-file-list="fileList"
-              image-preview
-            />
           </a-form-item>
         </a-col>
       </a-row>
@@ -140,6 +129,35 @@
         </a-col>
       </a-row>
       <a-divider />
+      <a-row :gutter="32">
+        <a-col :span="12">
+          <a-form-item label="上传头图" field="coverUrl">
+            <a-upload
+              :limit="1"
+              list-type="picture-card"
+              action="/"
+              :default-file-list="fileList"
+              image-preview
+            />
+          </a-form-item>
+        </a-col>
+      </a-row>
+      <a-row :gutter="32">
+        <a-col :span="12">
+          <a-form-item label="上传详细图片" field="detailUrls">
+            <a-upload
+              :multiple="true"
+              :draggable="true"
+              list-type="picture-card"
+              action="/"
+              :default-file-list="fileList"
+              image-preview
+            />
+          </a-form-item>
+        </a-col>
+      </a-row>
+      <a-divider />
+
       <a-form-item>
         <a-space size="large">
           <a-button type="primary" html-type="submit">提交</a-button>
@@ -173,7 +191,7 @@
     isActivated: false,
     description: '',
     coverURL: '',
-    purchasedQuantity: -1,
+    allowedSellQuantity: -1,
     validityPeriodDays: 0,
     saleStartDate: new Date(),
     saleEndDate: new Date(),

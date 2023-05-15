@@ -6,6 +6,7 @@ export const UriProductApi = '/product';
 
 export interface ProductSpecific {
   inventory: number;
+  soldAmount: number;
   weight: number;
   volume: number;
   encode: string;
@@ -24,7 +25,7 @@ export interface Product extends PowerModel, ProductSpecific {
   isActivated: boolean;
   description: string;
   coverURL: string;
-  purchasedQuantity: number;
+  allowedSellQuantity: number;
   validityPeriodDays: number;
   salesChannelsItemIds: number[];
   promoteChannelsItemIds: number[];

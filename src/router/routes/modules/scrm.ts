@@ -6,6 +6,7 @@ const Scrm: AppRouteRecordRaw = {
   name: 'Scrm',
   component: DEFAULT_LAYOUT,
   meta: {
+    order: 3,
     locale: 'menu.scrm',
     requiresAuth: true,
     icon: 'icon-wechat',

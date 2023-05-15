@@ -7,10 +7,10 @@ const Home: AppRouteRecordRaw = {
   component: DEFAULT_LAYOUT,
   redirect: '/home/index',
   meta: {
+    order: -1,
     locale: 'menu.home',
     requiresAuth: true,
     icon: 'icon-home',
-    order: -1,
   },
   children: [
     {

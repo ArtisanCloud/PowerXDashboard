@@ -6,6 +6,7 @@ const CRM: AppRouteRecordRaw = {
   name: 'CRM',
   component: DEFAULT_LAYOUT,
   meta: {
+    order: 2,
     locale: 'menu.crm',
     requiresAuth: true,
     icon: 'icon-user-group',
