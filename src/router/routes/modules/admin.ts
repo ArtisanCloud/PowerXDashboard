@@ -6,6 +6,7 @@ const Admin: AppRouteRecordRaw = {
   name: 'Admin',
   component: DEFAULT_LAYOUT,
   meta: {
+    order: 99,
     locale: 'menu.admin',
     requiresAuth: true,
     icon: 'icon-tool',

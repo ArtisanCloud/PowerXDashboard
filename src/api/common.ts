@@ -101,13 +101,13 @@ export function getDepartmentOptions(request: GetDepartmentOptionsRequest) {
 
 export interface PowerModel {
   id: number;
-  createdAt: Date;
-  updatedAt: Date;
-  deletedAt: Date;
+  createdAt?: Date;
+  updatedAt?: Date;
+  deletedAt?: Date;
 }
 
 export interface imageAbleInfo {
-  icon: string;
-  backgroundColor: string;
-  imageURL: string;
+  icon?: string;
+  backgroundColor?: string;
+  imageURL?: string;
 }
