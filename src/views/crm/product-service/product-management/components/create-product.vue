@@ -135,7 +135,7 @@
             <a-upload
               :limit="1"
               list-type="picture-card"
-              :custom-request="onUploadMediaResource"
+              :custom-request="uploadCoverImage"
               :default-file-list="state.coverUrlList"
               image-preview
             />
@@ -150,7 +150,7 @@
               :multiple="true"
               :draggable="true"
               list-type="picture-card"
-              :custom-request="onUploadMediaResource"
+              :custom-request="uploadDetailImages"
               :file-list="state.detailUrlList"
               image-preview
             />
@@ -176,8 +176,6 @@
 
   import useOptionsStore from '@/store/modules/data-dictionary';
   import CategorySelector from '@/views/crm/product-service/product-category/components/category-selector.vue';
-  import axios from 'axios';
-  import { aw } from '@fullcalendar/core/internal-common';
   import { uploadMediaResource } from '@/api/mediaresource';
 
   const emits = defineEmits(['submitSuccess', 'submitFailed', 'update:id']);
@@ -196,6 +194,8 @@
     validityPeriodDays: 0,
     saleStartDate: new Date(),
     saleEndDate: new Date(),
+    coverImageId: 0,
+    detailImageIds: [] as number[],
   } as Product);
 
   const rules = {
@@ -241,9 +241,25 @@
       });
   };
 
-  const onUploadMediaResource = async (option: any) => {
+  const uploadCoverImage = async (option: any) => {
     const result = await uploadMediaResource(option);
-    console.log(result);
+    if (result.data) {
+      formModel.value.coverImageId = result.data.id;
+      option.onSuccess(result.data);
+    } else {
+      option.onError(result);
+    }
+  };
+
+  const uploadDetailImages = async (option: any) => {
+    const result = await uploadMediaResource(option);
+    if (result.data) {
+      // console.log(result.data, result.data.id);
+      formModel.value.detailImageIds.push(result.data.id);
+      option.onSuccess(result.data);
+    } else {
+      option.onError(result);
+    }
   };
 
   const updateCategoryIds = (categoryIds: number[]) => {

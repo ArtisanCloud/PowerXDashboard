@@ -146,9 +146,10 @@
             <a-upload
               :limit="1"
               list-type="picture-card"
-              :custom-request="uploadMediaResource"
+              :custom-request="uploadCoverImage"
               :file-list="state.coverUrlList"
               image-preview
+              :on-before-remove="changeCoverImage"
             />
           </a-form-item>
         </a-col>
@@ -161,9 +162,10 @@
               :multiple="true"
               :draggable="true"
               list-type="picture-card"
-              :custom-request="uploadMediaResource"
+              :custom-request="uploadDetailImages"
               :file-list="state.detailUrlList"
               image-preview
+              :on-before-remove="changeDetailImages"
             />
           </a-form-item>
         </a-col>
@@ -188,7 +190,7 @@
   import useOptionsStore from '@/store/modules/data-dictionary';
   import CategorySelector from '@/views/crm/product-service/product-category/components/category-selector.vue';
 
-  import axios from 'axios';
+  import { uploadMediaResource } from '@/api/mediaresource';
 
   const prop = defineProps({
     node: {
@@ -224,6 +226,8 @@
     saleStartDate: prop.node.saleStartDate,
     saleEndDate: prop.node.saleEndDate,
     categoryIds: prop.node?.categoryIds,
+    coverImageId: prop.node?.coverImageId,
+    detailImageIds: prop.node?.detailImageIds ? prop.node?.detailImageIds : [],
   } as Product);
 
   const rules = {
@@ -255,6 +259,7 @@
     if (err) {
       return;
     }
+
     state.submitLoading = true;
     updateProduct(formModel.value)
       .then(() => {
@@ -274,48 +279,61 @@
     formModel.value.categoryIds = categoryIds;
   };
 
-  const uploadMediaResource = (option: any) => {
-    // 处理上传事件的逻辑
-    const { onSuccess, onError, file } = option;
+  const uploadCoverImage = async (option: any) => {
+    const result = await uploadMediaResource(option);
+    if (result.data) {
+      formModel.value.coverImageId = result.data.id;
+      option.onSuccess(result.data);
+    } else {
+      option.onError(result);
+    }
+  };
 
-    // 自定义上传逻辑
-    const formData = new FormData();
-    formData.append('resource', file);
+  const uploadDetailImages = async (option: any) => {
+    const result = await uploadMediaResource(option);
+    if (result.data) {
+      // console.log(result.data, result.data.id);
+      formModel.value.detailImageIds.push(result.data.id);
+      option.onSuccess(result.data);
+    } else {
+      option.onError(result);
+    }
+  };
 
-    // 发送自定义请求
-    axios
-      .post('/api/v1/admin/media/media-resources', formData)
-      .then((response) => {
-        // 上传成功
-        console.log(response.data);
-        onSuccess(response.data);
-      })
-      .catch((error) => {
-        // 上传失败
-        onError(error);
-      });
+  const changeCoverImage = async (option: any) => {
+    // console.log(option);
+    formModel.value.coverImageId = 0;
+    return true;
+  };
 
-    return {
-      abort() {
-        // 取消上传的逻辑
-      },
-    };
+  const changeDetailImages = async (option: any) => {
+    // console.log(option);
+    const index = formModel.value.detailImageIds.indexOf(option.uid);
+    if (index !== -1) {
+      formModel.value.detailImageIds.splice(index, 1);
+    }
+
+    return true;
   };
 
   onMounted(() => {
-    state.coverUrlList = [
-      {
-        uid: prop.node?.coverImage.id,
-        url: prop.node?.coverImage.url,
-        name: prop.node?.coverImage.name,
-      },
-    ];
+    if (prop.node?.coverImage) {
+      state.coverUrlList = [
+        {
+          uid: prop.node?.coverImage?.id,
+          url: prop.node?.coverImage?.url,
+          name: prop.node?.coverImage?.name,
+        },
+      ];
+    }
 
     state.detailUrlList = prop.node?.detailImages.map((detailImage) => ({
-      uid: detailImage.id,
-      url: detailImage.url,
-      name: detailImage.name,
+      uid: detailImage?.id,
+      url: detailImage?.url,
+      name: detailImage?.name,
     }));
     // console.log(state.detailUrlList);
+
+    console.log(formModel.value.detailImageIds, formModel.value.coverImageId);
   });
 </script>

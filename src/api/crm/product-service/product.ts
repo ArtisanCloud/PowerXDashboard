@@ -41,7 +41,7 @@ export interface Product extends PowerModel, ProductSpecific {
   saleEndDate: Date;
   productCategories: ProductCategory[];
   categoryIds: number[];
-  coverImageId: number[];
+  coverImageId: number;
   detailImageIds: number[];
 }
 
