@@ -11,6 +11,10 @@
       @page-change="pageChanged"
       @page-size-change="pageSizeChanged"
     >
+      <template #coverURL="{ record }">
+        <a-image width="72" :src="record.coverURL"></a-image>
+      </template>
+
       <template #type="{ record }">
         <a-typography-text
           >{{ options.GetOptionById(options.productTypes, record.type)?.name }}
@@ -97,6 +101,12 @@
       title: '产品名称',
       dataIndex: 'name',
       width: 150,
+    },
+    {
+      title: '头图',
+      dataIndex: 'coverURL',
+      width: 150,
+      slotName: 'coverURL',
     },
     {
       title: '品类名称',

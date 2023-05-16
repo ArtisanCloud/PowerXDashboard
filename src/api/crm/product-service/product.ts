@@ -4,6 +4,13 @@ import type { ProductCategory } from '@/api/crm/product-service/category';
 
 export const UriProductApi = '/product';
 
+export interface DetailImage {
+  id: number;
+  url: string;
+  name: string;
+  sort: string;
+}
+
 export interface ProductSpecific {
   inventory: number;
   soldAmount: number;
@@ -24,7 +31,8 @@ export interface Product extends PowerModel, ProductSpecific {
   approvalStatus: number;
   isActivated: boolean;
   description: string;
-  coverURL: string;
+  coverImage: DetailImage;
+  detailImages: DetailImage[];
   allowedSellQuantity: number;
   validityPeriodDays: number;
   salesChannelsItemIds: number[];
@@ -33,6 +41,8 @@ export interface Product extends PowerModel, ProductSpecific {
   saleEndDate: Date;
   productCategories: ProductCategory[];
   categoryIds: number[];
+  coverImageId: number[];
+  detailImageIds: number[];
 }
 
 export interface ListProductPageRequest {
