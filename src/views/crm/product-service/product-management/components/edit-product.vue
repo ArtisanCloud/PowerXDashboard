@@ -140,6 +140,35 @@
         </a-col>
       </a-row>
       <a-divider />
+      <a-row :gutter="32">
+        <a-col :span="12">
+          <a-form-item label="上传头图" field="coverUrl">
+            <a-upload
+              :limit="1"
+              list-type="picture-card"
+              :custom-request="uploadMediaResource"
+              :file-list="state.coverUrlList"
+              image-preview
+            />
+          </a-form-item>
+        </a-col>
+      </a-row>
+      <a-row :gutter="32">
+        <a-col :span="12">
+          <a-form-item label="上传详细图片" field="detailUrls">
+            <a-upload
+              :limit="10"
+              :multiple="true"
+              :draggable="true"
+              list-type="picture-card"
+              :custom-request="uploadMediaResource"
+              :file-list="state.detailUrlList"
+              image-preview
+            />
+          </a-form-item>
+        </a-col>
+      </a-row>
+      <a-divider />
       <a-form-item>
         <a-space size="large">
           <a-button type="primary" html-type="submit">提交</a-button>
@@ -158,6 +187,8 @@
 
   import useOptionsStore from '@/store/modules/data-dictionary';
   import CategorySelector from '@/views/crm/product-service/product-category/components/category-selector.vue';
+
+  import axios from 'axios';
 
   const prop = defineProps({
     node: {
@@ -188,8 +219,7 @@
     canUseForDeduct: prop.node.canUseForDeduct,
     isActivated: prop.node.isActivated,
     description: prop.node.description,
-    coverURL: prop.node.coverURL,
-    purchasedQuantity: prop.node.purchasedQuantity,
+    allowedSellQuantity: prop.node.allowedSellQuantity,
     validityPeriodDays: prop.node.validityPeriodDays,
     saleStartDate: prop.node.saleStartDate,
     saleEndDate: prop.node.saleEndDate,
@@ -211,7 +241,11 @@
     description: [{ max: 100, message: '描述长度不能超过 100 个字符' }],
   } as Record<string, FieldRule[]>;
 
-  const state = reactive({ submitLoading: false });
+  const state = reactive({
+    coverUrlList: [] as Array<any>,
+    detailUrlList: [] as Array<any>,
+    submitLoading: false,
+  });
 
   const onSubmit = async () => {
     if (state.submitLoading) {
@@ -240,5 +274,48 @@
     formModel.value.categoryIds = categoryIds;
   };
 
-  onMounted(() => {});
+  const uploadMediaResource = (option: any) => {
+    // 处理上传事件的逻辑
+    const { onSuccess, onError, file } = option;
+
+    // 自定义上传逻辑
+    const formData = new FormData();
+    formData.append('resource', file);
+
+    // 发送自定义请求
+    axios
+      .post('/api/v1/admin/media/media-resources', formData)
+      .then((response) => {
+        // 上传成功
+        console.log(response.data);
+        onSuccess(response.data);
+      })
+      .catch((error) => {
+        // 上传失败
+        onError(error);
+      });
+
+    return {
+      abort() {
+        // 取消上传的逻辑
+      },
+    };
+  };
+
+  onMounted(() => {
+    state.coverUrlList = [
+      {
+        uid: prop.node?.coverImage.id,
+        url: prop.node?.coverImage.url,
+        name: prop.node?.coverImage.name,
+      },
+    ];
+
+    state.detailUrlList = prop.node?.detailImages.map((detailImage) => ({
+      uid: detailImage.id,
+      url: detailImage.url,
+      name: detailImage.name,
+    }));
+    // console.log(state.detailUrlList);
+  });
 </script>

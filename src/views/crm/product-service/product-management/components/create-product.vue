@@ -135,8 +135,8 @@
             <a-upload
               :limit="1"
               list-type="picture-card"
-              action="/"
-              :default-file-list="fileList"
+              :custom-request="onUploadMediaResource"
+              :default-file-list="state.coverUrlList"
               image-preview
             />
           </a-form-item>
@@ -146,11 +146,12 @@
         <a-col :span="12">
           <a-form-item label="上传详细图片" field="detailUrls">
             <a-upload
+              :limit="10"
               :multiple="true"
               :draggable="true"
               list-type="picture-card"
-              action="/"
-              :default-file-list="fileList"
+              :custom-request="onUploadMediaResource"
+              :file-list="state.detailUrlList"
               image-preview
             />
           </a-form-item>
@@ -175,12 +176,13 @@
 
   import useOptionsStore from '@/store/modules/data-dictionary';
   import CategorySelector from '@/views/crm/product-service/product-category/components/category-selector.vue';
+  import axios from 'axios';
+  import { aw } from '@fullcalendar/core/internal-common';
+  import { uploadMediaResource } from '@/api/mediaresource';
 
   const emits = defineEmits(['submitSuccess', 'submitFailed', 'update:id']);
 
   const options = useOptionsStore();
-
-  const fileList = [];
 
   const formRef = ref();
   const formModel = ref({
@@ -190,7 +192,6 @@
     canUseForDeduct: false,
     isActivated: false,
     description: '',
-    coverURL: '',
     allowedSellQuantity: -1,
     validityPeriodDays: 0,
     saleStartDate: new Date(),
@@ -212,7 +213,11 @@
     description: [{ max: 100, message: '描述长度不能超过 100 个字符' }],
   } as Record<string, FieldRule[]>;
 
-  const state = reactive({ submitLoading: false });
+  const state = reactive({
+    coverUrlList: [],
+    detailUrlList: [],
+    submitLoading: false,
+  });
 
   const onSubmit = async () => {
     if (state.submitLoading) {
@@ -234,6 +239,11 @@
       .finally(() => {
         state.submitLoading = false;
       });
+  };
+
+  const onUploadMediaResource = async (option: any) => {
+    const result = await uploadMediaResource(option);
+    console.log(result);
   };
 
   const updateCategoryIds = (categoryIds: number[]) => {
