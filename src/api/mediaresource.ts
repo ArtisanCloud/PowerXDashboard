@@ -19,25 +19,15 @@ export interface CreateMediaResourceReply extends MediaResource {
 
 export function uploadMediaResource(option: any) {
   // 处理上传事件的逻辑
-  const { onSuccess, onError, file } = option;
+  const { fileItem } = option;
 
   // 自定义上传逻辑
   const formData = new FormData();
-  formData.append('resource', file);
+  formData.append('resource', fileItem.file);
 
   // 发送自定义请求
-  return axios
-    .post<CreateMediaResourceReply>(
-      `${PrefixUriAdminApi + UriMediaApi}/media-resources`,
-      formData
-    )
-    .then((response) => {
-      // 上传成功
-      console.log(response.data);
-      onSuccess(response.data);
-    })
-    .catch((error) => {
-      // 上传失败
-      onError(error);
-    });
+  return axios.post<CreateMediaResourceReply>(
+    `${PrefixUriAdminApi + UriMediaApi}/media-resources`,
+    formData
+  );
 }
