@@ -1,10 +1,10 @@
-import { PowerModel, PrefixUriAdminApi } from '@/api/common';
+import { PowerModel, PrefixUriAdmin } from '@/api/common';
 import axios from 'axios';
 
 import {
   Customer,
   CustomerExternalId,
-  URI_CUSTOMER_DOMAIN_API,
+  UriCustomerDomain,
 } from '@/api/crm/customer-domain/customer';
 
 export interface Lead extends PowerModel, CustomerExternalId {
@@ -35,7 +35,7 @@ export interface ListLeadPageReply {
 
 export function listLeads(request: ListLeadPageRequest) {
   return axios.get<ListLeadPageReply>(
-    `${PrefixUriAdminApi + URI_CUSTOMER_DOMAIN_API}/leads/page-list`,
+    `${PrefixUriAdmin + UriCustomerDomain}/leads/page-list`,
     {
       params: request,
     }
@@ -44,14 +44,14 @@ export function listLeads(request: ListLeadPageRequest) {
 
 export function createLead(request: Lead) {
   return axios.post<Lead>(
-    `${PrefixUriAdminApi + URI_CUSTOMER_DOMAIN_API}/leads`,
+    `${PrefixUriAdmin + UriCustomerDomain}/leads`,
     request
   );
 }
 
 export function updateLead(request: Lead) {
   return axios.put<Lead>(
-    `${PrefixUriAdminApi + URI_CUSTOMER_DOMAIN_API}/leads/${request.id}`,
+    `${PrefixUriAdmin + UriCustomerDomain}/leads/${request.id}`,
     request
   );
 }
@@ -66,6 +66,6 @@ export interface DeleteLeadReply {
 
 export function deleteLead(request: DeleteLeadRequest) {
   return axios.delete<DeleteLeadReply>(
-    `${PrefixUriAdminApi + URI_CUSTOMER_DOMAIN_API}/leads/${request.id}`
+    `${PrefixUriAdmin + UriCustomerDomain}/leads/${request.id}`
   );
 }

@@ -1,12 +1,12 @@
-import { PowerModel, PrefixUriAdminApi } from '@/api/common';
+import { PowerModel, PrefixUriAdmin } from '@/api/common';
 import axios from 'axios';
 
-export const URI_CUSTOMER_DOMAIN_API = '/customer-domain';
+export const UriCustomerDomain = '/customerdomain';
 
 export interface CustomerExternalId {
-  openIdInMiniProgram: string;
-  openIdInWeChatOfficialAccount: string;
-  openIdInWeCom: string;
+  openIdInMiniProgram?: string;
+  openIdInWeChatOfficialAccount?: string;
+  openIdInWeCom?: string;
 }
 
 export interface Customer extends PowerModel, CustomerExternalId {
@@ -17,6 +17,7 @@ export interface Customer extends PowerModel, CustomerExternalId {
   source: number;
   type: number;
   isActivated: boolean;
+  inviter?: Customer;
 }
 
 export interface ListCustomerPageRequest {
@@ -36,9 +37,9 @@ export interface ListCustomerPageReply {
 }
 
 export function listCustomers(request: ListCustomerPageRequest) {
-  console.log(request);
+  // console.log(request);
   return axios.get<ListCustomerPageReply>(
-    `${PrefixUriAdminApi + URI_CUSTOMER_DOMAIN_API}/customers/page-list`,
+    `${PrefixUriAdmin + UriCustomerDomain}/customers/page-list`,
     {
       params: request,
     }
@@ -47,14 +48,14 @@ export function listCustomers(request: ListCustomerPageRequest) {
 
 export function createCustomer(request: Customer) {
   return axios.post<Customer>(
-    `${PrefixUriAdminApi + URI_CUSTOMER_DOMAIN_API}/customers`,
+    `${PrefixUriAdmin + UriCustomerDomain}/customers`,
     request
   );
 }
 
 export function updateCustomer(request: Customer) {
   return axios.put<Customer>(
-    `${PrefixUriAdminApi + URI_CUSTOMER_DOMAIN_API}/customers/${request.id}`,
+    `${PrefixUriAdmin + UriCustomerDomain}/customers/${request.id}`,
     request
   );
 }
@@ -69,6 +70,6 @@ export interface DeleteCustomerReply {
 
 export function deleteCustomer(request: DeleteCustomerRequest) {
   return axios.delete<DeleteCustomerReply>(
-    `${PrefixUriAdminApi + URI_CUSTOMER_DOMAIN_API}/customers/${request.id}`
+    `${PrefixUriAdmin + UriCustomerDomain}/customers/${request.id}`
   );
 }

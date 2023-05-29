@@ -80,7 +80,7 @@
     ListProductPageRequest,
   } from '@/api/crm/product-service/product';
 
-  import EditProduct from '@/views/crm/product-service/product-management/components/edit-product.vue';
+  import EditProduct from '@/views/crm/product-service/product/components/edit-product.vue';
   import { Message } from '@arco-design/web-vue';
 
   import useOptionsStore from '@/store/modules/data-dictionary';

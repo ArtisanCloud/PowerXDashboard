@@ -1,8 +1,9 @@
-import { PowerModel, PrefixUriAdminApi } from '@/api/common';
+import { PowerModel, PrefixUriAdmin } from '@/api/common';
 import axios from 'axios';
 import type { ProductCategory } from '@/api/crm/product-service/category';
+import { MediaSet } from '@/api/mediaresource';
 
-export const UriProductApi = '/product';
+export const UriProduct = '/product';
 
 export interface DetailImage {
   id: number;
@@ -21,7 +22,7 @@ export interface ProductSpecific {
   extra: string;
 }
 
-export interface Product extends PowerModel, ProductSpecific {
+export interface Product extends PowerModel, ProductSpecific, MediaSet {
   name: string;
   type: number;
   plan: number;
@@ -31,18 +32,15 @@ export interface Product extends PowerModel, ProductSpecific {
   approvalStatus: number;
   isActivated: boolean;
   description: string;
-  coverImage: DetailImage;
-  detailImages: DetailImage[];
   allowedSellQuantity: number;
   validityPeriodDays: number;
   salesChannelsItemIds: number[];
   promoteChannelsItemIds: number[];
   saleStartDate: Date;
   saleEndDate: Date;
+  // category
   productCategories: ProductCategory[];
   categoryIds: number[];
-  coverImageId: number;
-  detailImageIds: number[];
 }
 
 export interface ListProductPageRequest {
@@ -62,7 +60,7 @@ export interface ListProductPageReply {
 
 export function listProducts(request: ListProductPageRequest) {
   return axios.get<ListProductPageReply>(
-    `${PrefixUriAdminApi + UriProductApi}/products/page-list`,
+    `${PrefixUriAdmin + UriProduct}/products/page-list`,
     {
       params: request,
     }
@@ -71,14 +69,14 @@ export function listProducts(request: ListProductPageRequest) {
 
 export function createProduct(request: Product) {
   return axios.post<Product>(
-    `${PrefixUriAdminApi + UriProductApi}/products`,
+    `${PrefixUriAdmin + UriProduct}/products`,
     request
   );
 }
 
 export function updateProduct(request: Product) {
   return axios.put<Product>(
-    `${PrefixUriAdminApi + UriProductApi}/products/${request.id}`,
+    `${PrefixUriAdmin + UriProduct}/products/${request.id}`,
     request
   );
 }
@@ -93,6 +91,6 @@ export interface DeleteProductReply {
 
 export function deleteProduct(request: DeleteProductRequest) {
   return axios.delete<DeleteProductReply>(
-    `${PrefixUriAdminApi + UriProductApi}/products/${request.id}`
+    `${PrefixUriAdmin + UriProduct}/products/${request.id}`
   );
 }

@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { PowerModel, PrefixUriAdminApi } from '@/api/common';
+import { PowerModel, PrefixUriAdmin } from '@/api/common';
 
 export const UriMediaApi = '/media';
 
@@ -11,6 +11,15 @@ export interface MediaResource extends PowerModel {
   isLocalStored: boolean;
   contentType: string;
   resourceType: string;
+}
+
+export interface MediaSet {
+  coverImage: MediaResource;
+  coverImages: MediaResource[];
+  detailImages: MediaResource[];
+  coverImageId: number;
+  coverImageIds: number[];
+  detailImageIds: number[];
 }
 
 export interface CreateMediaResourceReply extends MediaResource {
@@ -27,7 +36,7 @@ export function uploadMediaResource(option: any) {
 
   // 发送自定义请求
   return axios.post<CreateMediaResourceReply>(
-    `${PrefixUriAdminApi + UriMediaApi}/media-resources`,
+    `${PrefixUriAdmin + UriMediaApi}/resources`,
     formData
   );
 }

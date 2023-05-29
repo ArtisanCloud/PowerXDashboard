@@ -282,7 +282,7 @@
   const uploadCoverImage = async (option: any) => {
     const result = await uploadMediaResource(option);
     if (result.data) {
-      formModel.value.coverImageId = result.data.id;
+      formModel.value.coverImageId = result.data.id!;
       option.onSuccess(result.data);
     } else {
       option.onError(result);
@@ -293,7 +293,7 @@
     const result = await uploadMediaResource(option);
     if (result.data) {
       // console.log(result.data, result.data.id);
-      formModel.value.detailImageIds.push(result.data.id);
+      formModel.value.detailImageIds.push(result.data.id!);
       option.onSuccess(result.data);
     } else {
       option.onError(result);
@@ -322,7 +322,7 @@
         {
           uid: prop.node?.coverImage?.id,
           url: prop.node?.coverImage?.url,
-          name: prop.node?.coverImage?.name,
+          name: prop.node?.coverImage?.filename,
         },
       ];
     }
@@ -330,10 +330,10 @@
     state.detailUrlList = prop.node?.detailImages.map((detailImage) => ({
       uid: detailImage?.id,
       url: detailImage?.url,
-      name: detailImage?.name,
+      name: detailImage?.filename,
     }));
     // console.log(state.detailUrlList);
 
-    console.log(formModel.value.detailImageIds, formModel.value.coverImageId);
+    // console.log(formModel.value.detailImageIds, formModel.value.coverImageId);
   });
 </script>
