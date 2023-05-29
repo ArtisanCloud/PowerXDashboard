@@ -244,7 +244,7 @@
   const uploadCoverImage = async (option: any) => {
     const result = await uploadMediaResource(option);
     if (result.data) {
-      formModel.value.coverImageId = result.data.id;
+      formModel.value.coverImageId = result.data.id!;
       option.onSuccess(result.data);
     } else {
       option.onError(result);
@@ -255,7 +255,7 @@
     const result = await uploadMediaResource(option);
     if (result.data) {
       // console.log(result.data, result.data.id);
-      formModel.value.detailImageIds.push(result.data.id);
+      formModel.value.detailImageIds.push(result.data.id!);
       option.onSuccess(result.data);
     } else {
       option.onError(result);
