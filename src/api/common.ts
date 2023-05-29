@@ -7,7 +7,7 @@ import axios from 'axios';
  * @version v1
  */
 
-export const PrefixUriAdminApi = '/api/v1/admin';
+export const PrefixUriAdmin = '/api/v1/admin';
 export const DefaultPageSize = 10;
 export const MaxPageSize = 9999;
 
@@ -100,7 +100,7 @@ export function getDepartmentOptions(request: GetDepartmentOptionsRequest) {
 }
 
 export interface PowerModel {
-  id: number;
+  id?: number;
   createdAt?: Date;
   updatedAt?: Date;
   deletedAt?: Date;

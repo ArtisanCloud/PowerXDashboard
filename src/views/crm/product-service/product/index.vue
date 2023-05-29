@@ -2,17 +2,17 @@
   <div class="container">
     <a-card>
       <a-space size="large">
-        <a-button type="primary" @click="openAddLead()">新增线索 </a-button>
+        <a-button type="primary" @click="openAddStore()">新增商品 </a-button>
       </a-space>
     </a-card>
     <br />
     <a-card>
-      <LeadTable ref="RefLeadTable" />
+      <StoreTable ref="RefStoreTable" />
     </a-card>
-    <a-drawer v-model:visible="state.createLead.visible" width="500px">
-      <CreateLead
-        v-if="state.createLead.visible"
-        @submitSuccess="refreshLeadList"
+    <a-drawer v-model:visible="state.createStore.visible" width="800px">
+      <CreateStore
+        v-if="state.createStore.visible"
+        @submitSuccess="refreshStoreList"
       />
     </a-drawer>
   </div>
@@ -20,14 +20,14 @@
 
 <script lang="ts" setup>
   import { reactive, ref } from 'vue';
-  import LeadTable from '@/views/crm/customer-domain/lead/components/lead-table.vue';
-  import CreateLead from '@/views/crm/customer-domain/lead/components/create-lead.vue';
+  import StoreTable from '@/views/crm/product-service/product/components/product-table.vue';
+  import CreateStore from '@/views/crm/product-service/product/components/create-product.vue';
   import { DefaultPageSize } from '@/api/common';
 
-  const RefLeadTable = ref<any>();
+  const RefStoreTable = ref<any>();
 
-  const openAddLead = () => {
-    state.createLead.visible = true;
+  const openAddStore = () => {
+    state.createStore.visible = true;
   };
 
   const pagination = reactive({
@@ -41,14 +41,14 @@
   });
 
   const state = reactive({
-    createLead: {
+    createStore: {
       visible: false,
       parentNode: {},
     },
   });
 
-  const refreshLeadList = () => {
-    RefLeadTable.value.fetchLeadList({
+  const refreshStoreList = () => {
+    RefStoreTable.value.fetchStoreList({
       pageIndex: pagination.currentPage,
       pageSize: pagination.pageSize,
     });
@@ -57,7 +57,7 @@
 
 <script lang="ts">
   export default {
-    name: '线索管理',
+    name: '商品管理',
   };
 </script>
 

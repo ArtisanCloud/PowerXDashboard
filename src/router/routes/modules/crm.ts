@@ -64,8 +64,7 @@ const CRM: AppRouteRecordRaw = {
         {
           path: '/crm/product-service/store',
           name: 'Store Management',
-          component: () =>
-            import('@/views/crm/product-service/store/index.vue'),
+          component: () => import('@/views/crm/market/store/index.vue'),
           meta: {
             locale: 'menu.crm.productService.store',
             requiresAuth: true,
@@ -87,7 +86,7 @@ const CRM: AppRouteRecordRaw = {
           path: '/crm/product-service/product-management',
           name: 'ProductManagement',
           component: () =>
-            import('@/views/crm/product-service/product-management/index.vue'),
+            import('@/views/crm/product-service/product/index.vue'),
           meta: {
             locale: 'menu.crm.productService.productManagement',
             requiresAuth: true,
@@ -134,7 +133,7 @@ const CRM: AppRouteRecordRaw = {
         {
           path: '/crm/marketing/mgm',
           name: 'MGM',
-          component: () => import('@/views/crm/marketing/mgm/index.vue'),
+          component: () => import('@/views/crm/market/mgm/index.vue'),
           meta: {
             locale: 'menu.crm.marketing.mgm',
             requiresAuth: true,
@@ -146,7 +145,7 @@ const CRM: AppRouteRecordRaw = {
 
           name: 'MediaManagement',
           component: () =>
-            import('@/views/crm/marketing/media-management/index.vue'),
+            import('@/views/crm/market/media-management/index.vue'),
           meta: {
             locale: 'menu.crm.marketing.mediaManagement',
             requiresAuth: true,
@@ -156,8 +155,7 @@ const CRM: AppRouteRecordRaw = {
         {
           path: '/crm/marketing/brand-story',
           name: 'BrandStory',
-          component: () =>
-            import('@/views/crm/marketing/brand-story/index.vue'),
+          component: () => import('@/views/crm/market/brand-story/index.vue'),
           meta: {
             locale: 'menu.crm.marketing.brandStory',
             requiresAuth: true,

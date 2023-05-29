@@ -2,17 +2,17 @@
   <div class="container">
     <a-card>
       <a-space size="large">
-        <a-button type="primary" @click="openAddProduct()">新增商品 </a-button>
+        <a-button type="primary" @click="openAddStore()">新增门店</a-button>
       </a-space>
     </a-card>
     <br />
     <a-card>
-      <ProductTable ref="RefProductTable" />
+      <StoreTable ref="RefStoreTable" />
     </a-card>
-    <a-drawer v-model:visible="state.createProduct.visible" width="800px">
-      <CreateProduct
-        v-if="state.createProduct.visible"
-        @submitSuccess="refreshProductList"
+    <a-drawer v-model:visible="state.createStore.visible" width="500px">
+      <CreateStore
+        v-if="state.createStore.visible"
+        @submitSuccess="refreshStoreList"
       />
     </a-drawer>
   </div>
@@ -20,14 +20,14 @@
 
 <script lang="ts" setup>
   import { reactive, ref } from 'vue';
-  import ProductTable from '@/views/crm/product-service/product-management/components/product-table.vue';
-  import CreateProduct from '@/views/crm/product-service/product-management/components/create-product.vue';
+  import StoreTable from '@/views/crm/market/store/components/store-table.vue';
+  import CreateStore from '@/views/crm/market/store/components/create-store.vue';
   import { DefaultPageSize } from '@/api/common';
 
-  const RefProductTable = ref<any>();
+  const RefStoreTable = ref<any>();
 
-  const openAddProduct = () => {
-    state.createProduct.visible = true;
+  const openAddStore = () => {
+    state.createStore.visible = true;
   };
 
   const pagination = reactive({
@@ -41,14 +41,14 @@
   });
 
   const state = reactive({
-    createProduct: {
+    createStore: {
       visible: false,
       parentNode: {},
     },
   });
 
-  const refreshProductList = () => {
-    RefProductTable.value.fetchProductList({
+  const refreshStoreList = () => {
+    RefStoreTable.value.fetchStoreList({
       pageIndex: pagination.currentPage,
       pageSize: pagination.pageSize,
     });
@@ -57,7 +57,7 @@
 
 <script lang="ts">
   export default {
-    name: '商品管理',
+    name: '门店',
   };
 </script>
 

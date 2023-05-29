@@ -1,6 +1,6 @@
 import axios from 'axios';
-import { PowerModel, PrefixUriAdminApi } from '@/api/common';
-import { UriProductApi } from '@/api/crm/product-service/product';
+import { PowerModel, PrefixUriAdmin } from '@/api/common';
+import { UriProduct } from '@/api/crm/product-service/product';
 
 export interface PriceBook extends PowerModel {
   isStandard: boolean;
@@ -26,7 +26,7 @@ export interface ListPriceBooksReply {
 
 export function listPriceBooks(request: ListPriceBooksRequest) {
   return axios.get<ListPriceBooksReply>(
-    `${PrefixUriAdminApi + UriProductApi}/price-books/page-list`,
+    `${PrefixUriAdmin + UriProduct}/price-books/page-list`,
     {
       params: request,
     }
@@ -35,7 +35,7 @@ export function listPriceBooks(request: ListPriceBooksRequest) {
 
 export function createPriceBook(request: PriceBook) {
   return axios.post<PriceBook>(
-    `${PrefixUriAdminApi + UriProductApi}/price-books`,
+    `${PrefixUriAdmin + UriProduct}/price-books`,
     request
   );
 }
@@ -50,6 +50,6 @@ export interface DeletePriceBookReply {
 
 export function deletePriceBook(request: DeletePriceBookRequest) {
   return axios.delete<DeletePriceBookReply>(
-    `${PrefixUriAdminApi + UriProductApi}/price-books/${request.id}`
+    `${PrefixUriAdmin + UriProduct}/price-books/${request.id}`
   );
 }

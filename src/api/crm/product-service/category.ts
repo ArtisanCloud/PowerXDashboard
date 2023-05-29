@@ -2,10 +2,10 @@ import {
   DepartmentOption,
   imageAbleInfo,
   PowerModel,
-  PrefixUriAdminApi,
+  PrefixUriAdmin,
 } from '@/api/common';
 import axios from 'axios';
-import { UriProductApi } from '@/api/crm/product-service/product';
+import { UriProduct } from '@/api/crm/product-service/product';
 
 export interface ProductCategory extends PowerModel, imageAbleInfo {
   pId?: number;
@@ -26,7 +26,7 @@ export interface GetCategoryTreeReply {
 
 export function getCategoryTree(request: GetCategoryTreeRequest) {
   return axios.get<GetCategoryTreeReply>(
-    `${PrefixUriAdminApi + UriProductApi}/product-category-tree`
+    `${PrefixUriAdmin + UriProduct}/product-category-tree`
   );
 }
 
@@ -48,7 +48,7 @@ export interface CreateCategoryReply extends imageAbleInfo {
 
 export function createCategory(request: CreateCategoryRequest) {
   return axios.post<CreateCategoryReply>(
-    `${PrefixUriAdminApi + UriProductApi}/product-categories`,
+    `${PrefixUriAdmin + UriProduct}/product-categories`,
     request
   );
 }
@@ -63,6 +63,6 @@ export interface DeleteCategoryReply {
 
 export function deleteCategory(request: DeleteCategoryRequest) {
   return axios.delete<DeleteCategoryReply>(
-    `${PrefixUriAdminApi + UriProductApi}/product-categories/${request.id}`
+    `${PrefixUriAdmin + UriProduct}/product-categories/${request.id}`
   );
 }
