@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia';
 import {
   ApprovalStatusDDType,
+  ArtisanLevelDDType,
   CustomerTypesDDType,
   DictionaryItem,
   listDictionaryItems,
@@ -21,6 +22,7 @@ const useOptionsStore = defineStore('options', {
     salesChannels: [],
     promoteChannels: [],
     sourceTypes: [],
+    artisanLevels: [],
     setup: false,
   }),
 
@@ -110,6 +112,16 @@ const useOptionsStore = defineStore('options', {
       }
     },
 
+    async fetchArtisanLevelsOptions() {
+      try {
+        const res = await listDictionaryItems({ type: ArtisanLevelDDType });
+        this.artisanLevels = res.data.list;
+        // console.log(dictionaryTypeList)
+      } finally {
+        // console.log("fetch approval status options")
+      }
+    },
+
     async fetchAllOptions() {
       await this.fetchCustomerTypesOptions();
       await this.fetchProductTypeOptions();
@@ -118,6 +130,7 @@ const useOptionsStore = defineStore('options', {
       await this.fetchSalesChannelsOptions();
       await this.fetchPromoteChannelsOptions();
       await this.fetchSourceTypesOptions();
+      await this.fetchArtisanLevelsOptions();
       this.setup = true;
     },
 

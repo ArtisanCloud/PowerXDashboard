@@ -1,13 +1,16 @@
 import { PowerModel, PrefixUriAdmin } from '@/api/common';
 import axios from 'axios';
 import { UriProduct } from '@/api/crm/product-service/product';
+import { MediaSet } from '@/api/mediaresource';
 
-export interface Artisan extends PowerModel {
+const UriArtisan = '/artisans';
+
+export interface Artisan extends PowerModel, MediaSet {
   employeeId: number;
   name: string;
   level: number;
-  gender: string;
-  birthday: string;
+  gender: boolean;
+  birthday: Date;
   phoneNumber: string;
   coverURL: string;
   workNo: string;
@@ -35,7 +38,7 @@ export interface ListArtisanPageReply {
 
 export function listArtisans(request: ListArtisanPageRequest) {
   return axios.get<ListArtisanPageReply>(
-    `${PrefixUriAdmin + UriProduct}/artisans`,
+    `${PrefixUriAdmin + UriProduct + UriArtisan}/page-list`,
     {
       params: request,
     }
@@ -44,14 +47,14 @@ export function listArtisans(request: ListArtisanPageRequest) {
 
 export function createArtisan(request: Artisan) {
   return axios.post<Artisan>(
-    `${PrefixUriAdmin + UriProduct}/artisans`,
+    `${PrefixUriAdmin + UriProduct + UriArtisan}`,
     request
   );
 }
 
 export function updateArtisan(request: Artisan) {
   return axios.put<Artisan>(
-    `${PrefixUriAdmin + UriProduct}/artisans/${request.id}`,
+    `${PrefixUriAdmin + UriProduct + UriArtisan}/${request.id}`,
     request
   );
 }
@@ -66,6 +69,6 @@ export interface DeleteArtisanReply {
 
 export function deleteArtisan(request: DeleteArtisanRequest) {
   return axios.delete<DeleteArtisanReply>(
-    `${PrefixUriAdmin + UriProduct}/artisans/${request.id}`
+    `${PrefixUriAdmin + UriProduct + UriArtisan}/${request.id}`
   );
 }

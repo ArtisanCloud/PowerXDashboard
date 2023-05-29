@@ -8,5 +8,6 @@ export interface OptionsState {
   salesChannels: DictionaryItem[];
   promoteChannels: DictionaryItem[];
   sourceTypes: DictionaryItem[];
+  artisanLevels: DictionaryItem[];
   setup: boolean;
 }
