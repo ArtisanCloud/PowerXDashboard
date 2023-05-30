@@ -2,17 +2,17 @@
   <div class="container">
     <a-card>
       <a-space size="large">
-        <a-button type="primary" @click="openAddStore()">新增商品 </a-button>
+        <a-button type="primary" @click="openAddProduct()">新增商品 </a-button>
       </a-space>
     </a-card>
     <br />
     <a-card>
-      <StoreTable ref="RefStoreTable" />
+      <ProductTable ref="RefProductTable" />
     </a-card>
-    <a-drawer v-model:visible="state.createStore.visible" width="800px">
-      <CreateStore
-        v-if="state.createStore.visible"
-        @submitSuccess="refreshStoreList"
+    <a-drawer v-model:visible="state.createProduct.visible" width="800px">
+      <CreateProduct
+        v-if="state.createProduct.visible"
+        @submitSuccess="refreshProductList"
       />
     </a-drawer>
   </div>
@@ -20,14 +20,14 @@
 
 <script lang="ts" setup>
   import { reactive, ref } from 'vue';
-  import StoreTable from '@/views/crm/product-service/product/components/product-table.vue';
-  import CreateStore from '@/views/crm/product-service/product/components/create-product.vue';
+  import ProductTable from '@/views/crm/product-service/product/components/product-table.vue';
+  import CreateProduct from '@/views/crm/product-service/product/components/create-product.vue';
   import { DefaultPageSize } from '@/api/common';
 
-  const RefStoreTable = ref<any>();
+  const RefProductTable = ref<any>();
 
-  const openAddStore = () => {
-    state.createStore.visible = true;
+  const openAddProduct = () => {
+    state.createProduct.visible = true;
   };
 
   const pagination = reactive({
@@ -41,14 +41,14 @@
   });
 
   const state = reactive({
-    createStore: {
+    createProduct: {
       visible: false,
       parentNode: {},
     },
   });
 
-  const refreshStoreList = () => {
-    RefStoreTable.value.fetchStoreList({
+  const refreshProductList = () => {
+    RefProductTable.value.fetchProductList({
       pageIndex: pagination.currentPage,
       pageSize: pagination.pageSize,
     });

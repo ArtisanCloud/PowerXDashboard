@@ -14,12 +14,12 @@ export interface MediaResource extends PowerModel {
 }
 
 export interface MediaSet {
-  coverImage: MediaResource;
-  coverImages: MediaResource[];
-  detailImages: MediaResource[];
-  coverImageId: number;
-  coverImageIds: number[];
-  detailImageIds: number[];
+  coverImage?: MediaResource;
+  coverImages?: MediaResource[];
+  detailImages?: MediaResource[];
+  coverImageId?: number;
+  coverImageIds?: number[];
+  detailImageIds?: number[];
 }
 
 export interface CreateMediaResourceReply extends MediaResource {

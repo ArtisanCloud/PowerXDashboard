@@ -24,6 +24,7 @@ export interface ProductSpecific {
 
 export interface Product extends PowerModel, ProductSpecific, MediaSet {
   name: string;
+  spu: string;
   type: number;
   plan: number;
   accountingCategory: string;
