@@ -179,7 +179,7 @@
     const result = await uploadMediaResource(option);
     if (result.data) {
       // console.log(result.data, result.data.id);
-      formModel.value.detailImageIds.push(result.data.id!);
+      formModel.value.detailImageIds?.push(result.data.id!);
       option.onSuccess(result.data);
     } else {
       option.onError(result);
@@ -194,9 +194,9 @@
 
   const changeDetailImages = async (option: any) => {
     // console.log(option);
-    const index = formModel.value.detailImageIds.indexOf(option.uid);
+    const index = formModel.value.detailImageIds?.indexOf(option.uid);
     if (index !== -1) {
-      formModel.value.detailImageIds.splice(index, 1);
+      formModel.value.detailImageIds?.splice(index!, 1);
     }
 
     return true;
@@ -236,7 +236,7 @@
       // console.log(prop.node);
     }
 
-    state.detailUrlList = prop.node?.detailImages.map((detailImage) => ({
+    state.detailUrlList = prop.node?.detailImages?.map((detailImage) => ({
       uid: detailImage?.id,
       url: detailImage?.url,
       name: detailImage?.filename,

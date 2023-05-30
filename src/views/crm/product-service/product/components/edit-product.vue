@@ -53,8 +53,8 @@
           </a-form-item>
         </a-col>
         <a-col :span="12">
-          <a-form-item label="是否激活" field="isActivated">
-            <a-checkbox v-model="formModel.isActivated" default-value="false" />
+          <a-form-item label="SPU - 标准产品单位" field="spu">
+            <a-input v-model="formModel.spu" />
           </a-form-item>
         </a-col>
       </a-row>
@@ -65,6 +65,9 @@
           </a-form-item>
         </a-col>
         <a-col :span="12">
+          <a-form-item label="是否激活" field="isActivated">
+            <a-checkbox v-model="formModel.isActivated" default-value="false" />
+          </a-form-item>
           <a-form-item label="是否线上销售" field="canSellOnline">
             <a-checkbox v-model="formModel.canSellOnline" />
           </a-form-item>
@@ -144,7 +147,9 @@
         <a-col :span="12">
           <a-form-item label="上传头图" field="coverUrl">
             <a-upload
-              :limit="1"
+              :limit="3"
+              :multiple="true"
+              :draggable="true"
               list-type="picture-card"
               :custom-request="uploadCoverImage"
               :file-list="state.coverUrlList"
@@ -211,6 +216,7 @@
   const formModel = ref({
     id: prop.node?.id,
     name: prop.node.name,
+    spu: prop.node.spu,
     accountingCategory: prop.node.accountingCategory,
     type: prop.node.type,
     plan: prop.node.plan,
@@ -226,7 +232,7 @@
     saleStartDate: prop.node.saleStartDate,
     saleEndDate: prop.node.saleEndDate,
     categoryIds: prop.node?.categoryIds,
-    coverImageId: prop.node?.coverImageId,
+    coverImageIds: prop.node?.coverImageIds ? prop.node?.coverImageIds : [],
     detailImageIds: prop.node?.detailImageIds ? prop.node?.detailImageIds : [],
   } as Product);
 
@@ -234,6 +240,10 @@
     name: [
       { required: true, message: '请输入商品手册名称' },
       { max: 10, message: '商品名称长度不能超过 10 个字符' },
+    ],
+    spu: [
+      { required: true, message: '请输入SPU' },
+      { max: 20, message: 'SPU长度不能超过 20 个字符' },
     ],
     accountingCategory: [
       { required: true, message: '请输入财务类别名称' },
@@ -282,7 +292,7 @@
   const uploadCoverImage = async (option: any) => {
     const result = await uploadMediaResource(option);
     if (result.data) {
-      formModel.value.coverImageId = result.data.id!;
+      formModel.value.coverImageIds?.push(result.data.id!);
       option.onSuccess(result.data);
     } else {
       option.onError(result);
@@ -293,7 +303,7 @@
     const result = await uploadMediaResource(option);
     if (result.data) {
       // console.log(result.data, result.data.id);
-      formModel.value.detailImageIds.push(result.data.id!);
+      formModel.value.detailImageIds?.push(result.data.id!);
       option.onSuccess(result.data);
     } else {
       option.onError(result);
@@ -302,32 +312,34 @@
 
   const changeCoverImage = async (option: any) => {
     // console.log(option);
-    formModel.value.coverImageId = 0;
-    return true;
+    const index = formModel.value.coverImageIds?.indexOf(option.uid);
+    console.log(index);
+    if (index !== -1) {
+      formModel.value.coverImageIds?.splice(index!, 1);
+      return true;
+    }
+    return false;
   };
 
   const changeDetailImages = async (option: any) => {
     // console.log(option);
-    const index = formModel.value.detailImageIds.indexOf(option.uid);
+    const index = formModel.value.detailImageIds?.indexOf(option.uid);
     if (index !== -1) {
-      formModel.value.detailImageIds.splice(index, 1);
+      formModel.value.detailImageIds?.splice(index!, 1);
+      return true;
     }
 
-    return true;
+    return false;
   };
 
   onMounted(() => {
-    if (prop.node?.coverImage) {
-      state.coverUrlList = [
-        {
-          uid: prop.node?.coverImage?.id,
-          url: prop.node?.coverImage?.url,
-          name: prop.node?.coverImage?.filename,
-        },
-      ];
-    }
+    state.coverUrlList = prop.node?.coverImages?.map((coverImage) => ({
+      uid: coverImage?.id,
+      url: coverImage?.url,
+      name: coverImage?.filename,
+    }));
 
-    state.detailUrlList = prop.node?.detailImages.map((detailImage) => ({
+    state.detailUrlList = prop.node?.detailImages?.map((detailImage) => ({
       uid: detailImage?.id,
       url: detailImage?.url,
       name: detailImage?.filename,

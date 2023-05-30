@@ -113,7 +113,7 @@
   const formModel = ref({
     name: '',
     gender: true,
-    birthday: '',
+    birthday: new Date(),
     phoneNumber: '',
     coverURL: '',
     workNo: '',

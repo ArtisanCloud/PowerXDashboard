@@ -12,7 +12,7 @@
       @page-size-change="pageSizeChanged"
     >
       <template #coverURL="{ record }">
-        <a-image width="72" :src="record.coverImage?.url"></a-image>
+        <a-image width="72" :src="record.coverImages[0]?.url"></a-image>
       </template>
 
       <template #type="{ record }">
