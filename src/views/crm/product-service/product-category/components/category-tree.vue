@@ -63,14 +63,24 @@
         </a-table-column>
       </template>
     </a-table>
-    <a-drawer v-model:visible="state.createSubCategory.visible" width="500px">
+    <a-drawer
+      v-model:visible="state.createSubCategory.visible"
+      width="500px"
+      ok-text="关闭抽屉"
+      :hide-cancel="true"
+    >
       <CreateCategory
         v-if="state.createSubCategory.visible"
         :parent-node="state.createSubCategory.parentNode"
         @submitSuccess="fetchCategoryTree"
       />
     </a-drawer>
-    <a-drawer v-model:visible="state.editCategory.visible" width="500px">
+    <a-drawer
+      v-model:visible="state.editCategory.visible"
+      width="500px"
+      ok-text="关闭抽屉"
+      :hide-cancel="true"
+    >
       <EditCategory
         v-if="state.editCategory.visible"
         :node="state.editCategory.node"

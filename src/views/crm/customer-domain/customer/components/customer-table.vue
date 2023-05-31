@@ -47,7 +47,12 @@
       </template>
     </a-table>
 
-    <a-drawer v-model:visible="state.editCustomer.visible" width="500px">
+    <a-drawer
+      v-model:visible="state.editCustomer.visible"
+      width="500px"
+      ok-text="关闭抽屉"
+      :hide-cancel="true"
+    >
       <EditCustomer
         v-if="state.editCustomer.visible"
         :node="state.editCustomer.node"

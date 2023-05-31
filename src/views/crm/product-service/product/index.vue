@@ -9,7 +9,12 @@
     <a-card>
       <ProductTable ref="RefProductTable" />
     </a-card>
-    <a-drawer v-model:visible="state.createProduct.visible" width="800px">
+    <a-drawer
+      v-model:visible="state.createProduct.visible"
+      width="800px"
+      ok-text="关闭抽屉"
+      :hide-cancel="true"
+    >
       <CreateProduct
         v-if="state.createProduct.visible"
         @submitSuccess="refreshProductList"

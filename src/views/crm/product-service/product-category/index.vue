@@ -2,52 +2,54 @@
   <div class="container">
     <a-card>
       <a-space size="large">
-        <a-button type="primary" @click="openAddCategory()"
-        >新增品类
-        </a-button>
+        <a-button type="primary" @click="openAddCategory()">新增品类 </a-button>
       </a-space>
     </a-card>
-    <br/>
+    <br />
     <a-card>
-      <CategoryTree ref="RefTree"/>
+      <CategoryTree ref="RefTree" />
     </a-card>
     <a-drawer
-        v-model:visible="state.createCategory.visible" width="500px">
+      v-model:visible="state.createCategory.visible"
+      width="500px"
+      ok-text="关闭抽屉"
+      :hide-cancel="true"
+    >
       <CreateCategory
-          @submitSuccess="refreshTree"
-          v-if="state.createCategory.visible"/>
+        v-if="state.createCategory.visible"
+        @submitSuccess="refreshTree"
+      />
     </a-drawer>
   </div>
 </template>
 
 <script lang="ts" setup>
-import {reactive, ref} from 'vue';
-import CategoryTree from '@/views/crm/product-service/product-category/components/category-tree.vue';
-import CreateCategory from '@/views/crm/product-service/product-category/components/create-category.vue';
+  import { reactive, ref } from 'vue';
+  import CategoryTree from '@/views/crm/product-service/product-category/components/category-tree.vue';
+  import CreateCategory from '@/views/crm/product-service/product-category/components/create-category.vue';
 
-const RefTree = ref<any>();
+  const RefTree = ref<any>();
 
-const openAddCategory = () => {
-  state.createCategory.visible = true;
-};
+  const openAddCategory = () => {
+    state.createCategory.visible = true;
+  };
 
-const state = reactive({
-  createCategory: {
-    visible: false,
-    parentNode: {}
-  },
-});
+  const state = reactive({
+    createCategory: {
+      visible: false,
+      parentNode: {},
+    },
+  });
 
-const refreshTree = () =>{
-  RefTree.value.fetchCategoryTree()
-}
-
+  const refreshTree = () => {
+    RefTree.value.fetchCategoryTree();
+  };
 </script>
 
 <script lang="ts">
-export default {
-  name: '商品品类',
-};
+  export default {
+    name: '商品品类',
+  };
 </script>
 
 <style scoped></style>

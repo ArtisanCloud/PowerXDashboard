@@ -47,7 +47,8 @@
     <a-drawer
       v-model:visible="state.editArtisan.visible"
       width="500px"
-      ok-text="关闭"
+      ok-text="关闭抽屉"
+      :hide-cancel="true"
     >
       <EditArtisan
         v-if="state.editArtisan.visible"

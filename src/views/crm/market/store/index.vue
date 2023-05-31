@@ -9,7 +9,12 @@
     <a-card>
       <StoreTable ref="RefStoreTable" />
     </a-card>
-    <a-drawer v-model:visible="state.createStore.visible" width="500px">
+    <a-drawer
+      v-model:visible="state.createStore.visible"
+      width="500px"
+      ok-text="关闭抽屉"
+      :hide-cancel="true"
+    >
       <CreateStore
         v-if="state.createStore.visible"
         @submitSuccess="refreshStoreList"

@@ -1,13 +1,13 @@
 <template>
   <a-card>
     <a-table
-      :data="storeList"
+      :data="mediaList"
       :loading="state.loading"
       row-key="id"
       :columns="columns"
       column-resizable
-      :bordered="{ cell: true }"
       :pagination="pagination"
+      :bordered="{ cell: true }"
       @page-change="pageChanged"
       @page-size-change="pageSizeChanged"
     >
@@ -16,26 +16,26 @@
       </template>
       <template #optional="{ record }">
         <a-space align="center">
-          <!--编辑店铺按钮-->
-          <a-button @click="openEditStore(record)">
+          <!--编辑媒体按钮-->
+          <a-button @click="openEditMedia(record)">
             <template #icon>
               <icon-edit :style="{ fontSize: '16px', color: 'green' }" />
             </template>
           </a-button>
 
           <!--配置价格按钮-->
-          <a-button @click="openEditStore(record)">
+          <a-button @click="openEditMedia(record)">
             <template #icon>
               <icon-book :style="{ fontSize: '16px', color: '#d7ee8f' }" />
             </template>
           </a-button>
 
-          <!--删除店铺按钮-->
+          <!--删除媒体按钮-->
           <a-popconfirm
-            content="该操作会删除相关子店铺,确定要删除此店铺吗？"
-            @ok="deleteStoreById(record.id)"
+            content="该操作会删除相关子媒体,确定要删除此媒体吗？"
+            @ok="deleteMediaById(record.id)"
           >
-            <a-button>
+            <a-button v-if="!record.isStandard">
               <template #icon>
                 <icon-delete :style="{ fontSize: '16px', color: 'red' }" />
               </template>
@@ -44,28 +44,16 @@
         </a-space>
       </template>
     </a-table>
-
     <a-drawer
-      v-model:visible="state.createStore.visible"
+      v-model:visible="state.editMedia.visible"
       width="500px"
       ok-text="关闭抽屉"
       :hide-cancel="true"
     >
-      <CreateStore
-        v-if="state.createStore.visible"
-        @submitSuccess="fetchStoreList"
-      />
-    </a-drawer>
-    <a-drawer
-      v-model:visible="state.editStore.visible"
-      width="500px"
-      ok-text="关闭抽屉"
-      :hide-cancel="true"
-    >
-      <EditStore
-        v-if="state.editStore.visible"
-        :node="state.editStore.node"
-        @submitSuccess="fetchStoreList"
+      <EditMedia
+        v-if="state.editMedia.visible"
+        :node="state.editMedia.node"
+        @submitSuccess="fetchMediaList"
       />
     </a-drawer>
   </a-card>
@@ -73,19 +61,18 @@
 
 <script lang="ts" setup>
   import { onMounted, reactive, ref } from 'vue';
+  import {
+    listMedias,
+    deleteMedia,
+    Media,
+    ListMediaPageRequest,
+  } from '@/api/crm/market/media';
 
   import { Message } from '@arco-design/web-vue';
   import { DefaultPageSize } from '@/api/common';
-  import {
-    listStores,
-    deleteStore,
-    Store,
-    ListStorePageRequest,
-  } from '@/api/crm/market/store';
-  import EditStore from '@/views/crm/market/store/components/edit-store.vue';
-  import CreateStore from '@/views/crm/market/store/components/create-store.vue';
+  import EditMedia from '@/views/crm/market/media/components/edit-media.vue';
 
-  const storeList = ref<Store[]>([]);
+  const mediaList = ref<Media[]>([]);
 
   const columns = reactive([
     {
@@ -94,25 +81,20 @@
       width: 60,
     },
     {
-      title: '店铺名称',
-      dataIndex: 'name',
-      width: 150,
+      title: '媒体标题',
+      dataIndex: 'title',
+      width: 200,
+    },
+    {
+      title: '媒体副标题',
+      dataIndex: 'subTitle',
+      width: 250,
     },
     {
       title: '头图',
       dataIndex: 'coverURL',
       width: 150,
       slotName: 'coverURL',
-    },
-    {
-      title: '地址',
-      dataIndex: 'address',
-      width: 120,
-    },
-    {
-      title: '描述',
-      dataIndex: 'description',
-      width: 300,
     },
     {
       title: '操作',
@@ -132,42 +114,43 @@
 
   const state = reactive({
     loading: false,
-    createStore: {
+    createMedia: {
       visible: false,
       parentNode: {},
     },
-    editStore: {
+    editMedia: {
       visible: false,
       node: {},
     },
+    submitLoading: false,
   });
 
-  const fetchStoreList = async (req: ListStorePageRequest) => {
+  const fetchMediaList = async (req: ListMediaPageRequest) => {
     state.loading = true;
     try {
-      const res = await listStores(req);
-      storeList.value = res.data.list;
+      const res = await listMedias(req);
+      mediaList.value = res.data.list;
       pagination.currentPage = res.data.pageIndex;
       pagination.pageSize = res.data.pageSize;
       pagination.total = res.data.total;
-      // console.log(storeList);
+      // console.log(categoryTree)
     } finally {
       state.loading = false;
     }
   };
 
-  const openEditStore = (cat: Store) => {
+  const openEditMedia = (cat: Media) => {
     // console.log(cat)
-    state.editStore.node = cat;
-    state.editStore.visible = true;
+    state.editMedia.node = cat;
+    state.editMedia.visible = true;
   };
 
-  const deleteStoreById = async (storeId: number) => {
+  const deleteMediaById = async (bookId: number) => {
     try {
-      const rep = await deleteStore({ id: storeId });
+      const rep = await deleteMedia({ id: bookId });
       if (rep.data.id && rep.data.id > 0) {
         Message.success('删除成功');
-        await fetchStoreList({
+        await fetchMediaList({
           pageIndex: pagination.currentPage,
           pageSize: pagination.pageSize,
         });
@@ -178,19 +161,19 @@
   };
 
   const pageChanged = (page: number) => {
-    // console.log("page",page)
-    fetchStoreList({ pageIndex: page, pageSize: pagination.pageSize });
+    // console.log("page", page)
+    fetchMediaList({ pageIndex: page, pageSize: pagination.pageSize });
   };
 
   const pageSizeChanged = (pageSize: number) => {
-    // console.log("pagesize",pageSize)
-    fetchStoreList({ pageIndex: pagination.currentPage, pageSize });
+    // console.log("pagesize", pageSize)
+    fetchMediaList({ pageIndex: pagination.currentPage, pageSize });
   };
 
-  defineExpose({ fetchStoreList });
+  defineExpose({ fetchMediaList });
 
   onMounted(() => {
-    fetchStoreList({});
+    fetchMediaList({});
   });
 </script>
 

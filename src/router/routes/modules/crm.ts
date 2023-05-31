@@ -144,8 +144,7 @@ const CRM: AppRouteRecordRaw = {
           path: '/crm/marketing/media-management',
 
           name: 'MediaManagement',
-          component: () =>
-            import('@/views/crm/market/media-management/index.vue'),
+          component: () => import('@/views/crm/market/media/index.vue'),
           meta: {
             locale: 'menu.crm.marketing.mediaManagement',
             requiresAuth: true,
