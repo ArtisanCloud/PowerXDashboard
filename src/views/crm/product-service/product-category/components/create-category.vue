@@ -2,36 +2,38 @@
   <div>
     <a-form ref="formRef" :model="formModel" :rules="rules" @submit="onSubmit">
       <a-form-item label="品类名称" field="name">
-        <a-input v-model="formModel.name"/>
+        <a-input v-model="formModel.name" />
       </a-form-item>
       <a-form-item label="上级品类" field="pId">
         <a-select
-            v-model="formModel.pId"
-            :options="option.parentCategoryOptions"
-            :field-names="{ label: 'name', value: 'id' }"
+          v-model="formModel.pId"
+          :options="options.parentCategoryOptions"
+          :field-names="{ label: 'name', value: 'id' }"
         />
       </a-form-item>
       <a-form-item label="副标题" field="viceName">
-        <a-input v-model="formModel.viceName"/>
+        <a-input v-model="formModel.viceName" />
       </a-form-item>
       <a-form-item label="描述" field="desc">
-        <a-textarea v-model="formModel.description"/>
+        <a-textarea v-model="formModel.description" />
       </a-form-item>
       <a-form-item label="排序" field="sort">
-        <a-input-number v-model="formModel.sort"/>
+        <a-input-number v-model="formModel.sort" />
       </a-form-item>
       <a-form-item label="图标" field="icon">
-        <a-input v-model="formModel.icon"/>
+        <a-input v-model="formModel.icon" />
       </a-form-item>
       <a-form-item label="背景颜色" field="backgroundColor">
-        <a-input v-model="formModel.backgroundColor"/>
+        <a-input v-model="formModel.backgroundColor" />
       </a-form-item>
       <a-form-item label="头图上传" field="imageUrl">
         <a-upload
-            list-type="picture-card"
-            action="/"
-            :default-file-list="fileList"
-            image-preview
+          :limit="1"
+          :multiple="false"
+          list-type="picture-card"
+          :custom-request="uploadCoverImage"
+          :file-list="state.imageUrlList"
+          image-preview
         />
       </a-form-item>
 
@@ -46,88 +48,104 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, onMounted, PropType, reactive, ref} from 'vue';
-import {FieldRule, Message} from '@arco-design/web-vue';
-import {createCategory, CreateCategoryRequest, ProductCategory} from '@/api/crm/product-service/category';
-import {ParentOption} from "@/api/common";
+  import { computed, onMounted, PropType, reactive, ref } from 'vue';
+  import { FieldRule, Message } from '@arco-design/web-vue';
+  import {
+    createCategory,
+    CreateCategoryRequest,
+    ProductCategory,
+  } from '@/api/crm/product-service/category';
+  import { ParentOption } from '@/api/common';
+  import { uploadMediaResource } from '@/api/mediaresource';
 
-
-const prop = defineProps({
-  parentNode: {
-    type: Object as PropType<ProductCategory>,
-    default() {
-      return {};
+  const prop = defineProps({
+    parentNode: {
+      type: Object as PropType<ProductCategory>,
+      default() {
+        return {};
+      },
     },
-  },
-});
+    node: {
+      type: Object as PropType<ProductCategory>,
+      default() {
+        return {};
+      },
+    },
+  });
 
-const emits = defineEmits(['submitSuccess', 'submitFailed', 'update:id']);
+  const emits = defineEmits(['submitSuccess', 'submitFailed', 'update:id']);
 
+  const parentId = computed({
+    get() {
+      return prop.parentNode?.id;
+    },
+    set(val) {
+      emits('update:id', val);
+    },
+  });
 
-const parentId = computed({
-  get() {
-    return prop.parentNode?.id;
-  },
-  set(val) {
-    emits('update:id', val);
-  },
-});
+  const formRef = ref();
+  const formModel = ref({
+    name: '',
+    pId: parentId.value,
+    sort: 0,
+    viceName: '',
+    description: '',
+    icon: '',
+    backgroundColor: '',
+    coverImageId: 0,
+  } as CreateCategoryRequest);
 
-const fileList = []
+  const rules = {
+    name: [
+      { required: true, message: '请输入品类名称' },
+      { max: 10, message: '品类名称长度不能超过 10 个字符' },
+    ],
+    pId: [{ required: true, message: '请选择上级品类' }],
+    description: [{ max: 100, message: '描述长度不能超过 100 个字符' }],
+  } as Record<string, FieldRule[]>;
 
-const formRef = ref();
-const formModel = ref({
+  const state = reactive({
+    coverUrlList: [] as Array<any>,
+    submitLoading: false,
+  });
 
-  name: '',
-  pId: parentId.value,
-  sort: 0,
-  viceName: '',
-  description: '',
-  icon: '',
-  backgroundColor: '',
-  imageURL: '',
+  const options = reactive({
+    parentCategoryOptions: [] as Array<ParentOption>,
+  });
 
-} as CreateCategoryRequest);
+  const fetchParentOptions = () => {
+    options.parentCategoryOptions = [
+      {
+        id: Number(prop.parentNode.id ? prop.parentNode.id : 0),
+        name: prop.parentNode.name ? prop.parentNode.name : '无',
+      },
+    ];
 
-const rules = {
-  name: [
-    {required: true, message: '请输入品类名称'},
-    {max: 10, message: '品类名称长度不能超过 10 个字符'},
-  ],
-  pId: [{required: true, message: '请选择上级品类'}],
-  description: [{max: 100, message: '描述长度不能超过 100 个字符'}],
+    // console.log(option.parentCategoryOptions[0].name)
+  };
 
+  const uploadCoverImage = async (option: any) => {
+    const result = await uploadMediaResource(option);
+    if (result.data) {
+      formModel.value.coverImageId = result.data.id!;
 
-} as Record<string, FieldRule[]>;
+      option.onSuccess(result.data);
+    } else {
+      option.onError(result);
+    }
+  };
 
-const state = reactive({submitLoading: false});
-
-const option = reactive({
-  parentCategoryOptions: [] as Array<ParentOption>,
-});
-
-function fetchParentOptions() {
-
-  option.parentCategoryOptions = [{
-    id: Number(prop.parentNode.id ? prop.parentNode.id : 0),
-    name: (prop.parentNode.name ? prop.parentNode.name : "无")
-  }];
-
-  // console.log(option.parentCategoryOptions[0].name)
-
-
-}
-
-const onSubmit = async () => {
-  if (state.submitLoading) {
-    return;
-  }
-  const err = await formRef.value.validate();
-  if (err) {
-    return;
-  }
-  state.submitLoading = true;
-  createCategory(formModel.value)
+  const onSubmit = async () => {
+    if (state.submitLoading) {
+      return;
+    }
+    const err = await formRef.value.validate();
+    if (err) {
+      return;
+    }
+    state.submitLoading = true;
+    createCategory(formModel.value)
       .then(() => {
         Message.success('创建成功');
         emits('submitSuccess');
@@ -138,9 +156,19 @@ const onSubmit = async () => {
       .finally(() => {
         state.submitLoading = false;
       });
-};
+  };
 
-onMounted(() => {
-  fetchParentOptions();
-});
+  onMounted(() => {
+    if (prop.node?.coverImage) {
+      state.coverUrlList = [
+        {
+          uid: prop.node?.coverImage?.id,
+          url: prop.node?.coverImage?.url,
+          name: prop.node?.coverImage?.filename,
+        },
+      ];
+      // console.log(prop.node);
+    }
+    fetchParentOptions();
+  });
 </script>
