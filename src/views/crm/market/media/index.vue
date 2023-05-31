@@ -2,24 +2,22 @@
   <div class="container">
     <a-card>
       <a-space size="large">
-        <a-button type="primary" @click="openAddDictionaryType()"
-          >新增数据字典
-        </a-button>
+        <a-button type="primary" @click="openAddMedia()">新增媒体 </a-button>
       </a-space>
     </a-card>
     <br />
     <a-card>
-      <DictionaryTypeTable ref="RefDictionaryTypeTable" />
+      <MediaTable ref="RefMediaTable" />
     </a-card>
     <a-drawer
-      v-model:visible="state.createDictionaryType.visible"
+      v-model:visible="state.createMedia.visible"
       width="500px"
       ok-text="关闭抽屉"
       :hide-cancel="true"
     >
-      <CreateDictionaryType
-        v-if="state.createDictionaryType.visible"
-        @submitSuccess="refreshDictionaryTypeList"
+      <CreateMedia
+        v-if="state.createMedia.visible"
+        @submitSuccess="refreshMediaList"
       />
     </a-drawer>
   </div>
@@ -27,22 +25,21 @@
 
 <script lang="ts" setup>
   import { reactive, ref } from 'vue';
-
-  import DictionaryTypeTable from '@/views/admin/dictionary/components/dictionary-type-table.vue';
-  import CreateDictionaryType from '@/views/admin/dictionary/components/create-dictionary-type.vue';
   import { DefaultPageSize } from '@/api/common';
+  import MediaTable from '@/views/crm/market/media/components/media-table.vue';
+  import CreateMedia from '@/views/crm/market/media/components/create-media.vue';
 
-  const RefDictionaryTypeTable = ref<any>();
+  const RefMediaTable = ref<any>();
 
   const state = reactive({
-    createDictionaryType: {
+    createMedia: {
       visible: false,
       parentNode: {},
     },
   });
 
-  const openAddDictionaryType = () => {
-    state.createDictionaryType.visible = true;
+  const openAddMedia = () => {
+    state.createMedia.visible = true;
   };
 
   const pagination = reactive({
@@ -55,8 +52,8 @@
     'show-page-size': true,
   });
 
-  const refreshDictionaryTypeList = () => {
-    RefDictionaryTypeTable.value.fetchDictionaryTypeList({
+  const refreshMediaList = () => {
+    RefMediaTable.value.fetchMediaList({
       pageIndex: pagination.currentPage,
       pageSize: pagination.pageSize,
     });

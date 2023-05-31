@@ -9,7 +9,12 @@
     <a-card>
       <LeadTable ref="RefLeadTable" />
     </a-card>
-    <a-drawer v-model:visible="state.createLead.visible" width="500px">
+    <a-drawer
+      v-model:visible="state.createLead.visible"
+      width="500px"
+      ok-text="关闭抽屉"
+      :hide-cancel="true"
+    >
       <CreateLead
         v-if="state.createLead.visible"
         @submitSuccess="refreshLeadList"

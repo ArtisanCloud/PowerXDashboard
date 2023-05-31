@@ -9,5 +9,6 @@ export interface OptionsState {
   promoteChannels: DictionaryItem[];
   sourceTypes: DictionaryItem[];
   artisanLevels: DictionaryItem[];
+  mediaTypes: DictionaryItem[];
   setup: boolean;
 }

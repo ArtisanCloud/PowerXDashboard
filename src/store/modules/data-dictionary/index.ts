@@ -10,6 +10,7 @@ import {
   PromoteChannelsDDType,
   SalesChannelsDDType,
   SourceTypesDDType,
+  TypeMediaTypeDDType,
 } from '@/api/dictionary';
 import { OptionsState } from '@/store/modules/data-dictionary/type';
 
@@ -23,6 +24,7 @@ const useOptionsStore = defineStore('options', {
     promoteChannels: [],
     sourceTypes: [],
     artisanLevels: [],
+    mediaTypes: [],
     setup: false,
   }),
 
@@ -122,6 +124,16 @@ const useOptionsStore = defineStore('options', {
       }
     },
 
+    async fetchMediaTypesOptions() {
+      try {
+        const res = await listDictionaryItems({ type: TypeMediaTypeDDType });
+        this.mediaTypes = res.data.list;
+        // console.log(dictionaryTypeList)
+      } finally {
+        // console.log("fetch approval status options")
+      }
+    },
+
     async fetchAllOptions() {
       await this.fetchCustomerTypesOptions();
       await this.fetchProductTypeOptions();
@@ -131,6 +143,7 @@ const useOptionsStore = defineStore('options', {
       await this.fetchPromoteChannelsOptions();
       await this.fetchSourceTypesOptions();
       await this.fetchArtisanLevelsOptions();
+      await this.fetchMediaTypesOptions();
       this.setup = true;
     },
 
