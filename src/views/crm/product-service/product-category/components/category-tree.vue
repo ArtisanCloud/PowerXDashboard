@@ -10,7 +10,13 @@
       <template #columns>
         <a-table-column title="品类名称" data-index="name" />
         <a-table-column title="副标题" data-index="viceName" />
-        <a-table-column title="描述" data-index="description" />
+        <a-table-column title="icon" data-index="icon" />
+        <a-table-column title="preview" data-index="imageUrl">
+          <template #cell="{ record }">
+            <a-image width="72" :src="record.coverImage?.url"></a-image>
+          </template>
+        </a-table-column>
+        <a-table-column title="背景颜色" data-index="backgroundColor" />
         <a-table-column title="操作">
           <template #cell="{ record }">
             <a-space>
@@ -75,7 +81,7 @@
 </template>
 
 <script lang="ts" setup>
-  import { onMounted, reactive, ref } from 'vue';
+  import { computed, onMounted, reactive, ref } from 'vue';
   import {
     ProductCategory,
     getCategoryTree,
@@ -114,6 +120,13 @@
     }
   };
 
+  const setStyle = (record: ProductCategory) => {
+    return {
+      backgroundColor: record.backgroundColor,
+      width: '16px',
+    };
+  };
+
   const FindCategoryFromTreeById = (
     tree: ProductCategory[],
     id: number
@@ -139,7 +152,7 @@
   };
 
   const openAddSubCategory = (cat: ProductCategory) => {
-    const pCategory = FindCategoryFromTreeById(categoryTree.value, cat.id)!;
+    const pCategory = FindCategoryFromTreeById(categoryTree.value, cat.id!);
     let parentNode: ParentOption = { name: '无', id: 0 };
     if (pCategory) {
       parentNode = { name: pCategory.name, id: Number(pCategory.id) };

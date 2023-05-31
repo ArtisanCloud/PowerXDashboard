@@ -6,8 +6,9 @@ import {
 } from '@/api/common';
 import axios from 'axios';
 import { UriProduct } from '@/api/crm/product-service/product';
+import { MediaSet } from '@/api/mediaresource';
 
-export interface ProductCategory extends PowerModel, imageAbleInfo {
+export interface ProductCategory extends PowerModel, imageAbleInfo, MediaSet {
   pId?: number;
   name: string;
   sort?: number;
@@ -30,25 +31,23 @@ export function getCategoryTree(request: GetCategoryTreeRequest) {
   );
 }
 
-export interface CreateCategoryRequest extends imageAbleInfo {
-  pId: number;
-  name: string;
-  sort: number;
-  viceName: string;
-  description: string;
-}
+export type CreateCategoryRequest = ProductCategory;
 
-export interface CreateCategoryReply extends imageAbleInfo {
-  pId: number;
-  name: string;
-  sort: number;
-  viceName: string;
-  description: string;
-}
+export type CreateCategoryReply = ProductCategory;
+
+export type UpdateCategoryRequest = ProductCategory;
+export type UpdateCategoryReply = ProductCategory;
 
 export function createCategory(request: CreateCategoryRequest) {
   return axios.post<CreateCategoryReply>(
     `${PrefixUriAdmin + UriProduct}/product-categories`,
+    request
+  );
+}
+
+export function updateCategory(request: UpdateCategoryRequest) {
+  return axios.put<UpdateCategoryReply>(
+    `${PrefixUriAdmin + UriProduct}/product-categories/${request.id}`,
     request
   );
 }
