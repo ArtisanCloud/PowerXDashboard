@@ -222,7 +222,7 @@ const CRM: AppRouteRecordRaw = {
         {
           path: '/crm/transaction/order',
           name: 'Order',
-          component: () => import('@/views/crm/transaction/order/index.vue'),
+          component: () => import('@/views/crm/trade/order/index.vue'),
           meta: {
             locale: 'menu.crm.transaction.order',
             requiresAuth: true,
@@ -232,7 +232,7 @@ const CRM: AppRouteRecordRaw = {
         {
           path: '/crm/transaction/payment',
           name: 'Payment',
-          component: () => import('@/views/crm/transaction/payment/index.vue'),
+          component: () => import('@/views/crm/trade/payment/index.vue'),
           meta: {
             locale: 'menu.crm.transaction.payment',
             requiresAuth: true,

@@ -1,7 +1,7 @@
 <template>
   <a-card>
     <a-table
-      :data="priceBookList"
+      :data="paymentList"
       :loading="state.loading"
       row-key="id"
       :columns="columns"
@@ -11,32 +11,38 @@
       @page-change="pageChanged"
       @page-size-change="pageSizeChanged"
     >
-      <template #isStandard="{ record }">
+      <template #paymentType="{ record }">
         <a-typography-text>{{
-          record.isStandard ? '标准' : '普通'
+          options.GetOptionById(options.paymentTypes, record.paymentType)?.name
         }}</a-typography-text>
       </template>
-
+      <template #status="{ record }">
+        <a-typography-text>
+          {{
+            options.GetOptionById(options.paymentStatus, record.status)?.name
+          }}
+        </a-typography-text>
+      </template>
       <template #optional="{ record }">
         <a-space align="center">
-          <!--编辑品类按钮-->
-          <a-button @click="openEditPriceBook(record)">
+          <!--编辑支付单按钮-->
+          <a-button @click="openEditPayment(record)">
             <template #icon>
               <icon-edit :style="{ fontSize: '16px', color: 'green' }" />
             </template>
           </a-button>
 
           <!--配置价格按钮-->
-          <a-button @click="openEditPriceBook(record)">
+          <a-button @click="openEditPayment(record)">
             <template #icon>
               <icon-book :style="{ fontSize: '16px', color: '#d7ee8f' }" />
             </template>
           </a-button>
 
-          <!--删除品类按钮-->
+          <!--删除支付单按钮-->
           <a-popconfirm
-            content="该操作会删除相关子品类,确定要删除此品类吗？"
-            @ok="deletePriceBookById(record.id)"
+            content="该操作会删除相关子支付单,确定要删除此支付单吗？"
+            @ok="deletePaymentById(record.id)"
           >
             <a-button v-if="!record.isStandard">
               <template #icon>
@@ -47,28 +53,16 @@
         </a-space>
       </template>
     </a-table>
-
     <a-drawer
-      v-model:visible="state.createPriceBook.visible"
+      v-model:visible="state.editPayment.visible"
       width="500px"
       ok-text="关闭抽屉"
       :hide-cancel="true"
     >
-      <CreatePriceBook
-        v-if="state.createPriceBook.visible"
-        @submitSuccess="fetchPriceBookList"
-      />
-    </a-drawer>
-    <a-drawer
-      v-model:visible="state.editPriceBook.visible"
-      width="500px"
-      ok-text="关闭抽屉"
-      :hide-cancel="true"
-    >
-      <EditPriceBook
-        v-if="state.editPriceBook.visible"
-        :node="state.editPriceBook.node"
-        @submitSuccess="fetchPriceBookList"
+      <EditPayment
+        v-if="state.editPayment.visible"
+        :node="state.editPayment.node"
+        @submitSuccess="fetchPaymentList"
       />
     </a-drawer>
   </a-card>
@@ -76,36 +70,54 @@
 
 <script lang="ts" setup>
   import { onMounted, reactive, ref } from 'vue';
-  import {
-    listPriceBooks,
-    deletePriceBook,
-    PriceBook,
-    ListPriceBooksRequest,
-  } from '@/api/crm/product-service/priceBook';
-
-  import CreatePriceBook from '@/views/crm/product-service/price-book/components/create-price-book.vue';
-  import EditPriceBook from '@/views/crm/product-service/price-book/components/edit-price-book.vue';
   import { Message } from '@arco-design/web-vue';
   import { DefaultPageSize } from '@/api/common';
+  import {
+    listPayments,
+    deletePayment,
+    Payment,
+    ListPaymentPageRequest,
+  } from '@/api/crm/trade/payment';
 
-  const priceBookList = ref<PriceBook[]>([]);
+  import EditPayment from '@/views/crm/trade/payment/components/edit-payment.vue';
+  import { useOptionsStore } from '@/store';
+
+  const options = useOptionsStore();
+
+  const paymentList = ref<Payment[]>([]);
 
   const columns = reactive([
     {
-      title: '品类名称',
-      dataIndex: 'name',
+      title: 'ID',
+      dataIndex: 'id',
+      width: 60,
+    },
+    {
+      title: '支付单号',
+      dataIndex: 'paymentNumber',
+      width: 250,
+    },
+    {
+      title: '交易金额',
+      dataIndex: 'paidAmount',
+      width: 100,
+    },
+    {
+      title: '支付方式',
+      dataIndex: 'paymentType',
       width: 150,
+      slotName: 'paymentType',
     },
     {
-      title: '类型',
-      dataIndex: 'isStandard',
-      width: 120,
-      slotName: 'isStandard',
+      title: '支付订单状态',
+      dataIndex: 'status',
+      width: 150,
+      slotName: 'status',
     },
     {
-      title: '描述',
-      dataIndex: 'description',
-      width: 300,
+      title: '交易时间',
+      dataIndex: 'paymentDate',
+      width: 100,
     },
     {
       title: '操作',
@@ -125,21 +137,22 @@
 
   const state = reactive({
     loading: false,
-    createPriceBook: {
+    createPayment: {
       visible: false,
       parentNode: {},
     },
-    editPriceBook: {
+    editPayment: {
       visible: false,
       node: {},
     },
+    submitLoading: false,
   });
 
-  const fetchPriceBookList = async (req: ListPriceBooksRequest) => {
+  const fetchPaymentList = async (req: ListPaymentPageRequest) => {
     state.loading = true;
     try {
-      const res = await listPriceBooks(req);
-      priceBookList.value = res.data.list;
+      const res = await listPayments(req);
+      paymentList.value = res.data.list;
       pagination.currentPage = res.data.pageIndex;
       pagination.pageSize = res.data.pageSize;
       pagination.total = res.data.total;
@@ -149,18 +162,18 @@
     }
   };
 
-  const openEditPriceBook = (cat: PriceBook) => {
+  const openEditPayment = (cat: Payment) => {
     // console.log(cat)
-    state.editPriceBook.node = cat;
-    state.editPriceBook.visible = true;
+    state.editPayment.node = cat;
+    state.editPayment.visible = true;
   };
 
-  const deletePriceBookById = async (bookId: number) => {
+  const deletePaymentById = async (bookId: number) => {
     try {
-      const rep = await deletePriceBook({ id: bookId });
+      const rep = await deletePayment({ id: bookId });
       if (rep.data.id && rep.data.id > 0) {
         Message.success('删除成功');
-        await fetchPriceBookList({
+        await fetchPaymentList({
           pageIndex: pagination.currentPage,
           pageSize: pagination.pageSize,
         });
@@ -171,19 +184,19 @@
   };
 
   const pageChanged = (page: number) => {
-    // console.log("page",page)
-    fetchPriceBookList({ pageIndex: page, pageSize: pagination.pageSize });
+    // console.log("page", page)
+    fetchPaymentList({ pageIndex: page, pageSize: pagination.pageSize });
   };
 
   const pageSizeChanged = (pageSize: number) => {
-    // console.log("pagesize",pageSize)
-    fetchPriceBookList({ pageIndex: pagination.currentPage, pageSize });
+    // console.log("pagesize", pageSize)
+    fetchPaymentList({ pageIndex: pagination.currentPage, pageSize });
   };
 
-  defineExpose({ fetchPriceBookList });
+  defineExpose({ fetchPaymentList });
 
   onMounted(() => {
-    fetchPriceBookList({});
+    fetchPaymentList({});
   });
 </script>
 

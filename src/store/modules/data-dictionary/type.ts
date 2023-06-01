@@ -10,5 +10,12 @@ export interface OptionsState {
   sourceTypes: DictionaryItem[];
   artisanLevels: DictionaryItem[];
   mediaTypes: DictionaryItem[];
+  orderTypes: DictionaryItem[];
+  orderStatus: DictionaryItem[];
+  paymentTypes: DictionaryItem[];
+  paymentStatus: DictionaryItem[];
+
+  // custom
+
   setup: boolean;
 }

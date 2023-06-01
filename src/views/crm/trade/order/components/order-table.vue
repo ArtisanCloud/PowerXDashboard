@@ -1,7 +1,7 @@
 <template>
   <a-card>
     <a-table
-      :data="priceBookList"
+      :data="orderList"
       :loading="state.loading"
       row-key="id"
       :columns="columns"
@@ -11,32 +11,34 @@
       @page-change="pageChanged"
       @page-size-change="pageSizeChanged"
     >
-      <template #isStandard="{ record }">
-        <a-typography-text>{{
-          record.isStandard ? '标准' : '普通'
-        }}</a-typography-text>
+      <template #customerName="{ record }">
+        <a-typography-text>{{ record.customer?.name }} </a-typography-text>
       </template>
-
+      <template #status="{ record }">
+        <a-typography-text
+          >{{ options.GetOptionById(options.orderStatus, record.status)?.name }}
+        </a-typography-text>
+      </template>
       <template #optional="{ record }">
         <a-space align="center">
-          <!--编辑品类按钮-->
-          <a-button @click="openEditPriceBook(record)">
+          <!--编辑元匠按钮-->
+          <a-button @click="openEditOrder(record)">
             <template #icon>
               <icon-edit :style="{ fontSize: '16px', color: 'green' }" />
             </template>
           </a-button>
 
           <!--配置价格按钮-->
-          <a-button @click="openEditPriceBook(record)">
+          <a-button @click="openEditOrder(record)">
             <template #icon>
               <icon-book :style="{ fontSize: '16px', color: '#d7ee8f' }" />
             </template>
           </a-button>
 
-          <!--删除品类按钮-->
+          <!--删除元匠按钮-->
           <a-popconfirm
-            content="该操作会删除相关子品类,确定要删除此品类吗？"
-            @ok="deletePriceBookById(record.id)"
+            content="该操作会删除相关子元匠,确定要删除此元匠吗？"
+            @ok="deleteOrderById(record.id)"
           >
             <a-button v-if="!record.isStandard">
               <template #icon>
@@ -47,28 +49,16 @@
         </a-space>
       </template>
     </a-table>
-
     <a-drawer
-      v-model:visible="state.createPriceBook.visible"
+      v-model:visible="state.editOrder.visible"
       width="500px"
       ok-text="关闭抽屉"
       :hide-cancel="true"
     >
-      <CreatePriceBook
-        v-if="state.createPriceBook.visible"
-        @submitSuccess="fetchPriceBookList"
-      />
-    </a-drawer>
-    <a-drawer
-      v-model:visible="state.editPriceBook.visible"
-      width="500px"
-      ok-text="关闭抽屉"
-      :hide-cancel="true"
-    >
-      <EditPriceBook
-        v-if="state.editPriceBook.visible"
-        :node="state.editPriceBook.node"
-        @submitSuccess="fetchPriceBookList"
+      <EditOrder
+        v-if="state.editOrder.visible"
+        :node="state.editOrder.node"
+        @submitSuccess="fetchOrderList"
       />
     </a-drawer>
   </a-card>
@@ -76,37 +66,52 @@
 
 <script lang="ts" setup>
   import { onMounted, reactive, ref } from 'vue';
-  import {
-    listPriceBooks,
-    deletePriceBook,
-    PriceBook,
-    ListPriceBooksRequest,
-  } from '@/api/crm/product-service/priceBook';
 
-  import CreatePriceBook from '@/views/crm/product-service/price-book/components/create-price-book.vue';
-  import EditPriceBook from '@/views/crm/product-service/price-book/components/edit-price-book.vue';
+  import EditOrder from '@/views/crm/trade/order/components/edit-order.vue';
   import { Message } from '@arco-design/web-vue';
-  import { DefaultPageSize } from '@/api/common';
 
-  const priceBookList = ref<PriceBook[]>([]);
+  import { DefaultPageSize } from '@/api/common';
+  import {
+    listOrders,
+    deleteOrder,
+    Order,
+    ListOrderPageRequest,
+  } from '@/api/crm/trade/order';
+  import { useOptionsStore } from '@/store';
+
+  const options = useOptionsStore();
+
+  const orderList = ref<Order[]>([]);
 
   const columns = reactive([
     {
-      title: '品类名称',
-      dataIndex: 'name',
+      title: 'ID',
+      dataIndex: 'id',
+      width: 60,
+    },
+    {
+      title: '订单号',
+      dataIndex: 'orderNumber',
+      width: 250,
+    },
+    {
+      title: '交易金额',
+      dataIndex: 'unitPrice',
+      width: 100,
+    },
+    {
+      title: '客户名称',
+      dataIndex: 'customerName',
       width: 150,
+      slotName: 'customerName',
     },
     {
-      title: '类型',
-      dataIndex: 'isStandard',
-      width: 120,
-      slotName: 'isStandard',
+      title: '订单状态',
+      dataIndex: 'status',
+      width: 150,
+      slotName: 'status',
     },
-    {
-      title: '描述',
-      dataIndex: 'description',
-      width: 300,
-    },
+
     {
       title: '操作',
       slotName: 'optional',
@@ -125,21 +130,22 @@
 
   const state = reactive({
     loading: false,
-    createPriceBook: {
+    createOrder: {
       visible: false,
       parentNode: {},
     },
-    editPriceBook: {
+    editOrder: {
       visible: false,
       node: {},
     },
+    submitLoading: false,
   });
 
-  const fetchPriceBookList = async (req: ListPriceBooksRequest) => {
+  const fetchOrderList = async (req: ListOrderPageRequest) => {
     state.loading = true;
     try {
-      const res = await listPriceBooks(req);
-      priceBookList.value = res.data.list;
+      const res = await listOrders(req);
+      orderList.value = res.data.list;
       pagination.currentPage = res.data.pageIndex;
       pagination.pageSize = res.data.pageSize;
       pagination.total = res.data.total;
@@ -149,18 +155,18 @@
     }
   };
 
-  const openEditPriceBook = (cat: PriceBook) => {
+  const openEditOrder = (cat: Order) => {
     // console.log(cat)
-    state.editPriceBook.node = cat;
-    state.editPriceBook.visible = true;
+    state.editOrder.node = cat;
+    state.editOrder.visible = true;
   };
 
-  const deletePriceBookById = async (bookId: number) => {
+  const deleteOrderById = async (bookId: number) => {
     try {
-      const rep = await deletePriceBook({ id: bookId });
+      const rep = await deleteOrder({ id: bookId });
       if (rep.data.id && rep.data.id > 0) {
         Message.success('删除成功');
-        await fetchPriceBookList({
+        await fetchOrderList({
           pageIndex: pagination.currentPage,
           pageSize: pagination.pageSize,
         });
@@ -171,19 +177,19 @@
   };
 
   const pageChanged = (page: number) => {
-    // console.log("page",page)
-    fetchPriceBookList({ pageIndex: page, pageSize: pagination.pageSize });
+    // console.log("page", page)
+    fetchOrderList({ pageIndex: page, pageSize: pagination.pageSize });
   };
 
   const pageSizeChanged = (pageSize: number) => {
-    // console.log("pagesize",pageSize)
-    fetchPriceBookList({ pageIndex: pagination.currentPage, pageSize });
+    // console.log("pagesize", pageSize)
+    fetchOrderList({ pageIndex: pagination.currentPage, pageSize });
   };
 
-  defineExpose({ fetchPriceBookList });
+  defineExpose({ fetchOrderList });
 
   onMounted(() => {
-    fetchPriceBookList({});
+    fetchOrderList({});
   });
 </script>
 
