@@ -10,7 +10,11 @@ import {
   PromoteChannelsDDType,
   SalesChannelsDDType,
   SourceTypesDDType,
-  TypeMediaTypeDDType,
+  MediaTypeDDType,
+  OrderTypeDDType,
+  OrderStatusDDType,
+  PaymentTypeDDType,
+  PaymentStatusDDType,
 } from '@/api/dictionary';
 import { OptionsState } from '@/store/modules/data-dictionary/type';
 
@@ -25,6 +29,10 @@ const useOptionsStore = defineStore('options', {
     sourceTypes: [],
     artisanLevels: [],
     mediaTypes: [],
+    orderTypes: [],
+    orderStatus: [],
+    paymentTypes: [],
+    paymentStatus: [],
     setup: false,
   }),
 
@@ -126,8 +134,48 @@ const useOptionsStore = defineStore('options', {
 
     async fetchMediaTypesOptions() {
       try {
-        const res = await listDictionaryItems({ type: TypeMediaTypeDDType });
+        const res = await listDictionaryItems({ type: MediaTypeDDType });
         this.mediaTypes = res.data.list;
+        // console.log(dictionaryTypeList)
+      } finally {
+        // console.log("fetch approval status options")
+      }
+    },
+
+    async fetchOrderTypesOptions() {
+      try {
+        const res = await listDictionaryItems({ type: OrderTypeDDType });
+        this.orderTypes = res.data.list;
+        // console.log(dictionaryTypeList)
+      } finally {
+        // console.log("fetch approval status options")
+      }
+    },
+
+    async fetchOrderStatusOptions() {
+      try {
+        const res = await listDictionaryItems({ type: OrderStatusDDType });
+        this.orderStatus = res.data.list;
+        // console.log(dictionaryTypeList)
+      } finally {
+        // console.log("fetch approval status options")
+      }
+    },
+
+    async fetchPaymentTypesOptions() {
+      try {
+        const res = await listDictionaryItems({ type: PaymentTypeDDType });
+        this.paymentTypes = res.data.list;
+        // console.log(dictionaryTypeList)
+      } finally {
+        // console.log("fetch approval status options")
+      }
+    },
+
+    async fetchPaymentStatusOptions() {
+      try {
+        const res = await listDictionaryItems({ type: PaymentStatusDDType });
+        this.paymentStatus = res.data.list;
         // console.log(dictionaryTypeList)
       } finally {
         // console.log("fetch approval status options")
@@ -144,6 +192,10 @@ const useOptionsStore = defineStore('options', {
       await this.fetchSourceTypesOptions();
       await this.fetchArtisanLevelsOptions();
       await this.fetchMediaTypesOptions();
+      await this.fetchOrderTypesOptions();
+      await this.fetchOrderStatusOptions();
+      await this.fetchPaymentTypesOptions();
+      await this.fetchPaymentStatusOptions();
       this.setup = true;
     },
 

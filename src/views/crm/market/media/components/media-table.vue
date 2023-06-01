@@ -11,6 +11,11 @@
       @page-change="pageChanged"
       @page-size-change="pageSizeChanged"
     >
+      <template #mediaType="{ record }">
+        <a-typography-text>{{
+          options.GetOptionById(options.mediaTypes, record.mediaType)?.name
+        }}</a-typography-text>
+      </template>
       <template #coverURL="{ record }">
         <a-image width="72" :src="record.coverImage?.url"></a-image>
       </template>
@@ -71,6 +76,9 @@
   import { Message } from '@arco-design/web-vue';
   import { DefaultPageSize } from '@/api/common';
   import EditMedia from '@/views/crm/market/media/components/edit-media.vue';
+  import useOptionsStore from '../../../../../store/modules/data-dictionary';
+
+  const options = useOptionsStore();
 
   const mediaList = ref<Media[]>([]);
 
@@ -89,6 +97,12 @@
       title: '媒体副标题',
       dataIndex: 'subTitle',
       width: 250,
+    },
+    {
+      title: '类型',
+      dataIndex: 'mediaType',
+      width: 150,
+      slotName: 'mediaType',
     },
     {
       title: '头图',
