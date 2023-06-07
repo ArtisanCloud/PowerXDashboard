@@ -33,11 +33,11 @@
           </a-button>
 
           <!--转化客户按钮-->
-          <a-button @click="openCovertToCustomer(record)">
-            <template #icon>
-              <icon-user :style="{ fontSize: '16px' }" />
-            </template>
-          </a-button>
+          <!--          <a-button @click="openCovertToCustomer(record)">-->
+          <!--            <template #icon>-->
+          <!--              <icon-user :style="{ fontSize: '16px' }" />-->
+          <!--            </template>-->
+          <!--          </a-button>-->
 
           <!--删除线索按钮-->
           <a-popconfirm
@@ -147,7 +147,7 @@
     },
     editLead: {
       visible: false,
-      node: {},
+      node: {} as Lead,
     },
     submitLoading: false,
   });

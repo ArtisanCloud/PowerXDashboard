@@ -48,7 +48,7 @@ export interface ListEmployeesRequest {
   positions?: string[];
   likePhoneNumber?: string;
   roleCodes?: string[];
-  isEnable?: boolean;
+  isEnable?: any;
   pageIndex?: number;
   pageSize?: number;
 }

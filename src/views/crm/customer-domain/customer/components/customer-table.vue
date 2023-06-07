@@ -140,7 +140,7 @@
     },
     editCustomer: {
       visible: false,
-      node: {},
+      node: {} as Customer,
     },
     submitLoading: false,
   });

@@ -1,15 +1,7 @@
 <template>
-  <div class="container">
-
-  </div>
+  <div class="container"> </div>
 </template>
 
-<script>
-export default {
-  name: "WeWorkCustomerGroup"
-}
-</script>
+<script lang="ts" setup></script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

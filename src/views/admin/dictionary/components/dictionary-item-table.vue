@@ -116,7 +116,7 @@
     },
     editDictionaryItem: {
       visible: false,
-      node: {},
+      node: {} as DictionaryItem,
     },
   });
 
@@ -140,7 +140,7 @@
     state.createDictionaryItem.visible = true;
   };
 
-  const openEditDictionaryItem = (cat: DictionaryType) => {
+  const openEditDictionaryItem = (cat: DictionaryItem) => {
     // console.log(cat)
     state.editDictionaryItem.node = cat;
     state.editDictionaryItem.visible = true;

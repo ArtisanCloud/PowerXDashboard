@@ -131,7 +131,7 @@
     },
     editPriceBook: {
       visible: false,
-      node: {},
+      node: {} as PriceBook,
     },
   });
 

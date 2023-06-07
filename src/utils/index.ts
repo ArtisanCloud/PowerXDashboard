@@ -23,3 +23,7 @@ export const regexUrl = new RegExp(
 );
 
 export default null;
+
+export const convertIntArrayToStringArray = (numbers: number[]): string[] => {
+  return numbers.map((num) => num.toString());
+};

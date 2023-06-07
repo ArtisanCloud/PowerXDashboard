@@ -19,7 +19,7 @@
 </template>
 
 <script lang="ts" setup>
-  import { onMounted, reactive, ref } from 'vue';
+  import { onMounted, PropType, reactive, ref } from 'vue';
   import {
     getCategoryTree,
     ProductCategory,
@@ -27,7 +27,7 @@
 
   const props = defineProps({
     defaultValue: {
-      type: Array,
+      type: Array as PropType<string[]>,
       default: () => [],
     },
   });
@@ -91,7 +91,7 @@
     }
   };
 
-  const changeCategory = (e: number[]) => {
+  const changeCategory = (e: string[]) => {
     emits('update:category-ids', e);
   };
 

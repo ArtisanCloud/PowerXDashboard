@@ -74,7 +74,7 @@
       <a-form-item>
         <a-space size="large">
           <a-button type="primary" html-type="submit">提交</a-button>
-          <a-button @click="$refs.formRef.resetFields()">重置</a-button>
+          <a-button @click="formRef.resetFields()">重置</a-button>
         </a-space>
       </a-form-item>
     </a-form>
@@ -84,7 +84,12 @@
 <script lang="ts" setup>
   import { onMounted, PropType, reactive, ref } from 'vue';
   import { updateStore, Store } from '@/api/crm/market/store';
-  import { FieldRule, Message } from '@arco-design/web-vue';
+  import {
+    FieldRule,
+    Message,
+    RequestOption,
+    UploadRequest,
+  } from '@arco-design/web-vue';
   import { uploadMediaResource } from '@/api/mediaresource';
   import { formatStoreTime } from '@/utils/dayjs';
   import { dayjs } from '@arco-design/web-vue/es/_utils/date';
@@ -137,26 +142,46 @@
     submitLoading: false,
   });
 
-  const uploadCoverImage = async (option: any) => {
-    const result = await uploadMediaResource(option);
-    if (result.data) {
-      formModel.value.coverImageId = result.data.id!;
-
-      option.onSuccess(result.data);
-    } else {
-      option.onError(result);
-    }
+  const uploadCoverImage: (option: RequestOption) => UploadRequest = (
+    option: RequestOption
+  ) => {
+    return {
+      abort() {
+        return uploadMediaResource(option)
+          .then((result: any) => {
+            if (result.data) {
+              formModel.value.coverImageId = result.data.id!;
+              option.onSuccess(result.data);
+            } else {
+              option.onError(result);
+            }
+          })
+          .catch((error: any) => {
+            option.onError(error);
+          });
+      },
+    };
   };
 
-  const uploadDetailImages = async (option: any) => {
-    const result = await uploadMediaResource(option);
-    if (result.data) {
-      // console.log(result.data, result.data.id);
-      formModel.value.detailImageIds.push(result.data.id!);
-      option.onSuccess(result.data);
-    } else {
-      option.onError(result);
-    }
+  const uploadDetailImages: (option: RequestOption) => UploadRequest = (
+    option: RequestOption
+  ) => {
+    return {
+      abort() {
+        return uploadMediaResource(option)
+          .then((result: any) => {
+            if (result.data) {
+              formModel.value.detailImageIds?.push(result.data.id!);
+              option.onSuccess(result.data);
+            } else {
+              option.onError(result);
+            }
+          })
+          .catch((error: any) => {
+            option.onError(error);
+          });
+      },
+    };
   };
 
   const changeCoverImage = async (option: any) => {
@@ -199,10 +224,11 @@
       // console.log(prop.node);
     }
 
-    state.detailUrlList = prop.node?.detailImages.map((detailImage) => ({
-      uid: detailImage?.id,
-      url: detailImage?.url,
-      name: detailImage?.filename,
-    }));
+    state.detailUrlList =
+      prop.node?.detailImages?.map((detailImage) => ({
+        uid: detailImage?.id,
+        url: detailImage?.url,
+        name: detailImage?.filename,
+      })) || [];
   });
 </script>

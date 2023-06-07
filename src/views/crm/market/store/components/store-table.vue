@@ -138,7 +138,7 @@
     },
     editStore: {
       visible: false,
-      node: {},
+      node: {} as Store,
     },
   });
 

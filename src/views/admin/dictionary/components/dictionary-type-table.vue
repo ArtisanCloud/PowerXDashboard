@@ -84,7 +84,7 @@
 
   import EditDictionaryType from '@/views/admin/dictionary/components/edit-dictionary-type.vue';
   import DictionaryItemTable from '@/views/admin/dictionary/components/dictionary-item-table.vue';
-  import { Message } from '@arco-design/web-vue';
+  import { Message, TableData } from '@arco-design/web-vue';
   import CreateDictionaryItem from '@/views/admin/dictionary/components/create-dictionary-item.vue';
 
   const dictionaryTypeList = ref<DictionaryType[]>([]);
@@ -115,11 +115,11 @@
   const expandable = reactive({
     title: '展开数据项',
     width: 100,
-    expandedRowRender: (record: DictionaryType) => {
+    expandedRowRender: (record: any) => {
       if (record.items && record.items.length > 0) {
         const tbItems = (
           <DictionaryItemTable
-            submitUpdateSuccess={() => {}}
+            onSubmitUpdateSuccess={() => {}}
             dictionaryType={record}
           />
         );
@@ -148,11 +148,11 @@
     },
     editDictionaryType: {
       visible: false,
-      node: {},
+      node: {} as DictionaryType,
     },
     createDictionaryItem: {
       visible: false,
-      parentNode: {},
+      parentNode: {} as DictionaryType,
     },
     editDictionaryItem: {
       visible: false,

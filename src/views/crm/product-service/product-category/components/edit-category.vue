@@ -39,7 +39,7 @@
       <a-form-item>
         <a-space size="large">
           <a-button type="primary" html-type="submit">提交</a-button>
-          <a-button @click="$refs.formRef.resetFields()">重置</a-button>
+          <a-button @click="formRef.resetFields()">重置</a-button>
         </a-space>
       </a-form-item>
     </a-form>
@@ -48,7 +48,12 @@
 
 <script lang="ts" setup>
   import { computed, onMounted, PropType, reactive, ref } from 'vue';
-  import { FieldRule, Message } from '@arco-design/web-vue';
+  import {
+    FieldRule,
+    Message,
+    RequestOption,
+    UploadRequest,
+  } from '@arco-design/web-vue';
   import {
     createCategory,
     CreateCategoryRequest,
@@ -84,10 +89,6 @@
   //   },
   // });
 
-  const fileList = [
-    // prop.node?.imageURL,
-  ];
-
   const formRef = ref();
   const formModel = ref({
     id: prop.node.id,
@@ -110,7 +111,10 @@
     description: [{ max: 100, message: '描述长度不能超过 100 个字符' }],
   } as Record<string, FieldRule[]>;
 
-  const state = reactive({ submitLoading: false });
+  const state = reactive({
+    coverUrlList: [] as Array<any>,
+    submitLoading: false,
+  });
 
   const options = reactive({
     parentCategoryOptions: [] as Array<ParentOption>,
@@ -133,14 +137,25 @@
     console.log(options.parentCategoryOptions[0].name);
   }
 
-  const uploadCoverImage = async (option: any) => {
-    const result = await uploadMediaResource(option);
-    if (result.data) {
-      formModel.value.coverImageId = result.data.id!;
-      option.onSuccess(result.data);
-    } else {
-      option.onError(result);
-    }
+  const uploadCoverImage: (option: RequestOption) => UploadRequest = (
+    option: RequestOption
+  ) => {
+    return {
+      abort() {
+        return uploadMediaResource(option)
+          .then((result: any) => {
+            if (result.data) {
+              formModel.value.coverImageId = result.data.id!;
+              option.onSuccess(result.data);
+            } else {
+              option.onError(result);
+            }
+          })
+          .catch((error: any) => {
+            option.onError(error);
+          });
+      },
+    };
   };
 
   const changeCoverImage = async (option: any) => {

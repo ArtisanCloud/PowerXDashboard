@@ -31,7 +31,10 @@
         title="添加子部门"
         width="500px"
       >
-        <CreateDepartment :id="state.addDepDrawer.pId" @submit-success="fetch()"/>
+        <CreateDepartment
+          :id="state.addDepDrawer.pId"
+          @submit-success="fetch()"
+        />
       </a-drawer>
     </template>
     <template #switcher-icon>
@@ -74,7 +77,7 @@
     },
   });
 
-  const onSelect = (v: number[]) => {
+  const onSelect = (v: any[]) => {
     depId.value = v.shift();
   };
 

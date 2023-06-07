@@ -1,14 +1,7 @@
 <template>
-  <div class="container">
-
-  </div>
+  <div class="container"> </div>
 </template>
-<script>
-export default {
-  name: "WeWorkTag"
-}
-</script>
 
-<style scoped>
+<script lang="ts" setup></script>
 
-</style>
+<style scoped></style>

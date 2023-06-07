@@ -47,7 +47,7 @@
     <a-form-item>
       <a-space size="large">
         <a-button type="primary" html-type="submit">提交</a-button>
-        <a-button @click="$refs.formRef.resetFields()">重置</a-button>
+        <a-button @click="formRef.resetFields()">重置</a-button>
       </a-space>
     </a-form-item>
   </a-form>

@@ -1,13 +1,5 @@
-<template>
+<template> </template>
 
-</template>
+<script lang="ts" setup></script>
 
-<script>
-export default {
-  name: "WeWorkCustomerDetail"
-}
-</script>
-
-<style scoped>
-
-</style>
+<style scoped></style>

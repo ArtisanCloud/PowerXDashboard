@@ -4,6 +4,13 @@ import { Message } from '@arco-design/web-vue';
 import { getToken } from '@/utils/auth';
 import qs from 'query-string';
 
+export interface HttpResponse<T = unknown> {
+  status: number;
+  msg: string;
+  code: number;
+  data: T;
+}
+
 interface ErrorResponse {
   reason: string;
   msg: string;
