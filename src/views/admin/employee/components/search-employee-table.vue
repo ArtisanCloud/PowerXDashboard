@@ -1,6 +1,6 @@
 <template>
   <a-card>
-    <a-form class="inline-query-form" layout="inline">
+    <a-form class="inline-query-form" layout="inline" :model="queryForm">
       <a-form-item label="用户名">
         <a-input v-model="queryForm.likeName" @change="queryChange" />
       </a-form-item>
@@ -206,7 +206,7 @@
     router.push(`/admin/employee/detail/${id}`);
   }
 
-  function changeEmployeeStatus(id: number, value: boolean) {
+  function changeEmployeeStatus(id: number, value: any) {
     const status = value ? 'enabled' : 'disabled';
     updateEmployee({ id, status })
       .then((res) => {

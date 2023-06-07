@@ -73,6 +73,7 @@
   import { Message } from '@arco-design/web-vue';
 
   import { DefaultPageSize } from '@/api/common';
+  import { Store } from '@/api/crm/market/store';
 
   const artisanList = ref<Artisan[]>([]);
 
@@ -122,7 +123,7 @@
     },
     editArtisan: {
       visible: false,
-      node: {},
+      node: {} as Artisan,
     },
     submitLoading: false,
   });

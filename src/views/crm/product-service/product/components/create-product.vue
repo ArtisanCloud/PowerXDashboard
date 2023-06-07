@@ -109,8 +109,8 @@
       </a-row>
       <a-row :gutter="32">
         <a-col :span="12">
-          <a-form-item label="允许购买数量上限" field="purchasedQuantity">
-            <a-input-number v-model="formModel.purchasedQuantity" />
+          <a-form-item label="允许购买数量上限" field="allowedSellQuantity">
+            <a-input-number v-model="formModel.allowedSellQuantity" />
           </a-form-item>
         </a-col>
       </a-row>
@@ -167,7 +167,7 @@
       <a-form-item>
         <a-space size="large">
           <a-button type="primary" html-type="submit">提交</a-button>
-          <a-button @click="$refs.formRef.resetFields()">重置</a-button>
+          <a-button @click="formRef.resetFields()">重置</a-button>
         </a-space>
       </a-form-item>
     </a-form>
@@ -177,7 +177,12 @@
 <script lang="ts" setup>
   import { onMounted, reactive, ref } from 'vue';
   import { createProduct, Product } from '@/api/crm/product-service/product';
-  import { FieldRule, Message } from '@arco-design/web-vue';
+  import {
+    FieldRule,
+    Message,
+    RequestOption,
+    UploadRequest,
+  } from '@arco-design/web-vue';
 
   import useOptionsStore from '@/store/modules/data-dictionary';
   import CategorySelector from '@/views/crm/product-service/product-category/components/category-selector.vue';
@@ -251,25 +256,46 @@
       });
   };
 
-  const uploadCoverImage = async (option: any) => {
-    const result = await uploadMediaResource(option);
-    if (result.data) {
-      formModel.value.coverImageIds?.push(result.data.id!);
-      option.onSuccess(result.data);
-    } else {
-      option.onError(result);
-    }
+  const uploadCoverImage: (option: RequestOption) => UploadRequest = (
+    option: RequestOption
+  ) => {
+    return {
+      abort() {
+        return uploadMediaResource(option)
+          .then((result: any) => {
+            if (result.data) {
+              formModel.value.coverImageIds?.push(result.data.id!);
+              option.onSuccess(result.data);
+            } else {
+              option.onError(result);
+            }
+          })
+          .catch((error: any) => {
+            option.onError(error);
+          });
+      },
+    };
   };
 
-  const uploadDetailImages = async (option: any) => {
-    const result = await uploadMediaResource(option);
-    if (result.data) {
-      // console.log(result.data, result.data.id);
-      formModel.value.detailImageIds?.push(result.data.id!);
-      option.onSuccess(result.data);
-    } else {
-      option.onError(result);
-    }
+  const uploadDetailImages: (option: RequestOption) => UploadRequest = (
+    option: RequestOption
+  ) => {
+    return {
+      abort() {
+        return uploadMediaResource(option)
+          .then((result: any) => {
+            if (result.data) {
+              formModel.value.detailImageIds?.push(result.data.id!);
+              option.onSuccess(result.data);
+            } else {
+              option.onError(result);
+            }
+          })
+          .catch((error: any) => {
+            option.onError(error);
+          });
+      },
+    };
   };
 
   const updateCategoryIds = (categoryIds: number[]) => {

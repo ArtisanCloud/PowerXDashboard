@@ -1,9 +1,7 @@
-<template> </template>
+<template>
+  <div></div>
+</template>
 
-<script>
-  export default {
-    name: 'WeWorkCustomerList',
-  };
-</script>
+<script lang="ts" setup></script>
 
 <style scoped></style>

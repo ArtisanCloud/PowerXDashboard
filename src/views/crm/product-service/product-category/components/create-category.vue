@@ -32,7 +32,7 @@
           :multiple="false"
           list-type="picture-card"
           :custom-request="uploadCoverImage"
-          :file-list="state.imageUrlList"
+          :file-list="state.coverUrlList"
           image-preview
         />
       </a-form-item>
@@ -40,7 +40,7 @@
       <a-form-item>
         <a-space size="large">
           <a-button type="primary" html-type="submit">提交</a-button>
-          <a-button @click="$refs.formRef.resetFields()">重置</a-button>
+          <a-button @click="formRef.resetFields()">重置</a-button>
         </a-space>
       </a-form-item>
     </a-form>
@@ -49,7 +49,12 @@
 
 <script lang="ts" setup>
   import { computed, onMounted, PropType, reactive, ref } from 'vue';
-  import { FieldRule, Message } from '@arco-design/web-vue';
+  import {
+    FieldRule,
+    Message,
+    RequestOption,
+    UploadRequest,
+  } from '@arco-design/web-vue';
   import {
     createCategory,
     CreateCategoryRequest,
@@ -125,15 +130,25 @@
     // console.log(option.parentCategoryOptions[0].name)
   };
 
-  const uploadCoverImage = async (option: any) => {
-    const result = await uploadMediaResource(option);
-    if (result.data) {
-      formModel.value.coverImageId = result.data.id!;
-
-      option.onSuccess(result.data);
-    } else {
-      option.onError(result);
-    }
+  const uploadCoverImage: (option: RequestOption) => UploadRequest = (
+    option: RequestOption
+  ) => {
+    return {
+      abort() {
+        return uploadMediaResource(option)
+          .then((result: any) => {
+            if (result.data) {
+              formModel.value.coverImageId = result.data.id!;
+              option.onSuccess(result.data);
+            } else {
+              option.onError(result);
+            }
+          })
+          .catch((error: any) => {
+            option.onError(error);
+          });
+      },
+    };
   };
 
   const onSubmit = async () => {

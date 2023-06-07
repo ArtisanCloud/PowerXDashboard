@@ -39,6 +39,7 @@ export function getDepartmentTree(request: GetDepartmentTreeRequest) {
 export interface CreateDepartmentRequest {
   depName: string;
   leaderId: number;
+  leaderIds: number[];
   pId: number;
   desc?: string;
   phoneNumber?: string;

@@ -111,11 +111,11 @@
     },
     createSubCategory: {
       visible: false,
-      parentNode: {},
+      parentNode: {} as ProductCategory,
     },
     editCategory: {
       visible: false,
-      node: {},
+      node: {} as ProductCategory,
     },
   });
 

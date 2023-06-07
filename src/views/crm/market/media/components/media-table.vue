@@ -134,7 +134,7 @@
     },
     editMedia: {
       visible: false,
-      node: {},
+      node: {} as Media,
     },
     submitLoading: false,
   });

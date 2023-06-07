@@ -178,11 +178,11 @@
     loading: false,
     createProduct: {
       visible: false,
-      parentNode: {},
+      parentNode: {} as Product,
     },
     editProduct: {
       visible: false,
-      node: {},
+      node: {} as Product,
     },
     submitLoading: false,
   });

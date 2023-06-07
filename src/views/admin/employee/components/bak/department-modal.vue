@@ -25,7 +25,7 @@
           allow-clear
           @search="search"
           @change="
-            (v) => {
+            (v:any) => {
               formModel.leaderIds = [v];
             }
           "

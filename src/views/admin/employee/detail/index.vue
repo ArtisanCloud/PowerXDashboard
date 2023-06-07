@@ -39,7 +39,7 @@
       <a-divider />
       <a-space fill size="large">
         <a-button type="primary" @click="editOnClick">编辑</a-button>
-        <a-popconfirm @ok="deleteOnClick" content="确定要删除吗">
+        <a-popconfirm content="确定要删除吗" @ok="deleteOnClick">
           <a-button type="primary" status="danger">删除</a-button>
         </a-popconfirm>
         <a-button type="primary">激活用户</a-button>
@@ -51,7 +51,11 @@
           <span>启用</span>
         </div>
       </a-space>
-      <a-drawer width="500px" v-model:visible="state.updateEmployeeVisible" :footer="false">
+      <a-drawer
+        v-model:visible="state.updateEmployeeVisible"
+        width="500px"
+        :footer="false"
+      >
         <EditEmployee v-if="data.id !== undefined" :id="data.id" />
       </a-drawer>
     </a-card>
@@ -99,7 +103,7 @@
     });
   };
 
-  const enableChange = (value: boolean) => {
+  const enableChange = (value: any) => {
     if (value !== data.value.isEnabled) {
       updateEmployee({
         id: data.value.id,

@@ -14,7 +14,7 @@ export interface ProductCategory extends PowerModel, imageAbleInfo, MediaSet {
   sort?: number;
   viceName?: string;
   description?: string;
-  children: ProductCategory[];
+  children?: ProductCategory[];
 }
 
 export interface GetCategoryTreeRequest {

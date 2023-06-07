@@ -40,6 +40,11 @@
       affixRef.value.updatePosition();
     }
   );
+
+  const offsetTop = () => {
+    return appStore.navbar ? 60 : 0;
+  };
+
   listenerRouteChange((route: RouteLocationNormalized) => {
     if (
       !route.meta.noAffix &&

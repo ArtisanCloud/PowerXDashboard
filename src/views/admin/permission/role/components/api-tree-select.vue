@@ -20,11 +20,11 @@
 
   const emit = defineEmits(['update:modelValue']);
 
-  const data = computed({
-    get() {
-      return props.modelValue;
+  const data = computed<(string | number)[]>({
+    get(): Array<string | number> {
+      return props.modelValue as Array<string | number>;
     },
-    set(value) {
+    set(value: ReadonlyArray<string | number>): void {
       emit('update:modelValue', value);
     },
   });
