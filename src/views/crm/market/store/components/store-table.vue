@@ -53,7 +53,7 @@
     >
       <CreateStore
         v-if="state.createStore.visible"
-        @submitSuccess="fetchStoreList"
+        @submit-success="fetchStoreList"
       />
     </a-drawer>
     <a-drawer
@@ -65,7 +65,7 @@
       <EditStore
         v-if="state.editStore.visible"
         :node="state.editStore.node"
-        @submitSuccess="fetchStoreList"
+        @submit-success="fetchStoreList"
       />
     </a-drawer>
   </a-card>
@@ -173,7 +173,8 @@
         });
       }
     } catch (error) {
-      console.error(error);
+      Message.error('删除失败');
+      // console.error(error);
     }
   };
 

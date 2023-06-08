@@ -61,7 +61,7 @@
     updateCategory,
   } from '@/api/crm/product-service/category';
   import { getEmployeeOptions, ParentOption } from '@/api/common';
-  import { uploadMediaResource } from '@/api/mediaresource';
+  import uploadMediaImages from '@/utils/media-resource';
 
   const prop = defineProps({
     parentNode: {
@@ -140,22 +140,9 @@
   const uploadCoverImage: (option: RequestOption) => UploadRequest = (
     option: RequestOption
   ) => {
-    return {
-      abort() {
-        return uploadMediaResource(option)
-          .then((result: any) => {
-            if (result.data) {
-              formModel.value.coverImageId = result.data.id!;
-              option.onSuccess(result.data);
-            } else {
-              option.onError(result);
-            }
-          })
-          .catch((error: any) => {
-            option.onError(error);
-          });
-      },
-    };
+    return uploadMediaImages(option, (data: any) => {
+      formModel.value.coverImageId = data.id!;
+    });
   };
 
   const changeCoverImage = async (option: any) => {
