@@ -112,9 +112,9 @@
     RequestOption,
     UploadRequest,
   } from '@arco-design/web-vue';
-  import { uploadMediaResource } from '@/api/mediaresource';
   import useOptionsStore from '@/store/modules/data-dictionary';
   import { dayjs } from '@arco-design/web-vue/es/_utils/date';
+  import uploadMediaImages from '@/utils/media-resource';
 
   const prop = defineProps({
     node: {
@@ -173,43 +173,17 @@
   const uploadCoverImage: (option: RequestOption) => UploadRequest = (
     option: RequestOption
   ) => {
-    return {
-      abort() {
-        return uploadMediaResource(option)
-          .then((result: any) => {
-            if (result.data) {
-              formModel.value.coverImageId = result.data.id!;
-              option.onSuccess(result.data);
-            } else {
-              option.onError(result);
-            }
-          })
-          .catch((error: any) => {
-            option.onError(error);
-          });
-      },
-    };
+    return uploadMediaImages(option, (data: any) => {
+      formModel.value.coverImageId = data.id!;
+    });
   };
 
   const uploadDetailImages: (option: RequestOption) => UploadRequest = (
     option: RequestOption
   ) => {
-    return {
-      abort() {
-        return uploadMediaResource(option)
-          .then((result: any) => {
-            if (result.data) {
-              formModel.value.detailImageIds?.push(result.data.id!);
-              option.onSuccess(result.data);
-            } else {
-              option.onError(result);
-            }
-          })
-          .catch((error: any) => {
-            option.onError(error);
-          });
-      },
-    };
+    return uploadMediaImages(option, (data: any) => {
+      formModel.value.detailImageIds?.push(data.id!);
+    });
   };
 
   const changeCoverImage = async (option: any) => {

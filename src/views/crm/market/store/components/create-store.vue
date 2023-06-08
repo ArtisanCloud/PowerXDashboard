@@ -81,7 +81,7 @@
 </template>
 
 <script lang="ts" setup>
-  import { onMounted, reactive, ref } from 'vue';
+  import { reactive, ref } from 'vue';
   import { createStore, Store } from '@/api/crm/market/store';
   import {
     FieldRule,
@@ -89,7 +89,7 @@
     RequestOption,
     UploadRequest,
   } from '@arco-design/web-vue';
-  import { uploadMediaResource } from '@/api/mediaresource';
+  import uploadMediaImages from '@/utils/media-resource';
 
   const emits = defineEmits(['submitSuccess', 'submitFailed', 'update:id']);
 
@@ -132,43 +132,17 @@
   const uploadCoverImage: (option: RequestOption) => UploadRequest = (
     option: RequestOption
   ) => {
-    return {
-      abort() {
-        return uploadMediaResource(option)
-          .then((result: any) => {
-            if (result.data) {
-              formModel.value.coverImageId = result.data.id!;
-              option.onSuccess(result.data);
-            } else {
-              option.onError(result);
-            }
-          })
-          .catch((error: any) => {
-            option.onError(error);
-          });
-      },
-    };
+    return uploadMediaImages(option, (data: any) => {
+      formModel.value.coverImageId = data.id;
+    });
   };
 
   const uploadDetailImages: (option: RequestOption) => UploadRequest = (
     option: RequestOption
   ) => {
-    return {
-      abort() {
-        return uploadMediaResource(option)
-          .then((result: any) => {
-            if (result.data) {
-              formModel.value.detailImageIds?.push(result.data.id!);
-              option.onSuccess(result.data);
-            } else {
-              option.onError(result);
-            }
-          })
-          .catch((error: any) => {
-            option.onError(error);
-          });
-      },
-    };
+    return uploadMediaImages(option, (data: any) => {
+      formModel.value.detailImageIds?.push(data.id);
+    });
   };
 
   const onSubmit = async () => {
@@ -193,5 +167,5 @@
       });
   };
 
-  onMounted(() => {});
+  // onMounted(() => {});
 </script>

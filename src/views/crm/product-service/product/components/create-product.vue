@@ -140,7 +140,7 @@
               :multiple="true"
               :draggable="true"
               list-type="picture-card"
-              :custom-request="uploadCoverImage"
+              :custom-request="uploadCoverImages"
               :default-file-list="state.coverUrlList"
               image-preview
             />
@@ -186,7 +186,7 @@
 
   import useOptionsStore from '@/store/modules/data-dictionary';
   import CategorySelector from '@/views/crm/product-service/product-category/components/category-selector.vue';
-  import { uploadMediaResource } from '@/api/mediaresource';
+  import uploadMediaImages from '@/utils/media-resource';
 
   const emits = defineEmits(['submitSuccess', 'submitFailed', 'update:id']);
 
@@ -256,46 +256,20 @@
       });
   };
 
-  const uploadCoverImage: (option: RequestOption) => UploadRequest = (
+  const uploadCoverImages: (option: RequestOption) => UploadRequest = (
     option: RequestOption
   ) => {
-    return {
-      abort() {
-        return uploadMediaResource(option)
-          .then((result: any) => {
-            if (result.data) {
-              formModel.value.coverImageIds?.push(result.data.id!);
-              option.onSuccess(result.data);
-            } else {
-              option.onError(result);
-            }
-          })
-          .catch((error: any) => {
-            option.onError(error);
-          });
-      },
-    };
+    return uploadMediaImages(option, (data: any) => {
+      formModel.value.coverImageIds?.push(data.id!);
+    });
   };
 
   const uploadDetailImages: (option: RequestOption) => UploadRequest = (
     option: RequestOption
   ) => {
-    return {
-      abort() {
-        return uploadMediaResource(option)
-          .then((result: any) => {
-            if (result.data) {
-              formModel.value.detailImageIds?.push(result.data.id!);
-              option.onSuccess(result.data);
-            } else {
-              option.onError(result);
-            }
-          })
-          .catch((error: any) => {
-            option.onError(error);
-          });
-      },
-    };
+    return uploadMediaImages(option, (data: any) => {
+      formModel.value.detailImageIds?.push(data.id!);
+    });
   };
 
   const updateCategoryIds = (categoryIds: number[]) => {
