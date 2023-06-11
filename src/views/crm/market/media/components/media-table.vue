@@ -58,7 +58,7 @@
       <EditMedia
         v-if="state.editMedia.visible"
         :node="state.editMedia.node"
-        @submitSuccess="fetchMediaList"
+        @submit-Success="fetchMediaList"
       />
     </a-drawer>
   </a-card>

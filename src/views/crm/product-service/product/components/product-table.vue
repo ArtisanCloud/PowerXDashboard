@@ -70,7 +70,7 @@
       <EditProduct
         v-if="state.editProduct.visible"
         :node="state.editProduct.node"
-        @submitSuccess="fetchProductList"
+        @submit-Success="fetchProductList"
       />
     </a-drawer>
   </a-card>

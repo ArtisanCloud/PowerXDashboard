@@ -62,7 +62,7 @@
       <EditPayment
         v-if="state.editPayment.visible"
         :node="state.editPayment.node"
-        @submitSuccess="fetchPaymentList"
+        @submit-Success="fetchPaymentList"
       />
     </a-drawer>
   </a-card>

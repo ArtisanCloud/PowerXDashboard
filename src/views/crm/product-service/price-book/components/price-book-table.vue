@@ -56,7 +56,7 @@
     >
       <CreatePriceBook
         v-if="state.createPriceBook.visible"
-        @submitSuccess="fetchPriceBookList"
+        @submit-Success="fetchPriceBookList"
       />
     </a-drawer>
     <a-drawer
@@ -68,7 +68,7 @@
       <EditPriceBook
         v-if="state.editPriceBook.visible"
         :node="state.editPriceBook.node"
-        @submitSuccess="fetchPriceBookList"
+        @submit-Success="fetchPriceBookList"
       />
     </a-drawer>
   </a-card>

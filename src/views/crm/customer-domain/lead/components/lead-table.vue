@@ -63,7 +63,7 @@
       <EditLead
         v-if="state.editLead.visible"
         :node="state.editLead.node"
-        @submitSuccess="fetchLeadList"
+        @submit-Success="fetchLeadList"
       />
     </a-drawer>
   </a-card>

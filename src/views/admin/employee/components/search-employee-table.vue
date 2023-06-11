@@ -113,7 +113,7 @@
             >
               <EditEmployee
                 :id="state.editEmployee.employeeId"
-                @submit-success="queryChange()"
+                @submit-Success="queryChange()"
               />
             </a-drawer>
           </template>

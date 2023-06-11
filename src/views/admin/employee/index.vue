@@ -19,7 +19,7 @@
         >
           <a-card>
             <a-scrollbar style="width: 100%; height: 100%; overflow: auto">
-              <DepartmentSide style="min-height: 60vh"/>
+              <DepartmentSide style="min-height: 60vh" />
             </a-scrollbar>
           </a-card>
         </a-col>
@@ -34,7 +34,7 @@
       title="新增员工"
       width="500px"
     >
-      <CreateEmployee @submit-success="state.createEmployeeVisible = false" />
+      <CreateEmployee @submit-Success="state.createEmployeeVisible = false" />
     </a-drawer>
   </div>
 </template>

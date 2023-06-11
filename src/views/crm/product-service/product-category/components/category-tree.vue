@@ -72,7 +72,7 @@
       <CreateCategory
         v-if="state.createSubCategory.visible"
         :parent-node="state.createSubCategory.parentNode"
-        @submitSuccess="fetchCategoryTree"
+        @submit-Success="fetchCategoryTree"
       />
     </a-drawer>
     <a-drawer
@@ -84,7 +84,7 @@
       <EditCategory
         v-if="state.editCategory.visible"
         :node="state.editCategory.node"
-        @submitSuccess="fetchCategoryTree"
+        @submit-Success="fetchCategoryTree"
       />
     </a-drawer>
   </a-card>

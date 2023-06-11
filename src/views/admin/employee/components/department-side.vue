@@ -33,7 +33,7 @@
       >
         <CreateDepartment
           :id="state.addDepDrawer.pId"
-          @submit-success="fetch()"
+          @submit-Success="fetch()"
         />
       </a-drawer>
     </template>

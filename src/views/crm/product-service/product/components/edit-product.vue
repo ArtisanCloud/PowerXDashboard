@@ -192,7 +192,7 @@
   import useOptionsStore from '@/store/modules/data-dictionary';
   import CategorySelector from '@/views/crm/product-service/product-category/components/category-selector.vue';
 
-  import { convertIntArrayToStringArray } from '@/utils';
+  import { convertIntArrayToStringArray } from '@/utils/array';
   import uploadMediaImages from '@/utils/media-resource';
 
   const prop = defineProps({
