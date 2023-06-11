@@ -52,7 +52,7 @@
       <CreateDictionaryItem
         v-if="state.createDictionaryItem.visible"
         :parent-node="state.createDictionaryItem.parentNode"
-        @submitSuccess="fetchDictionaryTypeList"
+        @submit-Success="fetchDictionaryTypeList"
       />
     </a-drawer>
 
@@ -65,7 +65,7 @@
       <EditDictionaryType
         v-if="state.editDictionaryType.visible"
         :node="state.editDictionaryType.node"
-        @submitSuccess="fetchDictionaryTypeList"
+        @submit-Success="fetchDictionaryTypeList"
       />
     </a-drawer>
   </a-card>
@@ -79,12 +79,11 @@
     deleteDictionaryType,
     DictionaryType,
     ListDictionaryTypesRequest,
-    DictionaryItem,
   } from '@/api/dictionary';
 
   import EditDictionaryType from '@/views/admin/dictionary/components/edit-dictionary-type.vue';
   import DictionaryItemTable from '@/views/admin/dictionary/components/dictionary-item-table.vue';
-  import { Message, TableData } from '@arco-design/web-vue';
+  import { Message } from '@arco-design/web-vue';
   import CreateDictionaryItem from '@/views/admin/dictionary/components/create-dictionary-item.vue';
 
   const dictionaryTypeList = ref<DictionaryType[]>([]);
@@ -117,12 +116,7 @@
     width: 100,
     expandedRowRender: (record: any) => {
       if (record.items && record.items.length > 0) {
-        const tbItems = (
-          <DictionaryItemTable
-            onSubmitUpdateSuccess={() => {}}
-            dictionaryType={record}
-          />
-        );
+        const tbItems = <DictionaryItemTable dictionaryType={record} />;
 
         return tbItems;
       }

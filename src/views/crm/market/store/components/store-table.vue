@@ -53,7 +53,7 @@
     >
       <CreateStore
         v-if="state.createStore.visible"
-        @submit-success="fetchStoreList"
+        @submit-Success="fetchStoreList"
       />
     </a-drawer>
     <a-drawer
@@ -65,7 +65,7 @@
       <EditStore
         v-if="state.editStore.visible"
         :node="state.editStore.node"
-        @submit-success="fetchStoreList"
+        @submit-Success="fetchStoreList"
       />
     </a-drawer>
   </a-card>

@@ -17,7 +17,7 @@
     >
       <CreateLead
         v-if="state.createLead.visible"
-        @submitSuccess="refreshLeadList"
+        @submit-Success="refreshLeadList"
       />
     </a-drawer>
   </div>

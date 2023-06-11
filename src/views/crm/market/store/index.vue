@@ -17,7 +17,7 @@
     >
       <CreateStore
         v-if="state.createStore.visible"
-        @submit-success="refreshStoreList"
+        @submit-Success="refreshStoreList"
       />
     </a-drawer>
   </div>

@@ -56,7 +56,7 @@
       <EditCustomer
         v-if="state.editCustomer.visible"
         :node="state.editCustomer.node"
-        @submitSuccess="fetchCustomerList"
+        @submit-Success="fetchCustomerList"
       />
     </a-drawer>
   </a-card>
