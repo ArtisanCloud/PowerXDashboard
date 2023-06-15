@@ -4,13 +4,16 @@ FROM node:19 AS builder
 
 # 拷贝项目文件到容器中
 WORKDIR /app
-COPY . .
+COPY ./deploy/dist /app/dist
+COPY ./deploy /app/deploy
 
 # 安装依赖
-RUN yarn install
+# RUN #yarn install
 
 # 执行yarn build
-RUN yarn build:notsc
+# RUN yarn build:notsc
+
+# ------------------------------------------------
 
 # 第二阶段
 FROM nginx:latest
