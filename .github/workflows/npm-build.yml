@@ -1,0 +1,22 @@
+name: Npm Build
+
+on: [ push ]
+
+jobs:
+  build-npm:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '20'  # 替换为你需要的 Node.js 版本号
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
