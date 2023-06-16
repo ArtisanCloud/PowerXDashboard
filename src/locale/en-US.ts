@@ -45,6 +45,7 @@ export default {
   'menu.crm.productService.productManagement': 'Product Management',
   'menu.crm.productService.productCategory': 'Product Category',
   'menu.crm.productService.priceBook': 'Price Book',
+  'menu.crm.productService.priceBookEntry': 'Price Book Entry',
   'menu.crm.marketing': 'Marketing Management',
   'menu.crm.marketing.mgm': 'MGM Customer Fission',
   'menu.crm.marketing.mediaManagement': 'Media Management',

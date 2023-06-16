@@ -52,7 +52,7 @@
       <CreateDictionaryItem
         v-if="state.createDictionaryItem.visible"
         :parent-node="state.createDictionaryItem.parentNode"
-        @submit-Success="fetchDictionaryTypeList"
+        @submit-success="fetchDictionaryTypeList"
       />
     </a-drawer>
 
@@ -65,7 +65,7 @@
       <EditDictionaryType
         v-if="state.editDictionaryType.visible"
         :node="state.editDictionaryType.node"
-        @submit-Success="fetchDictionaryTypeList"
+        @submit-success="fetchDictionaryTypeList"
       />
     </a-drawer>
   </a-card>

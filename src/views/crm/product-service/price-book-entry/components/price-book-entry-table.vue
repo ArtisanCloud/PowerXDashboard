@@ -1,7 +1,7 @@
 <template>
   <a-card>
     <a-table
-      :data="priceBookList"
+      :data="priceBookEntryList"
       :loading="state.loading"
       row-key="id"
       :columns="columns"
@@ -11,33 +11,19 @@
       @page-change="pageChanged"
       @page-size-change="pageSizeChanged"
     >
-      <template #isStandard="{ record }">
-        <a-typography-text>{{
-          record.isStandard ? '标准' : '普通'
-        }}</a-typography-text>
-      </template>
-
       <template #optional="{ record }">
         <a-space align="center">
-          <!--编辑品类按钮-->
-          <a-button @click="openEditPriceBook(record)">
+          <!--编辑价格条目按钮-->
+          <a-button @click="openEditPriceBookEntry(record)">
             <template #icon>
               <icon-edit :style="{ fontSize: '16px', color: 'green' }" />
             </template>
           </a-button>
 
-          <!--配置价格按钮-->
-
-          <a-button :href="`price-book/price-book-entry?entryId=${record.id}`">
-            <template #icon>
-              <icon-book :style="{ fontSize: '16px', color: '#d7ee8f' }" />
-            </template>
-          </a-button>
-
-          <!--删除品类按钮-->
+          <!--删除价格条目按钮-->
           <a-popconfirm
-            content="该操作会删除相关子品类,确定要删除此品类吗？"
-            @ok="deletePriceBookById(record.id)"
+            content="该操作会删除价格条目,确定要删除此价格条目吗？"
+            @ok="deletePriceBookEntryById(record.id)"
           >
             <a-button v-if="!record.isStandard">
               <template #icon>
@@ -50,26 +36,26 @@
     </a-table>
 
     <a-drawer
-      v-model:visible="state.createPriceBook.visible"
+      v-model:visible="state.createPriceBookEntry.visible"
       width="500px"
       ok-text="关闭抽屉"
       :hide-cancel="true"
     >
-      <CreatePriceBook
-        v-if="state.createPriceBook.visible"
-        @submit-success="fetchPriceBookList"
+      <CreatePriceBookEntry
+        v-if="state.createPriceBookEntry.visible"
+        @submit-success="fetchPriceBookEntryList"
       />
     </a-drawer>
     <a-drawer
-      v-model:visible="state.editPriceBook.visible"
+      v-model:visible="state.editPriceBookEntry.visible"
       width="500px"
       ok-text="关闭抽屉"
       :hide-cancel="true"
     >
-      <EditPriceBook
-        v-if="state.editPriceBook.visible"
-        :node="state.editPriceBook.node"
-        @submit-success="fetchPriceBookList"
+      <EditPriceBookEntry
+        v-if="state.editPriceBookEntry.visible"
+        :node="state.editPriceBookEntry.node"
+        @submit-success="fetchPriceBookEntryList"
       />
     </a-drawer>
   </a-card>
@@ -78,34 +64,37 @@
 <script lang="ts" setup>
   import { onMounted, reactive, ref } from 'vue';
   import {
-    listPriceBooks,
-    deletePriceBook,
-    PriceBook,
-    ListPriceBooksRequest,
-  } from '@/api/crm/product-service/priceBook';
+    listPriceBookEntries,
+    deletePriceBookEntry,
+    PriceBookEntry,
+    ListPriceBookEntriesRequest,
+  } from '@/api/crm/product-service/priceBookEntry';
 
-  import CreatePriceBook from '@/views/crm/product-service/price-book/components/create-price-book.vue';
-  import EditPriceBook from '@/views/crm/product-service/price-book/components/edit-price-book.vue';
+  import CreatePriceBookEntry from '@/views/crm/product-service/price-book/components/create-price-book.vue';
+  import EditPriceBookEntry from '@/views/crm/product-service/price-book/components/edit-price-book.vue';
   import { Message } from '@arco-design/web-vue';
   import { DefaultPageSize } from '@/api/common';
+  import { useRouter } from 'vue-router';
 
-  const priceBookList = ref<PriceBook[]>([]);
+  const route = useRouter();
+
+  const priceBookEntryList = ref<PriceBookEntry[]>([]);
 
   const columns = reactive([
     {
-      title: '品类名称',
+      title: '产品名称',
       dataIndex: 'name',
       width: 150,
     },
     {
-      title: '类型',
+      title: 'SKU',
       dataIndex: 'isStandard',
       width: 120,
       slotName: 'isStandard',
     },
     {
-      title: '描述',
-      dataIndex: 'description',
+      title: '单价',
+      dataIndex: 'unitPrice',
       width: 300,
     },
     {
@@ -125,22 +114,23 @@
   });
 
   const state = reactive({
+    priceBookId: 0,
     loading: false,
-    createPriceBook: {
+    createPriceBookEntry: {
       visible: false,
       parentNode: {},
     },
-    editPriceBook: {
+    editPriceBookEntry: {
       visible: false,
-      node: {} as PriceBook,
+      node: {} as PriceBookEntry,
     },
   });
 
-  const fetchPriceBookList = async (req: ListPriceBooksRequest) => {
+  const fetchPriceBookEntryList = async (req: ListPriceBookEntriesRequest) => {
     state.loading = true;
     try {
-      const res = await listPriceBooks(req);
-      priceBookList.value = res.data.list;
+      const res = await listPriceBookEntries(req);
+      priceBookEntryList.value = res.data.list;
       pagination.currentPage = res.data.pageIndex;
       pagination.pageSize = res.data.pageSize;
       pagination.total = res.data.total;
@@ -150,18 +140,19 @@
     }
   };
 
-  const openEditPriceBook = (cat: PriceBook) => {
+  const openEditPriceBookEntry = (cat: PriceBookEntry) => {
     // console.log(cat)
-    state.editPriceBook.node = cat;
-    state.editPriceBook.visible = true;
+    state.editPriceBookEntry.node = cat;
+    state.editPriceBookEntry.visible = true;
   };
 
-  const deletePriceBookById = async (bookId: number) => {
+  const deletePriceBookEntryById = async (bookId: number) => {
     try {
-      const rep = await deletePriceBook({ id: bookId });
+      const rep = await deletePriceBookEntry({ id: bookId });
       if (rep.data.id && rep.data.id > 0) {
         Message.success('删除成功');
-        await fetchPriceBookList({
+        await fetchPriceBookEntryList({
+          priceBookId: state.priceBookId,
           pageIndex: pagination.currentPage,
           pageSize: pagination.pageSize,
         });
@@ -171,20 +162,32 @@
     }
   };
 
+  const refreshPriceBookList = () => {
+    fetchPriceBookEntryList({
+      priceBookId: state.priceBookId,
+      pageIndex: pagination.currentPage,
+      pageSize: pagination.pageSize,
+    });
+  };
+
   const pageChanged = (page: number) => {
     // console.log("page",page)
-    fetchPriceBookList({ pageIndex: page, pageSize: pagination.pageSize });
+    pagination.currentPage = page;
+    refreshPriceBookList();
   };
 
   const pageSizeChanged = (pageSize: number) => {
     // console.log("pagesize",pageSize)
-    fetchPriceBookList({ pageIndex: pagination.currentPage, pageSize });
+    pagination.pageSize = pageSize;
+    refreshPriceBookList();
   };
 
-  defineExpose({ fetchPriceBookList });
+  defineExpose({ fetchPriceBookEntryList });
 
   onMounted(() => {
-    fetchPriceBookList({});
+    const { query } = route.currentRoute.value;
+    state.priceBookId = Number(query.priceBookId);
+    // console.log(priceBookEntryId);
   });
 </script>
 

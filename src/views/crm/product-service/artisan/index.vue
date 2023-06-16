@@ -17,7 +17,7 @@
     >
       <CreateArtisan
         v-if="state.createArtisan.visible"
-        @submit-Success="refreshArtisanList"
+        @submit-success="refreshArtisanList"
       />
     </a-drawer>
   </div>

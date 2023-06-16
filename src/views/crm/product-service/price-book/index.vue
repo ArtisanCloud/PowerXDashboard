@@ -19,7 +19,7 @@
     >
       <CreatePriceBook
         v-if="state.createPriceBook.visible"
-        @submit-Success="refreshPriceBookList"
+        @submit-success="refreshPriceBookList"
       />
       />
     </a-drawer></div

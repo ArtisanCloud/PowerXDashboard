@@ -19,7 +19,7 @@
     >
       <CreateDictionaryType
         v-if="state.createDictionaryType.visible"
-        @submit-Success="refreshDictionaryTypeList"
+        @submit-success="refreshDictionaryTypeList"
       />
     </a-drawer>
   </div>

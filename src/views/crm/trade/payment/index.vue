@@ -17,7 +17,7 @@
     >
       <CreatePayment
         v-if="state.createPayment.visible"
-        @submit-Success="refreshPaymentList"
+        @submit-success="refreshPaymentList"
       />
     </a-drawer>
   </div>

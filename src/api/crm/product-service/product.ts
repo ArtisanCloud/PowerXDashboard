@@ -12,6 +12,22 @@ export interface DetailImage {
   sort: string;
 }
 
+export interface PriceEntry extends PowerModel {
+  unitPrice: number;
+  listPrice: number;
+  discount: number;
+}
+
+export interface SKU extends PowerModel {
+  skuNo: string;
+  inventory: number;
+  unitPrice: number;
+  listPrice: number;
+  discount: number;
+  optionsIds: number[];
+  isActive: boolean;
+}
+
 export interface ProductSpecific {
   inventory: number;
   soldAmount: number;
@@ -39,6 +55,11 @@ export interface Product extends PowerModel, ProductSpecific, MediaSet {
   promoteChannelsItemIds: number[];
   saleStartDate: Date;
   saleEndDate: Date;
+
+  // price
+  priceEntry: PriceEntry;
+  skus: SKU[];
+
   // category
   productCategories: ProductCategory[];
   categoryIds: number[];

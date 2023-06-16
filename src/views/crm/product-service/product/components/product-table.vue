@@ -70,7 +70,7 @@
       <EditProduct
         v-if="state.editProduct.visible"
         :node="state.editProduct.node"
-        @submit-Success="fetchProductList"
+        @submit-success="fetchProductList"
       />
     </a-drawer>
   </a-card>
@@ -218,7 +218,7 @@
         });
       }
     } catch (error) {
-      console.error(error);
+      // console.error(error);
     }
   };
 

@@ -66,7 +66,14 @@
         </a-col>
         <a-col :span="12">
           <a-form-item label="是否激活" field="isActivated">
-            <a-checkbox v-model="formModel.isActivated" default-value="false" />
+            <a-checkbox
+              v-model="formModel.isActivated"
+              default-value="false"
+              disabled
+            />
+            <span style="margin-left: 6px; font-size: 12px; color: #6b1111"
+              >(*配置该产品的价格，才能激活)</span
+            >
           </a-form-item>
           <a-form-item label="是否线上销售" field="canSellOnline">
             <a-checkbox v-model="formModel.canSellOnline" />
@@ -175,7 +182,7 @@
 </template>
 
 <script lang="ts" setup>
-  import { onMounted, reactive, ref } from 'vue';
+  import { reactive, ref } from 'vue';
   import { createProduct, Product } from '@/api/crm/product-service/product';
   import {
     FieldRule,
@@ -260,7 +267,7 @@
     option: RequestOption
   ) => {
     return uploadMediaImages(option, (data: any) => {
-      formModel.value.coverImageIds?.push(data.id!);
+      formModel.value.coverImageIds?.push(data.id);
     });
   };
 
@@ -268,7 +275,7 @@
     option: RequestOption
   ) => {
     return uploadMediaImages(option, (data: any) => {
-      formModel.value.detailImageIds?.push(data.id!);
+      formModel.value.detailImageIds?.push(data.id);
     });
   };
 
@@ -277,5 +284,5 @@
     formModel.value.categoryIds = categoryIds;
   };
 
-  onMounted(() => {});
+  // onMounted(() => {});
 </script>

@@ -1,9 +1,4 @@
-import {
-  DepartmentOption,
-  imageAbleInfo,
-  PowerModel,
-  PrefixUriAdmin,
-} from '@/api/common';
+import { imageAbleInfo, PowerModel, PrefixUriAdmin } from '@/api/common';
 import axios from 'axios';
 import { UriProduct } from '@/api/crm/product-service/product';
 import { MediaSet } from '@/api/mediaresource';
@@ -27,7 +22,10 @@ export interface GetCategoryTreeReply {
 
 export function getCategoryTree(request: GetCategoryTreeRequest) {
   return axios.get<GetCategoryTreeReply>(
-    `${PrefixUriAdmin + UriProduct}/product-category-tree`
+    `${PrefixUriAdmin + UriProduct}/product-category-tree`,
+    {
+      params: request,
+    }
   );
 }
 

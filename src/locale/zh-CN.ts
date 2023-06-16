@@ -45,6 +45,7 @@ export default {
   'menu.crm.productService.productManagement': '商品管理',
   'menu.crm.productService.productCategory': '商品品类',
   'menu.crm.productService.priceBook': '价格手册',
+  'menu.crm.productService.priceBookEntry': '价格手册条目',
   'menu.crm.marketing': '营销管理',
   'menu.crm.marketing.mgm': 'MGM客户裂变',
   'menu.crm.marketing.mediaManagement': '媒资管理',

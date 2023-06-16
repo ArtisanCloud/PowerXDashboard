@@ -17,7 +17,7 @@
     >
       <CreateCategory
         v-if="state.createCategory.visible"
-        @submit-Success="refreshTree"
+        @submit-success="refreshTree"
       />
     </a-drawer>
   </div>

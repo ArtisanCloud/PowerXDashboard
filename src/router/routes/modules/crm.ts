@@ -62,16 +62,6 @@ const CRM: AppRouteRecordRaw = {
       },
       children: [
         {
-          path: '/crm/product-service/store',
-          name: 'Store Management',
-          component: () => import('@/views/crm/market/store/index.vue'),
-          meta: {
-            locale: 'menu.crm.productService.store',
-            requiresAuth: true,
-            roles: ['*'],
-          },
-        },
-        {
           path: '/crm/product-service/artisan',
           name: 'Artisan Management',
           component: () =>
@@ -115,6 +105,18 @@ const CRM: AppRouteRecordRaw = {
             roles: ['*'],
           },
         },
+        {
+          path: '/crm/product-service/price-book/price-book-entry',
+          name: 'PriceBookEntry',
+          component: () =>
+            import('@/views/crm/product-service/price-book-entry/index.vue'),
+          meta: {
+            hideInMenu: true,
+            locale: 'menu.crm.productService.priceBookEntry',
+            requiresAuth: true,
+            roles: ['*'],
+          },
+        },
       ],
     },
     // marketing management
@@ -130,6 +132,16 @@ const CRM: AppRouteRecordRaw = {
         roles: ['*'],
       },
       children: [
+        {
+          path: '/crm/marketing/store',
+          name: 'Store Management',
+          component: () => import('@/views/crm/market/store/index.vue'),
+          meta: {
+            locale: 'menu.crm.productService.store',
+            requiresAuth: true,
+            roles: ['*'],
+          },
+        },
         {
           path: '/crm/marketing/mgm',
           name: 'MGM',

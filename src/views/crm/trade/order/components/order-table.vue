@@ -58,7 +58,7 @@
       <EditOrder
         v-if="state.editOrder.visible"
         :node="state.editOrder.node"
-        @submit-Success="fetchOrderList"
+        @submit-success="fetchOrderList"
       />
     </a-drawer>
   </a-card>
