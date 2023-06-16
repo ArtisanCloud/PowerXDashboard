@@ -44,8 +44,8 @@ export function listPriceBookEntries(request: ListPriceBookEntriesRequest) {
   );
 }
 
-export function createPriceBookEntry(request: PriceBookEntry) {
-  return axios.post<PriceBookEntry>(
+export function createPriceBookEntry(request: PriceBookEntry[]) {
+  return axios.post<PriceBookEntry[]>(
     `${PrefixUriAdmin + UriProduct}/price-book-entries`,
     request
   );

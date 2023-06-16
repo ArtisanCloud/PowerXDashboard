@@ -6,8 +6,11 @@
       :current="state.currentStep"
       @change="setCurrent"
     >
-      <a-step description="This is a description">选配产品</a-step>
-      <a-step description="This is a description">配置价格</a-step>
+      <!--选择产品-->
+      <a-step description="选择你要添加配置的产品，可以搜素">选配产品</a-step>
+
+      <!-- 配置价格 -->
+      <a-step description="为选中的产品，进行价格配置">配置价格</a-step>
     </a-steps>
     <div
       :style="{
@@ -18,7 +21,9 @@
         color: '#C2C7CC',
       }"
     >
-      <div :style="divStyle(1)">选配价格</div>
+      <div :style="divStyle(1)">
+        <product-search-select></product-search-select>
+      </div>
       <div :style="divStyle(2)">配置价格</div>
       <a-space size="large">
         <a-button
@@ -42,39 +47,27 @@
 
 <script lang="ts" setup>
   import { onMounted, reactive, ref } from 'vue';
+  import { Message } from '@arco-design/web-vue';
   import {
-    createPriceBook,
-    PriceBook,
-  } from '@/api/crm/product-service/priceBook';
-  import { FieldRule, Message } from '@arco-design/web-vue';
+    createPriceBookEntry,
+    PriceBookEntry,
+  } from '@/api/crm/product-service/priceBookEntry';
+  import ProductSearchSelect from '@/views/crm/product-service/product/components/product-search-select.vue';
 
   const emits = defineEmits(['submitSuccess', 'submitFailed', 'update:id']);
 
-  const formRef = ref();
-  const formModel = ref({
-    isStandard: false,
-    name: '',
-    description: '',
-    storeId: 0,
-  } as PriceBook);
-
-  const rules = {
-    name: [
-      { required: true, message: '请输入价格手册名称' },
-      { max: 10, message: '价格手册名称长度不能超过 10 个字符' },
-    ],
-    description: [{ max: 100, message: '描述长度不能超过 100 个字符' }],
-  } as Record<string, FieldRule[]>;
-
   const state = reactive({
     currentStep: 1,
+    listedPriceBooks: [] as PriceBookEntry[],
+    selectedPriceBooks: [] as PriceBookEntry[],
     submitLoading: false,
   });
 
   const divStyle = (index: number) => {
     return {
       display: index === state.currentStep ? 'block' : 'none',
-      lineHeight: '600px',
+      paddingTop: '20px',
+      // border: '1px dashed red',
     };
   };
 
@@ -94,12 +87,9 @@
     if (state.submitLoading) {
       return;
     }
-    const err = await formRef.value.validate();
-    if (err) {
-      return;
-    }
+
     state.submitLoading = true;
-    createPriceBook(formModel.value)
+    createPriceBookEntry(state.selectedPriceBooks)
       .then(() => {
         Message.success('创建成功');
         emits('submitSuccess');

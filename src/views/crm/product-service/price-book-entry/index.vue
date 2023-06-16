@@ -27,7 +27,7 @@
 <script lang="ts" setup>
   import { reactive, ref } from 'vue';
   import PriceBookEntryTable from '@/views/crm/product-service/price-book-entry/components/price-book-entry-table.vue';
-  import CreatePriceBookEntry from '@/views/crm/product-service/price-book/components/create-price-book.vue';
+  import CreatePriceBookEntry from '@/views/crm/product-service/price-book-entry/components/create-price-book-entry.vue';
   import { DefaultPageSize } from '@/api/common';
 
   const RefPriceBookEntryTable = ref<any>();
