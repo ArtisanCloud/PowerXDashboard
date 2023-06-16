@@ -40,10 +40,11 @@
     PriceBook,
   } from '@/api/crm/product-service/priceBook';
   import { FieldRule, Message } from '@arco-design/web-vue';
+  import { PriceBookEntry } from '@/api/crm/product-service/priceBookEntry';
 
   const prop = defineProps({
     node: {
-      type: Object as PropType<PriceBook>,
+      type: Object as PropType<PriceBookEntry>,
       default() {
         return {};
       },
@@ -53,11 +54,11 @@
 
   const formRef = ref();
   const formModel = ref({
-    id: prop.node.id,
-    isStandard: prop.node?.isStandard,
-    name: prop.node?.name,
-    description: prop.node?.description,
-    storeId: prop.node?.storeId,
+    // id: prop.node.id,
+    // isStandard: prop.node?.isStandard,
+    // name: prop.node?.name,
+    // description: prop.node?.description,
+    // storeId: prop.node?.storeId,
   } as PriceBook);
 
   const rules = {

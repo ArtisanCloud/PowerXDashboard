@@ -70,8 +70,8 @@
     ListPriceBookEntriesRequest,
   } from '@/api/crm/product-service/priceBookEntry';
 
-  import CreatePriceBookEntry from '@/views/crm/product-service/price-book/components/create-price-book.vue';
-  import EditPriceBookEntry from '@/views/crm/product-service/price-book/components/edit-price-book.vue';
+  import CreatePriceBookEntry from '@/views/crm/product-service/price-book-entry/components/create-price-book-entry.vue';
+  import EditPriceBookEntry from '@/views/crm/product-service/price-book-entry/components/edit-price-book-entry.vue';
   import { Message } from '@arco-design/web-vue';
   import { DefaultPageSize } from '@/api/common';
   import { useRouter } from 'vue-router';
