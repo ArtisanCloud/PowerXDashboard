@@ -53,7 +53,7 @@
       <EditArtisan
         v-if="state.editArtisan.visible"
         :node="state.editArtisan.node"
-        @submit-Success="fetchArtisanList"
+        @submit-success="fetchArtisanList"
       />
     </a-drawer>
   </a-card>

@@ -66,7 +66,14 @@
         </a-col>
         <a-col :span="12">
           <a-form-item label="是否激活" field="isActivated">
-            <a-checkbox v-model="formModel.isActivated" default-value="false" />
+            <a-checkbox
+              v-model="formModel.isActivated"
+              default-value="false"
+              :disabled="isDisabled()"
+            />
+            <span style="margin-left: 6px; font-size: 12px; color: #6b1111"
+              >(*配置该产品的价格，才能激活)</span
+            >
           </a-form-item>
           <a-form-item label="是否线上销售" field="canSellOnline">
             <a-checkbox v-model="formModel.canSellOnline" />
@@ -257,6 +264,13 @@
     submitLoading: false,
   });
 
+  const isDisabled = (): boolean => {
+    if (prop.node.priceEntry) {
+      return false;
+    }
+    return true;
+  };
+
   const onSubmit = async () => {
     if (state.submitLoading) {
       return;
@@ -289,7 +303,7 @@
     option: RequestOption
   ) => {
     return uploadMediaImages(option, (data: any) => {
-      formModel.value.coverImageIds?.push(data.id!);
+      formModel.value.coverImageIds?.push(data.id);
     });
   };
 
@@ -297,7 +311,7 @@
     option: RequestOption
   ) => {
     return uploadMediaImages(option, (data: any) => {
-      formModel.value.detailImageIds?.push(data.id!);
+      formModel.value.detailImageIds?.push(data.id);
     });
   };
 
@@ -308,9 +322,9 @@
   const changeCoverImage = async (option: any) => {
     // console.log(option);
     const index = formModel.value.coverImageIds?.indexOf(option.uid);
-    console.log(index);
+    // console.log(index);
     if (index !== -1) {
-      formModel.value.coverImageIds?.splice(index!, 1);
+      formModel.value.coverImageIds?.splice(index ?? 0, 1);
       return true;
     }
     return false;
@@ -320,7 +334,7 @@
     // console.log(option);
     const index = formModel.value.detailImageIds?.indexOf(option.uid);
     if (index !== -1) {
-      formModel.value.detailImageIds?.splice(index!, 1);
+      formModel.value.detailImageIds?.splice(index ?? 0, 1);
       return true;
     }
 

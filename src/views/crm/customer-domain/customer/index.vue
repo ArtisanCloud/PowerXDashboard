@@ -17,7 +17,7 @@
     >
       <CreateCustomer
         v-if="state.createCustomer.visible"
-        @submit-Success="refreshCustomerList"
+        @submit-success="refreshCustomerList"
       />
     </a-drawer>
   </div>

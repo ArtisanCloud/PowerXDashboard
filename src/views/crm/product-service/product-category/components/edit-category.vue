@@ -120,11 +120,11 @@
     parentCategoryOptions: [] as Array<ParentOption>,
   });
 
-  function fetchLeaderOptions(likeName = '') {
-    return getEmployeeOptions({ likeName }).then((res) => {
-      // options.leaderOptions = res.data.list;
-    });
-  }
+  // function fetchLeaderOptions(likeName = '') {
+  //   return getEmployeeOptions({ likeName }).then((res) => {
+  //     // options.leaderOptions = res.data.list;
+  //   });
+  // }
 
   function fetchParentOptions() {
     options.parentCategoryOptions = [

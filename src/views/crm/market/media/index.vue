@@ -17,7 +17,7 @@
     >
       <CreateMedia
         v-if="state.createMedia.visible"
-        @submit-Success="refreshMediaList"
+        @submit-success="refreshMediaList"
       />
     </a-drawer>
   </div>

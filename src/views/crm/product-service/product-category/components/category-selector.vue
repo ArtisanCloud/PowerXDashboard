@@ -2,7 +2,7 @@
   <div>
     <a-transfer
       :data="state.transferData"
-      :default-value="defaultValue"
+      :default-value="props.defaultValue"
       @change="changeCategory"
     >
       <template #source="{ data, selectedKeys, onSelect }">

@@ -17,7 +17,7 @@
     >
       <CreateOrder
         v-if="state.createOrder.visible"
-        @submit-Success="refreshOrderList"
+        @submit-success="refreshOrderList"
       />
     </a-drawer>
   </div>

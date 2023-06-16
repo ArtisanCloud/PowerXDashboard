@@ -34,7 +34,7 @@
       title="新增员工"
       width="500px"
     >
-      <CreateEmployee @submit-Success="state.createEmployeeVisible = false" />
+      <CreateEmployee @submit-success="state.createEmployeeVisible = false" />
     </a-drawer>
   </div>
 </template>

@@ -41,7 +41,7 @@
       <EditDictionaryItem
         v-if="state.editDictionaryItem.visible"
         :node="state.editDictionaryItem.node"
-        @submit-Success="refreshDictionaryItemList"
+        @submit-success="refreshDictionaryItemList"
       />
     </a-drawer>
   </a-card>
