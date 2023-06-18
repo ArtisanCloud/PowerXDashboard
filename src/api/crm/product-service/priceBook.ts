@@ -24,9 +24,24 @@ export interface ListPriceBooksReply {
   total: number;
 }
 
+export interface GetPriceBooksRequest {
+  priceBookId: number;
+}
+
+export type GetPriceBooksReply = PriceBook;
+
 export function listPriceBooks(request: ListPriceBooksRequest) {
   return axios.get<ListPriceBooksReply>(
     `${PrefixUriAdmin + UriProduct}/price-books/page-list`,
+    {
+      params: request,
+    }
+  );
+}
+
+export function getPriceBook(request: GetPriceBooksRequest) {
+  return axios.get<GetPriceBooksReply>(
+    `${PrefixUriAdmin + UriProduct}/price-books/${request.priceBookId}`,
     {
       params: request,
     }

@@ -41,7 +41,7 @@
       ok-text="关闭抽屉"
       :hide-cancel="true"
     >
-      <CreatePriceBookEntry
+      <CreatePriceBookEntries
         v-if="state.createPriceBookEntry.visible"
         @submit-success="fetchPriceBookEntryList"
       />
@@ -70,7 +70,7 @@
     ListPriceBookEntriesRequest,
   } from '@/api/crm/product-service/priceBookEntry';
 
-  import CreatePriceBookEntry from '@/views/crm/product-service/price-book-entry/components/create-price-book-entry.vue';
+  import CreatePriceBookEntries from '@/views/crm/product-service/price-book-entry/components/create-price-book-entries.vue';
   import EditPriceBookEntry from '@/views/crm/product-service/price-book-entry/components/edit-price-book-entry.vue';
   import { Message } from '@arco-design/web-vue';
   import { DefaultPageSize } from '@/api/common';
@@ -182,7 +182,7 @@
     refreshPriceBookList();
   };
 
-  defineExpose({ fetchPriceBookEntryList });
+  defineExpose({ refreshPriceBookList });
 
   onMounted(() => {
     const { query } = route.currentRoute.value;

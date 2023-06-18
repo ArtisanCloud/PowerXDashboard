@@ -2,6 +2,10 @@ import { PowerModel, PrefixUriAdmin } from '@/api/common';
 import axios from 'axios';
 import type { ProductCategory } from '@/api/crm/product-service/category';
 import { MediaSet } from '@/api/mediaresource';
+import {
+  PriceBookEntry,
+  ProductSpecific,
+} from '@/api/crm/product-service/priceBookEntry';
 
 export const UriProduct = '/product';
 
@@ -12,11 +16,11 @@ export interface DetailImage {
   sort: string;
 }
 
-export interface PriceEntry extends PowerModel {
-  unitPrice: number;
-  listPrice: number;
-  discount: number;
-}
+// export interface PriceEntry extends PowerModel {
+//   unitPrice: number;
+//   listPrice: number;
+//   discount: number;
+// }
 
 export interface SKU extends PowerModel {
   skuNo: string;
@@ -26,16 +30,6 @@ export interface SKU extends PowerModel {
   discount: number;
   optionsIds: number[];
   isActive: boolean;
-}
-
-export interface ProductSpecific {
-  inventory: number;
-  soldAmount: number;
-  weight: number;
-  volume: number;
-  encode: string;
-  barCode: string;
-  extra: string;
 }
 
 export interface Product extends PowerModel, ProductSpecific, MediaSet {
@@ -57,7 +51,8 @@ export interface Product extends PowerModel, ProductSpecific, MediaSet {
   saleEndDate: Date;
 
   // price
-  priceEntry: PriceEntry;
+  activePriceBookEntry: PriceBookEntry;
+  priceBookEntries: PriceBookEntry[];
   skus: SKU[];
 
   // category

@@ -1,23 +1,29 @@
 import axios from 'axios';
 import { PowerModel, PrefixUriAdmin } from '@/api/common';
-import { UriProduct } from '@/api/crm/product-service/product';
 
-export interface PriceBookEntrySpecific {
-  inventory: number;
-  weight: number;
-  volume: number;
-  encode: string;
-  barCode: string;
-  extra: string;
+const UriProduct = '/product';
+
+export interface ProductSpecific {
+  inventory?: number;
+  weight?: number;
+  volume?: number;
+  encode?: string;
+  barCode?: string;
+  extra?: string;
 }
 
-export interface PriceBookEntry extends PowerModel {
+export interface PriceBookEntry extends PowerModel, ProductSpecific {
   priceBookId: number;
   productId: number;
-  skuId: number;
+  skuId?: number;
   unitPrice: number;
-  listPrice: number;
+  listPrice?: number;
   isActive: boolean;
+  // extend
+  productName?: string;
+  spu?: string;
+  skuNo?: string;
+  skuEntries?: PriceBookEntry[];
 }
 
 export interface ListPriceBookEntriesRequest {
