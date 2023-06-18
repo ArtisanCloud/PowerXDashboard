@@ -4,28 +4,32 @@
     fill
     style="display: flex; justify-content: center"
   >
-    <div style="margin-top: 20px; width: 100%; /*border: #6b1111 1px dashed*/">
+    <div
+      style="
+        margin-top: 20px;
+        margin-bottom: 40px;
+        width: 100%; /*border: #6b1111 1px dashed*/
+      "
+    >
       <a-select
-        :model-value="props.modelValue"
-        :options="options.product"
-        :field-names="{ label: 'name', value: 'id' }"
-        :disabled="props.disabled"
+        v-model="state.productIds"
         allow-search
         allow-clear
+        :loading="state.loading"
+        placeholder="请选择需要选配的产品"
+        :filter-option="true"
         multiple
-        placeholder="请选择产品"
-        style="width: 50%"
-        @change="
-          (v) => {
-            emits('update:modelValue', v);
-          }
-        "
-        @search="
-          (v) => {
-            fetch([], v);
-          }
-        "
-      ></a-select>
+        @search="handleSearchProduct"
+        @change="onSelectedChanged"
+      >
+        <a-option
+          v-for="(item, index) of options.searchedProducts"
+          :key="index"
+          :value="item.id"
+        >
+          {{ item.name }}
+        </a-option>
+      </a-select>
     </div>
     <div
       style="
@@ -36,38 +40,129 @@
         margin-bottom: 20px;
       "
     >
-      <a-table style="width: 70%"></a-table>
+      <a-table
+        v-model:selectedKeys="state.productIds"
+        style="width: 100%"
+        row-key="id"
+        :columns="columns"
+        :data="options.searchedProducts"
+        :row-selection="rowSelection"
+        @select="onSelectedChanged"
+      >
+        <template #activePriceBookEntry="{ record }">
+          <a-typography-text>
+            {{
+              record.activePriceBookEntry === null
+                ? '未配置价格'
+                : record.activePriceBookEntry?.listPrice
+            }}
+          </a-typography-text>
+        </template>
+        <template #skus="{ record }">
+          <a-typography-text v-for="sku in record.skus" :key="sku.id">
+            {{ sku.skuNo }} ~ {{ sku.listPrice }} <br />
+          </a-typography-text>
+        </template>
+        <template #status="{ record }">
+          <a-typography-text>{{
+            record.isActivated ? '激活' : '未激活'
+          }}</a-typography-text>
+        </template>
+      </a-table>
     </div>
   </a-space>
 </template>
 
 <script lang="ts" setup>
-  import { onMounted, PropType, reactive } from 'vue';
+  import { onMounted, reactive } from 'vue';
   import { Product, listProducts } from '@/api/crm/product-service/product';
+  import { getObjectsByIds, mergeObjectArrays } from '@/utils/array';
 
-  const props = defineProps({
-    modelValue: {
-      type: Array as PropType<number[]>,
-      default() {
-        return [];
-      },
-    },
-    disabled: Boolean,
-  });
-
-  const emits = defineEmits(['update:modelValue']);
+  const emits = defineEmits(['onSelectedItems']);
   const options = reactive({
-    product: [] as Product[],
+    searchedProducts: [] as Product[],
   });
 
-  function fetch(ids: number[], likeName = '') {
-    listProducts({ ids, likeName, pageIndex: 1, pageSize: 10 }).then((res) => {
-      options.product = res.data.list;
-    });
-  }
+  const columns = [
+    {
+      title: '产品名称',
+      dataIndex: 'name',
+    },
+    {
+      title: 'SPU',
+      dataIndex: 'spu',
+    },
+    {
+      title: '手册价格条目',
+      dataIndex: 'activePriceBookEntry',
+      width: 150,
+      slotName: 'activePriceBookEntry',
+    },
+    {
+      title: 'SKUs',
+      dataIndex: 'skus',
+      width: 250,
+      slotName: 'skus',
+    },
+    {
+      title: '状态',
+      dataIndex: 'isActivated',
+      slotName: 'status',
+    },
+    {
+      title: '描述',
+      dataIndex: 'description',
+    },
+  ];
+
+  const state = reactive({
+    productIds: [] as number[],
+    loading: false,
+  });
+
+  const rowSelection = reactive({
+    type: 'checkbox',
+    showCheckedAll: true,
+    onlyCurrent: false,
+  } as any);
+
+  const fetchProducts = async ({ likeName = '' }) => {
+    state.loading = true;
+    try {
+      // console.log(likeName);
+      const res = await listProducts({
+        likeName,
+        pageIndex: 1,
+        pageSize: 10,
+      });
+      options.searchedProducts = mergeObjectArrays(
+        options.searchedProducts,
+        res.data.list
+      );
+    } finally {
+      state.loading = false;
+    }
+  };
+
+  const handleSearchProduct = (key: string) => {
+    if (key) {
+      fetchProducts({ likeName: key });
+    }
+  };
+
+  const onSelectedChanged = (value: any) => {
+    state.productIds = value;
+    // console.log(state.productIds);
+    const selectedProducts = getObjectsByIds(
+      options.searchedProducts,
+      state.productIds
+    );
+
+    emits('onSelectedItems', selectedProducts);
+  };
 
   onMounted(() => {
-    fetch(props.modelValue);
+    fetchProducts({ likeName: '' });
   });
 </script>
 

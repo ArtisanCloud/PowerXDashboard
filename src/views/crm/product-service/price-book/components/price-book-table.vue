@@ -28,7 +28,9 @@
 
           <!--配置价格按钮-->
 
-          <a-button :href="`price-book/price-book-entry?entryId=${record.id}`">
+          <a-button
+            :href="`price-book/price-book-entry?priceBookId=${record.id}`"
+          >
             <template #icon>
               <icon-book :style="{ fontSize: '16px', color: '#d7ee8f' }" />
             </template>

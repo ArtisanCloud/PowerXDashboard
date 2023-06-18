@@ -2,8 +2,9 @@
   <div class="container">
     <a-card>
       <a-space size="large">
-        <a-button type="primary" @click="openAddProduct"
-          >添加配置产品
+        当前价格手册 -> {{ state.priceBook.name }} ->
+        <a-button type="primary" @click="openAddProduct">
+          添加配置产品
         </a-button>
       </a-space>
     </a-card>
@@ -13,40 +14,36 @@
     </a-card>
     <a-modal
       v-model:visible="state.createPriceBookEntry.visible"
-      title="配置价格条目"
+      :title="`配置 - ${state.priceBook.name} - 价格条目`"
       ok-text="关闭"
       fullscreen
     >
-      <CreatePriceBookEntry
+      <CreatePriceBookEntries
         v-if="state.createPriceBookEntry.visible"
+        :price-book="state.priceBook"
         @submit-success="refreshPriceBookEntryList"
-      /> </a-modal
-  ></div>
+      />
+    </a-modal>
+  </div>
 </template>
 
 <script lang="ts" setup>
-  import { reactive, ref } from 'vue';
+  import { onMounted, reactive, ref } from 'vue';
   import PriceBookEntryTable from '@/views/crm/product-service/price-book-entry/components/price-book-entry-table.vue';
-  import CreatePriceBookEntry from '@/views/crm/product-service/price-book-entry/components/create-price-book-entry.vue';
-  import { DefaultPageSize } from '@/api/common';
+  import CreatePriceBookEntries from '@/views/crm/product-service/price-book-entry/components/create-price-book-entries.vue';
+  import { useRouter } from 'vue-router';
+  import { Message } from '@arco-design/web-vue';
+  import { getPriceBook, PriceBook } from '@/api/crm/product-service/priceBook';
 
+  const router = useRouter();
   const RefPriceBookEntryTable = ref<any>();
 
   const openAddProduct = () => {
     state.createPriceBookEntry.visible = true;
   };
 
-  const pagination = reactive({
-    'total': 0,
-    'currentPage': 0,
-    'pageSize': DefaultPageSize,
-    'show-more': true,
-    'show-total': true,
-    'show-jumper': true,
-    'show-page-size': true,
-  });
-
   const state = reactive({
+    priceBook: {} as PriceBook,
     createPriceBookEntry: {
       visible: false,
       parentNode: {},
@@ -54,11 +51,31 @@
   });
 
   const refreshPriceBookEntryList = () => {
-    RefPriceBookEntryTable.value.fetchPriceBookEntryList({
-      pageIndex: pagination.currentPage,
-      pageSize: pagination.pageSize,
-    });
+    RefPriceBookEntryTable.value.refreshPriceBookList();
   };
+  onMounted(() => {
+    const { query } = useRouter().currentRoute.value;
+    const priceBookId = Number(query.priceBookId);
+    // console.log(priceBookId);
+    if (!priceBookId || priceBookId <= 0) {
+      Message.error('请先选择正确的价格手册');
+      router.push({
+        name: 'PriceBook',
+      });
+      return;
+    }
+
+    const fetchPriceBook = async (priceBookId: number) => {
+      const res = await getPriceBook({
+        priceBookId,
+      });
+
+      state.priceBook = res.data;
+    };
+
+    // console.log(priceBookEntryId);
+    fetchPriceBook(priceBookId);
+  });
 </script>
 
 <script lang="ts">

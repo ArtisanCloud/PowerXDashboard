@@ -265,7 +265,7 @@
   });
 
   const isDisabled = (): boolean => {
-    if (prop.node.priceEntry) {
+    if (prop.node.activePriceBookEntry) {
       return false;
     }
     return true;
