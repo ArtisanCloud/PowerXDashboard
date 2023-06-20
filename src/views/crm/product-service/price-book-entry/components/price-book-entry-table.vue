@@ -11,6 +11,9 @@
       @page-change="pageChanged"
       @page-size-change="pageSizeChanged"
     >
+      <template #status="{ record }">
+        <a-checkbox v-model="record.isActive" disabled>激活</a-checkbox>
+      </template>
       <template #optional="{ record }">
         <a-space align="center">
           <!--编辑价格条目按钮-->
@@ -21,16 +24,16 @@
           </a-button>
 
           <!--删除价格条目按钮-->
-          <a-popconfirm
-            content="该操作会删除价格条目,确定要删除此价格条目吗？"
-            @ok="deletePriceBookEntryById(record.id)"
-          >
-            <a-button v-if="!record.isStandard">
-              <template #icon>
-                <icon-delete :style="{ fontSize: '16px', color: 'red' }" />
-              </template>
-            </a-button>
-          </a-popconfirm>
+          <!--          <a-popconfirm-->
+          <!--            content="该操作会删除价格条目,确定要删除此价格条目吗？"-->
+          <!--            @ok="deletePriceBookEntryById(record.id)"-->
+          <!--          >-->
+          <!--            <a-button v-if="!record.isStandard">-->
+          <!--              <template #icon>-->
+          <!--                <icon-delete :style="{ fontSize: '16px', color: 'red' }" />-->
+          <!--              </template>-->
+          <!--            </a-button>-->
+          <!--          </a-popconfirm>-->
         </a-space>
       </template>
     </a-table>
@@ -43,7 +46,7 @@
     >
       <CreatePriceBookEntries
         v-if="state.createPriceBookEntry.visible"
-        @submit-success="fetchPriceBookEntryList"
+        @submit-success="refreshPriceBookList"
       />
     </a-drawer>
     <a-drawer
@@ -55,7 +58,7 @@
       <EditPriceBookEntry
         v-if="state.editPriceBookEntry.visible"
         :node="state.editPriceBookEntry.node"
-        @submit-success="fetchPriceBookEntryList"
+        @submit-success="refreshPriceBookList"
       />
     </a-drawer>
   </a-card>
@@ -65,14 +68,12 @@
   import { onMounted, reactive, ref } from 'vue';
   import {
     listPriceBookEntries,
-    deletePriceBookEntry,
     PriceBookEntry,
     ListPriceBookEntriesRequest,
   } from '@/api/crm/product-service/priceBookEntry';
 
   import CreatePriceBookEntries from '@/views/crm/product-service/price-book-entry/components/create-price-book-entries.vue';
   import EditPriceBookEntry from '@/views/crm/product-service/price-book-entry/components/edit-price-book-entry.vue';
-  import { Message } from '@arco-design/web-vue';
   import { DefaultPageSize } from '@/api/common';
   import { useRouter } from 'vue-router';
 
@@ -83,22 +84,38 @@
   const columns = reactive([
     {
       title: '产品名称',
-      dataIndex: 'name',
+      dataIndex: 'productName',
+      width: 250,
+    },
+    {
+      title: 'SPU',
+      dataIndex: 'spu',
+      width: 120,
+    },
+    {
+      title: '状态',
+      dataIndex: 'status',
+      width: 100,
+      slotName: 'status',
+    },
+    {
+      title: '交易价格',
+      dataIndex: 'unitPrice',
       width: 150,
     },
     {
-      title: 'SKU',
-      dataIndex: 'isStandard',
-      width: 120,
-      slotName: 'isStandard',
+      title: '标识价格',
+      dataIndex: 'listPrice',
+      width: 100,
     },
     {
-      title: '单价',
-      dataIndex: 'unitPrice',
-      width: 300,
+      title: '折扣换算',
+      dataIndex: 'discount',
+      width: 100,
     },
     {
       title: '操作',
+      width: 200,
       slotName: 'optional',
     },
   ]);
@@ -146,21 +163,21 @@
     state.editPriceBookEntry.visible = true;
   };
 
-  const deletePriceBookEntryById = async (bookId: number) => {
-    try {
-      const rep = await deletePriceBookEntry({ id: bookId });
-      if (rep.data.id && rep.data.id > 0) {
-        Message.success('删除成功');
-        await fetchPriceBookEntryList({
-          priceBookId: state.priceBookId,
-          pageIndex: pagination.currentPage,
-          pageSize: pagination.pageSize,
-        });
-      }
-    } catch (error) {
-      // console.error(error);
-    }
-  };
+  // const deletePriceBookEntryById = async (bookId: number) => {
+  //   try {
+  //     const rep = await deletePriceBookEntry({ id: bookId });
+  //     if (rep.data.id && rep.data.id > 0) {
+  //       Message.success('删除成功');
+  //       await fetchPriceBookEntryList({
+  //         priceBookId: state.priceBookId,
+  //         pageIndex: pagination.currentPage,
+  //         pageSize: pagination.pageSize,
+  //       });
+  //     }
+  //   } catch (error) {
+  //     // console.error(error);
+  //   }
+  // };
 
   const refreshPriceBookList = () => {
     fetchPriceBookEntryList({
@@ -188,6 +205,7 @@
     const { query } = route.currentRoute.value;
     state.priceBookId = Number(query.priceBookId);
     // console.log(priceBookEntryId);
+    refreshPriceBookList();
   });
 </script>
 

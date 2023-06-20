@@ -39,6 +39,13 @@
             </template>
           </a-button>
 
+          <!--配置SKU-->
+          <a-button @click="openEditProduct(record)">
+            <template #icon>
+              <icon-copy :style="{ fontSize: '16px', color: '#d7ee8f' }" />
+            </template>
+          </a-button>
+
           <!--配置价格按钮-->
           <a-button @click="openEditProduct(record)">
             <template #icon>

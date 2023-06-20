@@ -50,9 +50,26 @@ export function listPriceBookEntries(request: ListPriceBookEntriesRequest) {
   );
 }
 
-export function createPriceBookEntry(request: PriceBookEntry[]) {
+export interface ConfigPriceBookEntryRequest {
+  priceBookEntries: PriceBookEntry[];
+}
+
+export function configPriceBookEntry(request: ConfigPriceBookEntryRequest) {
   return axios.post<PriceBookEntry[]>(
-    `${PrefixUriAdmin + UriProduct}/price-book-entries`,
+    `${PrefixUriAdmin + UriProduct}/price-book-entries/config`,
+    request
+  );
+}
+
+export type UpdatePriceBookEntryRequest = PriceBookEntry;
+
+export interface UpdatePriceBookEntryReply {
+  id: number;
+}
+
+export function updatePriceBookEntry(request: UpdatePriceBookEntryRequest) {
+  return axios.post<UpdatePriceBookEntryReply>(
+    `${PrefixUriAdmin + UriProduct}/price-book-entries/${request.id}`,
     request
   );
 }
