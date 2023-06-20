@@ -27,7 +27,7 @@
 </template>
 
 <script lang="ts" setup>
-  import { onMounted, PropType, reactive, ref, watch } from 'vue';
+  import { onMounted, PropType, reactive, ref } from 'vue';
   import { PriceBookEntry } from '@/api/crm/product-service/priceBookEntry';
 
   const formSKUEntryList = ref([] as PriceBookEntry[]);
@@ -74,7 +74,7 @@
       const skuEntry = prop.skuEntryList[i];
       formSKUEntryList.value.push(skuEntry);
     }
-    console.log(formSKUEntryList);
+    // console.log(formSKUEntryList);
   };
 
   onMounted(() => {

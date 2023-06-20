@@ -54,7 +54,7 @@
             {{
               record.activePriceBookEntry === null
                 ? '未配置价格'
-                : record.activePriceBookEntry?.listPrice
+                : record.activePriceBookEntry?.unitPrice
             }}
           </a-typography-text>
         </template>

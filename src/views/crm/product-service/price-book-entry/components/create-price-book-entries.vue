@@ -21,11 +21,11 @@
         color: '#C2C7CC',
       }"
     >
-      <div :style="divStyle(1)">
+      <div :style="divStyle(Step1)">
         <product-search-select @on-selected-items="onSelectedProducts" />
       </div>
 
-      <div :style="divStyle(2)">
+      <div :style="divStyle(Step2)">
         <a-table
           :data="formModel"
           style="width: 100%"
@@ -35,7 +35,7 @@
           :bordered="{ cell: true }"
           :columns="columns"
         >
-          <template #unitPirce="{ rowIndex }">
+          <template #unitPrice="{ rowIndex }">
             <a-input-number v-model="formModel[rowIndex].unitPrice" />
           </template>
           <template #status="{ rowIndex }">
@@ -70,7 +70,7 @@
   import { PropType, reactive, ref } from 'vue';
   import { Message } from '@arco-design/web-vue';
   import {
-    createPriceBookEntry,
+    configPriceBookEntry,
     PriceBookEntry,
   } from '@/api/crm/product-service/priceBookEntry';
   import ProductSearchSelect from '@/views/crm/product-service/product/components/product-search-select.vue';
@@ -82,7 +82,7 @@
 
   const Step1 = 1;
   const Step2 = 2;
-  const StepSubmit = 3;
+  // const StepSubmit = 3;
 
   const props = defineProps({
     priceBook: {
@@ -119,9 +119,9 @@
     },
     {
       title: '零售价格',
-      dataIndex: 'unitPrice',
+      dataIndex: 'listPrice',
       width: 150,
-      slotName: 'unitPrice',
+      slotName: 'listPrice',
     },
     {
       title: 'SPU',
@@ -156,15 +156,14 @@
   };
 
   const onSubmit = async () => {
-    console.log(123);
     if (state.submitLoading) {
       return;
     }
 
     state.submitLoading = true;
-    createPriceBookEntry(formModel.value)
+    configPriceBookEntry({ priceBookEntries: formModel.value })
       .then(() => {
-        Message.success('创建成功');
+        Message.success('配置成功');
         emits('submitSuccess');
       })
       .catch(() => {
@@ -196,8 +195,8 @@
       const entry = {
         productName: product.name,
         spu: product.spu,
-        priceBookId: props.priceBook.id!,
-        productId: product.id!,
+        priceBookId: props.priceBook.id ?? 0,
+        productId: product.id ?? 0,
         unitPrice: 0.0,
         listPrice: 0.0,
         isActive: false,
@@ -206,7 +205,7 @@
 
       if (product.activePriceBookEntry) {
         entry.unitPrice = product.activePriceBookEntry.unitPrice;
-        entry.listPrice = product.activePriceBookEntry.listPrice!;
+        entry.listPrice = product.activePriceBookEntry.listPrice ?? 0;
         entry.isActive = true;
       }
       if (product.skus && product.skus.length > 0) {
@@ -216,8 +215,9 @@
             productName: product.name,
             spu: product.spu,
             skuNo: sku.skuNo,
-            priceBookId: props.priceBook.id!,
-            productId: product.id!,
+            priceBookId: props.priceBook.id ?? 0,
+            productId: product.id ?? 0,
+            skuId: sku.id ?? 0,
             unitPrice: sku.unitPrice,
             listPrice: sku.listPrice,
             isActive: sku.isActive,

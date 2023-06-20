@@ -10,7 +10,7 @@ export const getObjectsByIds = <T extends { id?: number }>(
   objects: T[],
   ids: number[]
 ): T[] => {
-  return objects.filter((obj) => ids.includes(obj.id!));
+  return objects.filter((obj) => obj.id !== undefined && ids.includes(obj.id));
 };
 
 export const mergeObjectArrays = <T extends { id?: number }>(
