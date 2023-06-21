@@ -4,7 +4,7 @@ import type { ProductCategory } from '@/api/crm/product-service/category';
 import { MediaSet } from '@/api/mediaresource';
 import {
   PriceBookEntry,
-  ProductSpecific,
+  ProductAttribute,
 } from '@/api/crm/product-service/priceBookEntry';
 
 export const UriProduct = '/product';
@@ -32,7 +32,7 @@ export interface SKU extends PowerModel {
   isActive: boolean;
 }
 
-export interface Product extends PowerModel, ProductSpecific, MediaSet {
+export interface Product extends PowerModel, ProductAttribute, MediaSet {
   name: string;
   spu: string;
   type: number;
@@ -81,6 +81,18 @@ export function listProducts(request: ListProductPageRequest) {
     {
       params: request,
     }
+  );
+}
+
+export interface GetProductRequest {
+  productId: number;
+}
+
+export type GetProductReply = Product;
+
+export function getProduct(request: GetProductRequest) {
+  return axios.get<GetProductReply>(
+    `${PrefixUriAdmin + UriProduct}/products/${request.productId}`
   );
 }
 

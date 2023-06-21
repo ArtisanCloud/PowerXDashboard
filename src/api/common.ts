@@ -9,7 +9,7 @@ import axios from 'axios';
 
 export const PrefixUriAdmin = '/api/v1/admin';
 export const DefaultPageSize = 10;
-export const MaxPageSize = 9999;
+export const MaxPageSize = 399;
 
 export interface EmployeeOption {
   id: number;

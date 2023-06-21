@@ -43,6 +43,7 @@ export default {
   'menu.crm.productService.store': '门店',
   'menu.crm.productService.artisan': '元匠',
   'menu.crm.productService.productManagement': '商品管理',
+  'menu.crm.productService.sku': 'sku管理',
   'menu.crm.productService.productCategory': '商品品类',
   'menu.crm.productService.priceBook': '价格手册',
   'menu.crm.productService.priceBookEntry': '价格手册条目',
