@@ -43,6 +43,7 @@ export default {
   'menu.crm.productService.store': 'Store',
   'menu.crm.productService.artisan': 'Artisan',
   'menu.crm.productService.productManagement': 'Product Management',
+  'menu.crm.productService.sku': 'SKU Management',
   'menu.crm.productService.productCategory': 'Product Category',
   'menu.crm.productService.priceBook': 'Price Book',
   'menu.crm.productService.priceBookEntry': 'Price Book Entry',

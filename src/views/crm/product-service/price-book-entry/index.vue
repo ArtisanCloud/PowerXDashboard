@@ -53,6 +53,15 @@
   const refreshPriceBookEntryList = () => {
     RefPriceBookEntryTable.value.refreshPriceBookList();
   };
+
+  const fetchPriceBook = async (priceBookId: number) => {
+    const res = await getPriceBook({
+      priceBookId,
+    });
+
+    state.priceBook = res.data;
+  };
+
   onMounted(() => {
     const { query } = useRouter().currentRoute.value;
     const priceBookId = Number(query.priceBookId);
@@ -64,14 +73,6 @@
       });
       return;
     }
-
-    const fetchPriceBook = async (priceBookId: number) => {
-      const res = await getPriceBook({
-        priceBookId,
-      });
-
-      state.priceBook = res.data;
-    };
 
     // console.log(priceBookEntryId);
     fetchPriceBook(priceBookId);

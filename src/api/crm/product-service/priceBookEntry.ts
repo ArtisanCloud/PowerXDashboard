@@ -3,7 +3,7 @@ import { PowerModel, PrefixUriAdmin } from '@/api/common';
 
 const UriProduct = '/product';
 
-export interface ProductSpecific {
+export interface ProductAttribute {
   inventory?: number;
   weight?: number;
   volume?: number;
@@ -12,7 +12,7 @@ export interface ProductSpecific {
   extra?: string;
 }
 
-export interface PriceBookEntry extends PowerModel, ProductSpecific {
+export interface PriceBookEntry extends PowerModel, ProductAttribute {
   priceBookId: number;
   productId: number;
   skuId?: number;

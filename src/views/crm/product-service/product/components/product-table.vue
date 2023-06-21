@@ -40,9 +40,9 @@
           </a-button>
 
           <!--配置SKU-->
-          <a-button @click="openEditProduct(record)">
+          <a-button :href="`product-management/sku?productId=${record.id}`">
             <template #icon>
-              <icon-copy :style="{ fontSize: '16px', color: '#d7ee8f' }" />
+              <icon-list :style="{ fontSize: '16px', color: '#d7ee8f' }" />
             </template>
           </a-button>
 

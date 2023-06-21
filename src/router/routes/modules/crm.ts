@@ -84,6 +84,18 @@ const CRM: AppRouteRecordRaw = {
           },
         },
         {
+          path: '/crm/product-service/product-management/sku',
+          name: 'SKU',
+          component: () =>
+            import('@/views/crm/product-service/product/sku/index.vue'),
+          meta: {
+            hideInMenu: true,
+            locale: 'menu.crm.productService.sku',
+            requiresAuth: true,
+            roles: ['*'],
+          },
+        },
+        {
           path: '/crm/product-service/product-category',
           name: 'ProductCategory',
           component: () =>

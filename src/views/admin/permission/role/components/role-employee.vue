@@ -25,7 +25,11 @@
     RoleEmployee,
     setRoleEmployees,
   } from '@/api/permission';
-  import { EmployeeOption, getEmployeeOptions } from '@/api/common';
+  import {
+    EmployeeOption,
+    getEmployeeOptions,
+    MaxPageSize,
+  } from '@/api/common';
   import { Message } from '@arco-design/web-vue';
 
   const prop = defineProps({
@@ -74,7 +78,7 @@
     const request: GetRoleEmployeesRequest = {
       roleCode,
       pageIndex: 1,
-      pageSize: 99999,
+      pageSize: MaxPageSize,
     };
 
     getRoleEmployees(request)
@@ -90,7 +94,7 @@
   function fetchOption() {
     getEmployeeOptions({
       pageIndex: 1,
-      pageSize: 99999,
+      pageSize: MaxPageSize,
     }).then((res) => {
       option.employeeList = res.data.list;
     });
