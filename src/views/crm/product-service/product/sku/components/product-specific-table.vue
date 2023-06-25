@@ -71,7 +71,7 @@
   import { useRouter } from 'vue-router';
   import {
     listProductSpecifics,
-    ListProductSpecificsRequest,
+    ListProductSpecificsPageRequest,
     ProductSpecific,
   } from '@/api/crm/product-service/productSpeficic';
 
@@ -141,7 +141,9 @@
     },
   });
 
-  const fetchProductSpecificList = async (req: ListProductSpecificsRequest) => {
+  const fetchProductSpecificList = async (
+    req: ListProductSpecificsPageRequest
+  ) => {
     state.loading = true;
     try {
       const res = await listProductSpecifics(req);

@@ -6,6 +6,7 @@ import {
   PriceBookEntry,
   ProductAttribute,
 } from '@/api/crm/product-service/priceBookEntry';
+import { ProductSpecific } from '@/api/crm/product-service/productSpeficic';
 
 export const UriProduct = '/product';
 
@@ -54,6 +55,7 @@ export interface Product extends PowerModel, ProductAttribute, MediaSet {
   activePriceBookEntry: PriceBookEntry;
   priceBookEntries: PriceBookEntry[];
   skus: SKU[];
+  productSpecifics: ProductSpecific[];
 
   // category
   productCategories: ProductCategory[];

@@ -13,25 +13,25 @@ export interface ProductSpecific extends PowerModel {
   productId: number;
   name: string;
 
-  options?: SpecificOption[];
+  specificOptions?: SpecificOption[];
 }
 
-export interface ListProductSpecificsRequest {
+export interface ListProductSpecificsPageRequest {
   ids?: number[];
   productId: number;
   pageIndex?: number;
   pageSize?: number;
 }
 
-export interface ListProductSpecificsReply {
+export interface ListProductSpecificsPageReply {
   list: ProductSpecific[];
   pageIndex: number;
   pageSize: number;
   total: number;
 }
 
-export function listProductSpecifics(request: ListProductSpecificsRequest) {
-  return axios.get<ListProductSpecificsReply>(
+export function listProductSpecifics(request: ListProductSpecificsPageRequest) {
+  return axios.get<ListProductSpecificsPageReply>(
     `${PrefixUriAdmin + UriProduct}/product-specifics/page-list`,
     {
       params: request,
@@ -39,12 +39,15 @@ export function listProductSpecifics(request: ListProductSpecificsRequest) {
   );
 }
 
-export interface CreateProductSpecificRequest {
-  priceBookEntries: ProductSpecific[];
+export interface ConfigProductSpecificRequest {
+  productSpecifics: ProductSpecific[];
+}
+export interface ConfigProductSpecificReply {
+  result: boolean;
 }
 
-export function createProductSpecific(request: CreateProductSpecificRequest) {
-  return axios.post<ProductSpecific[]>(
+export function configProductSpecific(request: ConfigProductSpecificRequest) {
+  return axios.post<ConfigProductSpecificReply>(
     `${PrefixUriAdmin + UriProduct}/product-specifics/config`,
     request
   );

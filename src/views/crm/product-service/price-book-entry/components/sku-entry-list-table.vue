@@ -3,7 +3,7 @@
     <a-table
       :data="formSKUEntryList"
       :loading="state.loading"
-      row-key="key"
+      row-key="id"
       :columns="columns"
       column-resizable
       :pagination="false"
