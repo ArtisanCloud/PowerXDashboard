@@ -6,7 +6,8 @@ import {
   PriceBookEntry,
   ProductAttribute,
 } from '@/api/crm/product-service/priceBookEntry';
-import { ProductSpecific } from '@/api/crm/product-service/productSpeficic';
+import { SKU } from '@/api/crm/product-service/sku';
+import { ProductSpecific } from '@/api/crm/product-service/productSpecific';
 
 export const UriProduct = '/product';
 
@@ -22,16 +23,6 @@ export interface DetailImage {
 //   listPrice: number;
 //   discount: number;
 // }
-
-export interface SKU extends PowerModel {
-  skuNo: string;
-  inventory: number;
-  unitPrice: number;
-  listPrice: number;
-  discount: number;
-  optionsIds: number[];
-  isActive: boolean;
-}
 
 export interface Product extends PowerModel, ProductAttribute, MediaSet {
   name: string;

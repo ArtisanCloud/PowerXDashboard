@@ -73,7 +73,7 @@
     listProductSpecifics,
     ListProductSpecificsPageRequest,
     ProductSpecific,
-  } from '@/api/crm/product-service/productSpeficic';
+  } from '@/api/crm/product-service/productSpecific';
 
   const route = useRouter();
 

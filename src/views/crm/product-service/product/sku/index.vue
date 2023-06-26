@@ -39,27 +39,23 @@
                 "
               >
                 <a-input
-                  v-model="state.productSpecifics[index].name"
+                  v-model="specific.name"
                   size="mini"
-                  @change="
-                    validateSpecificNameDuplicated(
-                      state.productSpecifics[index].name
-                    )
-                  "
+                  @change="validateSpecificNameDuplicated"
                 />
                 &nbsp;&nbsp;
 
                 <a-button shape="round" size="mini" @click="addOption(index)">
                   <icon-plus />
                 </a-button>
-                &nbsp;
-                <a-button
-                  shape="round"
-                  size="mini"
-                  @click="removeSpecific(index)"
+                &nbsp;<a-popconfirm
+                  content="确认要删除改规格么？这会造成需要重新梳理SKU"
+                  @ok="removeSpecific(state.productSpecifics[index])"
                 >
-                  <icon-minus />
-                </a-button>
+                  <a-button shape="round" size="mini">
+                    <icon-minus />
+                  </a-button>
+                </a-popconfirm>
               </div>
             </template>
           </a-list-item-meta>
@@ -73,7 +69,7 @@
               <a-input
                 v-model="option.name"
                 size="mini"
-                @change="validateOptionNameDuplicated(index, option.name)"
+                @change="validateOptionNameDuplicated(index)"
               />
             </a-checkbox>
           </a-space>
@@ -96,7 +92,7 @@
       @submit="onSaveSKUs"
     >
       <a-table
-        :data="state.product.skus"
+        :data="state.skus"
         :loading="state.loading"
         row-key="id"
         :columns="columns"
@@ -108,16 +104,26 @@
           <a-typography-text>{{ rowIndex + 1 }}</a-typography-text>
         </template>
         <template #skuNo="{ rowIndex }">
-          <a-input v-model="state.product.skus[rowIndex].skuNo" />
-        </template>
-        <template #status="{ rowIndex }">
-          <a-checkbox v-model="state.product.skus[rowIndex].isActive"
-            >激活
-          </a-checkbox>
+          <a-input v-model="state.skus[rowIndex].skuNo" />
         </template>
 
         <template #inventory="{ rowIndex }">
-          <a-input-number v-model="state.product.skus[rowIndex].inventory" />
+          <a-input-number v-model="state.skus[rowIndex].inventory" />
+        </template>
+        <template #optional="{ record }">
+          <a-space align="center">
+            <!--删除SKU按钮-->
+            <a-popconfirm
+              content="该操作会删除SKU,确定要删除此SKU吗？"
+              @ok="removeSKU(record.id)"
+            >
+              <a-button>
+                <template #icon>
+                  <icon-delete :style="{ fontSize: '16px', color: 'red' }" />
+                </template>
+              </a-button>
+            </a-popconfirm>
+          </a-space>
         </template>
       </a-table>
       <div style="margin-top: 10px; display: flex; justify-content: flex-end">
@@ -129,16 +135,16 @@
 
 <script lang="ts" setup>
   import { computed, onMounted, reactive, ref } from 'vue';
-  import {
-    configProductSpecific,
-    listProductSpecifics,
-    ProductSpecific,
-    SpecificOption,
-  } from '@/api/crm/product-service/productSpeficic';
-  import { MaxPageSize } from '@/api/common';
   import { useRouter } from 'vue-router';
   import { Message } from '@arco-design/web-vue';
-  import { getProduct, Product, SKU } from '@/api/crm/product-service/product';
+  import { getProduct, Product } from '@/api/crm/product-service/product';
+  import { configSKU, deleteSKU, SKU } from '@/api/crm/product-service/sku';
+  import {
+    configProductSpecific,
+    deleteProductSpecific,
+    ProductSpecific,
+    SpecificOption,
+  } from '@/api/crm/product-service/productSpecific';
 
   const router = useRouter();
 
@@ -165,23 +171,25 @@
     {
       title: 'SKU',
       dataIndex: 'skuNo',
-      width: 250,
+      width: 350,
       slotName: 'skuNo',
-    },
-    {
-      title: '状态',
-      dataIndex: 'isActive',
-      slotName: 'status',
     },
     {
       title: '库存',
       dataIndex: 'inventory',
+      width: 150,
       slotName: 'inventory',
+    },
+    {
+      title: '操作',
+      width: 250,
+      // align: 'center',
+      slotName: 'optional',
     },
   ]);
 
   const specificOptionsDirection = computed(() => {
-    return state.productSpecifics.length > 3 ? 'vertical' : 'horizontal';
+    return state.productSpecifics.length > 3 ? 'horizontal' : 'vertical';
   });
 
   const addSpecific = () => {
@@ -194,19 +202,6 @@
       name: '新规格',
       specificOptions: [],
     });
-  };
-  const removeSpecific = (index: number) => {
-    state.productSpecifics.splice(index, 1);
-  };
-
-  const fetchProductSpecifics = async () => {
-    const res = await listProductSpecifics({
-      productId: state.product.id ?? 0,
-      pageIndex: 0,
-      pageSize: MaxPageSize,
-    });
-
-    state.productSpecifics = res.data.list;
   };
 
   const fetchProduct = async (productId: number) => {
@@ -225,6 +220,20 @@
   const refreshSKUs = () => {
     // fetchProductSpecifics();
     state.skus = state.product.skus;
+  };
+
+  const refreshPage = async () => {
+    await fetchProduct(state.productId);
+    refreshProductSpecifics();
+    refreshSKUs();
+  };
+
+  const removeSpecific = async (specific: ProductSpecific) => {
+    // console.log(specific, specific.id);
+    const res = await deleteProductSpecific({ id: specific.id ?? 0 });
+    if (res.data.id > 0) {
+      await refreshPage();
+    }
   };
 
   const onSaveSpecifics = async () => {
@@ -247,20 +256,29 @@
 
     if (res.data.result) {
       Message.info('更新产品规格成功，请配置SKU');
-      await fetchProduct(state.productId);
-      refreshSKUs();
+
+      await refreshPage();
     }
   };
 
-  const onSaveSKUs = () => {
+  const onSaveSKUs = async () => {
     // Perform any additional validation or checks if required
-    console.log('Save skus:', state.product.skus);
+    // console.log('Save skus:', state.skus);
+    const res = await configSKU({
+      skus: state.skus,
+    });
+
+    if (res.data.result) {
+      Message.info('更新SKU成功');
+
+      await refreshPage();
+    }
   };
 
   const addOption = (specificIndex: number) => {
     const specific = state.productSpecifics[specificIndex];
     // console.log(specific);
-    if (specific.specificOptions!.length >= 5) {
+    if (specific.specificOptions && specific.specificOptions.length >= 5) {
       Message.error('产品的规格选项数量不能超过5个');
       return;
     }
@@ -269,49 +287,54 @@
       name: '新规格选项',
       isActivated: true,
     } as SpecificOption;
-    if (specific.id! > 0) {
-      option.productSpecificId = specific.id!;
+    if (specific.id && specific.id > 0) {
+      option.productSpecificId = specific.id ?? 0;
     }
 
     specific.specificOptions?.push(option);
   };
 
-  const removeOption = (specificIndex: number, optionIndex: number) => {
-    state.productSpecifics[specificIndex].specificOptions?.splice(
-      optionIndex,
-      1
-    );
+  const removeSKU = async (id: number) => {
+    const res = await deleteSKU({ id });
+    if (res.data.id > 0) {
+      await refreshPage();
+    }
   };
 
-  const validateSpecificNameDuplicated = (name: string) => {
+  const validateSpecificNameDuplicated = () => {
     // Check for duplicated names in state.productSpecifics array
     const duplicates = state.productSpecifics.filter(
-      (specific) => specific.name === name
+      (specific, index, array) =>
+        array.findIndex((item) => item.name === specific.name) !== index
     );
 
     // Return true if duplicates exist, indicating that the name is duplicated
+    state.formSpecificValid = duplicates.length === 0;
 
-    state.formSpecificValid = !(duplicates.length > 1);
     if (!state.formSpecificValid) {
-      Message.error(`规格：${name}已经存在，请不要重名`);
+      Message.error(`规格名称存在重复，请确保每个规格名称都是唯一的`);
     }
+
     return state.formSpecificValid;
   };
-  const validateOptionNameDuplicated = (index: number, name: string) => {
+  const validateOptionNameDuplicated = (index: number) => {
     // Get the options array for the specific at the given index
-    const options = state.productSpecifics[index].specificOptions;
+    const options = state.productSpecifics[index]?.specificOptions;
 
     // Check for duplicated names in options array
-    const duplicates = options!.filter((option) => option.name === name);
+    const duplicates = options?.filter(
+      (option, optionIndex, array) =>
+        array.findIndex((item) => item.name === option.name) !== optionIndex
+    );
 
     // Return true if duplicates exist, indicating that the name is duplicated
-    state.formOptionValid = !(duplicates.length > 1);
+    state.formOptionValid = !duplicates || duplicates.length === 0;
 
     if (!state.formOptionValid) {
-      Message.error(`选项：${name}已经存在，请不要重名`);
+      Message.error(`选项名称存在重复，请确保每个选项名称都是唯一的`);
     }
 
-    return state.formSpecificValid;
+    return state.formOptionValid;
   };
 
   onMounted(async () => {
@@ -327,9 +350,7 @@
     }
 
     state.productId = productId;
-    await fetchProduct(state.productId);
-    refreshProductSpecifics();
-    refreshSKUs();
+    await refreshPage();
   });
 </script>
 
