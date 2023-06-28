@@ -47,15 +47,15 @@
           </a-button>
 
           <!--配置价格按钮-->
-          <a-button @click="openEditProduct(record)">
+          <a-button @click="openPriceBookEntry(record)">
             <template #icon>
               <icon-book :style="{ fontSize: '16px', color: '#d7ee8f' }" />
             </template>
           </a-button>
 
-          <!--删除品类按钮-->
+          <!--删除产品按钮-->
           <a-popconfirm
-            content="该操作会删除相关子品类,确定要删除此品类吗？"
+            content="确定要删除此产品吗？"
             @ok="deleteProductById(record.id)"
           >
             <a-button v-if="!record.isStandard">
@@ -80,6 +80,18 @@
         @submit-success="fetchProductList"
       />
     </a-drawer>
+
+    <a-modal
+      v-model:visible="state.createPriceBookEntry.visible"
+      :title="`配置 - ${state.productToConfigPrice.name} - 价格条目`"
+      ok-text="关闭"
+      fullscreen
+    >
+      <CreatePriceBookEntry
+        v-if="state.createPriceBookEntry.visible"
+        :product="state.productToConfigPrice"
+      />
+    </a-modal>
   </a-card>
 </template>
 
@@ -98,6 +110,7 @@
   import useOptionsStore from '@/store/modules/data-dictionary';
   import { dayjs } from '@arco-design/web-vue/es/_utils/date';
   import { DefaultPageSize } from '@/api/common';
+  import CreatePriceBookEntry from '@/views/crm/product-service/price-book-entry/components/create-price-book-entry.vue';
 
   const options = useOptionsStore();
 
@@ -191,9 +204,17 @@
       visible: false,
       node: {} as Product,
     },
+    createPriceBookEntry: {
+      visible: false,
+    },
+    productToConfigPrice: {} as Product,
     submitLoading: false,
   });
 
+  const openPriceBookEntry = (product: Product) => {
+    state.createPriceBookEntry.visible = true;
+    state.productToConfigPrice = product;
+  };
   const fetchProductList = async (req: ListProductPageRequest) => {
     state.loading = true;
     try {
