@@ -20,10 +20,8 @@
       <CreatePriceBook
         v-if="state.createPriceBook.visible"
         @submit-success="refreshPriceBookList"
-      />
-      />
-    </a-drawer></div
-  >
+      /> </a-drawer
+  ></div>
 </template>
 
 <script lang="ts" setup>
