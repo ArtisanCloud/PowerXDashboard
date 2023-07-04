@@ -20,6 +20,7 @@ export interface PriceBookEntry extends PowerModel, ProductAttribute {
   listPrice?: number;
   isActive: boolean;
   // extend
+  priceBookName?: string;
   productName?: string;
   spu?: string;
   skuNo?: string;
