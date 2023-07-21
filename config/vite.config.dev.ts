@@ -15,6 +15,10 @@ export default mergeConfig(
           target: 'http://localhost:8888',
           changeOrigin: true,
         },
+        '/bucket.*': {
+          target: 'http://localhost:9001',
+          changeOrigin: true,
+        },
       },
     },
     plugins: [
