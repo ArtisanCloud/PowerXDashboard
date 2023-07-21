@@ -59,7 +59,7 @@
 </template>
 
 <script lang="ts" setup>
-  import { onMounted, reactive, ref } from 'vue';
+  import { onMounted, ref } from 'vue';
   import { FieldRule, Message } from '@arco-design/web-vue';
   import {
     getEmployeeQueryOptions,
@@ -166,5 +166,9 @@
 
   onMounted(() => {
     fetchOption();
+  });
+
+  defineExpose({
+    reFetchOption: fetchOption,
   });
 </script>

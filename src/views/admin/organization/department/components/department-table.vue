@@ -43,13 +43,22 @@
         </a-table-column>
       </template>
     </a-table>
-    <a-drawer v-model:visible="state.createSubDepartment.visible" width="500px">
+    <a-drawer
+      v-model:visible="state.createSubDepartment.visible"
+      width="500px"
+      :footer="false"
+    >
       <CreateDepartment
         v-if="state.createSubDepartment.visible"
         :id="state.createSubDepartment.parentId"
+        @submit-success="fetchDepartmentTree()"
       />
     </a-drawer>
-    <a-drawer v-model:visible="state.editDepartment.visible" width="500px">
+    <a-drawer
+      v-model:visible="state.editDepartment.visible"
+      width="500px"
+      :footer="false"
+    >
       <EditDepartment
         v-if="state.editDepartment.visible"
         :id="state.editDepartment.departmentId"
@@ -93,6 +102,9 @@
     } finally {
       state.loading = false;
     }
+    state.createDepartment.visible = false;
+    state.createSubDepartment.visible = false;
+    state.editDepartment.visible = false;
   };
 
   const openAddSubDepartment = (depId: number) => {

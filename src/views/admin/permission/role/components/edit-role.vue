@@ -42,6 +42,8 @@
     },
   });
 
+  const emit = defineEmits(['submitSuccess']);
+
   const formRef = ref();
   const formModel = ref({ roleCode: prop.roleCode } as PutRoleRequest);
 
@@ -71,6 +73,7 @@
     }
     patchRole(formModel.value).then(() => {
       Message.success('修改成功');
+      emit('submitSuccess');
     });
   };
 
