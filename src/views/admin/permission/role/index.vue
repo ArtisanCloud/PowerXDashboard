@@ -37,7 +37,7 @@
       width="500px"
       :footer="false"
     >
-      <CreateRole v-if="state.createRole.visible" />
+      <CreateRole v-if="state.createRole.visible" @submit-success="fetch" />
     </a-drawer>
     <a-drawer
       v-model:visible="state.editRole.visible"
@@ -47,6 +47,7 @@
       <EditRole
         v-if="state.editRole.visible"
         :role-code="state.editRole.roleCode"
+        @submit-success="fetch"
       />
     </a-drawer>
     <a-drawer
@@ -57,6 +58,7 @@
       <RoleEmployee
         v-if="state.editEmployee.visible"
         :role-code="state.editEmployee.roleCode"
+        @submit-success="fetch"
       />
     </a-drawer>
   </div>
@@ -88,6 +90,9 @@
   function fetch() {
     listRoles().then((res) => {
       data.value = res.data;
+      state.createRole.visible = false;
+      state.editRole.visible = false;
+      state.editEmployee.visible = false;
     });
   }
 

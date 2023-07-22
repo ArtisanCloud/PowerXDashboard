@@ -1,6 +1,7 @@
 <template>
   <a-tree
     v-if="data.depTree.length > 0"
+    v-model:expanded-keys="state.expandKeys"
     :data="data.depTree"
     :show-line="true"
     :field-names="{
@@ -30,10 +31,11 @@
         v-model:visible="state.addDepDrawer.visible"
         title="添加子部门"
         width="500px"
+        :footer="false"
       >
         <CreateDepartment
           :id="state.addDepDrawer.pId"
-          @submit-success="fetch()"
+          @submit-success="afterCreate"
         />
       </a-drawer>
     </template>
@@ -51,7 +53,7 @@
   const prop = defineProps({
     modelValue: {
       type: Number as PropType<number | undefined>,
-      default: undefined,
+      default: 1,
     },
   });
 
@@ -75,6 +77,7 @@
       visible: false,
       pId: 0,
     },
+    expandKeys: [0] as number[],
   });
 
   const onSelect = (v: any[]) => {
@@ -84,8 +87,17 @@
   function fetch() {
     getDepartmentTree({ depId: 1 }).then((res) => {
       data.depTree = [res.data.depTree];
+      if (!state.expandKeys.includes(res.data.depTree.id)) {
+        state.expandKeys.push(res.data.depTree.id);
+      }
     });
   }
+
+  const afterCreate = () => {
+    fetch();
+    state.expandKeys.push(state.addDepDrawer.pId);
+    state.addDepDrawer.visible = false;
+  };
 
   function openAddDepDrawer(pId: number) {
     state.addDepDrawer.visible = true;

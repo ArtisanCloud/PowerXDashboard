@@ -19,12 +19,15 @@
         >
           <a-card>
             <a-scrollbar style="width: 100%; height: 100%; overflow: auto">
-              <DepartmentSide style="min-height: 60vh" />
+              <DepartmentSide v-model="state.depId" style="min-height: 60vh" />
             </a-scrollbar>
           </a-card>
         </a-col>
         <a-col :xs="24" :sm="24" :md="12" :lg="16">
-          <SearchEmployeeTable />
+          <SearchEmployeeTable
+            ref="searchEmployeeTableRef"
+            v-model:dep-ids="searchDepIds"
+          />
         </a-col>
       </a-row>
     </a-card>
@@ -33,21 +36,35 @@
       v-model:visible="state.createEmployeeVisible"
       title="新增员工"
       width="500px"
+      :footer="false"
     >
-      <CreateEmployee @submit-success="state.createEmployeeVisible = false" />
+      <CreateEmployee ref="createEmployeeRef" @submit-success="closeCreate" />
     </a-drawer>
   </div>
 </template>
 
 <script lang="ts" setup>
   import CreateEmployee from '@/views/admin/employee/components/create-employee.vue';
-  import { reactive } from 'vue';
+  import { computed, reactive, ref } from 'vue';
   import SearchEmployeeTable from '@/views/admin/employee/components/search-employee-table.vue';
   import DepartmentSide from '@/views/admin/employee/components/department-side.vue';
 
+  const createEmployeeRef = ref();
+  const searchEmployeeTableRef = ref();
+
   const state = reactive({
     createEmployeeVisible: false,
+    depId: 0,
   });
+
+  const searchDepIds = computed(() => {
+    return [state.depId];
+  });
+
+  const closeCreate = () => {
+    state.createEmployeeVisible = false;
+    searchEmployeeTableRef.value.refresh();
+  };
 </script>
 
 <script lang="ts">
