@@ -40,6 +40,8 @@
     },
   });
 
+  const emit = defineEmits(['submitSuccess']);
+
   const data = ref([] as RoleEmployee[]);
 
   const option = reactive({
@@ -106,6 +108,7 @@
       employeeIds: selectValue.value,
     }).then(() => {
       Message.success('更新成功');
+      emit('submitSuccess');
     });
   };
 

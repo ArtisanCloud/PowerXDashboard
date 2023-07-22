@@ -124,7 +124,7 @@
 </template>
 
 <script lang="ts" setup>
-  import { onMounted, reactive, ref } from 'vue';
+  import { computed, onMounted, reactive, ref, watch } from 'vue';
   import {
     deleteEmployee,
     listEmployees,
@@ -144,6 +144,24 @@
   const router = useRouter();
 
   const option = ref({} as GetEmployeeQueryOptionsReply);
+
+  const props = defineProps({
+    depIds: {
+      type: Array as () => number[],
+      default: [] as number[],
+    },
+  });
+
+  const emit = defineEmits(['update:depIds']);
+
+  const depIds = computed({
+    get() {
+      return props.depIds;
+    },
+    set(v) {
+      emit('update:depIds', v);
+    },
+  });
 
   const queryForm = reactive({
     likeName: '',
@@ -240,9 +258,18 @@
     state.editEmployee.visible = true;
   }
 
+  watch(depIds, () => {
+    queryForm.depIds = depIds.value;
+    queryChange();
+  });
+
   onMounted(() => {
     fetchOption();
     queryChange();
+  });
+
+  defineExpose({
+    refresh: queryChange,
   });
 </script>
 

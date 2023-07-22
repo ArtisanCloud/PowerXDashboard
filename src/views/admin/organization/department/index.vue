@@ -1,19 +1,23 @@
 <template>
   <div class="container">
-    <a-card>
-      <a-space size="large">
-        <a-button type="primary" @click="state.createDepartment.visible = true"
-          >新增部门</a-button
-        >
-      </a-space>
-    </a-card>
+    <!--    <a-card>-->
+    <!--      <a-space size="large">-->
+    <!--        <a-button type="primary" @click="state.createDepartment.visible = true"-->
+    <!--          >新增部门</a-button-->
+    <!--        >-->
+    <!--      </a-space>-->
+    <!--    </a-card>-->
     <br />
     <a-card>
       <DepartmentTable />
     </a-card>
-    <a-drawer v-model:visible="state.createDepartment.visible" width="500px">
-      <CreateDepartment v-if="state.createDepartment.visible" />
-    </a-drawer>
+    <!--    <a-drawer-->
+    <!--      v-model:visible="state.createDepartment.visible"-->
+    <!--      width="500px"-->
+    <!--      :footer="false"-->
+    <!--    >-->
+    <!--      <CreateDepartment v-if="state.createDepartment.visible"/>-->
+    <!--    </a-drawer>-->
   </div>
 </template>
 

@@ -141,11 +141,21 @@
       <li>
         <a-dropdown trigger="click">
           <a-avatar
+            v-if="avatar !== ''"
             :size="32"
             :style="{ marginRight: '8px', cursor: 'pointer' }"
           >
-            <img v-if="avatar === ''" alt="avatar" :src="avatar" />
-            <a-avatar v-else>{{ userStore.name }}</a-avatar>
+            <img alt="avatar" :src="avatar" />
+          </a-avatar>
+          <a-avatar
+            v-else
+            :style="{
+              marginRight: '8px',
+              cursor: 'pointer',
+              backgroundColor: '#00d0b6',
+            }"
+          >
+            {{ userStore.name }}
           </a-avatar>
           <template #content>
             <a-doption>

@@ -35,6 +35,8 @@
   import ApiTreeSelect from '@/views/admin/permission/role/components/api-tree-select.vue';
   import MenuTreeSelect from '@/views/admin/permission/role/components/menu-tree-select.vue';
 
+  const emit = defineEmits(['submitSuccess']);
+
   const formRef = ref();
   const formModel = ref({
     roleCode: '',
@@ -63,6 +65,7 @@
     }
     createRole(formModel.value).then(() => {
       Message.success('创建成功');
+      emit('submitSuccess');
     });
   };
 </script>
