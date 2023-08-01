@@ -230,9 +230,12 @@
 
   const removeSpecific = async (specific: ProductSpecific) => {
     // console.log(specific, specific.id);
-    const res = await deleteProductSpecific({ id: specific.id ?? 0 });
-    if (res.data.id > 0) {
-      await refreshPage();
+    const id = specific.id ?? 0;
+    if (id > 0) {
+      const res = await deleteProductSpecific({ id });
+      if (res.data.id > 0) {
+        await refreshPage();
+      }
     }
   };
 
