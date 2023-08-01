@@ -55,7 +55,6 @@ export interface EmployeeQueryDepartmentOption {
 }
 
 export interface GetEmployeeQueryOptionsReply {
-  positions: string[];
   roles: EmployeeQueryRoleOption[];
   departments: EmployeeQueryDepartmentOption[];
 }
@@ -110,4 +109,18 @@ export interface imageAbleInfo {
   icon?: string;
   backgroundColor?: string;
   imageURL?: string;
+}
+
+export interface GetOptionsRequest {
+  type: string;
+  search?: string;
+}
+export interface GetOptionsReply {
+  options: { [key: string]: any }[];
+}
+
+export function getOptions(request: GetOptionsRequest) {
+  return axios.get<GetOptionsReply>('/api/v1/admin/common/options', {
+    params: request,
+  });
 }

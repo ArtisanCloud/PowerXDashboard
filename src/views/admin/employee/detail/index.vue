@@ -15,7 +15,9 @@
               <span>{{ data.email }}</span>
             </a-form-item>
             <a-form-item label="职位">
-              <span>{{ data.position }}</span>
+              <span>
+                {{ data.position.name }} (LEVEL{{ data.position.level }})
+              </span>
             </a-form-item>
             <a-form-item label="角色"> TODO </a-form-item>
             <a-form-item label="部门"> TODO </a-form-item>

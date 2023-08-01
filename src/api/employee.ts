@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { Position } from "@/api/position";
 
 /**
  * Employee
@@ -23,7 +24,8 @@ export interface Employee {
   externalEmail?: string;
   roles: string[];
   department?: EmployeeDepartment;
-  position: string;
+  position?: Position;
+  positionId?: number;
   jobTitle: string;
   isEnabled: boolean;
   createdAt: string;
@@ -120,7 +122,7 @@ export interface UpdateEmployeeRequest {
   mobilePhone?: string;
   gender?: string;
   depId?: number;
-  position?: string;
+  positionId?: number;
   jobTitle?: string;
   password?: string;
   status?: string;
