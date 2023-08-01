@@ -19,7 +19,7 @@
 </template>
 
 <script lang="ts" setup>
-  import { onMounted, PropType, reactive, ref } from 'vue';
+  import { onMounted, PropType, reactive, ref, watch } from 'vue';
   import {
     getCategoryTree,
     ProductCategory,
@@ -37,7 +37,6 @@
     categoryTree: [] as ProductCategory[],
     transferData: [] as any[],
     loading: false,
-    defaultValue: [],
     categoryIds: [],
   });
 
@@ -47,9 +46,10 @@
     treeData: any[] = [],
     transferDataSource: any[] = []
   ) => {
+    // console.log(treeData, transferDataSource);
     treeData.forEach((item) => {
       if (item.children) getTransferData(item.children, transferDataSource);
-      else transferDataSource.push({ label: item.name, value: item.id });
+      else transferDataSource.push({ label: item.name, value: `${item.id}` });
     });
     return transferDataSource;
   };
