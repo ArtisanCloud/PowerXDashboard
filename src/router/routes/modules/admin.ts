@@ -86,6 +86,31 @@ const Admin: AppRouteRecordRaw = {
             },
           ],
         },
+        // position
+        {
+          path: '/admin/organization/position',
+          name: 'OrganizationPosition',
+          component: EMPTY_LAYOUT,
+          redirect: '/admin/position/list',
+          meta: {
+            locale: 'menu.admin.organization.position',
+            requiresAuth: true,
+            roles: ['*'],
+            hideChildrenInMenu: true,
+          },
+          children: [
+            {
+              path: '/admin/position/list',
+              name: 'OrganizationPositionList',
+              component: () => import('@/views/admin/organization/position/index.vue'),
+              meta: {
+                locale: 'menu.admin.position',
+                requiresAuth: true,
+                roles: ['*'],
+              },
+            },
+          ],
+        },
       ],
     },
     // permission

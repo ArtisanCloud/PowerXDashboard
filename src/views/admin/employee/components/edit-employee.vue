@@ -35,8 +35,12 @@
         :field-names="{ label: 'departmentName', value: 'departmentId' }"
       />
     </a-form-item>
-    <a-form-item label="职位" field="position">
-      <a-input v-model="formModel.position" />
+    <a-form-item label="职位" field="positionId">
+      <a-select
+        v-model="formModel.positionId"
+        :options="option.positions"
+        filter-option
+      />
     </a-form-item>
     <a-form-item label="职称" field="jobTitle">
       <a-input v-model="formModel.jobTitle" />
@@ -58,8 +62,8 @@
   import { FieldRule, Message } from '@arco-design/web-vue';
   import {
     getEmployeeQueryOptions,
-    GetEmployeeQueryOptionsReply,
-  } from '@/api/common';
+    getOptions
+  } from "@/api/common";
   import {
     getEmployee,
     updateEmployee,
@@ -92,7 +96,7 @@
     mobilePhone: '',
     gender: '',
     depId: 1,
-    position: '',
+    positionId: undefined,
     jobTitle: '',
     password: '',
   } as UpdateEmployeeRequest);
@@ -121,7 +125,7 @@
     ],
     gender: [{ required: true, message: '请选择性别' }],
     depId: [{ required: true, message: '请选择部门' }],
-    position: [{ max: 50, message: '职位长度不能超过 50 个字符' }],
+    positionId: [{ required: true, message: '请选择职位' }],
     jobTitle: [{ max: 50, message: '职称长度不能超过 50 个字符' }],
     password: [
       {
@@ -132,18 +136,20 @@
     ],
   } as Record<string, FieldRule[]>;
 
-  const option = ref({} as GetEmployeeQueryOptionsReply);
+  const option = ref({} as any);
 
-  function fetchOption() {
-    getEmployeeQueryOptions().then((res) => {
-      option.value = res.data;
-    });
+  async function fetchOption() {
+    const employeeQueryOptions = await getEmployeeQueryOptions();
+    option.value = employeeQueryOptions.data;
+    const positionOptions = await getOptions({ type: 'position' });
+    option.value.positions = positionOptions.data.options;
   }
 
   function fetchEmployee() {
     getEmployee({ id: employeeId.value }).then((res) => {
       formModel.value = res.data;
       formModel.value.depId = res.data.department?.depId;
+      formModel.value.positionId = res.data.position?.id;
     });
   }
 
