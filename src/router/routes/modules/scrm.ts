@@ -58,6 +58,27 @@ const Scrm: AppRouteRecordRaw = {
         roles: ['*'],
       },
     },
+    {
+      path: '/scrm/wechat-group',
+      name: 'wechatGroup',
+      component: () => import('@/views/scrm/wechat-group/index.vue'),
+      meta: {
+        locale: 'menu.scrm.wechatgroup',
+        requiresAuth: true,
+        roles: ['*'],
+      },
+    },
+    // app management
+    {
+      path: '/scrm/app',
+      name: 'WeWorkApp',
+      component: () => import('@/views/scrm/app/index.vue'),
+      meta: {
+        locale: 'menu.scrm.app',
+        requiresAuth: true,
+        roles: ['*'],
+      },
+    },
     // tag management
     {
       path: '/scrm/tag',

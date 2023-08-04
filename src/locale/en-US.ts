@@ -65,6 +65,8 @@ export default {
   'menu.scrm.customer': 'Customer Management',
   'menu.scrm.customer.detail': 'Customer Detail',
   'menu.scrm.customerGroup': 'Customer Group Management',
+  'menu.scrm.wechatgroup': 'Wechat Group Management',
+  'menu.scrm.app': 'App Management',
   'menu.scrm.tag': 'Tag Management',
   'menu.scrm.sessionArchive': 'Session Archive',
   'menu.scrm.enterpriseQR': 'WeChat Enterprise QR Code',
