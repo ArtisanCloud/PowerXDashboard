@@ -55,7 +55,7 @@
 </template>
 
 <script lang="ts" setup>
-  import { watch, reactive, ref } from 'vue';
+  import { watch, reactive, ref, PropType } from 'vue';
   import {
     FieldRule,
     Message,
@@ -70,8 +70,8 @@
 
   const prop = defineProps({
     chatIds: {
-      type: Array,
-      default:()=> {
+      type: Array as PropType<any>,
+      default: () => {
         return [];
       },
     },
