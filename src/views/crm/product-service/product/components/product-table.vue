@@ -40,7 +40,7 @@
           </a-button>
 
           <!--配置SKU-->
-          <a-button :href="`product-management/sku?productId=${record.id}`">
+          <a-button @click="$router.push(`product-management/sku?productId=${record.id}`)">
             <template #icon>
               <icon-list :style="{ fontSize: '16px', color: '#d7ee8f' }" />
             </template>
