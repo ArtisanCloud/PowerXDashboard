@@ -102,7 +102,8 @@ const Admin: AppRouteRecordRaw = {
             {
               path: '/admin/position/list',
               name: 'OrganizationPositionList',
-              component: () => import('@/views/admin/organization/position/index.vue'),
+              component: () =>
+                import('@/views/admin/organization/position/index.vue'),
               meta: {
                 locale: 'menu.admin.position',
                 requiresAuth: true,

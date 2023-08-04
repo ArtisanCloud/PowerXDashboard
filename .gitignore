@@ -4,3 +4,6 @@ dist
 dist-ssr
 *.local
 .idea/*
+
+.env.development
+.env.production
