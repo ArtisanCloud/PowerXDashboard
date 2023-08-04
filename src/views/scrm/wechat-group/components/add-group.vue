@@ -59,7 +59,7 @@
     CreateWechatGroupRequest,
     createWechatGroup,
   } from '@/api/scrm/customer';
-  import { listEmployees } from '@/api/employee';
+  import { listEmployees } from '@/api/scrm/employee';
 
   const employeesList = reactive<any>({
     list: [],

@@ -77,7 +77,7 @@
     loading: false,
     visible: false,
   });
-  const agentid = ref(null);
+  const agentid = ref(0 as number);
   const customersList = reactive<any>({
     list: [],
   });
@@ -93,7 +93,7 @@
   }
   const handleSendMsg = (item: any) => {
     state.visible = true;
-    agentid.value = item.agentid;
+    agentid.value =Number(item.agentid);
   };
 
   const handleSendSuccess = () => {
