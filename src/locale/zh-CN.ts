@@ -65,6 +65,8 @@ export default {
   'menu.scrm.customer': '客户管理',
   'menu.scrm.customer.detail': '客户详情',
   'menu.scrm.customerGroup': '客户群管理',
+  'menu.scrm.wechatgroup': '企业群管理',
+  'menu.scrm.app': '应用管理',
   'menu.scrm.tag': '标签管理',
   'menu.scrm.sessionArchive': '会话存档',
   'menu.scrm.enterpriseQR': '企微活码',

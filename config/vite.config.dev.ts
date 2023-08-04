@@ -12,11 +12,11 @@ export default mergeConfig(
       },
       proxy: {
         '/api': {
-          target: 'http://localhost:8888',
+          target: 'https://api.superman.net.cn',
           changeOrigin: true,
         },
         '/resource': {
-          target: 'http://localhost:8888',
+          target: 'https://shop.artisancloud.cn',
           changeOrigin: true,
         },
         '/bucket': {
