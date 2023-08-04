@@ -47,7 +47,7 @@ export interface ListEmployeesRequest {
   likeName?: string;
   likeEmail?: string;
   depIds?: number[];
-  positions?: string[];
+  positionIds?: [];
   likePhoneNumber?: string;
   roleCodes?: string[];
   isEnable?: any;

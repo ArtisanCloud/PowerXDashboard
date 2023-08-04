@@ -12,7 +12,7 @@
       </a-form-item>
       <a-form-item label="职位">
         <a-select
-          v-model="queryForm.positions"
+          v-model="queryForm.positionIds"
           :options="option.positions"
           multiple
           allow-clear
@@ -135,15 +135,12 @@
   import { useI18n } from 'vue-i18n';
   import { useRouter } from 'vue-router';
   import EditEmployee from '@/views/admin/employee/components/edit-employee.vue';
-  import {
-    getEmployeeQueryOptions,
-    GetEmployeeQueryOptionsReply,
-  } from '@/api/common';
+  import { getEmployeeQueryOptions, getOptions } from '@/api/common';
 
   const { t } = useI18n();
   const router = useRouter();
 
-  const option = ref({} as GetEmployeeQueryOptionsReply);
+  const option = ref({} as any);
 
   const props = defineProps({
     depIds: {
@@ -166,7 +163,7 @@
   const queryForm = reactive({
     likeName: '',
     likeEmail: '',
-    positions: [] as string[],
+    positionIds: [],
     likePhoneNumber: '',
     roleCodes: [] as string[],
     isEnable: undefined as undefined | boolean,
@@ -187,7 +184,11 @@
 
   function fetchOption() {
     getEmployeeQueryOptions().then((res) => {
-      option.value = res.data;
+      option.value.roles = res.data.roles;
+      option.value.departments = res.data.departments;
+    });
+    getOptions({ type: 'position' }).then((res) => {
+      option.value.positions = res.data.options;
     });
   }
 
