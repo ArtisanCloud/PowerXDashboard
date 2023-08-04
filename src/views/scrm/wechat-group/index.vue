@@ -133,7 +133,6 @@
   const wechatGroupList = reactive({
     list: [],
   } as GetWechatGroupReReply);
-
   const rowSelection = reactive({
     type: 'checkbox',
     showCheckedAll: true,
