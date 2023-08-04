@@ -429,7 +429,6 @@
     const res = await listEmployees({});
     try {
       employeesList.list = res.data?.list;
-      console.log(employeesList.list);
     } catch (err) {
       employeesList.list = [];
     }

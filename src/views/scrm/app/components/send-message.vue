@@ -89,7 +89,6 @@
   const prop = defineProps({
     agentid: {
       type: Number,
-      default: null,
     },
   });
 

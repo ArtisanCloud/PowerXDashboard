@@ -186,7 +186,7 @@ export interface ArticlesNews {
   articles: Articles[];
 }
 export interface GetMessageArticlesRequest {
-  agentid: number;
+  agentid?: number;
   msgtype: string;
   news: ArticlesNews;
   pagepath?: string;

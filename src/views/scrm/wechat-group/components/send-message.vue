@@ -70,7 +70,7 @@
 
   const prop = defineProps({
     chatIds: {
-      type: Array as PropType<string[]>,
+      type: Array as PropType<any>,
       default: () => {
         return [];
       },
