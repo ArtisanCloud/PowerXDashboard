@@ -78,7 +78,7 @@
     UploadRequest,
   } from '@arco-design/web-vue';
   import uploadMediaImages from '@/utils/media-resource';
-  import { listEmployees } from '@/api/employee';
+  import { listEmployees } from '@/api/scrm/employee';
   import {
     wechatMessageTemplate,
     GetWechatGroupArticlesRequest,
