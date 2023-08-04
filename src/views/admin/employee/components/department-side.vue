@@ -17,7 +17,9 @@
     </template>
     <template #extra="nodeData">
       <a-dropdown position="bl">
-        <a-button type="text" style="margin-right: 16px">···</a-button>
+        <a-button type="text" style="margin-right: 16px"
+          ><icon-settings
+        /></a-button>
         <template #content>
           <a-doption @click="openAddDepDrawer(nodeData.id)"
             >添加子部门</a-doption

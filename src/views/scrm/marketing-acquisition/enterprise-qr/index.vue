@@ -241,7 +241,6 @@
 
 <script lang="ts" setup>
   import { onMounted, reactive, ref, toRaw } from 'vue';
-  import vueQr from 'vue-qr/src/packages/vue-qr.vue';
   import { listEmployees } from '@/api/scrm/employee';
   import { Message } from '@arco-design/web-vue';
   import {
@@ -251,7 +250,6 @@
     enableQrcode,
     disableQrcode,
   } from '@/api/scrm/enterprise-qr';
-  import editQr from '@/views/scrm/enterprise-qr/components/edit-qr.vue';
 
   const qrcodeUrl = import.meta.env.VITE_BASE_QRCODE_URL;
   const state = reactive({

@@ -194,6 +194,7 @@ const CRM: AppRouteRecordRaw = {
       component: EMPTY_LAYOUT,
       redirect: '/crm/business/opportunity',
       meta: {
+        icon: 'icon-email',
         locale: 'menu.crm.business',
         requiresAuth: true,
         roles: [''],
@@ -238,6 +239,7 @@ const CRM: AppRouteRecordRaw = {
       component: EMPTY_LAYOUT,
       redirect: '/crm/transaction/order',
       meta: {
+        icon: 'icon-list',
         locale: 'menu.crm.transaction',
         requiresAuth: true,
         roles: [''],
@@ -272,6 +274,7 @@ const CRM: AppRouteRecordRaw = {
       component: EMPTY_LAYOUT,
       redirect: '/crm/membership/list',
       meta: {
+        icon: 'icon-subscribed',
         locale: 'menu.crm.membership',
         requiresAuth: true,
         roles: [''],

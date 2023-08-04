@@ -121,8 +121,8 @@
     getWechatSync,
   } from '@/api/scrm/customer';
   import { Message } from '@arco-design/web-vue';
-  import AddGroup from '@/views/scrm/wechat-group/components/add-group.vue';
-  import SendMessage from '@/views/scrm/wechat-group/components/send-message.vue';
+  import AddGroup from '@/views/scrm/wechat/components/add-group.vue';
+  import SendMessage from '@/views/scrm/wechat/components/send-message.vue';
 
   const chatIds = ref([] as string[]);
   const state = reactive({
