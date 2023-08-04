@@ -59,6 +59,10 @@ export interface AddTagRequest {
   tag: TagList[];
 }
 
+export interface CreateTagReply {
+  status: string;
+}
+
 export function addTag(request: AddTagRequest) {
   return axios.post<CreateTagReply>(
     `/api/v1/admin/scrm/tag/wechat/crop/create`,
@@ -111,7 +115,7 @@ export interface CustomerTagList {
   addTag?: string[];
   removeTag?: string[];
 }
-export function customerTag(request: CustomerTag) {
+export function customerTag(request: CustomerTagList) {
   return axios.post<any>(
     `/api/v1/admin/scrm/tag/wechat/customer/action`,
     request

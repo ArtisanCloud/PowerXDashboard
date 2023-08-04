@@ -77,7 +77,7 @@
     loading: false,
     visible: false,
   });
-  const agentid = ref(null);
+  const agentid = ref(0);
   const customersList = reactive<any>({
     list: [],
   });
