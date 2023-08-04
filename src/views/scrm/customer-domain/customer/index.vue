@@ -201,7 +201,6 @@
 <script lang="ts" setup>
   import { onMounted, reactive, ref, toRaw } from 'vue';
   import { corpOption } from '@/api/scrm/tag';
-  import addTag from '@/views/scrm/customer/components/add-tag.vue';
   import { getCustomers, GetCustomersRequest } from '@/api/scrm/customer';
 
   const state = reactive({

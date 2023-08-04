@@ -122,7 +122,7 @@
 
 <script lang="ts" setup>
   import { onMounted, reactive, ref, toRaw } from 'vue';
-  import SendMessage from '@/views/scrm/customer-group/components/send-message.vue';
+  import SendMessage from '@/views/scrm/customer-group/group/components/send-message.vue';
   import { Message } from '@arco-design/web-vue';
   import {
     getCustomersGroups,
