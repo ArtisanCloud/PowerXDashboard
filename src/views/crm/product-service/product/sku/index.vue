@@ -1,136 +1,138 @@
 <template>
-  <!--	产品规格配置表-->
-  <a-card>
-    <a-form
-      ref="formRefSpecific"
-      auto-label-width
-      :model="state.productSpecifics"
-      @submit="onSaveSpecifics"
-    >
-      <a-list>
-        <template #header>
-          {{ state.product.name }}
-          &nbsp;&nbsp;&nbsp;
-          <a-button
-            :style="{
-              width: '120px',
-              cursor: 'pointer',
-            }"
-            @click="addSpecific"
+  <div class="container">
+    <!--	产品规格配置表-->
+    <a-card>
+      <a-form
+        ref="formRefSpecific"
+        auto-label-width
+        :model="state.productSpecifics"
+        @submit="onSaveSpecifics"
+      >
+        <a-list>
+          <template #header>
+            {{ state.product.name }}
+            &nbsp;&nbsp;&nbsp;
+            <a-button
+              :style="{
+                width: '120px',
+                cursor: 'pointer',
+              }"
+              @click="addSpecific"
+            >
+              <template #icon>
+                <icon-plus />
+              </template>
+              添加规格
+            </a-button>
+          </template>
+          <a-list-item
+            v-for="(specific, index) in state.productSpecifics"
+            :key="index"
           >
-            <template #icon>
-              <icon-plus />
-            </template>
-            添加规格
-          </a-button>
-        </template>
-        <a-list-item
-          v-for="(specific, index) in state.productSpecifics"
-          :key="index"
-        >
-          <a-list-item-meta>
-            <template #title>
-              <div
-                style="
-                  width: 160px;
-                  display: flex;
-                  flex-wrap: nowrap;
-                  /*border: #6b1111 1px dashed;*/
-                "
+            <a-list-item-meta>
+              <template #title>
+                <div
+                  style="
+                    width: 160px;
+                    display: flex;
+                    flex-wrap: nowrap;
+                    /*border: #6b1111 1px dashed;*/
+                  "
+                >
+                  <a-input
+                    v-model="specific.name"
+                    size="mini"
+                    @change="validateSpecificNameDuplicated"
+                  />
+                  &nbsp;&nbsp;
+
+                  <a-button shape="round" size="mini" @click="addOption(index)">
+                    <icon-plus />
+                  </a-button>
+                  &nbsp;<a-popconfirm
+                    content="确认要删除改规格么？这会造成需要重新梳理SKU"
+                    @ok="removeSpecific(state.productSpecifics[index])"
+                  >
+                    <a-button shape="round" size="mini">
+                      <icon-minus />
+                    </a-button>
+                  </a-popconfirm>
+                </div>
+              </template>
+            </a-list-item-meta>
+            <a-space :wrap="true" :direction="specificOptionsDirection">
+              <a-checkbox
+                v-for="(option, indexOption) in specific.specificOptions"
+                :key="indexOption"
+                v-model="option.isActivated"
+                :default-checked="option.isActivated"
               >
                 <a-input
-                  v-model="specific.name"
+                  v-model="option.name"
                   size="mini"
-                  @change="validateSpecificNameDuplicated"
+                  @change="validateOptionNameDuplicated(index)"
                 />
-                &nbsp;&nbsp;
-
-                <a-button shape="round" size="mini" @click="addOption(index)">
-                  <icon-plus />
-                </a-button>
-                &nbsp;<a-popconfirm
-                  content="确认要删除改规格么？这会造成需要重新梳理SKU"
-                  @ok="removeSpecific(state.productSpecifics[index])"
-                >
-                  <a-button shape="round" size="mini">
-                    <icon-minus />
-                  </a-button>
-                </a-popconfirm>
-              </div>
-            </template>
-          </a-list-item-meta>
-          <a-space :wrap="true" :direction="specificOptionsDirection">
-            <a-checkbox
-              v-for="(option, indexOption) in specific.specificOptions"
-              :key="indexOption"
-              v-model="option.isActivated"
-              :default-checked="option.isActivated"
-            >
-              <a-input
-                v-model="option.name"
-                size="mini"
-                @change="validateOptionNameDuplicated(index)"
-              />
-            </a-checkbox>
-          </a-space>
-        </a-list-item>
-        <template #footer>
-          <div style="display: flex; justify-content: flex-end">
-            <a-button type="primary" html-type="submit">保存规格</a-button>
-          </div>
-        </template>
-      </a-list>
-    </a-form>
-  </a-card>
-
-  <!--	SKU 配置表格-->
-  <a-card>
-    <a-form
-      ref="formRefSKU"
-      auto-label-width
-      :model="state.productSpecifics"
-      @submit="onSaveSKUs"
-    >
-      <a-table
-        :data="state.skus"
-        :loading="state.loading"
-        row-key="id"
-        :columns="columns"
-        column-resizable
-        :pagination="false"
-        :bordered="{ cell: true }"
+              </a-checkbox>
+            </a-space>
+          </a-list-item>
+          <template #footer>
+            <div style="display: flex; justify-content: flex-end">
+              <a-button type="primary" html-type="submit">保存规格</a-button>
+            </div>
+          </template>
+        </a-list>
+      </a-form>
+    </a-card>
+    <br />
+    <!--	SKU 配置表格-->
+    <a-card>
+      <a-form
+        ref="formRefSKU"
+        auto-label-width
+        :model="state.productSpecifics"
+        @submit="onSaveSKUs"
       >
-        <template #id="{ rowIndex }">
-          <a-typography-text>{{ rowIndex + 1 }}</a-typography-text>
-        </template>
-        <template #skuNo="{ rowIndex }">
-          <a-input v-model="state.skus[rowIndex].skuNo" />
-        </template>
+        <a-table
+          :data="state.skus"
+          :loading="state.loading"
+          row-key="id"
+          :columns="columns"
+          column-resizable
+          :pagination="false"
+          :bordered="{ cell: true }"
+        >
+          <template #id="{ rowIndex }">
+            <a-typography-text>{{ rowIndex + 1 }}</a-typography-text>
+          </template>
+          <template #skuNo="{ rowIndex }">
+            <a-input v-model="state.skus[rowIndex].skuNo" />
+          </template>
 
-        <template #inventory="{ rowIndex }">
-          <a-input-number v-model="state.skus[rowIndex].inventory" />
-        </template>
-        <template #optional="{ record }">
-          <a-space align="center">
-            <!--删除SKU按钮-->
-            <a-popconfirm
-              content="该操作会删除SKU,确定要删除此SKU吗？"
-              @ok="removeSKU(record.id)"
-            >
-              <a-button>
-                <template #icon>
-                  <icon-delete :style="{ fontSize: '16px', color: 'red' }" />
-                </template>
-              </a-button>
-            </a-popconfirm>
-          </a-space>
-        </template>
-      </a-table>
-      <div style="margin-top: 10px; display: flex; justify-content: flex-end">
-        <a-button type="primary" html-type="submit">保存SKU</a-button>
-      </div>
-    </a-form>
-  </a-card>
+          <template #inventory="{ rowIndex }">
+            <a-input-number v-model="state.skus[rowIndex].inventory" />
+          </template>
+          <template #optional="{ record }">
+            <a-space align="center">
+              <!--删除SKU按钮-->
+              <a-popconfirm
+                content="该操作会删除SKU,确定要删除此SKU吗？"
+                @ok="removeSKU(record.id)"
+              >
+                <a-button>
+                  <template #icon>
+                    <icon-delete :style="{ fontSize: '16px', color: 'red' }" />
+                  </template>
+                </a-button>
+              </a-popconfirm>
+            </a-space>
+          </template>
+        </a-table>
+        <div style="margin-top: 10px; display: flex; justify-content: flex-end">
+          <a-button type="primary" html-type="submit">保存SKU</a-button>
+        </div>
+      </a-form>
+    </a-card>
+  </div>
 </template>
 
 <script lang="ts" setup>
