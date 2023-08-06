@@ -1,6 +1,6 @@
 <template>
-  <!--	产品规格配置表-->
   <div class="container">
+    <!--	产品规格配置表-->
     <a-card>
       <a-form
         ref="formRefSpecific"
