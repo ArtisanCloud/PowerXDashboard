@@ -30,8 +30,8 @@
     ]
   },
   "dependencies": {
-    "@arco-design/web-vue": "^2.40.0",
-    "@arco-themes/vue-taolu-publishing-platform": "^0.0.2",
+    "@arco-design/web-vue": "^2.49.3",
+    "@arco-themes/vue-powerx-design-default": "^0.0.1",
     "@fullcalendar/core": "^6.1.6",
     "@fullcalendar/daygrid": "^6.1.6",
     "@fullcalendar/interaction": "^6.1.6",
@@ -54,7 +54,7 @@
     "vue-router": "^4.0.14"
   },
   "devDependencies": {
-    "@arco-plugins/vite-vue": "^1.4.3",
+    "@arco-plugins/vite-vue": "^1.4.5",
     "@commitlint/cli": "^17.1.2",
     "@commitlint/config-conventional": "^17.1.0",
     "@types/lodash": "^4.14.186",
