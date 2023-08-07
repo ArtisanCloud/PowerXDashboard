@@ -34,6 +34,7 @@ export default {
   'menu.admin.organization.department': '部门管理',
   'menu.admin.organization.department.list': '部门列表',
   'menu.admin.organization.position': '职位管理',
+  'menu.admin.organization.position.list': '职位列表',
   'menu.admin.organization.jobTitle': '职级管理',
   'menu.crm': 'CRM',
   'menu.crm.domain': '客域管理',

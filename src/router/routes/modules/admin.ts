@@ -53,7 +53,6 @@ const Admin: AppRouteRecordRaw = {
       path: '/admin/organization',
       name: 'Organization',
       component: EMPTY_LAYOUT,
-      redirect: '/admin/organization/department',
       meta: {
         icon: 'icon-relation',
         locale: 'menu.admin.organization',
@@ -75,7 +74,7 @@ const Admin: AppRouteRecordRaw = {
           children: [
             {
               path: '/admin/organization/department/list',
-              name: 'DepartmentList',
+              name: 'OrganizationDepartmentList',
               component: () =>
                 import('@/views/admin/organization/department/index.vue'),
               meta: {
@@ -91,7 +90,7 @@ const Admin: AppRouteRecordRaw = {
           path: '/admin/organization/position',
           name: 'OrganizationPosition',
           component: EMPTY_LAYOUT,
-          redirect: '/admin/position/list',
+          redirect: '/admin/organization/position/list',
           meta: {
             locale: 'menu.admin.organization.position',
             requiresAuth: true,
@@ -100,12 +99,12 @@ const Admin: AppRouteRecordRaw = {
           },
           children: [
             {
-              path: '/admin/position/list',
+              path: '/admin/organization/position/list',
               name: 'OrganizationPositionList',
               component: () =>
                 import('@/views/admin/organization/position/index.vue'),
               meta: {
-                locale: 'menu.admin.position',
+                locale: 'menu.admin.organization.position.list',
                 requiresAuth: true,
                 roles: ['*'],
               },
