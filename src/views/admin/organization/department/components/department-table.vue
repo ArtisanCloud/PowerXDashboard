@@ -16,26 +16,27 @@
         <a-table-column title="操作">
           <template #cell="{ record }">
             <a-space>
-              <a-button
-                type="primary"
-                size="small"
-                @click="openAddSubDepartment(record.id)"
-              >
-                添加子部门
+              <!-- 添加子部门按钮 -->
+              <a-button @click="openAddSubDepartment(record.id)">
+                <template #icon>
+                  <icon-plus :style="{ fontSize: '16px', color: 'blue' }" />
+                </template>
               </a-button>
-              <a-button
-                type="primary"
-                size="small"
-                @click="openEditDepartment(record.id)"
-              >
-                详情
+              <!-- 编辑部门按钮 -->
+              <a-button @click="openEditDepartment(record.id)">
+                <template #icon>
+                  <icon-edit :style="{ fontSize: '16px', color: 'green' }" />
+                </template>
               </a-button>
+              <!-- 删除部门按钮 -->
               <a-popconfirm
                 content="确定要删除此部门吗？"
                 @ok="deleteDepartmentById(record.id)"
               >
-                <a-button type="primary" size="small" status="danger">
-                  删除
+                <a-button>
+                  <template #icon>
+                    <icon-delete :style="{ fontSize: '16px', color: 'red' }" />
+                  </template>
                 </a-button>
               </a-popconfirm>
             </a-space>

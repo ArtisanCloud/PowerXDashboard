@@ -90,23 +90,36 @@
         <a-table-column title="操作" :width="200">
           <template #cell="{ record }">
             <a-space>
-              <a-link @click="openEditEmployeeModal(record.id)">编辑 </a-link>
-              <a-popconfirm content="确定要强退用户吗?">
-                <a-link disabled>强退</a-link>
-              </a-popconfirm>
+              <!-- 编辑员工按钮 -->
+              <a-button @click="openEditEmployeeModal(record.id)">
+                <template #icon>
+                  <icon-edit :style="{ fontSize: '16px', color: 'green' }" />
+                </template>
+              </a-button>
+              <!-- 强退用户按钮（禁用） -->
+              <a-button disabled>
+                <template #icon>
+                  <icon-export :style="{ fontSize: '16px', color: 'gray' }" />
+                </template>
+              </a-button>
+              <!-- 删除员工按钮 -->
               <a-popconfirm
                 content="确定要删除用户吗?"
                 :ok-loading="state.deleteEmployeeLoading"
                 @ok="deleteEmployeeById(record.id)"
               >
-                <a-link status="danger">删除</a-link>
+                <a-button>
+                  <template #icon>
+                    <icon-delete :style="{ fontSize: '16px', color: 'red' }" />
+                  </template>
+                </a-button>
               </a-popconfirm>
             </a-space>
             <a-drawer
               v-if="
-                state.editEmployee.visible &&
-                state.editEmployee.employeeId === record.id
-              "
+          state.editEmployee.visible &&
+          state.editEmployee.employeeId === record.id
+        "
               v-model:visible="state.editEmployee.visible"
               title="编辑员工"
               width="500px"

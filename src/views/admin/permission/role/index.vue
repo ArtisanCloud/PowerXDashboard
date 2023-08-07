@@ -17,15 +17,22 @@
           <a-table-column title="操作" data-index="id">
             <template #cell="{ record }">
               <a-space>
-                <a-button type="text" @click="editRoleOnClick(record.roleCode)">
-                  编辑角色
-                </a-button>
-                <a-button
-                  type="text"
-                  @click="editEmployeeOnClick(record.roleCode)"
-                >
-                  编辑员工
-                </a-button>
+                <!-- 编辑角色按钮 -->
+                <a-tooltip content="编辑角色">
+                  <a-button @click="editRoleOnClick(record.roleCode)">
+                    <template #icon>
+                      <icon-edit :style="{ fontSize: '16px', color: 'green' }" />
+                    </template>
+                  </a-button>
+                </a-tooltip>
+                <!-- 编辑员工按钮 -->
+                <a-tooltip content="分配员工">
+                  <a-button @click="editEmployeeOnClick(record.roleCode)">
+                    <template #icon>
+                      <icon-user :style="{ fontSize: '16px', color: 'blue' }" />
+                    </template>
+                  </a-button>
+                </a-tooltip>
               </a-space>
             </template>
           </a-table-column>
