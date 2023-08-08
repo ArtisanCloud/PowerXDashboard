@@ -1,8 +1,0 @@
-node_modules
-.DS_Store
-.vscode
-dist
-dist-ssr
-.vscode/
-deploy/dist
-yarn-error.log
