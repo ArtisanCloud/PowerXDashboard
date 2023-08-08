@@ -51,6 +51,7 @@
       if (item.children) getTransferData(item.children, transferDataSource);
       else transferDataSource.push({ label: item.name, value: `${item.id}` });
     });
+    // console.log(treeData, transferDataSource);
     return transferDataSource;
   };
 
@@ -61,10 +62,10 @@
       const treeDataSource: any[] = [];
       _treeData.forEach((item: ProductCategory) => {
         // console.log(item, item.children, values.includes(item.id));
-        if (item.children || values.includes(item.id)) {
+        if (item.children || values.includes(`${item.id}`)) {
           const sourceItem: any = {
             title: item.name,
-            key: item.id,
+            key: `${item.id}`,
             children: null,
           };
           if (item.children) {
@@ -76,6 +77,7 @@
       return treeDataSource;
     };
 
+    console.log(state.categoryTree);
     return travel(state.categoryTree);
   };
 
@@ -98,6 +100,7 @@
   onMounted(async () => {
     await fetchCategoryTree();
     state.transferData = getTransferData(state.categoryTree);
+    // console.log(state.transferData);
   });
 </script>
 
