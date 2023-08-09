@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { Pagination } from '@/types/global';
 
 /**
  * 通用接口
@@ -20,19 +21,14 @@ export interface EmployeeOption {
   phoneNumber: string;
 }
 
-export interface GetEmployeeOptionsRequest {
+export interface GetEmployeeOptionsRequest extends Pagination {
   likeName?: string;
   likeEmail?: string;
   likePhoneNumber?: string;
-  pageIndex?: number;
-  pageSize?: number;
 }
 
-export interface GetEmployeeOptionsReply {
+export interface GetEmployeeOptionsReply extends Pagination {
   list: EmployeeOption[];
-  pageIndex: number;
-  pageSize: number;
-  total: number;
 }
 
 export function getEmployeeOptions(request: GetEmployeeOptionsRequest) {
@@ -75,18 +71,13 @@ export interface DepartmentOption {
   name: string;
 }
 
-export interface GetDepartmentOptionsRequest {
+export interface GetDepartmentOptionsRequest extends Pagination {
   ids?: number[];
   likeName?: string;
-  pageIndex?: number;
-  pageSize?: number;
 }
 
-export interface GetDepartmentOptionsReply {
+export interface GetDepartmentOptionsReply extends Pagination {
   list: DepartmentOption[];
-  pageIndex: number;
-  pageSize: number;
-  total: number;
 }
 
 export function getDepartmentOptions(request: GetDepartmentOptionsRequest) {

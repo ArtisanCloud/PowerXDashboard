@@ -8,6 +8,7 @@ import {
 } from '@/api/crm/product-service/priceBookEntry';
 import { SKU } from '@/api/crm/product-service/sku';
 import { ProductSpecific } from '@/api/crm/product-service/productSpecific';
+import { Pagination } from '@/types/global';
 
 export const UriProduct = '/product';
 
@@ -53,19 +54,14 @@ export interface Product extends PowerModel, ProductAttribute, MediaSet {
   categoryIds: number[];
 }
 
-export interface ListProductPageRequest {
+export interface ListProductPageRequest extends Pagination {
   ids?: number[];
   likeName?: string;
   storeIds?: number[];
-  pageIndex?: number;
-  pageSize?: number;
 }
 
-export interface ListProductPageReply {
+export interface ListProductPageReply extends Pagination {
   list: Product[];
-  pageIndex: number;
-  pageSize: number;
-  total: number;
 }
 
 export function listProducts(request: ListProductPageRequest) {

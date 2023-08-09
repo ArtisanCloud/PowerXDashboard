@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { PowerModel, PrefixUriAdmin } from '@/api/common';
 import { UriProduct } from '@/api/crm/product-service/product';
+import { Pagination } from '@/types/global';
 
 export interface PriceBook extends PowerModel {
   isStandard: boolean;
@@ -9,19 +10,14 @@ export interface PriceBook extends PowerModel {
   storeId: number;
 }
 
-export interface ListPriceBooksRequest {
+export interface ListPriceBooksRequest extends Pagination {
   ids?: number[];
   likeName?: string;
   storeIds?: number[];
-  pageIndex?: number;
-  pageSize?: number;
 }
 
-export interface ListPriceBooksReply {
+export interface ListPriceBooksReply extends Pagination {
   list: PriceBook[];
-  pageIndex: number;
-  pageSize: number;
-  total: number;
 }
 
 export interface GetPriceBooksRequest {

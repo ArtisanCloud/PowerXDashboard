@@ -1,5 +1,6 @@
 import axios from 'axios';
-import { Position } from "@/api/position";
+import { Position } from '@/api/position';
+import { Pagination } from '@/types/global';
 
 /**
  * Employee
@@ -42,7 +43,7 @@ export function getEmployee(request: GetEmployeeRequest) {
   );
 }
 
-export interface ListEmployeesRequest {
+export interface ListEmployeesRequest extends Pagination {
   ids?: number[];
   likeName?: string;
   likeEmail?: string;
@@ -51,15 +52,10 @@ export interface ListEmployeesRequest {
   likePhoneNumber?: string;
   roleCodes?: string[];
   isEnable?: any;
-  pageIndex?: number;
-  pageSize?: number;
 }
 
-export interface ListEmployeesReply {
+export interface ListEmployeesReply extends Pagination {
   list: Employee[];
-  pageIndex: number;
-  pageSize: number;
-  total: number;
 }
 
 export function listEmployees(request: ListEmployeesRequest) {

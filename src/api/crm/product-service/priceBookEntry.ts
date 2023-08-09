@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { PowerModel, PrefixUriAdmin } from '@/api/common';
+import { Pagination } from '@/types/global';
 
 const UriProduct = '/product';
 
@@ -27,19 +28,14 @@ export interface PriceBookEntry extends PowerModel, ProductAttribute {
   skuEntries?: PriceBookEntry[];
 }
 
-export interface ListPriceBookEntriesRequest {
+export interface ListPriceBookEntriesRequest extends Pagination {
   ids?: number[];
   priceBookId: number;
   productIds?: number[];
-  pageIndex?: number;
-  pageSize?: number;
 }
 
-export interface ListPriceBookEntriesReply {
+export interface ListPriceBookEntriesReply extends Pagination {
   list: PriceBookEntry[];
-  pageIndex: number;
-  pageSize: number;
-  total: number;
 }
 
 export function listPriceBookEntries(request: ListPriceBookEntriesRequest) {

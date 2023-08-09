@@ -6,6 +6,7 @@ import {
   CustomerExternalId,
   UriCustomerDomain,
 } from '@/api/crm/customer-domain/customer';
+import { Pagination } from '@/types/global';
 
 export interface Lead extends PowerModel, CustomerExternalId {
   name: string;
@@ -18,19 +19,14 @@ export interface Lead extends PowerModel, CustomerExternalId {
   isActivated: boolean;
 }
 
-export interface ListLeadPageRequest {
+export interface ListLeadPageRequest extends Pagination {
   ids?: number[];
   likeName?: string;
   storeIds?: number[];
-  pageIndex?: number;
-  pageSize?: number;
 }
 
-export interface ListLeadPageReply {
+export interface ListLeadPageReply extends Pagination {
   list: Lead[];
-  pageIndex: number;
-  pageSize: number;
-  total: number;
 }
 
 export function listLeads(request: ListLeadPageRequest) {
