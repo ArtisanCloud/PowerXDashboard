@@ -133,9 +133,9 @@
     try {
       const res = await listArtisans(req);
       artisanList.value = res.data.list;
-      pagination.currentPage = res.data.pageIndex;
-      pagination.pageSize = res.data.pageSize;
-      pagination.total = res.data.total;
+      pagination.currentPage = res.data.pageIndex!;
+      pagination.pageSize = res.data.pageSize!;
+      pagination.total = res.data.total!;
       // console.log(categoryTree)
     } finally {
       state.loading = false;

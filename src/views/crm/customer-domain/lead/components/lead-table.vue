@@ -157,9 +157,9 @@
     try {
       const res = await listLeads(req);
       leadList.value = res.data.list;
-      pagination.currentPage = res.data.pageIndex;
-      pagination.pageSize = res.data.pageSize;
-      pagination.total = res.data.total;
+      pagination.currentPage = res.data.pageIndex!;
+      pagination.pageSize = res.data.pageSize!;
+      pagination.total = res.data.total!;
       // console.log(leadList);
     } finally {
       state.loading = false;

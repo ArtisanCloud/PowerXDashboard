@@ -150,9 +150,9 @@
     try {
       const res = await listCustomers(req);
       customerList.value = res.data.list;
-      pagination.currentPage = res.data.pageIndex;
-      pagination.pageSize = res.data.pageSize;
-      pagination.total = res.data.total;
+      pagination.currentPage = res.data.pageIndex!;
+      pagination.pageSize = res.data.pageSize!;
+      pagination.total = res.data.total!;
       // console.log(customerList)
     } finally {
       state.loading = false;

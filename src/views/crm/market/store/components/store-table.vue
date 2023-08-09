@@ -147,9 +147,9 @@
     try {
       const res = await listStores(req);
       storeList.value = res.data.list;
-      pagination.currentPage = res.data.pageIndex;
-      pagination.pageSize = res.data.pageSize;
-      pagination.total = res.data.total;
+      pagination.currentPage = res.data.pageIndex!;
+      pagination.pageSize = res.data.pageSize!;
+      pagination.total = res.data.total!;
       // console.log(storeList);
     } finally {
       state.loading = false;
