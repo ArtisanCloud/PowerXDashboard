@@ -3,6 +3,7 @@ import axios from 'axios';
 import { Payment } from '@/api/crm/trade/payment';
 import { Customer } from '@/api/crm/customer-domain/customer';
 import UriTrade from '@/api/crm/trade/index';
+import { Pagination } from '@/types/global';
 
 const UriOrder = '/orders';
 
@@ -37,19 +38,14 @@ export interface Order extends PowerModel {
   customer?: Customer;
 }
 
-export interface ListOrderPageRequest {
+export interface ListOrderPageRequest extends Pagination {
   ids?: number[];
   likeName?: string;
   storeIds?: number[];
-  pageIndex?: number;
-  pageSize?: number;
 }
 
-export interface ListOrderPageReply {
+export interface ListOrderPageReply extends Pagination {
   list: Order[];
-  pageIndex: number;
-  pageSize: number;
-  total: number;
 }
 
 export function listOrders(request: ListOrderPageRequest) {

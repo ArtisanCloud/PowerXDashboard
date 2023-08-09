@@ -1,6 +1,7 @@
 import { PowerModel, PrefixUriAdmin } from '@/api/common';
 import axios from 'axios';
 import UriTrade from '@/api/crm/trade/index';
+import { Pagination } from '@/types/global';
 
 const UriPayment = '/payments';
 
@@ -32,19 +33,14 @@ export interface Payment extends PowerModel {
   paymentItems?: PaymentItem[];
 }
 
-export interface ListPaymentPageRequest {
+export interface ListPaymentPageRequest extends Pagination {
   ids?: number[];
   likeName?: string;
   storeIds?: number[];
-  pageIndex?: number;
-  pageSize?: number;
 }
 
-export interface ListPaymentPageReply {
+export interface ListPaymentPageReply extends Pagination {
   list: Payment[];
-  pageIndex: number;
-  pageSize: number;
-  total: number;
 }
 
 export function listPayments(request: ListPaymentPageRequest) {

@@ -2,6 +2,7 @@ import { PowerModel, PrefixUriAdmin } from '@/api/common';
 import axios from 'axios';
 import { UriProduct } from '@/api/crm/product-service/product';
 import { MediaSet } from '@/api/mediaresource';
+import { Pagination } from '@/types/global';
 
 const UriArtisan = '/artisans';
 
@@ -21,19 +22,14 @@ export interface Artisan extends PowerModel, MediaSet {
   address: string;
 }
 
-export interface ListArtisanPageRequest {
+export interface ListArtisanPageRequest extends Pagination {
   ids?: number[];
   likeName?: string;
   storeIds?: number[];
-  pageIndex?: number;
-  pageSize?: number;
 }
 
-export interface ListArtisanPageReply {
+export interface ListArtisanPageReply extends Pagination {
   list: Artisan[];
-  pageIndex: number;
-  pageSize: number;
-  total: number;
 }
 
 export function listArtisans(request: ListArtisanPageRequest) {

@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { PowerModel, PrefixUriAdmin } from '@/api/common';
+import { Pagination } from '@/types/global';
 
 const UriDateDictionaryApi = '/dictionary';
 
@@ -49,18 +50,13 @@ export interface DictionaryType extends PowerModel {
   items: DictionaryItem[];
 }
 
-export interface ListDictionaryTypesRequest {
+export interface ListDictionaryTypesRequest extends Pagination {
   ids?: number[];
   likeName?: string;
-  pageIndex?: number;
-  pageSize?: number;
 }
 
-export interface ListDictionaryTypesReply {
+export interface ListDictionaryTypesReply extends Pagination {
   list: DictionaryType[];
-  pageIndex: number;
-  pageSize: number;
-  total: number;
 }
 
 export function listDictionaryTypes(request: ListDictionaryTypesRequest) {

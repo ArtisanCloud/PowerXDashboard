@@ -1,5 +1,6 @@
 import { PowerModel, PrefixUriAdmin } from '@/api/common';
 import axios from 'axios';
+import { Pagination } from '@/types/global';
 
 export const UriCustomerDomain = '/customerdomain';
 
@@ -20,20 +21,15 @@ export interface Customer extends PowerModel, CustomerExternalId {
   inviter?: Customer;
 }
 
-export interface ListCustomerPageRequest {
+export interface ListCustomerPageRequest extends Pagination {
   ids?: number[];
   likeName?: string;
   likeMobile?: string;
   storeIds?: number[];
-  pageIndex?: number;
-  pageSize?: number;
 }
 
-export interface ListCustomerPageReply {
+export interface ListCustomerPageReply extends Pagination {
   list: Customer[];
-  pageIndex: number;
-  pageSize: number;
-  total: number;
 }
 
 export function listCustomers(request: ListCustomerPageRequest) {

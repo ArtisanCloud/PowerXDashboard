@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { Pagination } from '@/types/global';
 
 /**
  * PowerX
@@ -104,10 +105,8 @@ export function listAPI(request: ListAPIRequest) {
   });
 }
 
-export interface GetRoleEmployeesRequest {
+export interface GetRoleEmployeesRequest extends Pagination {
   roleCode: string;
-  pageIndex: number;
-  pageSize: number;
 }
 
 export interface RoleEmployeeDepartment {
@@ -125,11 +124,8 @@ export interface RoleEmployee {
   email: string;
 }
 
-export interface GetRoleEmployeesReply {
+export interface GetRoleEmployeesReply extends Pagination {
   list: RoleEmployee[];
-  pageIndex: number;
-  pageSize: number;
-  total: number;
 }
 
 export function getRoleEmployees(request: GetRoleEmployeesRequest) {

@@ -1,6 +1,7 @@
 import { PowerModel, PrefixUriAdmin } from '@/api/common';
 import axios from 'axios';
 import { MediaSet } from '@/api/mediaresource';
+import { Pagination } from '@/types/global';
 
 export const UriMarket = '/market';
 const UriMedia = '/medias';
@@ -25,19 +26,14 @@ export interface Media extends PowerModel, MediaSet {
   viewedCount?: number;
 }
 
-export interface ListMediaPageRequest {
+export interface ListMediaPageRequest extends Pagination {
   ids?: number[];
   likeName?: string;
   storeIds?: number[];
-  pageIndex?: number;
-  pageSize?: number;
 }
 
-export interface ListMediaPageReply {
+export interface ListMediaPageReply extends Pagination {
   list: Media[];
-  pageIndex: number;
-  pageSize: number;
-  total: number;
 }
 
 export function listMedias(request: ListMediaPageRequest) {

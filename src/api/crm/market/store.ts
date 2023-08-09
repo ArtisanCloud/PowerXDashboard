@@ -2,6 +2,7 @@ import { PowerModel, PrefixUriAdmin } from '@/api/common';
 import axios from 'axios';
 import { UriMarket } from '@/api/crm/market/media';
 import { MediaSet } from '@/api/mediaresource';
+import { Pagination } from '@/types/global';
 
 const UriStore = '/stores';
 
@@ -17,19 +18,14 @@ export interface Store extends PowerModel, MediaSet {
   endWork: string;
 }
 
-export interface ListStorePageRequest {
+export interface ListStorePageRequest extends Pagination {
   ids?: number[];
   likeName?: string;
   storeIds?: number[];
-  pageIndex?: number;
-  pageSize?: number;
 }
 
-export interface ListStorePageReply {
+export interface ListStorePageReply extends Pagination {
   list: Store[];
-  pageIndex: number;
-  pageSize: number;
-  total: number;
 }
 
 export function listStores(request: ListStorePageRequest) {
