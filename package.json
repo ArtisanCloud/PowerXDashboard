@@ -31,7 +31,7 @@
   },
   "dependencies": {
     "@arco-design/web-vue": "^2.49.3",
-    "@arco-themes/vue-powerx-design-default": "^0.0.1",
+    "@arco-themes/vue-powerx-design-default": "^0.0.2",
     "@fullcalendar/core": "^6.1.6",
     "@fullcalendar/daygrid": "^6.1.6",
     "@fullcalendar/interaction": "^6.1.6",
