@@ -93,7 +93,7 @@
 <script lang="ts" setup>
   import { onMounted, reactive, ref } from 'vue';
 
-  import EditTokenProduct from '@/views/crm/product-service/product/components/edit-product.vue';
+  import EditTokenProduct from '@/views/crm/trade/token/components/token-product/edit-token-product.vue';
   import { Message } from '@arco-design/web-vue';
 
   import useOptionsStore from '@/store/modules/data-dictionary';
@@ -105,6 +105,7 @@
     TokenProduct,
     ListTokenProductPageRequest,
   } from '@/api/crm/trade/token';
+  import { Product } from '@/api/crm/product-service/product';
 
   const options = useOptionsStore();
 
@@ -168,11 +169,11 @@
     createPriceBookEntry: {
       visible: false,
     },
-    productToConfigPrice: {} as TokenProduct,
+    productToConfigPrice: {} as Product,
     submitLoading: false,
   });
 
-  const openPriceBookEntry = (product: TokenProduct) => {
+  const openPriceBookEntry = (product: Product) => {
     state.createPriceBookEntry.visible = true;
     state.productToConfigPrice = product;
   };
@@ -190,9 +191,9 @@
     }
   };
 
-  const openEditTokenProduct = (cat: TokenProduct) => {
+  const openEditTokenProduct = (product: Product) => {
     // console.log(cat)
-    state.editTokenProduct.node = cat;
+    state.editTokenProduct.node = product;
     state.editTokenProduct.visible = true;
   };
 
