@@ -19,7 +19,7 @@
               <!-- 添加子部门按钮 -->
               <a-button @click="openAddSubDepartment(record.id)">
                 <template #icon>
-                  <icon-plus :style="{ fontSize: '16px', color: 'blue' }" />
+                  <icon-plus :style="{ fontSize: '16px', color: 'green' }" />
                 </template>
               </a-button>
               <!-- 编辑部门按钮 -->
