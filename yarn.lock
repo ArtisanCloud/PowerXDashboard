@@ -22,7 +22,7 @@
   dependencies:
     color "^3.1.3"
 
-"@arco-design/web-vue@^2.44.7":
+"@arco-design/web-vue@^2.49.3":
   version "2.49.3"
   resolved "https://registry.npmmirror.com/@arco-design/web-vue/-/web-vue-2.49.3.tgz#3bce3c7cc71204b6e39f417567c97749ab95ebed"
   integrity sha512-9VwJfTTTRVhmKErTwkO2NSCfxgEg4l5iMpIz2VkPeJG6MR2lnUIO1/P4r3RKF12IU91XYLIQJmweKwHP3JvPpw==
@@ -48,10 +48,10 @@
     "@babel/types" "^7.12.12"
     "@types/node" "^16.11.10"
 
-"@arco-themes/vue-powerx-design-default@^0.0.1":
-  version "0.0.1"
-  resolved "https://registry.npmmirror.com/@arco-themes/vue-powerx-design-default/-/vue-powerx-design-default-0.0.1.tgz#3b454674610e37d6726141765cb55988b95b8386"
-  integrity sha512-+y4QyrgbBUIgwPUUKTxERZnjBHy0fnZdRDeqVnWJPH156G1pGjts2aAFifMD6XAc6wyz7lTC5OYvrAS9nVEYIw==
+"@arco-themes/vue-powerx-design-default@^0.0.2":
+  version "0.0.2"
+  resolved "https://registry.npmmirror.com/@arco-themes/vue-powerx-design-default/-/vue-powerx-design-default-0.0.2.tgz#4ed22a3b96010fad7ac6989a08a2619ed1704360"
+  integrity sha512-SuWalHSDDOGIU2kFxmlVxR3aUp4OFmmk8xjJKOj2IrfiOdbc+V4imawg3SWTtnPnKzpEqw7s9NU9SKUlGVdgEg==
 
 "@babel/code-frame@^7.0.0", "@babel/code-frame@^7.18.6", "@babel/code-frame@^7.21.4":
   version "7.21.4"
