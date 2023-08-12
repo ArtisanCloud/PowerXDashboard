@@ -56,9 +56,12 @@ export default {
   'menu.crm.business.opportunity': 'Opportunity Management',
   'menu.crm.business.quote': 'Quote Management',
   'menu.crm.business.contract': 'Contract Management',
-  'menu.crm.transaction': 'Transaction Management',
-  'menu.crm.transaction.order': 'Order Management',
-  'menu.crm.transaction.payment': 'Payment Management',
+  'menu.crm.trade': 'Transaction Management',
+  'menu.crm.trade.order': 'Order Management',
+  'menu.crm.trade.payment': 'Payment Management',
+  'menu.crm.trade.token': 'Token Management',
+  'menu.crm.trade.token.product': 'Token Product',
+  'menu.crm.trade.token.exchangeRatio': 'Token Exchange Setting',
   'menu.crm.membership': 'Membership Management',
   'menu.crm.membership.list': 'Membership List',
   'menu.crm.membership.points': 'Points Management',
@@ -73,7 +76,8 @@ export default {
   'menu.scrm.operation.groupSend': 'Customer Group Messaging',
   'menu.scrm.operation.welcomeScript': 'Group Welcome Message',
   'menu.scrm.operation.moment': 'Enterprise WeChat Moments',
-  'menu.scrm.operation.employeeGroupSendHistory': 'Employee Group Messaging History',
+  'menu.scrm.operation.employeeGroupSendHistory':
+    'Employee Group Messaging History',
   'menu.scrm.customerDomain': 'Customer Domain Management',
   'menu.scrm.customerDomain.customer': 'Customer Management',
   'menu.scrm.customerDomain.customer.detail': 'Customer Details',
@@ -94,4 +98,4 @@ export default {
   ...localeMessageBox,
   ...localeLogin,
   ...localeEmployee,
-}
+};

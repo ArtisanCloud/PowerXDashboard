@@ -232,38 +232,74 @@ const CRM: AppRouteRecordRaw = {
         },
       ],
     },
-    // transaction management
+    // trade management
     {
-      path: '/crm/transaction',
-      name: 'Transaction',
+      path: '/crm/trade',
+      name: 'Trade',
       component: EMPTY_LAYOUT,
-      redirect: '/crm/transaction/order',
+      redirect: '/crm/trade/order',
       meta: {
         icon: 'icon-list',
-        locale: 'menu.crm.transaction',
+        locale: 'menu.crm.trade',
         requiresAuth: true,
         roles: [''],
       },
       children: [
         {
-          path: '/crm/transaction/order',
+          path: '/crm/trade/order',
           name: 'Order',
           component: () => import('@/views/crm/trade/order/index.vue'),
           meta: {
-            locale: 'menu.crm.transaction.order',
+            locale: 'menu.crm.trade.order',
             requiresAuth: true,
             roles: [''],
           },
         },
         {
-          path: '/crm/transaction/payment',
+          path: '/crm/trade/payment',
           name: 'Payment',
           component: () => import('@/views/crm/trade/payment/index.vue'),
           meta: {
-            locale: 'menu.crm.transaction.payment',
+            locale: 'menu.crm.trade.payment',
             requiresAuth: true,
             roles: [''],
           },
+        },
+        {
+          path: '/crm/trade/token',
+          name: 'Token',
+          component: EMPTY_LAYOUT,
+          redirect: '/crm/trade/token/product',
+          meta: {
+            locale: 'menu.crm.trade.token',
+            requiresAuth: true,
+            roles: [''],
+          },
+          children: [
+            {
+              path: '/crm/trade/token/product',
+              name: 'Token Product',
+              component: () => import('@/views/crm/trade/token/index.vue'),
+              meta: {
+                locale: 'menu.crm.trade.token.product',
+                requiresAuth: true,
+                roles: [''],
+              },
+            },
+            {
+              path: '/crm/trade/token/exchange-ratio',
+              name: 'Token Exchange Ratio',
+              component: () =>
+                import(
+                  '@/views/crm/trade/token/components/exchange-rate/exchange-rate-table.vue'
+                ),
+              meta: {
+                locale: 'menu.crm.trade.token.exchangeRatio',
+                requiresAuth: true,
+                roles: [''],
+              },
+            },
+          ],
         },
       ],
     },
