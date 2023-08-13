@@ -42,6 +42,7 @@ export interface Product extends PowerModel, ProductAttribute, MediaSet {
   promoteChannelsItemIds: number[];
   saleStartDate: Date;
   saleEndDate: Date;
+  sort: number;
 
   // price
   activePriceBookEntry: PriceBookEntry;

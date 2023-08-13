@@ -120,6 +120,14 @@
             <a-input-number v-model="formModel.allowedSellQuantity" />
           </a-form-item>
         </a-col>
+        <a-col :span="12">
+          <a-form-item label="产品前端展示排序" field="sort">
+            <a-input-number v-model="formModel.sort" />
+            <span style="margin-left: 6px; font-size: 12px; color: #6b1111"
+              >(数值越大，排列越靠前)</span
+            >
+          </a-form-item>
+        </a-col>
       </a-row>
       <a-divider />
       <a-row :gutter="32">
@@ -143,7 +151,7 @@
         <a-col :span="12">
           <a-form-item label="上传头图" field="coverUrl">
             <a-upload
-              :limit="3"
+              :limit="4"
               :multiple="true"
               :draggable="true"
               list-type="picture-card"
@@ -158,7 +166,7 @@
         <a-col :span="12">
           <a-form-item label="上传详细图片" field="detailUrls">
             <a-upload
-              :limit="10"
+              :limit="12"
               :multiple="true"
               :draggable="true"
               list-type="picture-card"
@@ -212,6 +220,7 @@
     validityPeriodDays: 0,
     saleStartDate: new Date(),
     saleEndDate: new Date(),
+    sort: 0,
     coverImageIds: [] as number[],
     detailImageIds: [] as number[],
   } as Product);
