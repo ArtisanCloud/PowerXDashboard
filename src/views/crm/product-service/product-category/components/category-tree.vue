@@ -84,6 +84,7 @@
       <EditCategory
         v-if="state.editCategory.visible"
         :node="state.editCategory.node"
+        :parent-node="state.editCategory.parentNode"
         @submit-success="fetchCategoryTree"
       />
     </a-drawer>
@@ -116,6 +117,7 @@
     editCategory: {
       visible: false,
       node: {} as ProductCategory,
+      parentNode: {} as ProductCategory,
     },
   });
 
@@ -172,7 +174,14 @@
   };
 
   const openEditCategory = (cat: ProductCategory) => {
-    // console.log(cat)
+    // console.log(cat);
+    const pCategory = FindCategoryFromTreeById(categoryTree.value, cat.pId!);
+    let parentNode: ParentOption = { name: '无', id: 0 };
+    if (pCategory) {
+      parentNode = { name: pCategory.name, id: Number(pCategory.id) };
+    }
+    // console.log(parentNode);
+    state.editCategory.parentNode = parentNode;
     state.editCategory.node = cat;
     state.editCategory.visible = true;
   };

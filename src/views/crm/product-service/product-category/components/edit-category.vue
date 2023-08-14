@@ -99,7 +99,7 @@
     description: prop.node?.description,
     icon: prop.node?.icon,
     backgroundColor: prop.node?.backgroundColor,
-    imageURL: prop.node?.imageURL,
+    coverImageId: prop.node?.coverImageId ?? 0,
   } as CreateCategoryRequest);
 
   const rules = {
@@ -174,6 +174,17 @@
   };
 
   onMounted(() => {
+    if (prop.node?.coverImage) {
+      state.coverUrlList = [
+        {
+          uid: prop.node?.coverImage?.id,
+          url: prop.node?.coverImage?.url,
+          name: prop.node?.coverImage?.filename,
+        },
+      ];
+      // console.log(prop.node);
+    }
+
     fetchParentOptions();
   });
 </script>
