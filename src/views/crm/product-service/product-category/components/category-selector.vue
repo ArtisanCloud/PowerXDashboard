@@ -77,7 +77,7 @@
       return treeDataSource;
     };
 
-    console.log(state.categoryTree);
+    // console.log(state.categoryTree);
     return travel(state.categoryTree);
   };
 

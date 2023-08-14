@@ -10,7 +10,7 @@
       <a-row :gutter="32">
         <a-col :span="12">
           <a-form-item label="产品名称" field="name">
-            <a-input v-model="formModel.name" />
+            <a-textarea v-model="formModel.name" style="height: 80px" />
           </a-form-item>
         </a-col>
         <a-col :span="12">
@@ -332,7 +332,7 @@
   const changeCoverImage = async (option: any) => {
     // console.log(option);
     const index = formModel.value.coverImageIds?.indexOf(option.uid);
-    // console.log(index);
+    // console.log(index, formModel.value.coverImageIds);
     if (index !== -1) {
       formModel.value.coverImageIds?.splice(index ?? 0, 1);
       return true;
@@ -343,6 +343,7 @@
   const changeDetailImages = async (option: any) => {
     // console.log(option);
     const index = formModel.value.detailImageIds?.indexOf(option.uid);
+    // console.log(index, formModel.value.coverImageIds);
     if (index !== -1) {
       formModel.value.detailImageIds?.splice(index ?? 0, 1);
       return true;
