@@ -11,6 +11,9 @@
       @page-change="pageChanged"
       @page-size-change="pageSizeChanged"
     >
+      <template #ID="{ rowIndex }">
+        <a-typography-text>{{ rowIndex + 1 }}</a-typography-text>
+      </template>
       <template #coverURL="{ record }">
         <a-image width="72" :src="record.coverImages[0]?.url"></a-image>
       </template>
@@ -123,8 +126,8 @@
   const columns = reactive([
     {
       title: 'ID',
-      dataIndex: 'id',
       width: 60,
+      slotName: 'ID',
     },
     {
       title: '产品名称',

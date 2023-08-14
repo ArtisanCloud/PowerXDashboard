@@ -10,7 +10,7 @@
       <a-row :gutter="32">
         <a-col :span="12">
           <a-form-item label="产品名称" field="name">
-            <a-input v-model="formModel.name" />
+            <a-textarea v-model="formModel.name" style="height: 80px" />
           </a-form-item>
         </a-col>
         <a-col :span="12">
@@ -158,6 +158,7 @@
               :custom-request="uploadCoverImages"
               :default-file-list="state.coverUrlList"
               image-preview
+              :on-before-remove="changeCoverImage"
             />
           </a-form-item>
         </a-col>
@@ -173,6 +174,7 @@
               :custom-request="uploadDetailImages"
               :file-list="state.detailUrlList"
               image-preview
+              :on-before-remove="changeDetailImages"
             />
           </a-form-item>
         </a-col>
@@ -195,6 +197,7 @@
   import {
     FieldRule,
     Message,
+    Modal,
     RequestOption,
     UploadRequest,
   } from '@arco-design/web-vue';
@@ -250,6 +253,28 @@
     submitLoading: false,
   });
 
+  const changeCoverImage = async (option: any) => {
+    // console.log(option);
+    const index = formModel.value.coverImageIds?.indexOf(option.response.id);
+    // console.log(index, formModel.value.coverImageIds);
+    if (index !== -1) {
+      formModel.value.coverImageIds?.splice(index ?? 0, 1);
+      return true;
+    }
+    return false;
+  };
+
+  const changeDetailImages = async (option: any) => {
+    // console.log(option);
+    const index = formModel.value.detailImageIds?.indexOf(option.response.id);
+    if (index !== -1) {
+      formModel.value.detailImageIds?.splice(index ?? 0, 1);
+      return true;
+    }
+
+    return false;
+  };
+
   const onSubmit = async () => {
     if (state.submitLoading) {
       return;
@@ -276,6 +301,7 @@
     option: RequestOption
   ) => {
     return uploadMediaImages(option, (data: any) => {
+      // console.log(data);
       formModel.value.coverImageIds?.push(data.id);
     });
   };
@@ -284,6 +310,7 @@
     option: RequestOption
   ) => {
     return uploadMediaImages(option, (data: any) => {
+      // console.log(data);
       formModel.value.detailImageIds?.push(data.id);
     });
   };
