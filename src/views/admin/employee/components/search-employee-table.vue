@@ -97,7 +97,7 @@
                 </template>
               </a-button>
               <!-- 强退用户按钮（禁用） -->
-              <a-button disabled>
+              <a-button title="导出" disabled>
                 <template #icon>
                   <icon-export :style="{ fontSize: '16px', color: 'gray' }" />
                 </template>
@@ -117,9 +117,9 @@
             </a-space>
             <a-drawer
               v-if="
-          state.editEmployee.visible &&
-          state.editEmployee.employeeId === record.id
-        "
+                state.editEmployee.visible &&
+                state.editEmployee.employeeId === record.id
+              "
               v-model:visible="state.editEmployee.visible"
               title="编辑员工"
               width="500px"

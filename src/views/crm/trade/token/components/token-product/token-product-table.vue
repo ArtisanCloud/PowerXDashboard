@@ -53,7 +53,7 @@
             content="确定要删除此产品吗？"
             @ok="deleteTokenProductById(record.id)"
           >
-            <a-button v-if="!record.isStandard">
+            <a-button>
               <template #icon>
                 <icon-delete :style="{ fontSize: '16px', color: 'red' }" />
               </template>

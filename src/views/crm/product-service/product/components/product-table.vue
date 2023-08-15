@@ -36,7 +36,7 @@
       <template #optional="{ record }">
         <a-space align="center">
           <!--编辑品类按钮-->
-          <a-button @click="openEditProduct(record)">
+          <a-button title="编辑" @click="openEditProduct(record)">
             <template #icon>
               <icon-edit :style="{ fontSize: '16px', color: 'green' }" />
             </template>
@@ -44,6 +44,7 @@
 
           <!--配置SKU-->
           <a-button
+            title="配置SKU"
             @click="
               $router.push(`product-management/sku?productId=${record.id}`)
             "
@@ -54,7 +55,7 @@
           </a-button>
 
           <!--配置价格按钮-->
-          <a-button @click="openPriceBookEntry(record)">
+          <a-button title="配置价格" @click="openPriceBookEntry(record)">
             <template #icon>
               <icon-book :style="{ fontSize: '16px', color: '#d7ee8f' }" />
             </template>
@@ -65,7 +66,7 @@
             content="确定要删除此产品吗？"
             @ok="deleteProductById(record.id)"
           >
-            <a-button v-if="!record.isStandard">
+            <a-button title="删除">
               <template #icon>
                 <icon-delete :style="{ fontSize: '16px', color: 'red' }" />
               </template>

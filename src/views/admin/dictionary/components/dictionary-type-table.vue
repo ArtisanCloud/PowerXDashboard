@@ -22,7 +22,7 @@
           </a-button>
 
           <!--添加字典数据项按钮-->
-          <a-button @click="openCreateDictionaryItem(record)">
+          <a-button title="添加" @click="openCreateDictionaryItem(record)">
             <template #icon>
               <icon-plus :style="{ fontSize: '16px' }" />
             </template>
@@ -33,7 +33,7 @@
             content="该操作会删除相关子字典,确定要删除此字典吗？"
             @ok="deleteDictionaryTypeByType(record.type)"
           >
-            <a-button v-if="!record.isStandard">
+            <a-button title="删除">
               <template #icon>
                 <icon-delete :style="{ fontSize: '16px', color: 'red' }" />
               </template>

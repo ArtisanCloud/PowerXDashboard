@@ -44,7 +44,7 @@
             content="该操作会删除相关子支付单,确定要删除此支付单吗？"
             @ok="deletePaymentById(record.id)"
           >
-            <a-button v-if="!record.isStandard">
+            <a-button>
               <template #icon>
                 <icon-delete :style="{ fontSize: '16px', color: 'red' }" />
               </template>

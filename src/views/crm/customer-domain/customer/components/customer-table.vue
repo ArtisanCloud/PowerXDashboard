@@ -26,7 +26,7 @@
       <template #optional="{ record }">
         <a-space align="center">
           <!--编辑客户按钮-->
-          <a-button @click="openEditCustomer(record)">
+          <a-button title="编辑" @click="openEditCustomer(record)">
             <template #icon>
               <icon-edit :style="{ fontSize: '16px', color: 'green' }" />
             </template>
@@ -37,7 +37,7 @@
             content="该操作会删除相关子客户,确定要删除此客户吗？"
             @ok="deleteCustomerById(record.id)"
           >
-            <a-button v-if="!record.isStandard">
+            <a-button title="删除">
               <template #icon>
                 <icon-delete :style="{ fontSize: '16px', color: 'red' }" />
               </template>

@@ -17,7 +17,10 @@
       <template #optional="{ record }">
         <a-space align="center">
           <!--编辑价格条目按钮-->
-          <a-button @click="openEditProductSpecific(record)">
+          <a-button
+            title="编辑价格条目"
+            @click="openEditProductSpecific(record)"
+          >
             <template #icon>
               <icon-edit :style="{ fontSize: '16px', color: 'green' }" />
             </template>
@@ -28,7 +31,7 @@
           <!--            content="该操作会删除价格条目,确定要删除此价格条目吗？"-->
           <!--            @ok="deleteProductSpecificById(record.id)"-->
           <!--          >-->
-          <!--            <a-button v-if="!record.isStandard">-->
+          <!--            <a-button >-->
           <!--              <template #icon>-->
           <!--                <icon-delete :style="{ fontSize: '16px', color: 'red' }" />-->
           <!--              </template>-->

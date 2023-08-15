@@ -3,7 +3,7 @@
     <a-card>
       <a-space size="large">
         当前价格手册 -> {{ state.priceBook.name }} ->
-        <a-button type="primary" @click="openAddProduct">
+        <a-button title="添加" type="primary" @click="openAddProduct">
           添加配置产品
         </a-button>
       </a-space>
