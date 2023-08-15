@@ -21,13 +21,13 @@
           <template #cell="{ record }">
             <a-space>
               <!--新建子品类按钮-->
-              <a-button @click="openAddSubCategory(record)">
+              <a-button title="添加" @click="openAddSubCategory(record)">
                 <template #icon>
                   <icon-plus :style="{ fontSize: '16px' }" />
                 </template>
               </a-button>
               <!--编辑品类按钮-->
-              <a-button @click="openEditCategory(record)">
+              <a-button title="编辑" @click="openEditCategory(record)">
                 <template #icon>
                   <icon-edit :style="{ fontSize: '16px', color: 'green' }" />
                 </template>

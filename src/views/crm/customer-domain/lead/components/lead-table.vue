@@ -26,7 +26,7 @@
       <template #optional="{ record }">
         <a-space align="center">
           <!--编辑线索按钮-->
-          <a-button @click="openEditLead(record)">
+          <a-button title="编辑" @click="openEditLead(record)">
             <template #icon>
               <icon-edit :style="{ fontSize: '16px', color: 'green' }" />
             </template>
@@ -44,7 +44,7 @@
             content="该操作会删除相关子线索,确定要删除此线索吗？"
             @ok="deleteLeadById(record.id)"
           >
-            <a-button v-if="!record.isStandard">
+            <a-button title="删除">
               <template #icon>
                 <icon-delete :style="{ fontSize: '16px', color: 'red' }" />
               </template>

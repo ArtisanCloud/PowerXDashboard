@@ -17,7 +17,10 @@
       <template #optional="{ record }">
         <a-space align="center">
           <!--编辑价格条目按钮-->
-          <a-button @click="openEditPriceBookEntry(record)">
+          <a-button
+            title="编辑价格条目"
+            @click="openEditPriceBookEntry(record)"
+          >
             <template #icon>
               <icon-edit :style="{ fontSize: '16px', color: 'green' }" />
             </template>

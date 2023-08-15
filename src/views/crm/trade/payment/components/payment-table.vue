@@ -26,14 +26,14 @@
       <template #optional="{ record }">
         <a-space align="center">
           <!--编辑支付单按钮-->
-          <a-button @click="openEditPayment(record)">
+          <a-button title="编辑" @click="openEditPayment(record)">
             <template #icon>
               <icon-edit :style="{ fontSize: '16px', color: 'green' }" />
             </template>
           </a-button>
 
           <!--配置价格按钮-->
-          <a-button @click="openEditPayment(record)">
+          <a-button title="配置价格" @click="openEditPayment(record)">
             <template #icon>
               <icon-book :style="{ fontSize: '16px', color: '#d7ee8f' }" />
             </template>
@@ -44,7 +44,7 @@
             content="该操作会删除相关子支付单,确定要删除此支付单吗？"
             @ok="deletePaymentById(record.id)"
           >
-            <a-button v-if="!record.isStandard">
+            <a-button>
               <template #icon>
                 <icon-delete :style="{ fontSize: '16px', color: 'red' }" />
               </template>

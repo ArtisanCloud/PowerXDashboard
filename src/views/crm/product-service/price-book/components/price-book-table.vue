@@ -20,7 +20,7 @@
       <template #optional="{ record }">
         <a-space align="center">
           <!--编辑品类按钮-->
-          <a-button @click="openEditPriceBook(record)">
+          <a-button title="编辑" @click="openEditPriceBook(record)">
             <template #icon>
               <icon-edit :style="{ fontSize: '16px', color: 'green' }" />
             </template>
@@ -41,7 +41,7 @@
             content="该操作会删除相关子品类,确定要删除此品类吗？"
             @ok="deletePriceBookById(record.id)"
           >
-            <a-button v-if="!record.isStandard">
+            <a-button v-if="!record.isStandard" title="删除">
               <template #icon>
                 <icon-delete :style="{ fontSize: '16px', color: 'red' }" />
               </template>

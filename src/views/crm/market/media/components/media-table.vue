@@ -22,14 +22,14 @@
       <template #optional="{ record }">
         <a-space align="center">
           <!--编辑媒体按钮-->
-          <a-button @click="openEditMedia(record)">
+          <a-button title="编辑" @click="openEditMedia(record)">
             <template #icon>
               <icon-edit :style="{ fontSize: '16px', color: 'green' }" />
             </template>
           </a-button>
 
           <!--配置价格按钮-->
-          <a-button @click="openEditMedia(record)">
+          <a-button title="配置价格" @click="openEditMedia(record)">
             <template #icon>
               <icon-book :style="{ fontSize: '16px', color: '#d7ee8f' }" />
             </template>
@@ -40,7 +40,7 @@
             content="该操作会删除相关子媒体,确定要删除此媒体吗？"
             @ok="deleteMediaById(record.id)"
           >
-            <a-button v-if="!record.isStandard">
+            <a-button title="删除">
               <template #icon>
                 <icon-delete :style="{ fontSize: '16px', color: 'red' }" />
               </template>

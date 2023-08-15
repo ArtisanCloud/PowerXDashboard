@@ -7,7 +7,10 @@
     </a-card>
     <br />
     <a-card>
-      <OrderTable ref="RefOrderTable" />
+      <a-space size="large" direction="vertical" fill>
+        <filter-order></filter-order>
+        <OrderTable ref="RefOrderTable" />
+      </a-space>
     </a-card>
     <a-drawer
       v-model:visible="state.createOrder.visible"
@@ -28,6 +31,7 @@
   import OrderTable from '@/views/crm/trade/order/components/order-table.vue';
   import CreateOrder from '@/views/crm/trade/order/components/create-order.vue';
   import { DefaultPageSize } from '@/api/common';
+  import FilterOrder from '@/views/crm/trade/order/components/filter-order.vue';
 
   const RefOrderTable = ref<any>();
 
