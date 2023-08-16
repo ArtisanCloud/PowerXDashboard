@@ -158,11 +158,13 @@
               :limit="4"
               :multiple="true"
               :draggable="true"
-              list-type="picture-card"
+              :auto-upload="true"
               :custom-request="uploadCoverImages"
+              list-type="picture-card"
               :file-list="state.coverUrlList"
               image-preview
-              :on-before-remove="changeCoverImage"
+              :change="onChangeCoverImages"
+              :on-before-remove="onRemoveCoverImages"
             />
           </a-form-item>
         </a-col>
@@ -174,11 +176,13 @@
               :limit="12"
               :multiple="true"
               :draggable="true"
-              list-type="picture-card"
+              :auto-upload="true"
               :custom-request="uploadDetailImages"
+              list-type="picture-card"
               :file-list="state.detailUrlList"
               image-preview
-              :on-before-remove="changeDetailImages"
+              :on-before-remove="onRemoveDetailImages"
+              :change="onChangeDetailImages"
             />
           </a-form-item>
         </a-col>
@@ -199,6 +203,7 @@
   import { updateProduct } from '@/api/crm/product-service/product';
   import {
     FieldRule,
+    FileItem,
     Message,
     RequestOption,
     UploadRequest,
@@ -210,6 +215,11 @@
 
   import { convertIntArrayToStringArray } from '@/utils/array';
   import uploadMediaImages from '@/utils/media-resource';
+  import { MediaResource } from '@/api/mediaresource';
+  import {
+    sortBySortIndexAndGetSortedIds,
+    SortIdItem,
+  } from '@/utils/sort-id-item';
 
   const prop = defineProps({
     node: {
@@ -245,8 +255,10 @@
     saleEndDate: prop.node.saleEndDate,
     sort: prop.node?.sort ?? 0,
     categoryIds: prop.node?.categoryIds,
-    coverImageIds: prop.node?.coverImageIds ? prop.node?.coverImageIds : [],
-    detailImageIds: prop.node?.detailImageIds ? prop.node?.detailImageIds : [],
+    coverImageIds: prop.node?.coverImageIds ?? [],
+    detailImageIds: prop.node?.detailImageIds ?? [],
+    coverImageSortIndexes: prop.node?.coverImageSortIndexes ?? [],
+    detailImageIdSortIndexes: prop.node?.detailImageIdSortIndexes ?? [],
   } as Product);
 
   const rules = {
@@ -290,6 +302,8 @@
       return;
     }
 
+    // console.log(formModel.value.detailImageIds);
+
     state.submitLoading = true;
     updateProduct(formModel.value)
       .then(() => {
@@ -312,16 +326,24 @@
   const uploadCoverImages: (option: RequestOption) => UploadRequest = (
     option: RequestOption
   ) => {
-    return uploadMediaImages(option, (data: any) => {
-      formModel.value.coverImageIds?.push(data.id);
+    return uploadMediaImages(option, (data: MediaResource) => {
+      formModel.value.coverImageSortIndexes?.push({
+        id: data.id,
+        sortIndex: data.sortIndex,
+      } as SortIdItem);
+      formModel.value.coverImageIds?.push(data.id!);
     });
   };
 
   const uploadDetailImages: (option: RequestOption) => UploadRequest = (
     option: RequestOption
   ) => {
-    return uploadMediaImages(option, (data: any) => {
-      formModel.value.detailImageIds?.push(data.id);
+    return uploadMediaImages(option, (data: MediaResource) => {
+      formModel.value.detailImageIdSortIndexes?.push({
+        id: data.id,
+        sortIndex: data.sortIndex,
+      } as SortIdItem);
+      formModel.value.detailImageIds?.push(data.id!);
     });
   };
 
@@ -329,7 +351,11 @@
     return convertIntArrayToStringArray(num);
   };
 
-  const changeCoverImage = async (option: any) => {
+  const onChangeCoverImages = async (fileItems: FileItem[]) => {
+    // console.log(fileItems);
+  };
+
+  const onRemoveCoverImages = async (option: any) => {
     // console.log(option);
     const index = formModel.value.coverImageIds?.indexOf(option.uid);
     // console.log(index, formModel.value.coverImageIds);
@@ -340,7 +366,11 @@
     return false;
   };
 
-  const changeDetailImages = async (option: any) => {
+  const onChangeDetailImages = async (fileItems: FileItem[]) => {
+    // console.log(fileItems);
+  };
+
+  const onRemoveDetailImages = async (option: any) => {
     // console.log(option);
     const index = formModel.value.detailImageIds?.indexOf(option.uid);
     // console.log(index, formModel.value.coverImageIds);

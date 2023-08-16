@@ -1,7 +1,7 @@
 <template>
   <div class="content">
     <a-space>
-      <a-input v-model="searchModel.name" placeholder="产品关键词" />
+      <a-input v-model="searchModel.name" placeholder="订单号关键词" />
 
       <a-range-picker
         style="width: 300px"

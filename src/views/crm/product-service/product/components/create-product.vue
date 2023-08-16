@@ -158,7 +158,7 @@
               :custom-request="uploadCoverImages"
               :default-file-list="state.coverUrlList"
               image-preview
-              :on-before-remove="changeCoverImage"
+              :on-before-remove="onRemoveCoverImages"
             />
           </a-form-item>
         </a-col>
@@ -174,7 +174,7 @@
               :custom-request="uploadDetailImages"
               :file-list="state.detailUrlList"
               image-preview
-              :on-before-remove="changeDetailImages"
+              :on-before-remove="onRemoveDetailImages"
             />
           </a-form-item>
         </a-col>
@@ -205,6 +205,8 @@
   import useOptionsStore from '@/store/modules/data-dictionary';
   import CategorySelector from '@/views/crm/product-service/product-category/components/category-selector.vue';
   import uploadMediaImages from '@/utils/media-resource';
+  import { MediaResource } from '@/api/mediaresource';
+  import { SortIdItem } from '@/utils/sort-id-item';
 
   const emits = defineEmits(['submitSuccess', 'submitFailed', 'update:id']);
 
@@ -226,6 +228,8 @@
     sort: 0,
     coverImageIds: [] as number[],
     detailImageIds: [] as number[],
+    coverImageSortIndexes: [] as SortIdItem[],
+    detailImageIdSortIndexes: [] as SortIdItem[],
   } as Product);
 
   const rules = {
@@ -253,7 +257,7 @@
     submitLoading: false,
   });
 
-  const changeCoverImage = async (option: any) => {
+  const onRemoveCoverImages = async (option: any) => {
     // console.log(option);
     const index = formModel.value.coverImageIds?.indexOf(option.response.id);
     // console.log(index, formModel.value.coverImageIds);
@@ -264,7 +268,7 @@
     return false;
   };
 
-  const changeDetailImages = async (option: any) => {
+  const onRemoveDetailImages = async (option: any) => {
     // console.log(option);
     const index = formModel.value.detailImageIds?.indexOf(option.response.id);
     if (index !== -1) {
@@ -300,9 +304,12 @@
   const uploadCoverImages: (option: RequestOption) => UploadRequest = (
     option: RequestOption
   ) => {
-    return uploadMediaImages(option, (data: any) => {
-      // console.log(data);
-      formModel.value.coverImageIds?.push(data.id);
+    return uploadMediaImages(option, (data: MediaResource) => {
+      formModel.value.coverImageSortIndexes?.push({
+        id: data.id,
+        sortIndex: data.sortIndex,
+      } as SortIdItem);
+      formModel.value.coverImageIds?.push(data.id!);
     });
   };
 
@@ -311,7 +318,11 @@
   ) => {
     return uploadMediaImages(option, (data: any) => {
       // console.log(data);
-      formModel.value.detailImageIds?.push(data.id);
+      formModel.value.detailImageIdSortIndexes?.push({
+        id: data.id,
+        sortIndex: data.sortIndex,
+      } as SortIdItem);
+      formModel.value.detailImageIds?.push(data.id!);
     });
   };
 

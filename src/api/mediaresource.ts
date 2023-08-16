@@ -1,5 +1,7 @@
 import axios from 'axios';
 import { PowerModel, PrefixUriAdmin } from '@/api/common';
+import { split } from 'lodash';
+import { SortIdItem } from '@/utils/sort-id-item';
 
 export const UriMediaApi = '/media';
 
@@ -11,6 +13,7 @@ export interface MediaResource extends PowerModel {
   isLocalStored: boolean;
   contentType: string;
   resourceType: string;
+  sortIndex: number;
 }
 
 export interface MediaSet {
@@ -19,7 +22,9 @@ export interface MediaSet {
   detailImages?: MediaResource[];
   coverImageId?: number;
   coverImageIds?: number[];
+  coverImageSortIndexes?: SortIdItem[];
   detailImageIds?: number[];
+  detailImageIdSortIndexes?: SortIdItem[];
 }
 
 export interface CreateMediaResourceReply extends MediaResource {
@@ -33,10 +38,13 @@ export function uploadMediaResource(option: any) {
   // 自定义上传逻辑
   const formData = new FormData();
   formData.append('resource', fileItem.file);
-
+  const { uid } = fileItem;
+  // console.log(uid);
+  const sortIndex = split(uid, '-')[1];
+  // console.log(sortIndex);
   // 发送自定义请求
   return axios.post<CreateMediaResourceReply>(
-    `${PrefixUriAdmin + UriMediaApi}/resources`,
+    `${PrefixUriAdmin + UriMediaApi}/resources?sortIndex=${sortIndex}`,
     formData
   );
 }

@@ -33,3 +33,38 @@ export default function uploadMediaImages(
     promise: uploadPromise, // 返回上传操作的Promise对象
   };
 }
+
+// export function uploadMediaImagesInOrder(
+//   imageOptions: RequestOption[],
+//   onSuccess: (results: any[]) => void,
+//   onError: (error: any) => void
+// ): UploadRequest {
+//   let currentIndex = 0;
+//   const results = [];
+//
+//   const uploadNextImage = () => {
+//     if (currentIndex >= imageOptions.length) {
+//       // 所有图片上传完成，调用成功回调
+//       onSuccess(results);
+//       return;
+//     }
+//
+//     const option = imageOptions[currentIndex];
+//     const { promise, abort } = uploadMediaImages(option);
+//
+//     promise
+//       .then((result) => {
+//         results.push(result);
+//         currentIndex++;
+//         uploadNextImage(); // 继续上传下一张图片
+//       })
+//       .catch((error) => {
+//         onError(error);
+//       });
+//
+//     option.onAbort = abort; // 将中止上传的函数传递给 RequestOption
+//   };
+//
+//   // 开始上传第一张图片
+//   uploadNextImage();
+// }
