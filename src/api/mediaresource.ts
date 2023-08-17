@@ -22,7 +22,7 @@ export interface MediaSet {
   detailImages?: MediaResource[];
   coverImageId?: number;
   coverImageIds?: number[];
-  coverImageSortIndexes?: SortIdItem[];
+  coverImageIdSortIndexes?: SortIdItem[];
   detailImageIds?: number[];
   detailImageIdSortIndexes?: SortIdItem[];
 }
@@ -31,17 +31,14 @@ export interface CreateMediaResourceReply extends MediaResource {
   isOSS: boolean;
 }
 
-export function uploadMediaResource(option: any) {
+export function uploadMediaResource(option: any, sortIndex: number) {
   // 处理上传事件的逻辑
   const { fileItem } = option;
 
   // 自定义上传逻辑
   const formData = new FormData();
   formData.append('resource', fileItem.file);
-  const { uid } = fileItem;
-  // console.log(uid);
-  const sortIndex = split(uid, '-')[1];
-  // console.log(sortIndex);
+
   // 发送自定义请求
   return axios.post<CreateMediaResourceReply>(
     `${PrefixUriAdmin + UriMediaApi}/resources?sortIndex=${sortIndex}`,

@@ -164,7 +164,7 @@
               :file-list="state.coverUrlList"
               image-preview
               :change="onChangeCoverImages"
-              :on-before-remove="onRemoveCoverImages"
+              :on-before-remove="onBeforeRemoveCoverImages"
             />
           </a-form-item>
         </a-col>
@@ -173,7 +173,7 @@
         <a-col :span="12">
           <a-form-item label="上传详细图片" field="detailUrls">
             <a-upload
-              :limit="12"
+              :limit="15"
               :multiple="true"
               :draggable="true"
               :auto-upload="true"
@@ -181,7 +181,7 @@
               list-type="picture-card"
               :file-list="state.detailUrlList"
               image-preview
-              :on-before-remove="onRemoveDetailImages"
+              :on-before-remove="onBeforeRemoveDetailImages"
               :change="onChangeDetailImages"
             />
           </a-form-item>
@@ -217,7 +217,8 @@
   import uploadMediaImages from '@/utils/media-resource';
   import { MediaResource } from '@/api/mediaresource';
   import {
-    sortBySortIndexAndGetSortedIds,
+    rebuildSortIndex,
+    removeSortItemById,
     SortIdItem,
   } from '@/utils/sort-id-item';
 
@@ -257,7 +258,7 @@
     categoryIds: prop.node?.categoryIds,
     coverImageIds: prop.node?.coverImageIds ?? [],
     detailImageIds: prop.node?.detailImageIds ?? [],
-    coverImageSortIndexes: prop.node?.coverImageSortIndexes ?? [],
+    coverImageIdSortIndexes: prop.node?.coverImageIdSortIndexes ?? [],
     detailImageIdSortIndexes: prop.node?.detailImageIdSortIndexes ?? [],
   } as Product);
 
@@ -326,24 +327,56 @@
   const uploadCoverImages: (option: RequestOption) => UploadRequest = (
     option: RequestOption
   ) => {
-    return uploadMediaImages(option, (data: MediaResource) => {
-      formModel.value.coverImageSortIndexes?.push({
+    const { uid } = option.fileItem;
+    // console.log(uid);
+    let sortIndex = parseInt(uid.split('-')[1], 10);
+
+    // 重新建立索引
+    const imageCount = formModel.value.coverImageIdSortIndexes?.length ?? 0;
+    if (imageCount > 0) {
+      sortIndex += imageCount;
+    }
+    // console.log(sortIndex);
+
+    return uploadMediaImages(option, sortIndex, (data: MediaResource) => {
+      formModel.value.coverImageIdSortIndexes?.push({
         id: data.id,
         sortIndex: data.sortIndex,
       } as SortIdItem);
       formModel.value.coverImageIds?.push(data.id!);
+      // console.log(
+      //   data.id!,
+      //   formModel.value.coverImageIdSortIndexes,
+      //   formModel.value.coverImageIds
+      // );
     });
   };
 
   const uploadDetailImages: (option: RequestOption) => UploadRequest = (
     option: RequestOption
   ) => {
-    return uploadMediaImages(option, (data: MediaResource) => {
+    const { uid } = option.fileItem;
+    // console.log(uid);
+    let sortIndex = parseInt(uid.split('-')[1], 10);
+
+    // 重新建立索引
+    const imageCount = formModel.value.detailImageIdSortIndexes?.length ?? 0;
+    if (imageCount > 0) {
+      sortIndex += imageCount;
+    }
+    // console.log(sortIndex);
+
+    return uploadMediaImages(option, sortIndex, (data: MediaResource) => {
       formModel.value.detailImageIdSortIndexes?.push({
         id: data.id,
         sortIndex: data.sortIndex,
       } as SortIdItem);
       formModel.value.detailImageIds?.push(data.id!);
+      // console.log(
+      //   data.id!,
+      //   formModel.value.detailImageIdSortIndexes,
+      //   formModel.value.detailImageIds
+      // );
     });
   };
 
@@ -355,41 +388,86 @@
     // console.log(fileItems);
   };
 
-  const onRemoveCoverImages = async (option: any) => {
-    // console.log(option);
-    const index = formModel.value.coverImageIds?.indexOf(option.uid);
-    // console.log(index, formModel.value.coverImageIds);
-    if (index !== -1) {
-      formModel.value.coverImageIds?.splice(index ?? 0, 1);
-      return true;
+  const onBeforeRemoveCoverImages = async (fileItem: FileItem) => {
+    // console.log(fileItem);
+    // console.log(fileItem.uid);
+    // 获取当前uid和搜索的index
+    let index = -1;
+    let uid: any = -1;
+    if (fileItem.response) {
+      uid = fileItem.response.id;
+      index = formModel.value.coverImageIds?.indexOf(uid) ?? -1;
+    } else {
+      uid = fileItem.uid;
+      index = formModel.value.coverImageIds?.indexOf(uid) ?? -1;
     }
-    return false;
+
+    // 如果搜到了当前index，删除id和排序对象
+    if (index !== -1) {
+      // console.log(index, formModel.value.coverImageIds);
+      formModel.value.coverImageIds?.splice(index ?? 0, 1);
+      // console.log(uid, formModel.value.coverImageIdSortIndexes);
+      formModel.value.coverImageIdSortIndexes = removeSortItemById(
+        formModel.value.coverImageIdSortIndexes!,
+        uid
+      );
+
+      // 重新编排Sort
+      rebuildSortIndex(formModel.value.coverImageIdSortIndexes!);
+      // console.log(formModel.value.coverImageIdSortIndexes);
+    }
+    return true;
   };
 
   const onChangeDetailImages = async (fileItems: FileItem[]) => {
-    // console.log(fileItems);
+    console.log(
+      'onChangeDetailImages',
+      fileItems,
+      formModel.value.detailImageIdSortIndexes
+    );
   };
 
-  const onRemoveDetailImages = async (option: any) => {
-    // console.log(option);
-    const index = formModel.value.detailImageIds?.indexOf(option.uid);
-    // console.log(index, formModel.value.coverImageIds);
-    if (index !== -1) {
-      formModel.value.detailImageIds?.splice(index ?? 0, 1);
-      return true;
+  const onBeforeRemoveDetailImages = async (fileItem: FileItem) => {
+    // console.log(fileItem);
+    // console.log(fileItem.uid);
+    // 获取当前uid和搜索的index
+    let index = -1;
+    let uid: any = -1;
+    if (fileItem.response) {
+      uid = fileItem.response.id;
+      index = formModel.value.detailImageIds?.indexOf(uid) ?? -1;
+    } else {
+      uid = fileItem.uid;
+      index = formModel.value.detailImageIds?.indexOf(uid) ?? -1;
     }
 
-    return false;
+    // 如果搜到了当前index，删除id和排序对象
+    if (index !== -1) {
+      // console.log(index, formModel.value.detailImageIds);
+      formModel.value.detailImageIds?.splice(index ?? 0, 1);
+      // console.log(uid, formModel.value.detailImageIdSortIndexes);
+      formModel.value.detailImageIdSortIndexes = removeSortItemById(
+        formModel.value.detailImageIdSortIndexes!,
+        uid
+      );
+
+      // 重新编排Sort
+      rebuildSortIndex(formModel.value.detailImageIdSortIndexes!);
+      // console.log(formModel.value.detailImageIdSortIndexes);
+    }
+
+    return true;
   };
 
-  onMounted(() => {
+  const refreshCoverUrlList = () => {
     state.coverUrlList =
       prop.node?.coverImages?.map((coverImage) => ({
         uid: coverImage?.id,
         url: coverImage?.url,
         name: coverImage?.filename,
       })) ?? [];
-
+  };
+  const refreshDetailUrlList = () => {
     state.detailUrlList =
       prop.node?.detailImages?.map((detailImage) => ({
         uid: detailImage?.id,
@@ -399,5 +477,10 @@
     // console.log(state.detailUrlList);
 
     // console.log(formModel.value.detailImageIds, formModel.value.coverImageId);
+  };
+
+  onMounted(() => {
+    refreshCoverUrlList();
+    refreshDetailUrlList();
   });
 </script>

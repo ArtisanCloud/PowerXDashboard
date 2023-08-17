@@ -1,8 +1,10 @@
 import { RequestOption, UploadRequest } from '@arco-design/web-vue';
 import { uploadMediaResource } from '@/api/mediaresource';
+import { sortedIndex } from 'lodash';
 
 export default function uploadMediaImages(
   option: RequestOption,
+  sortIndex: number,
   onSuccess: (data: any) => void
 ): UploadRequest {
   let isAborted = false; // 标记是否中止上传
@@ -11,7 +13,7 @@ export default function uploadMediaImages(
     isAborted = true; // 设置标记为中止状态
   };
 
-  const uploadPromise = uploadMediaResource(option)
+  const uploadPromise = uploadMediaResource(option, sortIndex)
     .then((result: any) => {
       if (!isAborted) {
         if (result.data) {
