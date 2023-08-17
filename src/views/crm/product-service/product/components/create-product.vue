@@ -264,7 +264,7 @@
 
   const onBeforeRemoveCoverImages = async (fileItem: FileItem) => {
     // console.log(fileItem);
-    console.log(fileItem.uid);
+    // console.log(fileItem.uid);
     // 获取当前uid和搜索的index
     let index = -1;
     let uid: any = -1;
@@ -278,9 +278,9 @@
 
     // 如果搜到了当前index，删除id和排序对象
     if (index !== -1) {
-      console.log(index, formModel.value.coverImageIds);
+      // console.log(index, formModel.value.coverImageIds);
       formModel.value.coverImageIds?.splice(index ?? 0, 1);
-      console.log(uid, formModel.value.coverImageIdSortIndexes);
+      // console.log(uid, formModel.value.coverImageIdSortIndexes);
       formModel.value.coverImageIdSortIndexes = removeSortItemById(
         formModel.value.coverImageIdSortIndexes!,
         uid
@@ -288,22 +288,22 @@
 
       // 重新编排Sort
       rebuildSortIndex(formModel.value.coverImageIdSortIndexes!);
-      console.log(formModel.value.coverImageIdSortIndexes);
+      // console.log(formModel.value.coverImageIdSortIndexes);
     }
     return true;
   };
 
   const onChangeDetailImages = async (fileItems: FileItem[]) => {
-    console.log(
-      'onChangeDetailImages',
-      fileItems,
-      formModel.value.detailImageIdSortIndexes
-    );
+    // console.log(
+    //   'onChangeDetailImages',
+    //   fileItems,
+    //   formModel.value.detailImageIdSortIndexes
+    // );
   };
 
   const onBeforeRemoveDetailImages = async (fileItem: FileItem) => {
     // console.log(fileItem);
-    console.log(fileItem.uid);
+    // console.log(fileItem.uid);
     // 获取当前uid和搜索的index
     let index = -1;
     let uid: any = -1;
@@ -317,9 +317,9 @@
 
     // 如果搜到了当前index，删除id和排序对象
     if (index !== -1) {
-      console.log(index, formModel.value.detailImageIds);
+      // console.log(index, formModel.value.detailImageIds);
       formModel.value.detailImageIds?.splice(index ?? 0, 1);
-      console.log(uid, formModel.value.detailImageIdSortIndexes);
+      // console.log(uid, formModel.value.detailImageIdSortIndexes);
       formModel.value.detailImageIdSortIndexes = removeSortItemById(
         formModel.value.detailImageIdSortIndexes!,
         uid
@@ -327,7 +327,7 @@
 
       // 重新编排Sort
       rebuildSortIndex(formModel.value.detailImageIdSortIndexes!);
-      console.log(formModel.value.detailImageIdSortIndexes);
+      // console.log(formModel.value.detailImageIdSortIndexes);
     }
 
     return true;
@@ -359,7 +359,7 @@
     option: RequestOption
   ) => {
     const { uid } = option.fileItem;
-    console.log(uid);
+    // console.log(uid);
     let sortIndex = parseInt(uid.split('-')[1], 10);
 
     // 重新建立索引
@@ -367,7 +367,7 @@
     if (imageCount > 0) {
       sortIndex += imageCount;
     }
-    console.log(sortIndex);
+    // console.log(sortIndex);
 
     return uploadMediaImages(option, sortIndex, (data: MediaResource) => {
       formModel.value.coverImageIdSortIndexes?.push({
@@ -375,11 +375,11 @@
         sortIndex: data.sortIndex,
       } as SortIdItem);
       formModel.value.coverImageIds?.push(data.id!);
-      console.log(
-        data.id!,
-        formModel.value.coverImageIdSortIndexes,
-        formModel.value.coverImageIds
-      );
+      // console.log(
+      //   data.id!,
+      //   formModel.value.coverImageIdSortIndexes,
+      //   formModel.value.coverImageIds
+      // );
     });
   };
 
@@ -387,7 +387,7 @@
     option: RequestOption
   ) => {
     const { uid } = option.fileItem;
-    console.log(uid);
+    // console.log(uid);
     let sortIndex = parseInt(uid.split('-')[1], 10);
 
     // 重新建立索引
@@ -395,7 +395,7 @@
     if (imageCount > 0) {
       sortIndex += imageCount;
     }
-    console.log(sortIndex);
+    // console.log(sortIndex);
 
     return uploadMediaImages(option, sortIndex, (data: MediaResource) => {
       formModel.value.detailImageIdSortIndexes?.push({
@@ -403,11 +403,11 @@
         sortIndex: data.sortIndex,
       } as SortIdItem);
       formModel.value.detailImageIds?.push(data.id!);
-      console.log(
-        data.id!,
-        formModel.value.detailImageIdSortIndexes,
-        formModel.value.detailImageIds
-      );
+      // console.log(
+      //   data.id!,
+      //   formModel.value.detailImageIdSortIndexes,
+      //   formModel.value.detailImageIds
+      // );
     });
   };
 
