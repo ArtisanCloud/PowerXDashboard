@@ -159,6 +159,7 @@
               :default-file-list="state.coverUrlList"
               image-preview
               :on-before-remove="onBeforeRemoveCoverImages"
+              @change="onChangeCoverImages"
             />
           </a-form-item>
         </a-col>
@@ -175,6 +176,7 @@
               :file-list="state.detailUrlList"
               image-preview
               :on-before-remove="onBeforeRemoveDetailImages"
+              @change="onChangeDetailImages"
             />
           </a-form-item>
         </a-col>
@@ -293,7 +295,15 @@
     return true;
   };
 
-  const onChangeDetailImages = async (fileItems: FileItem[]) => {
+  const onChangeCoverImages = async (fileItems: FileItem) => {
+    // console.log(
+    //   'onChangeDetailImages',
+    //   fileItems,
+    //   formModel.value.detailImageIdSortIndexes
+    // );
+  };
+
+  const onChangeDetailImages = async (fileItems: FileItem) => {
     // console.log(
     //   'onChangeDetailImages',
     //   fileItems,
