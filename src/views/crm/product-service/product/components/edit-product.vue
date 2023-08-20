@@ -163,8 +163,8 @@
               list-type="picture-card"
               :file-list="state.coverUrlList"
               image-preview
-              :change="onChangeCoverImages"
               :on-before-remove="onBeforeRemoveCoverImages"
+              @change="onChangeCoverImages"
             />
           </a-form-item>
         </a-col>
@@ -182,7 +182,7 @@
               :file-list="state.detailUrlList"
               image-preview
               :on-before-remove="onBeforeRemoveDetailImages"
-              :change="onChangeDetailImages"
+              @change="onChangeDetailImages"
             />
           </a-form-item>
         </a-col>
@@ -384,7 +384,7 @@
     return convertIntArrayToStringArray(num);
   };
 
-  const onChangeCoverImages = async (fileItems: FileItem[]) => {
+  const onChangeCoverImages = async (fileItems: FileItem) => {
     // console.log(fileItems);
   };
 
@@ -419,12 +419,12 @@
     return true;
   };
 
-  const onChangeDetailImages = async (fileItems: FileItem[]) => {
-    console.log(
-      'onChangeDetailImages',
-      fileItems,
-      formModel.value.detailImageIdSortIndexes
-    );
+  const onChangeDetailImages = async (fileItems: FileItem) => {
+    // console.log(
+    //   'onChangeDetailImages',
+    //   fileItems,
+    //   formModel.value.detailImageIdSortIndexes
+    // );
   };
 
   const onBeforeRemoveDetailImages = async (fileItem: FileItem) => {
