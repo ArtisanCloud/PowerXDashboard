@@ -384,7 +384,10 @@
     return convertIntArrayToStringArray(num);
   };
 
-  const onChangeCoverImages = async (fileItems: FileItem) => {
+  const onChangeCoverImages = async (
+    fileList: FileItem[],
+    fileItem: FileItem
+  ) => {
     // console.log(fileItems);
   };
 
@@ -419,7 +422,10 @@
     return true;
   };
 
-  const onChangeDetailImages = async (fileItems: FileItem) => {
+  const onChangeDetailImages = async (
+    fileList: FileItem[],
+    fileItem: FileItem
+  ) => {
     // console.log(
     //   'onChangeDetailImages',
     //   fileItems,
