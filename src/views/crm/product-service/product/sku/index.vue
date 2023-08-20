@@ -148,6 +148,7 @@
     SpecificOption,
   } from '@/api/crm/product-service/productSpecific';
 
+  const MaxSpecificOptions = 8;
   const router = useRouter();
 
   const formRefSpecific = ref();
@@ -283,8 +284,11 @@
   const addOption = (specificIndex: number) => {
     const specific = state.productSpecifics[specificIndex];
     // console.log(specific);
-    if (specific.specificOptions && specific.specificOptions.length >= 5) {
-      Message.error('产品的规格选项数量不能超过5个');
+    if (
+      specific.specificOptions &&
+      specific.specificOptions.length >= MaxSpecificOptions
+    ) {
+      Message.error(`产品的规格选项数量不能超过${MaxSpecificOptions}个`);
       return;
     }
 
