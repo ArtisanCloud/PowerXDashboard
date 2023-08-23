@@ -65,7 +65,7 @@
     depId.value = selectedKeys[0] === 1 ? 0 : selectedKeys[0];
   };
   const departNodes = (data: DepartmentNode[], parentId = 0) => {
-    const departNodesList: [] = [];
+    const departNodesList: DepartmentNode[] = [];
     data.forEach((item) => {
       if (item.weWorkParentId === parentId) {
         const children = departNodes(data, item.weWorkDepId);
@@ -78,7 +78,7 @@
     return departNodesList;
   };
   function fetchDepartmentTree() {
-    getDepartmentTree({}).then((res: any) => {
+    getDepartmentTree().then((res: any) => {
       const list: DepartmentNode | any = res.data.list || [];
       const departNodesList = departNodes(list);
       res.data.list = departNodesList;

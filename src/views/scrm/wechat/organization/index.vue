@@ -70,7 +70,7 @@
     current: 1,
   });
   const departNodes = (data: DepartmentNode[], parentId = 0) => {
-    const departNodesList: [] = [];
+    const departNodesList: DepartmentNode[] = [];
     data.forEach((item) => {
       if (item.weWorkParentId === parentId) {
         const children = departNodes(data, item.weWorkDepId);
@@ -85,7 +85,7 @@
   const fetchDepartmentTree = async () => {
     state.loading = true;
     try {
-      const res = await getDepartmentTree({});
+      const res = await getDepartmentTree();
       const list: DepartmentNode | any = res.data.list || [];
       const departNodesList = departNodes(list);
       res.data.list = departNodesList;
