@@ -1,14 +1,19 @@
 <template>
   <div class="container">
     <a-card>
-      <!--      <a-space size="large">-->
-      <!--        <a-button type="primary" @click="openAddOrder()">新增订单 </a-button>-->
-      <!--      </a-space>-->
+      <filter-order @on-submit="onSearch"></filter-order>
+      <a-divider />
+      <a-space
+        size="large"
+        style="display: flex; justify-content: flex-end; padding-right: 80px"
+      >
+        <a-button type="primary" @click="downloadOrders()">下载订单 </a-button>
+        <a-button type="primary" @click="importOrders()">导入订单 </a-button>
+      </a-space>
     </a-card>
     <br />
     <a-card>
       <a-space size="large" direction="vertical" fill>
-        <filter-order></filter-order>
         <OrderTable ref="RefOrderTable" />
       </a-space>
     </a-card>
@@ -32,11 +37,15 @@
   import CreateOrder from '@/views/crm/trade/order/components/create-order.vue';
   import { DefaultPageSize } from '@/api/common';
   import FilterOrder from '@/views/crm/trade/order/components/filter-order.vue';
+  import { ListOrderPageRequest } from '@/api/crm/trade/order';
 
   const RefOrderTable = ref<any>();
 
-  const openAddOrder = () => {
-    state.createOrder.visible = true;
+  const downloadOrders = () => {
+    console.log('download orders');
+  };
+  const importOrders = () => {
+    console.log('import orders');
   };
 
   const pagination = reactive({
@@ -61,6 +70,10 @@
       pageIndex: pagination.currentPage,
       pageSize: pagination.pageSize,
     });
+  };
+
+  const onSearch = (data: ListOrderPageRequest) => {
+    RefOrderTable.value.fetchOrderList(data);
   };
 </script>
 

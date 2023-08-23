@@ -5,6 +5,15 @@ import timezone from 'dayjs/plugin/timezone';
 export const DateFormat = 'YYYY-MM-DD HH:mm:ss ZZ';
 export const TimeZone = 'Asia/Shanghai';
 
+export function formatDateToYMD(date: Date): string {
+  const year = date.getFullYear();
+  const month = (date.getMonth() + 1).toString().padStart(2, '0'); // 补零
+  const day = date.getDate().toString().padStart(2, '0'); // 补零
+
+  // 使用模板字符串拼接格式化后的日期
+  const formattedDate = `${year}-${month}-${day}`;
+  return formattedDate;
+}
 export function convertCSTDateToUTCDate(cstDateString: string): string {
   // CST格式的日期字符串  "2023-04-23 10:00:00 +0800 CST";
 

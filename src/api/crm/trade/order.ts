@@ -7,6 +7,8 @@ import { Pagination } from '@/types/global';
 
 const UriOrder = '/orders';
 
+export const MaxOrderPageSize = 9999;
+
 export interface OrderItem extends PowerModel {
   orderId: number;
   priceBookEntryId: number;
@@ -40,8 +42,13 @@ export interface Order extends PowerModel {
 
 export interface ListOrderPageRequest extends Pagination {
   ids?: number[];
-  likeName?: string;
+  name?: string;
+  startAt?: string;
+  endAt?: string;
+  typeIds?: number[];
+  statusIds?: number[];
   storeIds?: number[];
+  dates?: Date[];
 }
 
 export interface ListOrderPageReply extends Pagination {

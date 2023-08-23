@@ -295,7 +295,10 @@
     return true;
   };
 
-  const onChangeCoverImages = async (fileItems: FileItem) => {
+  const onChangeCoverImages = async (
+    fileList: FileItem[],
+    fileItem: FileItem
+  ) => {
     // console.log(
     //   'onChangeDetailImages',
     //   fileItems,
@@ -303,7 +306,10 @@
     // );
   };
 
-  const onChangeDetailImages = async (fileItems: FileItem) => {
+  const onChangeDetailImages = async (
+    fileList: FileItem[],
+    fileItem: FileItem
+  ) => {
     // console.log(
     //   'onChangeDetailImages',
     //   fileItems,
