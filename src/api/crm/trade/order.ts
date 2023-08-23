@@ -42,7 +42,7 @@ export interface Order extends PowerModel {
 
 export interface ListOrderPageRequest extends Pagination {
   ids?: number[];
-  likeName?: string;
+  name?: string;
   startAt?: string;
   endAt?: string;
   typeIds?: number[];

@@ -74,12 +74,12 @@
     // console.log('onSelect', formSearch.value.dates);
   };
 
-  // const onPopupVisibleChange = (visible: boolean) => {
-  //   if (!visible) {
-  //     formSearch.value.dates = [];
-  //   }
-  //   console.log(visible, formSearch.value.dates);
-  // };
+  const onPopupVisibleChange = (visible: boolean) => {
+    // if (!visible) {
+    //   formSearch.value.dates = [];
+    // }
+    // console.log(visible, formSearch.value.dates);
+  };
   const disabledDate = (current: any): boolean => {
     const { dates } = formSearch.value;
     const divide = 24 * 60 * 60 * 1000;
