@@ -58,6 +58,10 @@ export interface Product extends PowerModel, ProductAttribute, MediaSet {
 export interface ListProductPageRequest extends Pagination {
   ids?: number[];
   likeName?: string;
+  startDate: string;
+  endDate: string;
+  typeIds: number[];
+  statusIds: number[];
   storeIds?: number[];
 }
 

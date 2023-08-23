@@ -21,7 +21,9 @@
                 <a-tooltip content="编辑角色">
                   <a-button @click="editRoleOnClick(record.roleCode)">
                     <template #icon>
-                      <icon-edit :style="{ fontSize: '16px', color: 'green' }" />
+                      <icon-edit
+                        :style="{ fontSize: '16px', color: 'green' }"
+                      />
                     </template>
                   </a-button>
                 </a-tooltip>
@@ -29,7 +31,9 @@
                 <a-tooltip content="分配员工">
                   <a-button @click="editEmployeeOnClick(record.roleCode)">
                     <template #icon>
-                      <icon-user :style="{ fontSize: '16px', color: 'blue' }" />
+                      <icon-user
+                        :style="{ fontSize: '16px', color: 'green' }"
+                      />
                     </template>
                   </a-button>
                 </a-tooltip>
