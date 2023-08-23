@@ -123,7 +123,7 @@
       await deleteDepartment({ id: depId });
       await fetchDepartmentTree();
     } catch (error) {
-      console.error(error);
+      // console.error(error);
     }
   };
 
