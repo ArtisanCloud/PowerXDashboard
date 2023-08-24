@@ -1,18 +1,16 @@
 <template>
   <div class="container">
     <a-card>
-      <filter-order @on-submit="onSearch"></filter-order>
-      <a-divider />
-      <a-space
-        size="large"
-        style="display: flex; justify-content: flex-end; padding-right: 80px"
-      >
-        <a-button type="primary" @click="downloadOrders()">下载订单 </a-button>
-        <a-button type="primary" @click="importOrders()">导入订单 </a-button>
-      </a-space>
+      <filter-order
+        ref="RefFilerOrder"
+        @on-submit="onSearch"
+        @on-reset="onResetSearch"
+      ></filter-order>
     </a-card>
     <br />
     <a-card>
+      <import-export ref="RefImportExport"></import-export>
+      <a-divider />
       <a-space size="large" direction="vertical" fill>
         <OrderTable ref="RefOrderTable" />
       </a-space>
@@ -37,16 +35,12 @@
   import CreateOrder from '@/views/crm/trade/order/components/create-order.vue';
   import { DefaultPageSize } from '@/api/common';
   import FilterOrder from '@/views/crm/trade/order/components/filter-order.vue';
+  import ImportExport from '@/views/crm/trade/order/components/import-export/index.vue';
   import { ListOrderPageRequest } from '@/api/crm/trade/order';
 
+  const RefFilerOrder = ref<any>();
+  const RefImportExport = ref<any>();
   const RefOrderTable = ref<any>();
-
-  const downloadOrders = () => {
-    console.log('download orders');
-  };
-  const importOrders = () => {
-    console.log('import orders');
-  };
 
   const pagination = reactive({
     'total': 0,
@@ -72,8 +66,15 @@
     });
   };
 
+  const onResetSearch = () => {
+    refreshOrderList();
+    RefImportExport.value.setFilters({});
+  };
+
   const onSearch = (data: ListOrderPageRequest) => {
     RefOrderTable.value.fetchOrderList(data);
+
+    RefImportExport.value.setFilters(data);
   };
 </script>
 

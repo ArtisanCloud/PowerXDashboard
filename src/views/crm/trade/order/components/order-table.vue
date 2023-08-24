@@ -11,6 +11,9 @@
       @page-change="pageChanged"
       @page-size-change="pageSizeChanged"
     >
+      <template #ID="{ rowIndex }">
+        <a-typography-text>{{ rowIndex + 1 }}</a-typography-text>
+      </template>
       <template #customerName="{ record }">
         <a-typography-text>{{ record.customer?.name }} </a-typography-text>
       </template>
@@ -86,8 +89,8 @@
   const columns = reactive([
     {
       title: 'ID',
-      dataIndex: 'id',
       width: 60,
+      slotName: 'ID',
     },
     {
       title: '订单号',
