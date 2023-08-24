@@ -64,6 +64,20 @@ export function listOrders(request: ListOrderPageRequest) {
   );
 }
 
+interface ExportOrdersReply {
+  data: any;
+  headers: any;
+}
+
+export function ExportOrders(request: ListOrderPageRequest) {
+  return axios.get<ExportOrdersReply>(
+    `${PrefixUriAdmin + UriTrade + UriOrder}/export`,
+    {
+      params: request,
+    }
+  );
+}
+
 export function createOrder(request: Order) {
   return axios.post<Order>(`${PrefixUriAdmin + UriTrade + UriOrder}`, request);
 }

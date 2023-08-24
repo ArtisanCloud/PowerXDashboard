@@ -1,6 +1,7 @@
 <template>
   <div class="content">
     <a-form
+      ref="formRef"
       :model="formSearch"
       :style="{ width: '600px' }"
       @submit="handleSubmit"
@@ -39,7 +40,10 @@
         />
       </a-form-item>
       <a-form-item>
-        <a-button type="primary" html-type="submit">查询</a-button>
+        <a-space>
+          <a-button @click="resetForm">重置</a-button>
+          <a-button type="primary" html-type="submit">查询</a-button>
+        </a-space>
       </a-form-item>
     </a-form>
   </div>
@@ -56,8 +60,9 @@
 
   const options = useOptionsStore();
 
-  const emits = defineEmits(['onSubmit']);
+  const emits = defineEmits(['onSubmit', 'onReset']);
 
+  const formRef = ref();
   const formSearch = ref({
     name: '' as string,
     dates: [] as Date[],
@@ -97,6 +102,11 @@
       return tooEarly || tooLate;
     }
     return false;
+  };
+
+  const resetForm = () => {
+    formRef.value.resetFields();
+    emits('onReset');
   };
 
   const handleSubmit = async (data: any) => {
