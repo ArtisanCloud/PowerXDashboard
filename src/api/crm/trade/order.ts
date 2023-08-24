@@ -65,7 +65,7 @@ export function listOrders(request: ListOrderPageRequest) {
 }
 
 interface ExportOrdersReply {
-  data: any;
+  data: string;
   headers: any;
 }
 

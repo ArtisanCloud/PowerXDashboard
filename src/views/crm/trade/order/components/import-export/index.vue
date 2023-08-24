@@ -7,15 +7,15 @@
       type="primary"
       tooltip="通过查询结果，下载订单"
       :disabled="filterIsEmpty()"
-      @click="downloadOrders"
+      @click="downloadOrders()"
       >下载订单
     </a-button>
     <div>
       <a-upload
         ref="uploadRef"
         action="/api/v1/admin/trade/orders/import"
-        limit="1"
-        @change="onChange"
+        :limit="1"
+        @change="importOrders"
       >
         <template #upload-button>
           <a-space>
@@ -50,7 +50,8 @@
       // console.log(headers);
 
       // 创建 Blob 对象并触发下载
-      const blob = new Blob([res.data], {
+      const blobParts: any[] = [res.data];
+      const blob = new Blob(blobParts, {
         type: headers['content-type'],
       });
       const fileName = `${formSearch.value.startAt}_${formSearch.value.endAt}.csv`;
@@ -70,6 +71,7 @@
   };
 
   const setFilters = (req: ListOrderPageRequest) => {
+    // console.log('set filter', req);
     formSearch.value = req;
   };
 
