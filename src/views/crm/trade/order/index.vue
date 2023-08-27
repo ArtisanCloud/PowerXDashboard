@@ -9,12 +9,22 @@
     </a-card>
     <br />
     <a-card>
-      <import-export ref="RefImportExport"></import-export>
+      <import-export
+        ref="RefImportExport"
+        @on-import-finish="onImportFinish"
+      ></import-export>
       <a-divider />
       <a-space size="large" direction="vertical" fill>
         <OrderTable ref="RefOrderTable" />
       </a-space>
     </a-card>
+    <a-modal v-model:visible="state.importOrders.visible">
+      <template #title> 处理结果 </template>
+      <div>{{
+        `总共处理订单：${state.importOrders.res.total}，处理了${state.importOrders.res.success}条记录，失败了${state.importOrders.res.failed}条记录,
+        忽略了${state.importOrders.res.ignored}条记录`
+      }}</div>
+    </a-modal>
     <a-drawer
       v-model:visible="state.createOrder.visible"
       width="500px"
@@ -33,10 +43,14 @@
   import { reactive, ref } from 'vue';
   import OrderTable from '@/views/crm/trade/order/components/order-table.vue';
   import CreateOrder from '@/views/crm/trade/order/components/create-order.vue';
-  import { DefaultPageSize } from '@/api/common';
+  import { DefaultPageSize } from '@/api';
   import FilterOrder from '@/views/crm/trade/order/components/filter-order.vue';
   import ImportExport from '@/views/crm/trade/order/components/import-export/index.vue';
-  import { ListOrderPageRequest } from '@/api/crm/trade/order';
+  import {
+    ListOrderPageRequest,
+    UploadOrdersReply,
+  } from '@/api/crm/trade/order';
+  import { Message } from '@arco-design/web-vue';
 
   const RefFilerOrder = ref<any>();
   const RefImportExport = ref<any>();
@@ -57,6 +71,10 @@
       visible: false,
       parentNode: {},
     },
+    importOrders: {
+      visible: false,
+      res: {} as UploadOrdersReply,
+    },
   });
 
   const refreshOrderList = () => {
@@ -75,6 +93,12 @@
     RefOrderTable.value.fetchOrderList(data);
 
     RefImportExport.value.setFilters(data);
+  };
+
+  const onImportFinish = (res: UploadOrdersReply) => {
+    state.importOrders.res = res;
+    state.importOrders.visible = true;
+    RefOrderTable.value.fetchOrderList({});
   };
 </script>
 

@@ -27,7 +27,7 @@
   import { reactive, ref } from 'vue';
   import CustomerTable from '@/views/crm/customer-domain/customer/components/customer-table.vue';
   import CreateCustomer from '@/views/crm/customer-domain/customer/components/create-customer.vue';
-  import { DefaultPageSize } from '@/api/common';
+  import { DefaultPageSize } from '@/api';
 
   const RefCustomerTable = ref<any>();
 

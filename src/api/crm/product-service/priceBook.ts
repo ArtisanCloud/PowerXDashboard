@@ -1,7 +1,8 @@
 import axios from 'axios';
-import { PowerModel, PrefixUriAdmin } from '@/api/common';
+import { PowerModel } from '@/api/common';
 import { UriProduct } from '@/api/crm/product-service/product';
 import { Pagination } from '@/types/global';
+import { PrefixUriAdmin } from '@/api';
 
 export interface PriceBook extends PowerModel {
   isStandard: boolean;

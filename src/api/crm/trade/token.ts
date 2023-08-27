@@ -1,7 +1,8 @@
-import { PowerModel, PrefixUriAdmin } from '@/api/common';
+import { PowerModel } from '@/api/common';
 import axios from 'axios';
 import UriTrade from '@/api/crm/trade/index';
 import { Pagination } from '@/types/global';
+import { PrefixUriAdmin } from '@/api';
 
 const UriTokenProduct = '/token/products';
 

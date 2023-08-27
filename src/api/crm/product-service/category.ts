@@ -1,7 +1,8 @@
-import { imageAbleInfo, PowerModel, PrefixUriAdmin } from '@/api/common';
+import { imageAbleInfo, PowerModel } from '@/api/common';
 import axios from 'axios';
 import { UriProduct } from '@/api/crm/product-service/product';
 import { MediaSet } from '@/api/mediaresource';
+import { PrefixUriAdmin } from '@/api';
 
 export interface ProductCategory extends PowerModel, imageAbleInfo, MediaSet {
   pId?: number;

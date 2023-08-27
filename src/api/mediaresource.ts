@@ -1,7 +1,7 @@
 import axios from 'axios';
-import { PowerModel, PrefixUriAdmin } from '@/api/common';
-import { split } from 'lodash';
+import { PowerModel } from '@/api/common';
 import { SortIdItem } from '@/utils/sort-id-item';
+import { PrefixUriAdmin } from '@/api/index';
 
 export const UriMediaApi = '/media';
 

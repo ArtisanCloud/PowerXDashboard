@@ -117,7 +117,7 @@
 
   import useOptionsStore from '@/store/modules/data-dictionary';
   import { dayjs } from '@arco-design/web-vue/es/_utils/date';
-  import { DefaultPageSize } from '@/api/common';
+  import { DefaultPageSize } from '@/api';
   import CreatePriceBookEntry from '@/views/crm/product-service/price-book-entry/components/create-price-book-entry.vue';
 
   const options = useOptionsStore();

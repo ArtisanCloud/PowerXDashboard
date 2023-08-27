@@ -98,7 +98,7 @@
     listPriceBooks,
     PriceBook,
   } from '@/api/crm/product-service/priceBook';
-  import { MaxPageSize } from '@/api/common';
+  import { MaxPageSize } from '@/api';
   import { getObjectsByIds } from '@/utils/array';
 
   const emits = defineEmits(['submitSuccess', 'submitFailed', 'update:id']);

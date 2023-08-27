@@ -25,12 +25,9 @@
     RoleEmployee,
     setRoleEmployees,
   } from '@/api/permission';
-  import {
-    EmployeeOption,
-    getEmployeeOptions,
-    MaxPageSize,
-  } from '@/api/common';
+  import { EmployeeOption, getEmployeeOptions } from '@/api/common';
   import { Message } from '@arco-design/web-vue';
+  import { MaxPageSize } from '@/api';
 
   const prop = defineProps({
     roleCode: {

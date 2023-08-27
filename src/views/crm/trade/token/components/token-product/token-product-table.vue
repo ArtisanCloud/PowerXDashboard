@@ -97,7 +97,7 @@
   import { Message } from '@arco-design/web-vue';
 
   import useOptionsStore from '@/store/modules/data-dictionary';
-  import { DefaultPageSize } from '@/api/common';
+  import { DefaultPageSize } from '@/api';
   import CreatePriceBookEntry from '@/views/crm/product-service/price-book-entry/components/create-price-book-entry.vue';
   import {
     listTokenProducts,

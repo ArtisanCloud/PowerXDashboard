@@ -70,7 +70,7 @@
 <script lang="ts" setup>
   import { onMounted, reactive, ref } from 'vue';
 
-  import { DefaultPageSize } from '@/api/common';
+  import { DefaultPageSize } from '@/api';
   import { useRouter } from 'vue-router';
   import {
     listProductSpecifics,

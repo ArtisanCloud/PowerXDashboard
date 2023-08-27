@@ -25,7 +25,7 @@
 
 <script lang="ts" setup>
   import { reactive, ref } from 'vue';
-  import { DefaultPageSize } from '@/api/common';
+  import { DefaultPageSize } from '@/api';
   import PositionTable from '@/views/admin/organization/position/components/position-table.vue';
   import CreatePosition from '@/views/admin/organization/position/components/create-position.vue';
 

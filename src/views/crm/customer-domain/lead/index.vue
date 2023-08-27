@@ -27,7 +27,7 @@
   import { reactive, ref } from 'vue';
   import LeadTable from '@/views/crm/customer-domain/lead/components/lead-table.vue';
   import CreateLead from '@/views/crm/customer-domain/lead/components/create-lead.vue';
-  import { DefaultPageSize } from '@/api/common';
+  import { DefaultPageSize } from '@/api';
 
   const RefLeadTable = ref<any>();
 
