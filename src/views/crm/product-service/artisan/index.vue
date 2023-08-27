@@ -27,7 +27,7 @@
   import { reactive, ref } from 'vue';
   import ArtisanTable from '@/views/crm/product-service/artisan/components/artisan-table.vue';
   import CreateArtisan from '@/views/crm/product-service/artisan/components/create-artisan.vue';
-  import { DefaultPageSize } from '@/api/common';
+  import { DefaultPageSize } from '@/api';
 
   const RefArtisanTable = ref<any>();
 

@@ -27,7 +27,7 @@
   import { reactive, ref } from 'vue';
   import ProductTable from '@/views/crm/product-service/product/components/product-table.vue';
   import CreateProduct from '@/views/crm/product-service/product/components/create-product.vue';
-  import { DefaultPageSize } from '@/api/common';
+  import { DefaultPageSize } from '@/api';
 
   const RefProductTable = ref<any>();
 

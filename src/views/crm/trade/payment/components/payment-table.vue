@@ -71,7 +71,7 @@
 <script lang="ts" setup>
   import { onMounted, reactive, ref } from 'vue';
   import { Message } from '@arco-design/web-vue';
-  import { DefaultPageSize } from '@/api/common';
+  import { DefaultPageSize } from '@/api';
   import {
     listPayments,
     deletePayment,

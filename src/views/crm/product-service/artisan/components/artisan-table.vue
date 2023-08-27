@@ -72,7 +72,7 @@
   import EditArtisan from '@/views/crm/product-service/artisan/components/edit-artisan.vue';
   import { Message } from '@arco-design/web-vue';
 
-  import { DefaultPageSize } from '@/api/common';
+  import { DefaultPageSize } from '@/api';
   import { Store } from '@/api/crm/market/store';
 
   const artisanList = ref<Artisan[]>([]);

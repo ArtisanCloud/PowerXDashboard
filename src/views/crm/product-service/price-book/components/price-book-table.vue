@@ -89,7 +89,7 @@
   import CreatePriceBook from '@/views/crm/product-service/price-book/components/create-price-book.vue';
   import EditPriceBook from '@/views/crm/product-service/price-book/components/edit-price-book.vue';
   import { Message } from '@arco-design/web-vue';
-  import { DefaultPageSize } from '@/api/common';
+  import { DefaultPageSize } from '@/api';
 
   const priceBookList = ref<PriceBook[]>([]);
 

@@ -1,4 +1,4 @@
-import { PowerModel, PrefixUriAdmin } from '@/api/common';
+import { PowerModel } from '@/api/common';
 import axios from 'axios';
 
 import {
@@ -7,6 +7,7 @@ import {
   UriCustomerDomain,
 } from '@/api/crm/customer-domain/customer';
 import { Pagination } from '@/types/global';
+import { PrefixUriAdmin } from '@/api';
 
 export interface Lead extends PowerModel, CustomerExternalId {
   name: string;

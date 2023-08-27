@@ -1,5 +1,6 @@
 import axios from 'axios';
-import { PowerModel, PrefixUriAdmin } from '@/api/common';
+import { PowerModel } from '@/api/common';
+import { PrefixUriAdmin } from '@/api';
 
 const UriProduct = '/product';
 

@@ -1,6 +1,7 @@
-import { PowerModel, PrefixUriAdmin } from '@/api/common';
+import { PowerModel } from '@/api/common';
 import axios from 'axios';
 import { Pagination } from '@/types/global';
+import { PrefixUriAdmin } from '@/api';
 
 export const UriCustomerDomain = '/customerdomain';
 

@@ -27,7 +27,7 @@
   import { reactive, ref } from 'vue';
   import PaymentTable from '@/views/crm/trade/payment/components/payment-table.vue';
   import CreatePayment from '@/views/crm/trade/payment/components/create-payment.vue';
-  import { DefaultPageSize } from '@/api/common';
+  import { DefaultPageSize } from '@/api';
 
   const RefPaymentTable = ref<any>();
 

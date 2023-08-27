@@ -75,7 +75,7 @@
   import { Message } from '@arco-design/web-vue';
 
   import useOptionsStore from '@/store/modules/data-dictionary';
-  import { DefaultPageSize } from '@/api/common';
+  import { DefaultPageSize } from '@/api';
 
   const options = useOptionsStore();
 

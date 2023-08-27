@@ -27,7 +27,7 @@
   import { reactive, ref } from 'vue';
   import StoreTable from '@/views/crm/market/store/components/store-table.vue';
   import CreateStore from '@/views/crm/market/store/components/create-store.vue';
-  import { DefaultPageSize } from '@/api/common';
+  import { DefaultPageSize } from '@/api';
 
   const RefStoreTable = ref<any>();
 

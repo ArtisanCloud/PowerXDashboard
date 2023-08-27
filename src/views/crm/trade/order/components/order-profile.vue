@@ -9,86 +9,50 @@
     >
       <a-row :gutter="32">
         <a-col :span="32">
-          <a-form-item label="订单号" field="orderNumber">
-            <a-input v-model="formModel.orderNumber" />
+          <a-form-item label="物流单号" field="trackingCode">
+            <a-input v-model="formModel.logistics.trackingCode" />
           </a-form-item> </a-col
       ></a-row>
       <a-row :gutter="32">
         <a-col :span="12">
-          <a-form-item label="订单类型" field="type">
-            <a-select
-              v-model="formModel.type"
-              :options="options.orderTypes"
-              :field-names="{ label: 'name', value: 'id' }"
-              placeholder="请选择订单类型"
-            />
+          <a-form-item label="货代商" field="carrier">
+            <a-input v-model="formModel.logistics.carrier" />
           </a-form-item>
         </a-col>
         <a-col :span="12">
-          <a-form-item label="支付类型" field="paymentType">
-            <a-select
-              v-model="formModel.paymentType"
-              :options="options.paymentTypes"
-              :field-names="{ label: 'name', value: 'id' }"
-              placeholder="请选择支付类型"
-            />
+          <a-form-item label="物流单状态" field="status">
+            <a-input v-model="formModel.logistics.status" />
           </a-form-item>
         </a-col>
       </a-row>
+
       <a-row :gutter="32">
         <a-col :span="12">
-          <a-form-item label="订单状态" field="approvalStatus">
-            <a-select
-              v-model="formModel.status"
-              :options="options.orderStatus"
-              :field-names="{ label: 'name', value: 'id' }"
-              placeholder="请选择订单状态"
-            />
-          </a-form-item>
-        </a-col>
-      </a-row>
-      <a-row :gutter="32">
-        <a-col :span="12">
-          <a-form-item label="零售价格" field="listPrice">
-            <a-input-number v-model="formModel.listPrice" />
+          <a-form-item label="预期送货时间" field="estimatedDeliveryDate">
+            <a-input v-model="formModel.logistics.estimatedDeliveryDate" />
           </a-form-item>
         </a-col>
         <a-col :span="12">
-          <a-form-item label="实际成交价格" field="unitPrice">
-            <a-input-number v-model="formModel.unitPrice" />
-          </a-form-item>
-        </a-col>
-      </a-row>
-      <a-row :gutter="32">
-        <a-col :span="12">
-          <a-form-item label="折扣" field="discount">
-            <a-input-number v-model="formModel.discount" />
-          </a-form-item> </a-col
-      ></a-row>
-      <a-row :gutter="32">
-        <a-col :span="32">
-          <a-form-item label="标注" field="comment">
-            <a-textarea v-model="formModel.comment" style="width: 360px" />
+          <a-form-item label="实际到货时间" field="actualDeliveryDate">
+            <a-input v-model="formModel.logistics.actualDeliveryDate" />
           </a-form-item>
         </a-col>
       </a-row>
 
       <a-divider />
       <a-row :gutter="32">
-        <a-form-item label="购买项详情" field="orderItems">
+        <a-form-item label="支付记录" field="orderItems">
           <a-list style="width: 100%">
-            <a-list-item v-for="item in formModel.orderItems" :key="item.id">
+            <a-list-item v-for="item in formModel.payments" :key="item.id">
               <a-list-item-meta>
-                <template #avatar>
-                  <a-avatar shape="square">
-                    <img alt="avatar" :src="getOssUrl(item.coverImage)" />
-                  </a-avatar>
-                </template>
                 <template #description>
-                  产品名称：{{ item.productName }}
+                  支付单号：{{ item.paymentNumber }} - 支付时间:
+                  {{ item.paymentDate }}
                   <br />
-                  成交价格：{{ item.unitPrice }}元 x 单位：{{ item.quantity }}
+                  参考单号：{{ item.referenceNumber }} - 支付类型：
+                  {{ item.paymentType }}
                   <br />
+                  支付状态：{{ item.status }}
                 </template>
               </a-list-item-meta>
             </a-list-item>
@@ -116,6 +80,7 @@
   import useOptionsStore from '@/store/modules/data-dictionary';
   import { ossUrl, staticUrl } from '@/api';
   import { MediaResource } from '@/api/mediaresource';
+  import { getDefaultLogistics } from '@/api/crm/trade/logistics';
 
   const prop = defineProps({
     node: {
@@ -141,6 +106,7 @@
     unitPrice: prop.node?.unitPrice,
     comment: prop.node?.comment,
     orderItems: prop.node?.orderItems,
+    logistics: prop.node?.logistics ?? getDefaultLogistics(),
   } as Order);
 
   const rules = {
@@ -150,7 +116,7 @@
     ],
   } as Record<string, FieldRule[]>;
 
-  const getOssUrl = (resource: MediaResource | undefined): string => {
+  const getOssUrl = (resource: MediaResource) => {
     if (resource) {
       if (resource.isLocalStored) {
         return staticUrl(resource.url);

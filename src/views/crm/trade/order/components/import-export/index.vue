@@ -13,13 +13,14 @@
     <div>
       <a-upload
         ref="uploadRef"
-        action="/api/v1/admin/trade/orders/import"
+        :auto-upload="false"
+        :custom-request="uploadOrders"
         :limit="1"
         @change="importOrders"
       >
         <template #upload-button>
           <a-space>
-            <a-button type="primary">导入订单 </a-button>
+            <a-button>导入物流单号 </a-button>
           </a-space>
         </template>
       </a-upload>
@@ -29,8 +30,15 @@
 
 <script lang="ts" setup>
   import { ref } from 'vue';
-  import { ExportOrders, ListOrderPageRequest } from '@/api/crm/trade/order';
-  import { Message } from '@arco-design/web-vue';
+  import {
+    ExportOrders,
+    ListOrderPageRequest,
+    uploadOrdersWithTrackingNumbers,
+  } from '@/api/crm/trade/order';
+  import { Message, RequestOption, UploadRequest } from '@arco-design/web-vue';
+  import uploadMediaImages from '@/utils/media-resource';
+
+  const emits = defineEmits(['onImportFinish']);
 
   const uploadRef = ref();
   const files = ref([]);
@@ -67,12 +75,20 @@
     }
   };
   const importOrders = () => {
-    console.log('import orders');
+    // console.log('import orders');
   };
 
   const setFilters = (req: ListOrderPageRequest) => {
     // console.log('set filter', req);
     formSearch.value = req;
+  };
+
+  const uploadOrders: (option: RequestOption) => UploadRequest = (
+    option: RequestOption
+  ) => {
+    return uploadOrdersWithTrackingNumbers(option, (data: any) => {
+      emits('onImportFinish', data);
+    });
   };
 
   defineExpose({ setFilters });

@@ -74,7 +74,7 @@
   } from '@/api/crm/market/media';
 
   import { Message } from '@arco-design/web-vue';
-  import { DefaultPageSize } from '@/api/common';
+  import { DefaultPageSize } from '@/api';
   import EditMedia from '@/views/crm/market/media/components/edit-media.vue';
   import useOptionsStore from '../../../../../store/modules/data-dictionary';
 

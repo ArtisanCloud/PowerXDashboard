@@ -77,7 +77,7 @@
 
   import CreatePriceBookEntries from '@/views/crm/product-service/price-book-entry/components/create-price-book-entries.vue';
   import EditPriceBookEntry from '@/views/crm/product-service/price-book-entry/components/edit-price-book-entry.vue';
-  import { DefaultPageSize } from '@/api/common';
+  import { DefaultPageSize } from '@/api';
   import { useRouter } from 'vue-router';
 
   const route = useRouter();

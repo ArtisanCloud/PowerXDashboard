@@ -29,7 +29,7 @@
   import { reactive, ref } from 'vue';
   import TokenProductTable from '@/views/crm/trade/token/components/token-product/token-product-table.vue';
   import CreateTokenProduct from '@/views/crm/trade/token/components/token-product/create-token-product.vue';
-  import { DefaultPageSize } from '@/api/common';
+  import { DefaultPageSize } from '@/api';
 
   const RefTokenProductTable = ref<any>();
 

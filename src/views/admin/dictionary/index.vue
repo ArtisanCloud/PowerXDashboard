@@ -30,7 +30,7 @@
 
   import DictionaryTypeTable from '@/views/admin/dictionary/components/dictionary-type-table.vue';
   import CreateDictionaryType from '@/views/admin/dictionary/components/create-dictionary-type.vue';
-  import { DefaultPageSize } from '@/api/common';
+  import { DefaultPageSize } from '@/api';
 
   const RefDictionaryTypeTable = ref<any>();
 

@@ -1,8 +1,9 @@
-import { PowerModel, PrefixUriAdmin } from '@/api/common';
+import { PowerModel } from '@/api/common';
 import axios from 'axios';
 import { UriMarket } from '@/api/crm/market/media';
 import { MediaSet } from '@/api/mediaresource';
 import { Pagination } from '@/types/global';
+import { PrefixUriAdmin } from '@/api';
 
 const UriStore = '/stores';
 

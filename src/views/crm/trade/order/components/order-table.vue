@@ -31,8 +31,8 @@
             </template>
           </a-button>
 
-          <!--配置价格按钮-->
-          <a-button title="配置价格" @click="openEditOrder(record)">
+          <!--查看支付和物流按钮-->
+          <a-button title="查看支付和物流" @click="openOrderProfile(record)">
             <template #icon>
               <icon-book :style="{ fontSize: '16px', color: '#d7ee8f' }" />
             </template>
@@ -64,16 +64,27 @@
         @submit-success="fetchOrderList"
       />
     </a-drawer>
+    <a-drawer
+      v-model:visible="state.profile.visible"
+      width="500px"
+      ok-text="关闭抽屉"
+      :hide-cancel="true"
+    >
+      <OrderProfile
+        v-if="state.profile.visible"
+        :node="state.profile.node"
+        @submit-success="fetchOrderList"
+      />
+    </a-drawer>
   </a-card>
 </template>
 
 <script lang="ts" setup>
   import { onMounted, reactive, ref } from 'vue';
 
-  import EditOrder from '@/views/crm/trade/order/components/edit-order.vue';
   import { Message } from '@arco-design/web-vue';
 
-  import { DefaultPageSize } from '@/api/common';
+  import { DefaultPageSize } from '@/api';
   import {
     listOrders,
     deleteOrder,
@@ -81,6 +92,8 @@
     ListOrderPageRequest,
   } from '@/api/crm/trade/order';
   import { useOptionsStore } from '@/store';
+  import EditOrder from '@/views/crm/trade/order/components/edit-order.vue';
+  import OrderProfile from '@/views/crm/trade/order/components/order-profile.vue';
 
   const options = useOptionsStore();
 
@@ -116,6 +129,12 @@
     },
 
     {
+      title: '物流单号',
+      dataIndex: 'logistics.trackingCode',
+      width: 150,
+    },
+
+    {
       title: '操作',
       slotName: 'optional',
     },
@@ -139,8 +158,13 @@
     },
     editOrder: {
       visible: false,
-      node: {},
+      node: {} as Order,
     },
+    profile: {
+      visible: false,
+      node: {} as Order,
+    },
+
     submitLoading: false,
   });
 
@@ -158,10 +182,15 @@
     }
   };
 
-  const openEditOrder = (cat: Order) => {
+  const openEditOrder = (order: Order) => {
     // console.log(cat)
-    state.editOrder.node = cat;
+    state.editOrder.node = order;
     state.editOrder.visible = true;
+  };
+
+  const openOrderProfile = (order: Order) => {
+    state.profile.node = order;
+    state.profile.visible = true;
   };
 
   const deleteOrderById = async (bookId: number) => {
