@@ -1,9 +1,9 @@
 import { PowerModel } from '@/api/common';
 import axios from 'axios';
 import { UriProduct } from '@/api/crm/product-service/product';
-import { MediaSet } from '@/api/mediaresource';
 import { Pagination } from '@/types/global';
 import { PrefixUriAdmin } from '@/api';
+import { MediaSet } from '@/api/media-resource';
 
 const UriArtisan = '/artisans';
 

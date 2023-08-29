@@ -215,12 +215,12 @@
 
   import { convertIntArrayToStringArray } from '@/utils/array';
   import uploadMediaImages from '@/utils/media-resource';
-  import { MediaResource } from '@/api/mediaresource';
   import {
     rebuildSortIndex,
     removeSortItemById,
     SortIdItem,
   } from '@/utils/sort-id-item';
+  import { MediaResource } from '@/api/media-resource';
 
   const prop = defineProps({
     node: {

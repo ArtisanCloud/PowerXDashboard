@@ -208,12 +208,12 @@
   import useOptionsStore from '@/store/modules/data-dictionary';
   import CategorySelector from '@/views/crm/product-service/product-category/components/category-selector.vue';
   import uploadMediaImages from '@/utils/media-resource';
-  import { MediaResource } from '@/api/mediaresource';
   import {
     rebuildSortIndex,
     removeSortItemById,
     SortIdItem,
   } from '@/utils/sort-id-item';
+  import { MediaResource } from '@/api/media-resource';
 
   const emits = defineEmits(['submitSuccess', 'submitFailed', 'update:id']);
 
