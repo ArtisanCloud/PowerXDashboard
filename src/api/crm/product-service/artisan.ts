@@ -21,6 +21,7 @@ export interface Artisan extends PowerModel, MediaSet {
   specialty: string;
   certificate: string;
   address: string;
+  storeIds: number[];
 }
 
 export interface ListArtisanPageRequest extends Pagination {
@@ -67,5 +68,21 @@ export interface DeleteArtisanReply {
 export function deleteArtisan(request: DeleteArtisanRequest) {
   return axios.delete<DeleteArtisanReply>(
     `${PrefixUriAdmin + UriProduct + UriArtisan}/${request.id}`
+  );
+}
+
+export interface BindArtisanToStoreRequest {
+  artisanIds: number[];
+  storeIds: number[];
+}
+
+export interface BindArtisanToStoreReply {
+  pivotIds: number[];
+}
+
+export function bindArtisanToStore(request: BindArtisanToStoreRequest) {
+  return axios.post<BindArtisanToStoreReply>(
+    `${PrefixUriAdmin + UriProduct + UriArtisan}/bind/stores`,
+    request
   );
 }
