@@ -79,8 +79,8 @@
   import { Order } from '@/api/crm/trade/order';
   import useOptionsStore from '@/store/modules/data-dictionary';
   import { ossUrl, staticUrl } from '@/api';
-  import { MediaResource } from '@/api/mediaresource';
   import { getDefaultLogistics } from '@/api/crm/trade/logistics';
+  import { MediaResource } from '@/api/media-resource';
 
   const prop = defineProps({
     node: {

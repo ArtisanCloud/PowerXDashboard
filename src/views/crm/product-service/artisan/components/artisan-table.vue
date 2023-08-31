@@ -23,10 +23,10 @@
             </template>
           </a-button>
 
-          <!--配置价格按钮-->
-          <a-button @click="openEditArtisan(record)">
+          <!--绑定门店按钮-->
+          <a-button title="绑定门店" @click="openBindStore(record)">
             <template #icon>
-              <icon-book :style="{ fontSize: '16px', color: '#d7ee8f' }" />
+              <icon-link :style="{ fontSize: '16px', color: '#8f9438' }" />
             </template>
           </a-button>
 
@@ -56,6 +56,18 @@
         @submit-success="fetchArtisanList"
       />
     </a-drawer>
+    <a-drawer
+      v-model:visible="state.bindStore.visible"
+      width="500px"
+      ok-text="关闭抽屉"
+      :hide-cancel="true"
+    >
+      <BindStore
+        v-if="state.bindStore.visible"
+        :node="state.bindStore.node"
+        @submit-success="fetchArtisanList"
+      />
+    </a-drawer>
   </a-card>
 </template>
 
@@ -68,12 +80,11 @@
     ListArtisanPageRequest,
   } from '@/api/crm/product-service/artisan';
 
-  import CreateArtisan from '@/views/crm/product-service/artisan/components/create-artisan.vue';
+  import BindStore from '@/views/crm/product-service/artisan/components/bind-store.vue';
   import EditArtisan from '@/views/crm/product-service/artisan/components/edit-artisan.vue';
   import { Message } from '@arco-design/web-vue';
 
   import { DefaultPageSize } from '@/api';
-  import { Store } from '@/api/crm/market/store';
 
   const artisanList = ref<Artisan[]>([]);
 
@@ -125,6 +136,10 @@
       visible: false,
       node: {} as Artisan,
     },
+    bindStore: {
+      visible: false,
+      node: {} as Artisan,
+    },
     submitLoading: false,
   });
 
@@ -142,10 +157,16 @@
     }
   };
 
-  const openEditArtisan = (cat: Artisan) => {
+  const openEditArtisan = (artisan: Artisan) => {
     // console.log(cat)
-    state.editArtisan.node = cat;
+    state.editArtisan.node = artisan;
     state.editArtisan.visible = true;
+  };
+
+  const openBindStore = (artisan: Artisan) => {
+    // console.log(cat)
+    state.bindStore.node = artisan;
+    state.bindStore.visible = true;
   };
 
   const deleteArtisanById = async (bookId: number) => {

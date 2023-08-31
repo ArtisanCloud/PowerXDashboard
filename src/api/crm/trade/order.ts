@@ -6,8 +6,8 @@ import UriTrade from '@/api/crm/trade/index';
 import { Pagination } from '@/types/global';
 import { RequestOption, UploadRequest } from '@arco-design/web-vue';
 import { PrefixUriAdmin } from '@/api';
-import { MediaSet } from '@/api/mediaresource';
 import { Logistics } from '@/api/crm/trade/logistics';
+import { MediaSet } from '@/api/media-resource';
 
 const UriOrder = '/orders';
 

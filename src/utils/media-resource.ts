@@ -1,6 +1,6 @@
 import { RequestOption, UploadRequest } from '@arco-design/web-vue';
-import { uploadMediaResource } from '@/api/mediaresource';
 import { sortedIndex } from 'lodash';
+import { uploadMediaResource } from '@/api/media-resource';
 
 export default function uploadMediaImages(
   option: RequestOption,

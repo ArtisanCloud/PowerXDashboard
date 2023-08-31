@@ -1,8 +1,8 @@
 import { PowerModel } from '@/api/common';
 import axios from 'axios';
-import { MediaSet } from '@/api/mediaresource';
 import { Pagination } from '@/types/global';
 import { PrefixUriAdmin } from '@/api';
+import { MediaSet } from '@/api/media-resource';
 
 export const UriMarket = '/market';
 const UriMedia = '/medias';

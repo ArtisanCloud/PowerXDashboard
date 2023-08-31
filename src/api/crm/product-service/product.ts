@@ -1,7 +1,6 @@
 import { PowerModel } from '@/api/common';
 import axios from 'axios';
 import type { ProductCategory } from '@/api/crm/product-service/category';
-import { MediaSet } from '@/api/mediaresource';
 import {
   PriceBookEntry,
   ProductAttribute,
@@ -10,6 +9,7 @@ import { SKU } from '@/api/crm/product-service/sku';
 import { ProductSpecific } from '@/api/crm/product-service/productSpecific';
 import { Pagination } from '@/types/global';
 import { PrefixUriAdmin } from '@/api';
+import { MediaSet } from '@/api/media-resource';
 
 export const UriProduct = '/product';
 
