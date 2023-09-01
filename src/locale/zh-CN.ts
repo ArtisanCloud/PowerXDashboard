@@ -94,6 +94,11 @@ export default {
   'menu.scrm.sessionArchive': '会话存档',
   'menu.scrm.smartCS': '智能客服',
 
+  'menu.infoOrganization': '信息组织',
+  'menu.infoOrganization.label': '框架标签',
+  'menu.infoOrganization.tag': '碎片标签',
+  'menu.infoOrganization.category': '类别',
+
   ...localeSettings,
   ...localeMessageBox,
   ...localeLogin,

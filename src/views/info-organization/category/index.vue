@@ -2,7 +2,7 @@
   <div class="container">
     <a-card>
       <a-space size="large">
-        <a-button type="primary" @click="openAddCategory()">新增品类 </a-button>
+        <a-button type="primary" @click="openAddCategory()">新增类别 </a-button>
       </a-space>
     </a-card>
     <br />
@@ -25,8 +25,8 @@
 
 <script lang="ts" setup>
   import { reactive, ref } from 'vue';
-  import CategoryTree from '@/views/crm/product-service/product-category/components/category-tree.vue';
-  import CreateCategory from '@/views/crm/product-service/product-category/components/create-category.vue';
+  import CategoryTree from '@/views/info-organization/category/components/category-tree.vue';
+  import CreateCategory from '@/views/info-organization/category/components/create-category.vue';
 
   const RefTree = ref<any>();
 
