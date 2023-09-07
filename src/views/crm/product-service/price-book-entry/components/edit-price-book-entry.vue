@@ -33,7 +33,7 @@
   import {
     PriceBookEntry,
     updatePriceBookEntry,
-  } from '@/api/crm/product-service/priceBookEntry';
+  } from '@/api/crm/product-service/price-book-entry';
 
   const prop = defineProps({
     node: {

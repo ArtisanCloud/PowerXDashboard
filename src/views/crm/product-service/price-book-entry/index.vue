@@ -33,7 +33,10 @@
   import CreatePriceBookEntries from '@/views/crm/product-service/price-book-entry/components/create-price-book-entries.vue';
   import { useRouter } from 'vue-router';
   import { Message } from '@arco-design/web-vue';
-  import { getPriceBook, PriceBook } from '@/api/crm/product-service/priceBook';
+  import {
+    getPriceBook,
+    PriceBook,
+  } from '@/api/crm/product-service/price-book';
 
   const router = useRouter();
   const RefPriceBookEntryTable = ref<any>();

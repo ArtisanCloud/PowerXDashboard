@@ -38,7 +38,7 @@
   import {
     createPriceBook,
     PriceBook,
-  } from '@/api/crm/product-service/priceBook';
+  } from '@/api/crm/product-service/price-book';
   import { FieldRule, Message } from '@arco-design/web-vue';
 
   const prop = defineProps({

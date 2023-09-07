@@ -28,7 +28,7 @@
 
 <script lang="ts" setup>
   import { onMounted, PropType, reactive, ref } from 'vue';
-  import { PriceBookEntry } from '@/api/crm/product-service/priceBookEntry';
+  import { PriceBookEntry } from '@/api/crm/product-service/price-book-entry';
 
   const formSKUEntryList = ref([] as PriceBookEntry[]);
 

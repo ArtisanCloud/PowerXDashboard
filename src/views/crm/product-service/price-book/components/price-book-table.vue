@@ -84,7 +84,7 @@
     deletePriceBook,
     PriceBook,
     ListPriceBooksRequest,
-  } from '@/api/crm/product-service/priceBook';
+  } from '@/api/crm/product-service/price-book';
 
   import CreatePriceBook from '@/views/crm/product-service/price-book/components/create-price-book.vue';
   import EditPriceBook from '@/views/crm/product-service/price-book/components/edit-price-book.vue';
