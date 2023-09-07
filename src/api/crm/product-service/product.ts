@@ -4,9 +4,9 @@ import type { ProductCategory } from '@/api/crm/product-service/category';
 import {
   PriceBookEntry,
   ProductAttribute,
-} from '@/api/crm/product-service/priceBookEntry';
+} from '@/api/crm/product-service/price-book-entry';
 import { SKU } from '@/api/crm/product-service/sku';
-import { ProductSpecific } from '@/api/crm/product-service/productSpecific';
+import { ProductSpecific } from '@/api/crm/product-service/product-specific';
 import { Pagination } from '@/types/global';
 import { PrefixUriAdmin } from '@/api';
 import { MediaSet } from '@/api/media-resource';

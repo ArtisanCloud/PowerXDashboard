@@ -146,7 +146,7 @@
     deleteProductSpecific,
     ProductSpecific,
     SpecificOption,
-  } from '@/api/crm/product-service/productSpecific';
+  } from '@/api/crm/product-service/product-specific';
 
   const MaxSpecificOptions = 8;
   const router = useRouter();

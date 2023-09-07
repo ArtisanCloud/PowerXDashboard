@@ -72,11 +72,11 @@
   import {
     configPriceBookEntry,
     PriceBookEntry,
-  } from '@/api/crm/product-service/priceBookEntry';
+  } from '@/api/crm/product-service/price-book-entry';
   import ProductSearchSelect from '@/views/crm/product-service/product/components/product-search-select.vue';
   import { Product } from '@/api/crm/product-service/product';
   import SKUEntryListTable from '@/views/crm/product-service/price-book-entry/components/sku-entry-list-table.vue';
-  import { PriceBook } from '@/api/crm/product-service/priceBook';
+  import { PriceBook } from '@/api/crm/product-service/price-book';
 
   const emits = defineEmits(['submitSuccess', 'submitFailed', 'update:id']);
 

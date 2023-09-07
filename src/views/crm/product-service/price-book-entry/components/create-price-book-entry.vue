@@ -91,13 +91,13 @@
   import {
     configPriceBookEntry,
     PriceBookEntry,
-  } from '@/api/crm/product-service/priceBookEntry';
+  } from '@/api/crm/product-service/price-book-entry';
   import { Product } from '@/api/crm/product-service/product';
   import SKUEntryListTable from '@/views/crm/product-service/price-book-entry/components/sku-entry-list-table.vue';
   import {
     listPriceBooks,
     PriceBook,
-  } from '@/api/crm/product-service/priceBook';
+  } from '@/api/crm/product-service/price-book';
   import { MaxPageSize } from '@/api';
   import { getObjectsByIds } from '@/utils/array';
 
