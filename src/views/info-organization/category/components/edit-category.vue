@@ -57,21 +57,21 @@
   import {
     createCategory,
     CreateCategoryRequest,
-    ProductCategory,
+    Category,
     updateCategory,
-  } from '@/api/crm/product-service/category';
+  } from '@/api/info-organization/category';
   import { getEmployeeOptions, ParentOption } from '@/api/common';
   import uploadMediaImages from '@/utils/media-resource';
 
   const prop = defineProps({
     parentNode: {
-      type: Object as PropType<ProductCategory>,
+      type: Object as PropType<Category>,
       default() {
         return {};
       },
     },
     node: {
-      type: Object as PropType<ProductCategory>,
+      type: Object as PropType<Category>,
       default() {
         return {};
       },
