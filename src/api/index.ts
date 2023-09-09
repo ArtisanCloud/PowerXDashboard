@@ -1,4 +1,7 @@
 export const PrefixUriAdmin = '/api/v1/admin';
+
+export const PowerXVersion = import.meta.env.VITE_POWERX_VERSION ?? 'v1.0.0';
+
 export const DefaultPageSize = 10;
 export const MaxPageSize = 399;
 
