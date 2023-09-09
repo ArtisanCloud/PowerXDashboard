@@ -32,13 +32,13 @@
 
 ## PowerX社区交流群
 
-<img src="https://raw.githubusercontent.com/ArtisanCloud/PowerX/develop/resource/images/contact_me_qr.jpg" alt="请扫我" style="display:inline; width: 150px;"/>
+<img src="https://powerx.artisan-cloud.com/assets/contact_me_qr.304649f9.jpg" alt="请扫我" style="display:inline; width: 150px;"/>
 
 ## 企业微信主要维护者
 
 Matrix-X
 
-<img src="https://raw.githubusercontent.com/ArtisanCloud/PowerX/develop/resource/images/contact-qr-matrix-x.png" alt="请扫我" style="display:inline; width: 150px;"/>
+<img src="https://powerx.artisan-cloud.com/assets/contact-qr-matrix-x.b70d53f1.png" alt="请扫我" style="display:inline; width: 150px;"/>
 
 North
 
