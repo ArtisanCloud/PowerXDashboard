@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { PowerModel } from '@/api/common';
 import { Pagination } from '@/types/global';
-import { PrefixUriAdmin } from '@/api/index';
+import { PrefixUriAdmin } from '@/api';
 
 const UriDateDictionaryApi = '/dictionary';
 

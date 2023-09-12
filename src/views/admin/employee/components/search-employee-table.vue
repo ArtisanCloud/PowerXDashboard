@@ -62,6 +62,7 @@
             </a-link>
           </template>
         </a-table-column>
+        <a-table-column title="账号" data-index="account" :width="100"/>
         <a-table-column title="性别" :width="75">
           <template #cell="{ record }">
             <span>{{ getGenderLabel(record.gender) }}</span>

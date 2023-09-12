@@ -11,8 +11,8 @@
   "menuWidth": 220,
   "globalSettings": false,
   "device": "desktop",
-  "tabBar": false,
+  "tabBar": true,
   "menuFromServer": false,
-  "menuAccessFromServer": true,
+  "attachRoleToClientMenu": true,
   "serverMenu": []
 }

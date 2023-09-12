@@ -3,10 +3,14 @@ import { Notification } from '@arco-design/web-vue';
 import type { NotificationReturn } from '@arco-design/web-vue/es/notification/interface';
 import type { RouteRecordNormalized } from 'vue-router';
 import defaultSettings from '@/config/settings.json';
-import { menuRoutes } from '@/router/routes';
-import { getMenuList, getMenuRoles } from '@/api/userinfo';
-import { isEmpty } from 'lodash';
+import { getMenuList } from '@/api/userinfo';
 import { AppState } from './types';
+
+const sessionPrefix = 'app';
+
+function formatSessionKey(key: string) {
+  return `${sessionPrefix}:${key}`;
+}
 
 const useAppStore = defineStore('app', {
   state: (): AppState => ({ ...defaultSettings }),
@@ -24,13 +28,13 @@ const useAppStore = defineStore('app', {
   },
 
   actions: {
-    // Update app settings
+    // 更新应用设置
     updateSettings(partial: Partial<AppState>) {
-      // @ts-ignore-next-line
+      // @ts-ignore
       this.$patch(partial);
     },
 
-    // Change theme color
+    // 切换主题颜色
     toggleTheme(dark: boolean) {
       if (dark) {
         this.theme = 'dark';
@@ -40,92 +44,41 @@ const useAppStore = defineStore('app', {
         document.body.removeAttribute('arco-theme');
       }
     },
+    // 切换设备
     toggleDevice(device: string) {
       this.device = device;
     },
+    // 切换菜单显示
     toggleMenu(value: boolean) {
       this.hideMenu = value;
     },
+    // 获取服务器菜单配置
     async fetchServerMenuConfig() {
       let notifyInstance: NotificationReturn | null = null;
       try {
         notifyInstance = Notification.info({
-          id: 'menuNotice', // Keep the instance id the same
-          content: 'loading',
+          id: 'menuNotice',
+          content: '加载中',
           closable: true,
         });
         const { data } = await getMenuList();
         this.serverMenu = data;
         notifyInstance = Notification.success({
           id: 'menuNotice',
-          content: 'success',
+          content: '成功',
           closable: true,
         });
       } catch (error) {
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         notifyInstance = Notification.error({
           id: 'menuNotice',
-          content: 'error',
+          content: '错误',
           closable: true,
         });
       }
     },
+    // 清除服务器菜单
     clearServerMenu() {
       this.serverMenu = [];
-    },
-    async fetchServerMenuRoles() {
-      try {
-        const { data } = await getMenuRoles();
-
-        if (data === null || isEmpty(data.menuRoles)) {
-          this.serverMenu = menuRoutes;
-          return;
-        }
-
-        const map = new Map(
-          data.menuRoles.map((v) => [v.menuName, v.allowRoleCodes])
-        );
-
-        const setRoles = (menuRoute: RouteRecordNormalized) => {
-          const menuName = menuRoute.name as string;
-
-          if (map.has(menuName)) {
-            menuRoute.meta.roles = map.get(menuName);
-          } else {
-            menuRoute.meta.roles = undefined;
-          }
-
-          const rSet = new Set();
-
-          if (menuRoute.children && menuRoute.children.length > 0) {
-            menuRoute.children.forEach((v: any) => {
-              setRoles(v);
-
-              v.meta?.roles?.forEach((r: string) => {
-                rSet.add(r);
-              });
-            });
-
-            menuRoute.meta?.roles?.forEach((r) => {
-              rSet.add(r);
-            });
-
-            menuRoute.meta.roles = Array.from(rSet) as string[];
-          }
-        };
-
-        this.serverMenu = menuRoutes.map((m) => {
-          setRoles(m);
-          return m;
-        });
-      } catch (error) {
-        Notification.error({
-          id: 'menuNotice',
-          content: '获取菜单权限失败',
-          closable: true,
-        });
-        this.serverMenu = menuRoutes;
-      }
     },
   },
 });

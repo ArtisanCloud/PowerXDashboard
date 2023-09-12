@@ -4,6 +4,8 @@ import {
   DEFAULT_ROUTE,
   DEFAULT_ROUTE_NAME,
   EMPTY_LAYOUT_NAME,
+  LOGIN_ROUTE_NAME,
+  NOT_FOUND_ROUTE_NAME,
   REDIRECT_ROUTE_NAME,
 } from '@/router/constants';
 import { isString } from '@/utils/is';
@@ -20,7 +22,7 @@ const formatTag = (route: RouteLocationNormalized): TagProps => {
   };
 };
 
-const BAN_LIST = [REDIRECT_ROUTE_NAME];
+const BAN_LIST = [REDIRECT_ROUTE_NAME, NOT_FOUND_ROUTE_NAME, LOGIN_ROUTE_NAME];
 
 const useAppStore = defineStore('tabBar', {
   state: (): TabBarState => ({

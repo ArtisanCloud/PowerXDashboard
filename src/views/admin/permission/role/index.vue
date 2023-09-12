@@ -27,16 +27,16 @@
                     </template>
                   </a-button>
                 </a-tooltip>
-                <!-- 编辑员工按钮 -->
-                <a-tooltip content="分配员工">
-                  <a-button @click="editEmployeeOnClick(record.roleCode)">
-                    <template #icon>
-                      <icon-user
-                        :style="{ fontSize: '16px', color: 'green' }"
-                      />
-                    </template>
-                  </a-button>
-                </a-tooltip>
+                <!--                &lt;!&ndash; 编辑员工按钮 &ndash;&gt;-->
+                <!--                <a-tooltip content="分配员工">-->
+                <!--                  <a-button @click="editEmployeeOnClick(record.roleCode)">-->
+                <!--                    <template #icon>-->
+                <!--                      <icon-user-->
+                <!--                        :style="{ fontSize: '16px', color: 'green' }"-->
+                <!--                      />-->
+                <!--                    </template>-->
+                <!--                  </a-button>-->
+                <!--                </a-tooltip>-->
               </a-space>
             </template>
           </a-table-column>

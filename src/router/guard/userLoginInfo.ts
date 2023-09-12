@@ -10,37 +10,43 @@ export default function setupUserLoginInfoGuard(router: Router) {
     const userStore = useUserStore();
     const optionsStore = useOptionsStore();
     if (isLogin()) {
-      if (userStore.id !== undefined) {
-        next();
-      } else {
+      const checkInfo = async () => {
+        if (userStore.id !== undefined) {
+          return true;
+        }
         try {
           await userStore.info();
-          next();
+          return true;
         } catch (error) {
           await userStore.logout();
-          next({
-            name: 'login',
-            query: {
-              redirect: to.name,
-              ...to.query,
-            } as LocationQueryRaw,
-          });
+          return false;
         }
+      };
+
+      if (!(await checkInfo())) {
+        next({
+          name: 'Login',
+          query: {
+            redirect: to.name,
+            ...to.query,
+          } as LocationQueryRaw,
+        });
+        return;
       }
 
-      // init options after login
+      // 登陆后获取全局选项
       if (!optionsStore.isSetup()) {
-        optionsStore.fetchAllOptions().then(() => {
-          // do something when options is ready
-        });
+        await optionsStore.fetchAllOptions();
       }
+
+      next();
     } else {
-      if (to.name === 'login') {
+      if (to.name === 'Login') {
         next();
         return;
       }
       next({
-        name: 'login',
+        name: 'Login',
         query: {
           redirect: to.name,
           ...to.query,

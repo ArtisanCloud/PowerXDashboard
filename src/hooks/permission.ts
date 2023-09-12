@@ -4,6 +4,7 @@ import { useUserStore } from '@/store';
 export default function usePermission() {
   const userStore = useUserStore();
 
+  // 检查用户是否具有访问特定路由的权限
   function hasAccess(
     userRoles: string[] | undefined,
     routeRoles: string[]
@@ -14,6 +15,7 @@ export default function usePermission() {
     );
   }
 
+  // 在给定的路由列表中查找用户可以访问的第一个路由
   function findAccessibleRoute(
     routes: RouteRecordRaw[],
     userRoles: string[]
@@ -32,7 +34,9 @@ export default function usePermission() {
     }, null as any);
   }
 
+  // 返回一个对象，包含两个方法：accessRouter 和 findFirstPermissionRoute
   return {
+    // 检查用户是否具有访问特定路由的权限
     accessRouter(route: RouteLocationNormalized | RouteRecordRaw): boolean {
       const { account, roles } = userStore;
 
@@ -44,6 +48,7 @@ export default function usePermission() {
       );
     },
 
+    // 在给定的路由列表中查找用户可以访问的第一个路由
     findFirstPermissionRoute(
       routers: RouteRecordRaw[],
       userRoles: string[] = []
