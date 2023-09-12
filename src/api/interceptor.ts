@@ -42,10 +42,6 @@ if (import.meta.env.VITE_API_BASE_URL) {
 
 axios.interceptors.request.use(
   (config: AxiosRequestConfig) => {
-    // let each request carry token
-    // this example using the JWT token
-    // Authorization is a custom headers key
-    // please modify it according to the actual situation
     const token = getToken();
     if (token) {
       if (!config.headers) {
@@ -56,27 +52,50 @@ axios.interceptors.request.use(
     return config;
   },
   (error) => {
-    // do something
+    Message.error({
+      content: '网络错误, 无法连接到远程服务器',
+      duration: 5 * 1000,
+    });
     return Promise.reject(error);
   }
 );
 // add response interceptors
 axios.interceptors.response.use(
   (res) => {
-    if (res.status !== 200) {
+    // 如果返回 2xx, 则直接返回数据
+    if (res.status >= 200 && res.status < 300) {
+      return res;
+    }
+    // 如果返回 4xx, 则提示错误
+    if (res.status >= 400 && res.status < 500) {
       Message.error({
-        content: (res.data as ErrorResponse).msg || 'Error',
+        content: (res.data as ErrorResponse).msg || '违规请求',
         duration: 5 * 1000,
       });
       return Promise.reject(
-        new Error((res.data as ErrorResponse).msg || 'Error')
+        new Error((res.data as ErrorResponse).msg || '违规请求')
+      );
+    }
+    // 如果返回 5xx, 则提示错误
+    if (res.status >= 500 && res.status < 600) {
+      Message.error({
+        content:
+          (res.data as ErrorResponse).msg ||
+          '服务器错误, 请稍后重试或联系技术支持',
+        duration: 5 * 1000,
+      });
+      return Promise.reject(
+        new Error(
+          (res.data as ErrorResponse).msg ||
+            '服务器错误, 请稍后重试或联系技术支持'
+        )
       );
     }
     return res;
   },
   (error) => {
     Message.error({
-      content: error.response.data.msg || 'Request Error',
+      content: error.response.data.msg || '请求错误',
       duration: 5 * 1000,
     });
     return Promise.reject(error);

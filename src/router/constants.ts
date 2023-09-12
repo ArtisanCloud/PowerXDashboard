@@ -9,6 +9,9 @@ export const NOT_FOUND = {
 };
 
 export const REDIRECT_ROUTE_NAME = 'Redirect';
+export const NOT_FOUND_ROUTE_NAME = 'NotFound';
+
+export const LOGIN_ROUTE_NAME = 'Login';
 
 export const DEFAULT_ROUTE_NAME = 'HomeIndex';
 
