@@ -22,7 +22,6 @@ export default function setupUserLoginInfoGuard(router: Router) {
             name: 'login',
             query: {
               redirect: to.name,
-              ...to.query,
             } as LocationQueryRaw,
           });
         }

@@ -1,17 +1,23 @@
-import { computed } from 'vue';
+import { computed, ref, watchEffect } from 'vue';
 import { RouteRecordRaw, RouteRecordNormalized } from 'vue-router';
 import usePermission from '@/hooks/permission';
 import { useAppStore } from '@/store';
 import appClientMenus from '@/router/app-menus';
+import { withRoleClientMenu } from '@/router/app-menus/with-menu-role';
 
 export default function useMenuTree() {
   const permission = usePermission();
   const appStore = useAppStore();
-  const appRoute = computed(() => {
-    if (appStore.menuFromServer || appStore.menuAccessFromServer) {
-      return appStore.appAsyncMenus;
+  const appRoute = ref([] as unknown[]);
+
+  watchEffect(async () => {
+    if (appStore.menuFromServer) {
+      appRoute.value = appStore.appAsyncMenus;
+    } else if (appStore.attachRoleToClientMenu) {
+      appRoute.value = await withRoleClientMenu(appClientMenus);
+    } else {
+      appRoute.value = appClientMenus;
     }
-    return appClientMenus;
   });
   const menuTree = computed(() => {
     const copyRouter = JSON.parse(JSON.stringify(appRoute.value));

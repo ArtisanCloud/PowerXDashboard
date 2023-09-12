@@ -15,7 +15,7 @@ export interface AppState {
   device: string;
   tabBar: boolean;
   menuFromServer: boolean;
-  menuAccessFromServer: boolean;
+  attachRoleToClientMenu: boolean;
   serverMenu: RouteRecordNormalized[];
 
   [key: string]: unknown;
