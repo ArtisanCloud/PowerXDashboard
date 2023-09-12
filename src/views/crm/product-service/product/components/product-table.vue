@@ -271,9 +271,6 @@
   defineExpose({ fetchProductList });
 
   onMounted(() => {
-    options.fetchProductTypeOptions();
-    options.fetchProductPlanOptions();
-
     fetchProductList({});
   });
 </script>

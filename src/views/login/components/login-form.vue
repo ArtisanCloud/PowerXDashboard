@@ -125,6 +125,7 @@
           });
         })
         .catch(() => {
+          errorMessage.value = t('login.form.login.errMsg');
           setLoading(false);
         });
     }

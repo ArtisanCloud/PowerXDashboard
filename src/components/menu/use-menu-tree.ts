@@ -3,7 +3,7 @@ import { RouteRecordRaw, RouteRecordNormalized } from 'vue-router';
 import usePermission from '@/hooks/permission';
 import { useAppStore } from '@/store';
 import appClientMenus from '@/router/app-menus';
-import { withRoleClientMenu } from '@/router/app-menus/with-menu-role';
+import withRoleClientMenu from '@/components/menu/with-menu-role';
 
 export default function useMenuTree() {
   const permission = usePermission();

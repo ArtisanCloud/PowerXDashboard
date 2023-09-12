@@ -52,6 +52,10 @@ axios.interceptors.request.use(
     return config;
   },
   (error) => {
+    Message.error({
+      content: '网络错误, 无法连接到远程服务器',
+      duration: 5 * 1000,
+    });
     return Promise.reject(error);
   }
 );
@@ -90,7 +94,6 @@ axios.interceptors.response.use(
     return res;
   },
   (error) => {
-    console.log(error);
     Message.error({
       content: error.response.data.msg || '请求错误',
       duration: 5 * 1000,

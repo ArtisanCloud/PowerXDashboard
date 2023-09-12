@@ -23,7 +23,6 @@
   import type { RouteLocationNormalized } from 'vue-router';
   import { listenerRouteChange } from '@/utils/route-listener';
   import { useAppStore, useTabBarStore } from '@/store';
-  // eslint-disable-next-line import/no-self-import
   import tabItem from './tab-item.vue';
 
   const appStore = useAppStore();

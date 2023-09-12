@@ -2,8 +2,6 @@ import { getMenuRoles } from '@/api/userinfo';
 import { RouteRecordNormalized } from 'vue-router';
 import { appRoutes } from '@/router/routes';
 import router from '@/router';
-import { cloneDeep } from 'lodash';
-import { ex } from '@fullcalendar/core/internal-common';
 
 const sessionPrefix = 'menu';
 
@@ -11,7 +9,7 @@ function formatSessionKey(key: string) {
   return `${sessionPrefix}:${key}`;
 }
 
-export async function withRoleClientMenu(clientMenus: any[]) {
+export default async function withRoleClientMenu(clientMenus: any[]) {
   let menuRoles: any[] = [];
   // 检查 sessionStorage 中是否存在菜单角色缓存
   const menuRolesCache = sessionStorage.getItem(formatSessionKey('menu-roles'));
@@ -68,8 +66,4 @@ export async function withRoleClientMenu(clientMenus: any[]) {
   );
 
   return withRoleClientMenus;
-}
-
-export function isClientMenuSetup() {
-  return sessionStorage.getItem(formatSessionKey('menu-roles')) !== null;
 }
