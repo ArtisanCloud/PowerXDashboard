@@ -8,8 +8,8 @@
           </a-col>
           <a-col flex="1">
             <h2>{{ data.name }}</h2>
-            <a-form-item label="用户名">
-              <span>{{ data.name }}</span>
+            <a-form-item label="账户">
+              <span>{{ data.account }}</span>
             </a-form-item>
             <a-form-item label="邮箱地址">
               <span>{{ data.email }}</span>

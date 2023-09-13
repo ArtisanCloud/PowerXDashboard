@@ -83,8 +83,8 @@
 
   const loginConfig = useStorage('login-config', {
     rememberPassword: true,
-    userName: 'root',
-    password: 'root',
+    userName: undefined,
+    password: undefined,
   });
   const userInfo = reactive({
     userName: loginConfig.value.userName,
@@ -125,6 +125,7 @@
           });
         })
         .catch(() => {
+          errorMessage.value = t('login.form.login.errMsg');
           setLoading(false);
         });
     }

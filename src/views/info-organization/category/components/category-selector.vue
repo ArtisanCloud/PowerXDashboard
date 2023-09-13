@@ -2,7 +2,7 @@
   <div>
     <a-transfer
       :data="state.transferData"
-      :default-value="props.defaultValue"
+      :default-value="props.defaultValue!"
       @change="changeCategory"
     >
       <template #source="{ data, selectedKeys, onSelect }">
@@ -20,10 +20,7 @@
 
 <script lang="ts" setup>
   import { onMounted, PropType, reactive, ref, watch } from 'vue';
-  import {
-    getCategoryTree,
-    ProductCategory,
-  } from '@/api/crm/product-service/category';
+  import { getCategoryTree, Category } from '@/api/info-organization/category';
 
   const props = defineProps({
     defaultValue: {
@@ -34,7 +31,7 @@
 
   const loading = ref(false);
   const state = reactive({
-    categoryTree: [] as ProductCategory[],
+    categoryTree: [] as Category[],
     transferData: [] as any[],
     loading: false,
     categoryIds: [],
@@ -55,12 +52,12 @@
     return transferDataSource;
   };
 
-  const getTreeData = (data: ProductCategory[] = []) => {
+  const getTreeData = (data: Category[] = []) => {
     const values = data.map((item: any) => item.value);
 
     const travel = (_treeData: any[] = []) => {
       const treeDataSource: any[] = [];
-      _treeData.forEach((item: ProductCategory) => {
+      _treeData.forEach((item: Category) => {
         // console.log(item, item.children, values.includes(item.id));
         if (item.children || values.includes(`${item.id}`)) {
           const sourceItem: any = {

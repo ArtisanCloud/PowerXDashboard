@@ -225,8 +225,6 @@
   defineExpose({ fetchTokenProductList });
 
   onMounted(() => {
-    options.fetchProductTypeOptions();
-
     fetchTokenProductList({});
   });
 </script>
