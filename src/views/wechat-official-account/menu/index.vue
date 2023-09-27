@@ -1,13 +1,12 @@
 <template>
   <div class="content">
-    <custom-menu @submit-data="subMenuData" />
+    <w-offi-account-menu @submit-data="subMenuData" />
   </div>
 </template>
 
 <script lang="ts" setup>
   import { onMounted } from 'vue';
-  import { CustomMenu } from '@yaoyaochi/weyui/';
-  import '@yaoyaochi/weyui/style.css';
+  import { WOffiAccountMenu } from '@yaoyaochi/weyui';
 
   const subMenuData = async (menuData: any) => {
     console.log(menuData);

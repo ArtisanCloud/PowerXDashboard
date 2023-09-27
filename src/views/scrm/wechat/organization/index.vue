@@ -6,7 +6,7 @@
  * @LastEditTime: 2023-08-17 14:18:06
 -->
 <template>
-  <a-card>
+  <div class="content">
     <a-table
       :data="departmentTree.list"
       :loading="state.loading"
@@ -32,7 +32,7 @@
         <a-table-column title="备注" data-index="remark" />
       </template>
     </a-table>
-  </a-card>
+  </div>
 </template>
 
 <script lang="ts" setup>

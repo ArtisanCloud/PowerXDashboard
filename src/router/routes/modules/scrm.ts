@@ -9,7 +9,7 @@ const Scrm: AppRouteRecordRaw = {
     order: 3,
     locale: 'menu.scrm',
     requiresAuth: true,
-    icon: 'icon-wework',
+    icon: 'icon-wechat',
   },
   children: [
     {

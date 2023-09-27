@@ -1,5 +1,5 @@
 <template>
-  <a-card>
+  <div class="content">
     <a-table
       :data="dictionaryItemList"
       :loading="state.loading"
@@ -44,7 +44,7 @@
         @submit-success="refreshDictionaryItemList"
       />
     </a-drawer>
-  </a-card>
+  </div>
 </template>
 
 <script lang="tsx" setup>

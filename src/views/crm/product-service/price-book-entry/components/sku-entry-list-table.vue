@@ -1,5 +1,5 @@
 <template>
-  <a-card>
+  <div class="content">
     <a-table
       :data="formSKUEntryList"
       :loading="state.loading"
@@ -23,7 +23,7 @@
         <a-input-number v-model="formSKUEntryList[rowIndex].listPrice" />
       </template>
     </a-table>
-  </a-card>
+  </div>
 </template>
 
 <script lang="ts" setup>
