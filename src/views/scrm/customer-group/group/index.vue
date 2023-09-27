@@ -6,7 +6,7 @@
  * @LastEditTime: 2023-07-10 22:23:50
 -->
 <template>
-  <a-card>
+  <div class="content">
     <a-form
       :model="customersParams"
       layout="vertical"
@@ -117,7 +117,7 @@
         @submit-success="handleSendSuccess"
       ></SendMessage>
     </a-drawer>
-  </a-card>
+  </div>
 </template>
 
 <script lang="ts" setup>

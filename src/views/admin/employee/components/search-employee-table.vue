@@ -1,5 +1,5 @@
 <template>
-  <a-card>
+  <div class="content">
     <a-form class="inline-query-form" layout="inline" :model="queryForm">
       <a-form-item label="用户名">
         <a-input v-model="queryForm.likeName" @change="queryChange" />
@@ -62,7 +62,7 @@
             </a-link>
           </template>
         </a-table-column>
-        <a-table-column title="账号" data-index="account" :width="100"/>
+        <a-table-column title="账号" data-index="account" :width="100" />
         <a-table-column title="性别" :width="75">
           <template #cell="{ record }">
             <span>{{ getGenderLabel(record.gender) }}</span>
@@ -134,7 +134,7 @@
         </a-table-column>
       </template>
     </a-table>
-  </a-card>
+  </div>
 </template>
 
 <script lang="ts" setup>

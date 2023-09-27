@@ -6,7 +6,7 @@
  * @LastEditTime: 2023-08-02 17:22:37
 -->
 <template>
-  <a-card>
+  <div class="content">
     <a-form
       :model="qrcodeParams"
       layout="vertical"
@@ -236,7 +236,7 @@
         frameborder="0"
       ></iframe>
     </a-drawer>
-  </a-card>
+  </div>
 </template>
 
 <script lang="ts" setup>

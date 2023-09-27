@@ -6,7 +6,7 @@
  * @LastEditTime: 2023-07-10 11:09:04
 -->
 <template>
-  <a-card>
+  <div class="content">
     <a-table
       :data="customersList.list"
       :loading="state.loading"
@@ -65,7 +65,7 @@
         @submit-success="handleSendSuccess"
       ></send-message>
     </a-drawer>
-  </a-card>
+  </div>
 </template>
 
 <script lang="ts" setup>
@@ -93,7 +93,7 @@
   }
   const handleSendMsg = (item: any) => {
     state.visible = true;
-    agentid.value =Number(item.agentid);
+    agentid.value = Number(item.agentid);
   };
 
   const handleSendSuccess = () => {

@@ -95,6 +95,9 @@ export default {
   'menu.scrm.sessionArchive': 'Session Archive',
   'menu.scrm.smartCS': 'Smart Customer Service',
 
+  'menu.wechat.official': 'Wechat Official Account',
+  'menu.wechat.official.menu': 'Menu',
+
   'menu.infoOrganization.index': 'Info Organization',
 
   ...localeSettings,

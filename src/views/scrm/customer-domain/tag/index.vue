@@ -6,7 +6,7 @@
  * @LastEditTime: 2023-07-30 23:13:38
 -->
 <template>
-  <a-card>
+  <div class="content">
     <a-form
       :model="tagParams"
       layout="vertical"
@@ -180,7 +180,7 @@
     >
       <add-tag @submit-success="handleAddSuccess"></add-tag>
     </a-drawer>
-  </a-card>
+  </div>
 </template>
 
 <script lang="ts" setup>
