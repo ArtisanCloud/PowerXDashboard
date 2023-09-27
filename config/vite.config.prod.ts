@@ -7,7 +7,6 @@ import configImageminPlugin from './plugin/imagemin';
 
 export default mergeConfig(
   {
-    // base: './',
     mode: 'production',
     plugins: [
       configCompressPlugin('gzip'),
@@ -16,6 +15,10 @@ export default mergeConfig(
       configImageminPlugin(),
     ],
     build: {
+      minify: {
+        keep_classnames: true,
+        keep_fnames: true,
+      },
       rollupOptions: {
         output: {
           manualChunks: {

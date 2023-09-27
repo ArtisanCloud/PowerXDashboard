@@ -1,6 +1,6 @@
 export const WHITE_LIST = [
-  { name: 'notFound', children: [] },
-  { name: 'login', children: [] },
+  { name: 'NotFound', children: [] },
+  { name: 'Login', children: [] },
   { name: 'Home', children: ['HomeIndex'] },
 ];
 
