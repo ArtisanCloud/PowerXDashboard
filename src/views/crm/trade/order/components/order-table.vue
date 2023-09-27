@@ -1,5 +1,5 @@
 <template>
-  <a-card>
+  <div class="content">
     <a-table
       :data="orderList"
       :loading="state.loading"
@@ -76,7 +76,7 @@
         @submit-success="fetchOrderList"
       />
     </a-drawer>
-  </a-card>
+  </div>
 </template>
 
 <script lang="ts" setup>

@@ -9,6 +9,8 @@ export default mergeConfig(
   {
     mode: 'development',
     server: {
+      host: loadedEnv.VITE_WEB_HOST ?? '0.0.0.0',
+      port: loadedEnv.VITE_WEB_PORT ?? '8080',
       open: true,
       fs: {
         strict: true,

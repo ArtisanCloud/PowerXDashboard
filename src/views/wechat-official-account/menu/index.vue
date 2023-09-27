@@ -1,8 +1,6 @@
 <template>
   <div class="content">
-    <a-card class="card">
-      <custom-menu @submit-data="subMenuData" />
-    </a-card>
+    <custom-menu @submit-data="subMenuData" />
   </div>
 </template>
 
@@ -21,8 +19,5 @@
 <style scoped lang="less">
   .content {
     padding: 20px;
-    .card {
-      padding: 20px;
-    }
   }
 </style>
