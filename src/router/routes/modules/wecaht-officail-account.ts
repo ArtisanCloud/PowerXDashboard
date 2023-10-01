@@ -1,4 +1,4 @@
-import { DEFAULT_LAYOUT, EMPTY_LAYOUT } from '../base';
+import { DEFAULT_LAYOUT } from '../base';
 import { AppRouteRecordRaw } from '../types';
 
 const OfficialAccount: AppRouteRecordRaw = {
@@ -15,7 +15,7 @@ const OfficialAccount: AppRouteRecordRaw = {
     {
       path: '/wechat-official-account/menu',
       name: 'Wechat Official Account Menu',
-      component: () => import('@/views/wechat-official-account/menu/index.vue'),
+      component: () => import('@/views/wechat/official-account/menu/index.vue'),
       meta: {
         locale: 'menu.wechat.official.menu',
         requiresAuth: true,
