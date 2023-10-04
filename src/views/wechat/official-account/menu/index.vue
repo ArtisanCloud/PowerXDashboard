@@ -28,12 +28,11 @@
   };
 
   const menuDataList = ref<GetOAMenuTreeReply>();
-  const loadOAMenuDataList = async () => {
+  onMounted(async () => {
     const res = await getOAMenuTree();
     menuDataList.value = res.data;
-    console.log(menuDataList.value);
-  };
-  loadOAMenuDataList();
+    // console.log(menuDataList.value);
+  });
 </script>
 
 <style scoped lang="less">

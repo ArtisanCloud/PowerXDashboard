@@ -38,7 +38,7 @@
     "@fullcalendar/timegrid": "^6.1.6",
     "@fullcalendar/vue3": "^6.1.6",
     "@vueuse/core": "^9.3.0",
-    "@yaoyaochi/weyui": "^1.1.8",
+    "@yaoyaochi/weyui": "^1.1.9",
     "axios": "^0.24.0",
     "dayjs": "^1.11.7",
     "echarts": "^5.4.0",
