@@ -1,66 +1,65 @@
 <template>
   <div class="container">
-    <a-form
-      ref="formRef"
-      auto-label-width
-      :model="formModel"
-      @submit="onSubmit"
+    <a-card>
+      <a-space size="large">
+        <a-button type="primary" @click="openAddMGMRule()"
+          >新增MGM规则
+        </a-button>
+      </a-space>
+    </a-card>
+    <br />
+    <a-card>
+      <MGMRuleTable ref="RefMGMRuleTable" />
+    </a-card>
+    <a-drawer
+      v-model:visible="state.createMGMRule.visible"
+      width="500px"
+      ok-text="关闭抽屉"
+      :hide-cancel="true"
     >
-      <a-form-item label="首级介绍人分佣比例" field="title">
-        <a-input-number v-model="formModel.commissionRate1" />
-      </a-form-item>
-      <a-form-item label="一级介绍人分佣比例" field="title">
-        <a-input-number v-model="formModel.commissionRate2" />
-      </a-form-item>
-    </a-form>
+      <CreateMGMRule
+        v-if="state.createMGMRule.visible"
+        @submit-success="refreshMGMRuleList"
+      />
+    </a-drawer>
   </div>
 </template>
 
 <script lang="ts" setup>
-  import { onMounted, reactive, ref } from 'vue';
-  import { Media } from '@/api/crm/market/media';
-  import { configMGM, fetchMGMConfig, MGMConfig } from '@/api/crm/market/mgm';
-  import { Message } from '@arco-design/web-vue';
+  import { reactive, ref } from 'vue';
+  import { DefaultPageSize } from '@/api';
+  import MGMRuleTable from '@/views/crm/market/mgm/components/mgm-table.vue';
+  import CreateMGMRule from '@/views/crm/market/mgm/components/create-mgm.vue';
 
-  const formRef = ref();
-  const formModel = ref({
-    id: 0,
-    commissionRate1: 0,
-    commissionRate2: 0,
-  } as MGMConfig);
+  const RefMGMRuleTable = ref<any>();
 
   const state = reactive({
-    config: {} as MGMConfig,
-    submitLoading: false,
+    createMGMRule: {
+      visible: false,
+      parentNode: {},
+    },
   });
 
-  const onSubmit = async () => {
-    if (state.submitLoading) {
-      return;
-    }
-    const err = await formRef.value.validate();
-    if (err) {
-      return;
-    }
-    state.submitLoading = true;
-    configMGM(formModel.value)
-      .then(() => {
-        Message.success('创建成功');
-      })
-      .catch(() => {})
-      .finally(() => {
-        state.submitLoading = false;
-      });
+  const openAddMGMRule = () => {
+    state.createMGMRule.visible = true;
   };
 
-  onMounted(() => {
-    fetchMGMConfig();
+  const pagination = reactive({
+    'total': 0,
+    'currentPage': 0,
+    'pageSize': DefaultPageSize,
+    'show-more': true,
+    'show-total': true,
+    'show-jumper': true,
+    'show-page-size': true,
   });
+
+  const refreshMGMRuleList = () => {
+    RefMGMRuleTable.value.fetchMGMRuleList({
+      pageIndex: pagination.currentPage,
+      pageSize: pagination.pageSize,
+    });
+  };
 </script>
 
-<style scoped>
-  .content {
-    width: 600px;
-    margin: 20px 60px;
-  }
-</style>
+<style scoped></style>

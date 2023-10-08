@@ -1,6 +1,6 @@
 <template>
   <div class="tab-bar-container">
-    <a-affix ref="affixRef" :offset-top="offsetTop">
+    <a-affix ref="affixRef" :offset-top="offsetTop()">
       <div class="tab-bar-box">
         <div class="tab-bar-scroll">
           <div class="tags-wrap">

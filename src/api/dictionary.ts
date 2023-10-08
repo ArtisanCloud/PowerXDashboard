@@ -14,6 +14,7 @@ export const PromoteChannelsDDType = '_promote_channel';
 export const SourceTypesDDType = '_source_channel';
 export const ArtisanLevelDDType = '_artisan_level';
 export const MediaTypeDDType = '_media_type';
+export const MGMSceneDDType = '_mgm_scene';
 export const OrderTypeDDType = '_order_type';
 export const OrderStatusDDType = '_order_status';
 export const PaymentTypeDDType = '_payment_type';
