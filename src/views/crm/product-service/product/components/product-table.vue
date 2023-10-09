@@ -50,14 +50,20 @@
             "
           >
             <template #icon>
-              <icon-list :style="{ fontSize: '16px', color: '#d7ee8f' }" />
+              <icon-list :style="{ fontSize: '16px', color: 'green' }" />
             </template>
           </a-button>
 
           <!--配置价格按钮-->
           <a-button title="配置价格" @click="openPriceBookEntry(record)">
             <template #icon>
-              <icon-book :style="{ fontSize: '16px', color: '#d7ee8f' }" />
+              <icon-book :style="{ fontSize: '16px', color: 'green' }" />
+            </template>
+          </a-button>
+          <!--配置统计数量-->
+          <a-button title="配置统计数量" @click="openStatistics(record)">
+            <template #icon>
+              <icon-archive :style="{ fontSize: '16px', color: 'green' }" />
             </template>
           </a-button>
 
@@ -88,6 +94,17 @@
         @submit-success="fetchProductList"
       />
     </a-drawer>
+    <a-drawer
+      v-model:visible="state.editProductStatistics.visible"
+      width="500px"
+      ok-text="关闭抽屉"
+      :hide-cancel="true"
+    >
+      <EditProductStatistics
+        v-if="state.editProductStatistics.visible"
+        :node="state.editProductStatistics.node"
+      />
+    </a-drawer>
 
     <a-modal
       v-model:visible="state.createPriceBookEntry.visible"
@@ -112,13 +129,14 @@
     ListProductPageRequest,
   } from '@/api/crm/product-service/product';
 
+  import CreatePriceBookEntry from '@/views/crm/product-service/price-book-entry/components/create-price-book-entry.vue';
   import EditProduct from '@/views/crm/product-service/product/components/edit-product.vue';
+  import EditProductStatistics from '@/views/crm/product-service/product/components/edit-product-statistics.vue';
   import { Message } from '@arco-design/web-vue';
 
   import useOptionsStore from '@/store/modules/data-dictionary';
   import { dayjs } from '@arco-design/web-vue/es/_utils/date';
   import { DefaultPageSize } from '@/api';
-  import CreatePriceBookEntry from '@/views/crm/product-service/price-book-entry/components/create-price-book-entry.vue';
 
   const options = useOptionsStore();
 
@@ -212,6 +230,10 @@
       visible: false,
       node: {} as Product,
     },
+    editProductStatistics: {
+      visible: false,
+      node: {} as Product,
+    },
     createPriceBookEntry: {
       visible: false,
     },
@@ -237,10 +259,15 @@
     }
   };
 
-  const openEditProduct = (cat: Product) => {
+  const openEditProduct = (product: Product) => {
     // console.log(cat)
-    state.editProduct.node = cat;
+    state.editProduct.node = product;
     state.editProduct.visible = true;
+  };
+
+  const openStatistics = (product: Product) => {
+    state.editProductStatistics.node = product;
+    state.editProductStatistics.visible = true;
   };
 
   const deleteProductById = async (bookId: number) => {
