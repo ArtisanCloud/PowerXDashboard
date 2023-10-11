@@ -92,13 +92,21 @@
           appStore.updateSettings({ menuCollapse: val });
       };
 
+      const getIcon = (iconName: string) => {
+        if (iconName.startsWith('iconfont-')) {
+          return h(
+            compile(`<icon-font type="${iconName.replace('iconfont-', '')}"/>`)
+          );
+        }
+        return h(compile(`<${iconName}/>`));
+      };
+
       const renderSubMenu = () => {
         function travel(_route: RouteRecordRaw[], nodes = []) {
           if (_route) {
             _route.forEach((element) => {
-              // This is demo, modify nodes as needed
               const icon = element?.meta?.icon
-                ? () => h(compile(`<${element?.meta?.icon}/>`))
+                ? getIcon(element?.meta?.icon)
                 : null;
               const node =
                 element?.children && element?.children.length !== 0 ? (
