@@ -2,6 +2,8 @@ import { createApp } from 'vue';
 import ArcoVue from '@arco-design/web-vue';
 import ArcoVueIcon from '@arco-design/web-vue/es/icon';
 import globalComponents from '@/components';
+import WujieVue from 'wujie-vue3';
+import { loadPluginRoutes } from '@/router/routes';
 import router from './router';
 import store from './store';
 import i18n from './locale';
@@ -22,5 +24,8 @@ app.use(store);
 app.use(i18n);
 app.use(globalComponents);
 app.use(directive);
+app.use(WujieVue);
 
 app.mount('#app');
+
+loadPluginRoutes(router);
