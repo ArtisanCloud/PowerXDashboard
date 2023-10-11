@@ -26,6 +26,14 @@ export default mergeConfig(
           target: loadedEnv.VITE_OSS_URL ?? 'http://localhost:9001',
           changeOrigin: true,
         },
+        '/api/plugin': {
+          target: 'http://localhost:8888',
+          changeOrigin: true,
+        },
+        '/plugin': {
+          target: 'http://localhost:8888',
+          changeOrigin: true,
+        },
       },
     },
     plugins: [
