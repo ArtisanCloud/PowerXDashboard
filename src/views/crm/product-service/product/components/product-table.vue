@@ -15,7 +15,10 @@
         <a-typography-text>{{ rowIndex + 1 }}</a-typography-text>
       </template>
       <template #coverURL="{ record }">
-        <a-image width="72" :src="record.coverImages[0]?.url"></a-image>
+        <a-image
+          width="72"
+          :src="record.coverImages ? record.coverImages[0]?.url : ''"
+        ></a-image>
       </template>
 
       <template #type="{ record }">
@@ -67,6 +70,19 @@
             </template>
           </a-button>
 
+          <!--下架产品按钮-->
+          <a-popconfirm
+            content="确定要下架此产品吗？"
+            @ok="onDisableProductById(record.id)"
+          >
+            <a-button v-if="record.isActivated" title="下架">
+              <template #icon>
+                <icon-eye-invisible
+                  :style="{ fontSize: '16px', color: 'red' }"
+                />
+              </template>
+            </a-button>
+          </a-popconfirm>
           <!--删除产品按钮-->
           <a-popconfirm
             content="确定要删除此产品吗？"
@@ -84,6 +100,7 @@
 
     <a-drawer
       v-model:visible="state.editProduct.visible"
+      :mask-closable="false"
       width="800px"
       ok-text="关闭抽屉"
       :hide-cancel="true"
@@ -96,6 +113,7 @@
     </a-drawer>
     <a-drawer
       v-model:visible="state.editProductStatistics.visible"
+      :mask-closable="false"
       width="500px"
       ok-text="关闭抽屉"
       :hide-cancel="true"
@@ -127,6 +145,7 @@
     deleteProduct,
     Product,
     ListProductPageRequest,
+    disableProductById,
   } from '@/api/crm/product-service/product';
 
   import CreatePriceBookEntry from '@/views/crm/product-service/price-book-entry/components/create-price-book-entry.vue';
@@ -140,7 +159,7 @@
 
   const options = useOptionsStore();
 
-  const productList = ref<Product[]>([]);
+  const productList = ref([] as Product[]);
 
   const columns = reactive([
     {
@@ -270,9 +289,24 @@
     state.editProductStatistics.visible = true;
   };
 
-  const deleteProductById = async (bookId: number) => {
+  const onDisableProductById = async (productId: number) => {
     try {
-      const rep = await deleteProduct({ id: bookId });
+      const rep = await disableProductById({ id: productId });
+      if (rep.data.id && rep.data.id > 0) {
+        Message.success('下架成功');
+        await fetchProductList({
+          pageIndex: pagination.currentPage,
+          pageSize: pagination.pageSize,
+        });
+      }
+    } catch (error) {
+      // console.error(error);
+    }
+  };
+
+  const deleteProductById = async (productId: number) => {
+    try {
+      const rep = await deleteProduct({ id: productId });
       if (rep.data.id && rep.data.id > 0) {
         Message.success('删除成功');
         await fetchProductList({
