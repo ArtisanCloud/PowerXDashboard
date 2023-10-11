@@ -73,7 +73,7 @@
           <!--下架产品按钮-->
           <a-popconfirm
             content="确定要下架此产品吗？"
-            @ok="disableProductById(record.id)"
+            @ok="onDisableProductById(record.id)"
           >
             <a-button v-if="record.isActivated" title="下架">
               <template #icon>
@@ -145,6 +145,7 @@
     deleteProduct,
     Product,
     ListProductPageRequest,
+    disableProductById,
   } from '@/api/crm/product-service/product';
 
   import CreatePriceBookEntry from '@/views/crm/product-service/price-book-entry/components/create-price-book-entry.vue';
@@ -288,16 +289,16 @@
     state.editProductStatistics.visible = true;
   };
 
-  const disableProductById = async (productId: number) => {
+  const onDisableProductById = async (productId: number) => {
     try {
-      // const rep = await disableProductById({ id: productId });
-      // if (rep.data.id && rep.data.id > 0) {
-      //   Message.success('删除成功');
-      //   await fetchProductList({
-      //     pageIndex: pagination.currentPage,
-      //     pageSize: pagination.pageSize,
-      //   });
-      // }
+      const rep = await disableProductById({ id: productId });
+      if (rep.data.id && rep.data.id > 0) {
+        Message.success('下架成功');
+        await fetchProductList({
+          pageIndex: pagination.currentPage,
+          pageSize: pagination.pageSize,
+        });
+      }
     } catch (error) {
       // console.error(error);
     }

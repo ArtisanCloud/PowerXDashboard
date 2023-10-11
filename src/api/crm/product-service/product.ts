@@ -75,7 +75,7 @@ export function listProducts(request: ListProductPageRequest) {
     `${PrefixUriAdmin + UriProduct}/products/page-list`,
     {
       params: request,
-    }
+    },
   );
 }
 
@@ -87,21 +87,36 @@ export type GetProductReply = Product;
 
 export function getProduct(request: GetProductRequest) {
   return axios.get<GetProductReply>(
-    `${PrefixUriAdmin + UriProduct}/products/${request.productId}`
+    `${PrefixUriAdmin + UriProduct}/products/${request.productId}`,
   );
 }
 
 export function createProduct(request: Product) {
   return axios.post<Product>(
     `${PrefixUriAdmin + UriProduct}/products`,
-    request
+    request,
   );
 }
 
 export function updateProduct(request: Product) {
   return axios.put<Product>(
     `${PrefixUriAdmin + UriProduct}/products/${request.id}`,
-    request
+    request,
+  );
+}
+
+export interface DisableProductByIdRequest {
+  id: number;
+}
+
+export interface DisableProductByIdReply {
+  id: number;
+}
+
+export function disableProductById(request: DisableProductByIdRequest) {
+  return axios.put<DisableProductByIdReply>(
+    `${PrefixUriAdmin + UriProduct}/products/disable/${request.id}`,
+    request,
   );
 }
 
@@ -115,6 +130,6 @@ export interface DeleteProductReply {
 
 export function deleteProduct(request: DeleteProductRequest) {
   return axios.delete<DeleteProductReply>(
-    `${PrefixUriAdmin + UriProduct}/products/${request.id}`
+    `${PrefixUriAdmin + UriProduct}/products/${request.id}`,
   );
 }
