@@ -31,7 +31,7 @@ export type GetQrcodeReply = ReplyList;
 export function getQrcodeList(request: GetQrcodeRequest) {
   return axios.post<GetQrcodeReply>(
     `/api/v1/admin/scrm/qrcode/wechat/group/page`,
-    request
+    request,
   );
 }
 
@@ -54,14 +54,14 @@ export interface CreateQrcodeReply {
 export function createQrcode(request: CreateQrcodeRequest) {
   return axios.post<CreateQrcodeReply>(
     `/api/v1/admin/scrm/qrcode/wechat/group/create`,
-    request
+    request,
   );
 }
 
 export function editQrcode(request: CreateQrcodeRequest, qid: string) {
   return axios.patch<CreateQrcodeReply>(
     `/api/v1/admin/scrm/qrcode/wechat/group/update/${qid}`,
-    request
+    request,
   );
 }
 
@@ -71,11 +71,11 @@ export function deleteQrcode(qid: string) {
 
 export function enableQrcode(qid: string) {
   return axios.patch<any>(
-    `/api/v1/admin/scrm/qrcode/wechat/group/enable/${qid}`
+    `/api/v1/admin/scrm/qrcode/wechat/group/enable/${qid}`,
   );
 }
 export function disableQrcode(qid: string) {
   return axios.patch<any>(
-    `/api/v1/admin/scrm/qrcode/wechat/group/disable/${qid}`
+    `/api/v1/admin/scrm/qrcode/wechat/group/disable/${qid}`,
   );
 }

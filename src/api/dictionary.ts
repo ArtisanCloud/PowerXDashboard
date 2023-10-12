@@ -66,7 +66,7 @@ export function listDictionaryTypes(request: ListDictionaryTypesRequest) {
     `${PrefixUriAdmin + UriDateDictionaryApi}/types`,
     {
       params: request,
-    }
+    },
   );
 }
 
@@ -85,7 +85,7 @@ export interface CreateDictionaryTypeReply {
 export function createDictionaryType(request: CreateDictionaryTypeRequest) {
   return axios.post<CreateDictionaryTypeReply>(
     `${PrefixUriAdmin + UriDateDictionaryApi}/types`,
-    request
+    request,
   );
 }
 
@@ -100,7 +100,7 @@ export type UpdateDictionaryTypeReply = DictionaryType;
 export function updateDictionaryType(request: UpdateDictionaryTypeRequest) {
   return axios.put<UpdateDictionaryTypeReply>(
     `${PrefixUriAdmin + UriDateDictionaryApi}/types/${request.type}`,
-    request
+    request,
   );
 }
 
@@ -114,7 +114,7 @@ export interface DeleteDictionaryTypeReply {
 
 export function deleteDictionaryType(request: DeleteDictionaryTypeRequest) {
   return axios.delete<DeleteDictionaryTypeReply>(
-    `${PrefixUriAdmin + UriDateDictionaryApi}/types/${request.type}`
+    `${PrefixUriAdmin + UriDateDictionaryApi}/types/${request.type}`,
   );
 }
 
@@ -131,7 +131,7 @@ export function listDictionaryItems(request: ListDictionaryItemsRequest) {
     `${PrefixUriAdmin + UriDateDictionaryApi}/items`,
     {
       params: request,
-    }
+    },
   );
 }
 
@@ -156,7 +156,7 @@ export interface CreateDictionaryItemReply {
 export function createDictionaryItem(request: CreateDictionaryItemRequest) {
   return axios.post<CreateDictionaryItemReply>(
     `${PrefixUriAdmin + UriDateDictionaryApi}/items/`,
-    request
+    request,
   );
 }
 
@@ -176,7 +176,7 @@ export function updateDictionaryItem(request: UpdateDictionaryItemRequest) {
     `${PrefixUriAdmin + UriDateDictionaryApi}/items/${request.type}/${
       request.key
     }`,
-    request
+    request,
   );
 }
 
@@ -194,6 +194,6 @@ export function deleteDictionaryItem(request: DeleteDictionaryItemRequest) {
   return axios.delete<DeleteDictionaryItemReply>(
     `${PrefixUriAdmin + UriDateDictionaryApi}/items/${request.type}/${
       request.key
-    }`
+    }`,
   );
 }

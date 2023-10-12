@@ -84,7 +84,7 @@
   };
 
   const uploadOrders: (option: RequestOption) => UploadRequest = (
-    option: RequestOption
+    option: RequestOption,
   ) => {
     return uploadOrdersWithTrackingNumbers(option, (data: any) => {
       emits('onImportFinish', data);

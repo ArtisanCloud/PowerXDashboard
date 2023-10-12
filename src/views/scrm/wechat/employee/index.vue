@@ -6,7 +6,7 @@
  * @LastEditTime: 2023-08-24 00:32:21
 -->
 <template>
-  <div class="content">
+  <div class="container">
     <a-row :gutter="{ xs: 8, sm: 16, md: 24, lg: 32 }">
       <a-col
         :xs="24"

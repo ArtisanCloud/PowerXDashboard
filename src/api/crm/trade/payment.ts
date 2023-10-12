@@ -49,21 +49,21 @@ export function listPayments(request: ListPaymentPageRequest) {
     `${PrefixUriAdmin + UriTrade + UriPayment}/page-list`,
     {
       params: request,
-    }
+    },
   );
 }
 
 export function createPayment(request: Payment) {
   return axios.post<Payment>(
     `${PrefixUriAdmin + UriTrade + UriPayment}`,
-    request
+    request,
   );
 }
 
 export function updatePayment(request: Payment) {
   return axios.put<Payment>(
     `${PrefixUriAdmin + UriTrade + UriPayment}/${request.id}`,
-    request
+    request,
   );
 }
 
@@ -77,6 +77,6 @@ export interface DeletePaymentReply {
 
 export function deletePayment(request: DeletePaymentRequest) {
   return axios.delete<DeletePaymentReply>(
-    `${PrefixUriAdmin + UriTrade + UriPayment}/${request.id}`
+    `${PrefixUriAdmin + UriTrade + UriPayment}/${request.id}`,
   );
 }

@@ -49,7 +49,7 @@
   } from '@/api/position';
   import { FieldRule, Message } from '@arco-design/web-vue';
   import { AdminRole, listRoles } from '@/api/permission';
-  import { getOptions } from "@/api/common";
+  import { getOptions } from '@/api/common';
 
   const prop = defineProps({
     positionId: {

@@ -285,7 +285,7 @@
       // console.log(uid, formModel.value.coverImageIdSortIndexes);
       formModel.value.coverImageIdSortIndexes = removeSortItemById(
         formModel.value.coverImageIdSortIndexes!,
-        uid
+        uid,
       );
 
       // 重新编排Sort
@@ -297,7 +297,7 @@
 
   const onChangeCoverImages = async (
     fileList: FileItem[],
-    fileItem: FileItem
+    fileItem: FileItem,
   ) => {
     // console.log(
     //   'onChangeDetailImages',
@@ -308,7 +308,7 @@
 
   const onChangeDetailImages = async (
     fileList: FileItem[],
-    fileItem: FileItem
+    fileItem: FileItem,
   ) => {
     // console.log(
     //   'onChangeDetailImages',
@@ -338,7 +338,7 @@
       // console.log(uid, formModel.value.detailImageIdSortIndexes);
       formModel.value.detailImageIdSortIndexes = removeSortItemById(
         formModel.value.detailImageIdSortIndexes!,
-        uid
+        uid,
       );
 
       // 重新编排Sort
@@ -372,7 +372,7 @@
   };
 
   const uploadCoverImages: (option: RequestOption) => UploadRequest = (
-    option: RequestOption
+    option: RequestOption,
   ) => {
     const { uid } = option.fileItem;
     // console.log(uid);
@@ -400,7 +400,7 @@
   };
 
   const uploadDetailImages: (option: RequestOption) => UploadRequest = (
-    option: RequestOption
+    option: RequestOption,
   ) => {
     const { uid } = option.fileItem;
     // console.log(uid);

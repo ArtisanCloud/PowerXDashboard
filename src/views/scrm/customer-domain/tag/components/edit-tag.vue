@@ -182,6 +182,6 @@
         tagListCopy.value = JSON.parse(JSON.stringify(tagList.value));
       }
     },
-    { deep: true }
+    { deep: true },
   );
 </script>

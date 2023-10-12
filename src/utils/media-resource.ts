@@ -5,7 +5,7 @@ import { uploadMediaResource } from '@/api/media-resource';
 export default function uploadMediaImages(
   option: RequestOption,
   sortIndex: number,
-  onSuccess: (data: any) => void
+  onSuccess: (data: any) => void,
 ): UploadRequest {
   let isAborted = false; // 标记是否中止上传
 

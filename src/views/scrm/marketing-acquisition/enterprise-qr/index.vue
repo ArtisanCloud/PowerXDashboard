@@ -6,7 +6,7 @@
  * @LastEditTime: 2023-08-02 17:22:37
 -->
 <template>
-  <div class="content">
+  <div class="container">
     <a-form
       :model="qrcodeParams"
       layout="vertical"
@@ -400,7 +400,7 @@
       false,
       false,
       0,
-      null
+      null,
     );
     saveLink.dispatchEvent(event);
     setTimeout(() => {

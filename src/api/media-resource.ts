@@ -42,6 +42,6 @@ export function uploadMediaResource(option: any, sortIndex: number) {
   // 发送自定义请求
   return axios.post<CreateMediaResourceReply>(
     `${PrefixUriAdmin + UriMediaApi}/resources?sortIndex=${sortIndex}`,
-    formData
+    formData,
   );
 }

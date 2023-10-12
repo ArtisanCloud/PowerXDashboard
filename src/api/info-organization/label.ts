@@ -28,7 +28,7 @@ export function getLabelTree(request: GetLabelTreeRequest) {
     `${PrefixUriAdmin + UriInfoOrganization}/label-tree`,
     {
       params: request,
-    }
+    },
   );
 }
 
@@ -42,14 +42,14 @@ export type UpdateLabelReply = Label;
 export function createLabel(request: CreateLabelRequest) {
   return axios.post<CreateLabelReply>(
     `${PrefixUriAdmin + UriInfoOrganization + UriLabel}`,
-    request
+    request,
   );
 }
 
 export function updateLabel(request: UpdateLabelRequest) {
   return axios.put<UpdateLabelReply>(
     `${PrefixUriAdmin + UriInfoOrganization + UriLabel}/${request.id}`,
-    request
+    request,
   );
 }
 
@@ -63,6 +63,6 @@ export interface DeleteLabelReply {
 
 export function deleteLabel(request: DeleteLabelRequest) {
   return axios.delete<DeleteLabelReply>(
-    `${PrefixUriAdmin + UriInfoOrganization + UriLabel}/${request.id}`
+    `${PrefixUriAdmin + UriInfoOrganization + UriLabel}/${request.id}`,
   );
 }

@@ -5,7 +5,6 @@ import vueJsx from '@vitejs/plugin-vue-jsx';
 import svgLoader from 'vite-svg-loader';
 import configArcoStyleImportPlugin from './plugin/arcoStyleImport.js';
 
-
 export default defineConfig({
   plugins: [
     vue(),
@@ -42,7 +41,7 @@ export default defineConfig({
       less: {
         modifyVars: {
           hack: `true; @import (reference) "${resolve(
-            'src/assets/style/breakpoint.less'
+            'src/assets/style/breakpoint.less',
           )}";`,
         },
         javascriptEnabled: true,

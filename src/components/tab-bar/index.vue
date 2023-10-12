@@ -37,7 +37,7 @@
     () => appStore.navbar,
     () => {
       affixRef.value.updatePosition();
-    }
+    },
   );
 
   const offsetTop = () => {
@@ -55,6 +55,10 @@
 </script>
 
 <style scoped lang="less">
+  :deep(.arco-affix) {
+    z-index: 98;
+  }
+
   .tab-bar-container {
     position: relative;
     background-color: var(--color-bg-2);

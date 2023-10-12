@@ -31,7 +31,7 @@ export function CreateWujieComponent(option: Option) {
 }
 
 export function BuildPluginRoutes(
-  routes: RouteRecordRaw[]
+  routes: RouteRecordRaw[],
 ): AppRouteRecordRaw[] {
   return routes.map((route) => {
     route.component = CreateWujieComponent({

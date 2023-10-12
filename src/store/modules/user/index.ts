@@ -60,7 +60,7 @@ const useUserStore = defineStore('user', {
       // 缓存到 session storage 中
       sessionStorage.setItem(
         formatSessionKey('user-info'),
-        JSON.stringify(res.data)
+        JSON.stringify(res.data),
       );
     },
 

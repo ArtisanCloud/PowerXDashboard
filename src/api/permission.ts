@@ -56,7 +56,7 @@ export interface GetRoleRequest {
 
 export function getRole(request: GetRoleRequest) {
   return axios.get<AdminRole>(
-    `/api/v1/admin/permission/roles/${request.roleCode}`
+    `/api/v1/admin/permission/roles/${request.roleCode}`,
   );
 }
 
@@ -71,7 +71,7 @@ export interface PutRoleRequest {
 export function patchRole(request: PutRoleRequest) {
   return axios.patch<AdminRole>(
     `/api/v1/admin/permission/roles/${request.roleCode}`,
-    request
+    request,
   );
 }
 
@@ -87,7 +87,7 @@ export interface SetRolePermissionsReply {
 export function setRolePermissions(request: SetRolePermissionsRequest) {
   return axios.post<SetRolePermissionsReply>(
     `/api/v1/admin/permission/roles/${request.roleCode}/actions/set-permissions`,
-    request
+    request,
   );
 }
 
@@ -131,7 +131,7 @@ export interface GetRoleEmployeesReply extends Pagination {
 export function getRoleEmployees(request: GetRoleEmployeesRequest) {
   return axios.get<GetRoleEmployeesReply>(
     `/api/v1/admin/permission/roles/${request.roleCode}/users`,
-    { params: request }
+    { params: request },
   );
 }
 
@@ -147,7 +147,7 @@ export interface SetUserRolesReply {
 export function setUserRoles(request: SetUserRolesRequest) {
   return axios.post<SetUserRolesReply>(
     `/api/v1/admin/permission/users/${request.userId}/actions/set-roles`,
-    request
+    request,
   );
 }
 
@@ -163,6 +163,6 @@ interface SetRoleEmployeesReply {
 export function setRoleEmployees(request: SetRoleEmployeesRequest) {
   return axios.post<SetRoleEmployeesReply>(
     `/api/v1/admin/permission/roles/${request.roleCode}/actions/set-employees`,
-    request
+    request,
   );
 }

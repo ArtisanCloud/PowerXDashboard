@@ -44,7 +44,7 @@ export function listPriceBookEntries(request: ListPriceBookEntriesRequest) {
     `${PrefixUriAdmin + UriProduct}/price-book-entries/page-list`,
     {
       params: request,
-    }
+    },
   );
 }
 
@@ -55,7 +55,7 @@ export interface ConfigPriceBookEntryRequest {
 export function configPriceBookEntry(request: ConfigPriceBookEntryRequest) {
   return axios.post<PriceBookEntry[]>(
     `${PrefixUriAdmin + UriProduct}/price-book-entries/config`,
-    request
+    request,
   );
 }
 
@@ -68,7 +68,7 @@ export interface UpdatePriceBookEntryReply {
 export function updatePriceBookEntry(request: UpdatePriceBookEntryRequest) {
   return axios.post<UpdatePriceBookEntryReply>(
     `${PrefixUriAdmin + UriProduct}/price-book-entries/${request.id}`,
-    request
+    request,
   );
 }
 
@@ -82,6 +82,6 @@ export interface DeletePriceBookEntryReply {
 
 export function deletePriceBookEntry(request: DeletePriceBookEntryRequest) {
   return axios.delete<DeletePriceBookEntryReply>(
-    `${PrefixUriAdmin + UriProduct}/price-book-entries/${request.id}`
+    `${PrefixUriAdmin + UriProduct}/price-book-entries/${request.id}`,
   );
 }

@@ -41,7 +41,7 @@ export function initDayJs() {
 export function formatStoreTime(storeWorkTime: string) {
   // console.log(storeWorkTime);
   const match = storeWorkTime.match(
-    /(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})/
+    /(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})/,
   );
   if (match) {
     const hour = match[4];

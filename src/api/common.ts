@@ -32,7 +32,7 @@ export function getEmployeeOptions(request: GetEmployeeOptionsRequest) {
     '/api/v1/admin/common/options/employees',
     {
       params: request,
-    }
+    },
   );
 }
 
@@ -53,7 +53,7 @@ export interface GetEmployeeQueryOptionsReply {
 
 export function getEmployeeQueryOptions() {
   return axios.get<GetEmployeeQueryOptionsReply>(
-    '/api/v1/admin/common/options/employee-query'
+    '/api/v1/admin/common/options/employee-query',
   );
 }
 
@@ -81,7 +81,7 @@ export function getDepartmentOptions(request: GetDepartmentOptionsRequest) {
     '/api/v1/admin/common/options/departments',
     {
       params: request,
-    }
+    },
   );
 }
 

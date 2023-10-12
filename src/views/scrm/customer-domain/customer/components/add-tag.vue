@@ -187,7 +187,7 @@
         fetchGroupTagList();
       }
     },
-    { deep: true }
+    { deep: true },
   );
 </script>
 

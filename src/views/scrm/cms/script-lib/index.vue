@@ -1,5 +1,5 @@
 <template>
-  <div>ToDo:话术库</div>
+  <div class="container"> TODO: 话术库 </div>
 </template>
 
 <script lang="ts" setup></script>

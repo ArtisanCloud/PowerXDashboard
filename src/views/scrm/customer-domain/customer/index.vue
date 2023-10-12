@@ -6,7 +6,7 @@
  * @LastEditTime: 2023-07-30 23:04:59
 -->
 <template>
-  <div>
+  <div class="container">
     <a-card>
       <a-form
         :model="customersParams"
