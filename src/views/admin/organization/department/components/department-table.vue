@@ -1,5 +1,5 @@
 <template>
-  <a-card>
+  <div class="content">
     <a-table
       :data="departmentTree"
       :loading="state.loading"
@@ -65,7 +65,7 @@
         :id="state.editDepartment.departmentId"
       />
     </a-drawer>
-  </a-card>
+  </div>
 </template>
 
 <script lang="ts" setup>

@@ -1,7 +1,7 @@
 <template>
   <div class="content">
     <a-table
-      :data="customerList"
+      :data="mgmList"
       :loading="state.loading"
       row-key="id"
       :columns="columns"
@@ -11,31 +11,27 @@
       @page-change="pageChanged"
       @page-size-change="pageSizeChanged"
     >
-      <template #type="{ record }">
+      <template #mgmRuleType="{ record }">
         <a-typography-text>{{
-          options.GetOptionById(options.customerTypes, record.type)?.name
+          options.GetOptionById(options.mgmScenes, record.scene)?.name
         }}</a-typography-text>
       </template>
-
-      <template #isActivated="{ record }">
-        <a-typography-text>{{
-          record.isActivated ? '激活' : '禁用'
-        }}</a-typography-text>
+      <template #coverURL="{ record }">
+        <a-image width="72" :src="record.coverImage?.url"></a-image>
       </template>
-
       <template #optional="{ record }">
         <a-space align="center">
-          <!--编辑客户按钮-->
-          <a-button title="编辑" @click="openEditCustomer(record)">
+          <!--编辑MGM规则按钮-->
+          <a-button title="编辑" @click="openEditMGMRule(record)">
             <template #icon>
               <icon-edit :style="{ fontSize: '16px', color: 'green' }" />
             </template>
           </a-button>
 
-          <!--删除客户按钮-->
+          <!--删除MGM规则按钮-->
           <a-popconfirm
-            content="该操作会删除相关子客户,确定要删除此客户吗？"
-            @ok="deleteCustomerById(record.id)"
+            content="该操作会删除相关子MGM规则,确定要删除此MGM规则吗？"
+            @ok="deleteMGMRuleById(record.id)"
           >
             <a-button title="删除">
               <template #icon>
@@ -46,17 +42,16 @@
         </a-space>
       </template>
     </a-table>
-
     <a-drawer
-      v-model:visible="state.editCustomer.visible"
+      v-model:visible="state.editMGMRule.visible"
       width="500px"
       ok-text="关闭抽屉"
       :hide-cancel="true"
     >
-      <EditCustomer
-        v-if="state.editCustomer.visible"
-        :node="state.editCustomer.node"
-        @submit-success="fetchCustomerList"
+      <EditMGMRule
+        v-if="state.editMGMRule.visible"
+        :node="state.editMGMRule.node"
+        @submit-success="fetchMGMRuleList"
       />
     </a-drawer>
   </div>
@@ -65,21 +60,20 @@
 <script lang="ts" setup>
   import { onMounted, reactive, ref } from 'vue';
   import {
-    listCustomers,
-    deleteCustomer,
-    Customer,
-    ListCustomerPageRequest,
-  } from '@/api/crm/customer-domain/customer';
+    deleteMGMRule,
+    ListMGMRulePageRequest,
+    listMGMRules,
+    MGMRule,
+  } from '@/api/crm/market/mgm';
 
-  import EditCustomer from '@/views/crm/customer-domain/customer/components/edit-customer.vue';
   import { Message } from '@arco-design/web-vue';
-
-  import useOptionsStore from '@/store/modules/data-dictionary';
   import { DefaultPageSize } from '@/api';
+  import EditMGMRule from '@/views/crm/market/mgm/components/edit-mgm.vue';
+  import useOptionsStore from '@/store/modules/data-dictionary';
 
   const options = useOptionsStore();
 
-  const customerList = ref<Customer[]>([]);
+  const mgmList = ref<MGMRule[]>([]);
 
   const columns = reactive([
     {
@@ -88,33 +82,30 @@
       width: 60,
     },
     {
-      title: '客户名称',
+      title: '名字',
       dataIndex: 'name',
       width: 150,
     },
     {
+      title: '一级反佣率',
+      dataIndex: 'commissionRate1',
+      width: 150,
+    },
+    {
+      title: '二级反佣率',
+      dataIndex: 'commissionRate2',
+      width: 150,
+    },
+    {
       title: '类型',
-      dataIndex: 'type',
-      width: 120,
-      slotName: 'type',
+      dataIndex: 'scene',
+      width: 250,
+      slotName: 'mgmRuleType',
     },
     {
-      title: '手机号码',
-      dataIndex: 'mobile',
-      width: 120,
-      slotName: 'mobile',
-    },
-    {
-      title: '小程序OpenId',
-      dataIndex: 'openIdInMiniProgram',
-      width: 200,
-      slotName: 'openIdInMiniProgram',
-    },
-    {
-      title: '状态',
-      dataIndex: 'isActivated',
-      width: 120,
-      slotName: 'isActivated',
+      title: '描述',
+      dataIndex: 'description',
+      width: 250,
     },
     {
       title: '操作',
@@ -134,43 +125,43 @@
 
   const state = reactive({
     loading: false,
-    createCustomer: {
+    createMGMRule: {
       visible: false,
       parentNode: {},
     },
-    editCustomer: {
+    editMGMRule: {
       visible: false,
-      node: {} as Customer,
+      node: {} as MGMRule,
     },
     submitLoading: false,
   });
 
-  const fetchCustomerList = async (req: ListCustomerPageRequest) => {
+  const fetchMGMRuleList = async (req: ListMGMRulePageRequest) => {
     state.loading = true;
     try {
-      const res = await listCustomers(req);
-      customerList.value = res.data.list;
+      const res = await listMGMRules(req);
+      mgmList.value = res.data.list;
       pagination.currentPage = res.data.pageIndex!;
       pagination.pageSize = res.data.pageSize!;
       pagination.total = res.data.total!;
-      // console.log(customerList)
+      // console.log(categoryTree)
     } finally {
       state.loading = false;
     }
   };
 
-  const openEditCustomer = (customer: Customer) => {
-    // console.log(customer)
-    state.editCustomer.node = customer;
-    state.editCustomer.visible = true;
+  const openEditMGMRule = (cat: MGMRule) => {
+    // console.log(cat)
+    state.editMGMRule.node = cat;
+    state.editMGMRule.visible = true;
   };
 
-  const deleteCustomerById = async (bookId: number) => {
+  const deleteMGMRuleById = async (bookId: number) => {
     try {
-      const rep = await deleteCustomer({ id: bookId });
+      const rep = await deleteMGMRule({ id: bookId });
       if (rep.data.id && rep.data.id > 0) {
         Message.success('删除成功');
-        await fetchCustomerList({
+        await fetchMGMRuleList({
           pageIndex: pagination.currentPage,
           pageSize: pagination.pageSize,
         });
@@ -181,19 +172,19 @@
   };
 
   const pageChanged = (page: number) => {
-    // console.log('page', page);
-    fetchCustomerList({ pageIndex: page, pageSize: pagination.pageSize });
+    // console.log("page", page)
+    fetchMGMRuleList({ pageIndex: page, pageSize: pagination.pageSize });
   };
 
   const pageSizeChanged = (pageSize: number) => {
-    // console.log('pagesize', pageSize);
-    fetchCustomerList({ pageIndex: pagination.currentPage, pageSize });
+    // console.log("pagesize", pageSize)
+    fetchMGMRuleList({ pageIndex: pagination.currentPage, pageSize });
   };
 
-  defineExpose({ fetchCustomerList });
+  defineExpose({ fetchMGMRuleList });
 
   onMounted(() => {
-    fetchCustomerList({});
+    fetchMGMRuleList({});
   });
 </script>
 

@@ -11,6 +11,7 @@
     </a-card>
     <a-drawer
       v-model:visible="state.createProduct.visible"
+      :mask-closable="false"
       width="800px"
       ok-text="关闭抽屉"
       :hide-cancel="true"

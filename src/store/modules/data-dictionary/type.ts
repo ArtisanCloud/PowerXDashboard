@@ -10,6 +10,7 @@ export interface OptionsState {
   sourceTypes: DictionaryItem[];
   artisanLevels: DictionaryItem[];
   mediaTypes: DictionaryItem[];
+  mgmScenes: DictionaryItem[];
   orderTypes: DictionaryItem[];
   orderStatus: DictionaryItem[];
   paymentTypes: DictionaryItem[];

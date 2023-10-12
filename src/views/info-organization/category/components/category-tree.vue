@@ -1,5 +1,5 @@
 <template>
-  <a-card>
+  <div class="content">
     <a-table
       :data="categoryTree"
       :loading="state.loading"
@@ -88,7 +88,7 @@
         @submit-success="fetchCategoryTree"
       />
     </a-drawer>
-  </a-card>
+  </div>
 </template>
 
 <script lang="ts" setup>

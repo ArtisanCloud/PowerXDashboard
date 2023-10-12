@@ -1,5 +1,5 @@
 <template>
-  <a-card>
+  <div class="content">
     <a-table
       :data="productList"
       :loading="state.loading"
@@ -87,7 +87,7 @@
         :product="state.productToConfigPrice"
       />
     </a-modal>
-  </a-card>
+  </div>
 </template>
 
 <script lang="ts" setup>

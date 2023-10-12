@@ -6,7 +6,7 @@
  * @LastEditTime: 2023-08-24 00:32:21
 -->
 <template>
-  <a-card>
+  <div class="content">
     <a-row :gutter="{ xs: 8, sm: 16, md: 24, lg: 32 }">
       <a-col
         :xs="24"
@@ -55,7 +55,7 @@
         </a-card>
       </a-col>
     </a-row>
-  </a-card>
+  </div>
 </template>
 
 <script lang="ts" setup>

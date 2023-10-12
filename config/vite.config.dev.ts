@@ -9,6 +9,8 @@ export default mergeConfig(
   {
     mode: 'development',
     server: {
+      host: loadedEnv.VITE_WEB_HOST ?? '0.0.0.0',
+      port: loadedEnv.VITE_WEB_PORT ?? '8080',
       open: true,
       fs: {
         strict: true,
@@ -24,6 +26,14 @@ export default mergeConfig(
         },
         '/bucket': {
           target: loadedEnv.VITE_OSS_URL ?? 'http://localhost:9001',
+          changeOrigin: true,
+        },
+        '/api/plugin': {
+          target: 'http://localhost:8888',
+          changeOrigin: true,
+        },
+        '/plugin': {
+          target: 'http://localhost:8888',
           changeOrigin: true,
         },
       },

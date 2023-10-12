@@ -7,8 +7,7 @@
 import { vitePluginForArco } from '@arco-plugins/vite-vue';
 
 export default function configArcoStyleImportPlugin() {
-  const arcoResolverPlugin = vitePluginForArco({
+  return vitePluginForArco({
     theme: '@arco-themes/vue-powerx-design-default',
   });
-  return arcoResolverPlugin;
 }

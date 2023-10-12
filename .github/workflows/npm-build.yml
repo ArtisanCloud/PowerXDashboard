@@ -18,7 +18,7 @@ jobs:
         run: cp .env.example .env.development
 
       - name: Install dependencies
-        run: npm i
+        run: npm i --force
 
       - name: Build
         run: npm run build
