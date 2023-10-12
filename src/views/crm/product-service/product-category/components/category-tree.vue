@@ -141,7 +141,7 @@
 
   const FindCategoryFromTreeById = (
     tree: ProductCategory[],
-    id: number
+    id: number,
   ): ProductCategory | undefined => {
     if (!tree) {
       return undefined;

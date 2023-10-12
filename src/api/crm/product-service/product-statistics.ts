@@ -21,11 +21,11 @@ export interface ConfigProductStatisticsReply {
 }
 
 export function configProductStatistics(
-  request: ConfigProductStatisticsRequest
+  request: ConfigProductStatisticsRequest,
 ) {
   return axios.post<ConfigProductStatisticsReply>(
     `${PrefixUriAdmin + UriProduct}/product-statistics/config`,
-    request
+    request,
   );
 }
 
@@ -35,9 +35,9 @@ export interface getProductStatisticsByProductIdRequest {
 export type getProductStatisticsByProductIdReply = ProductStatistics;
 
 export function getProductStatisticsByProductId(
-  request: getProductStatisticsByProductIdRequest
+  request: getProductStatisticsByProductIdRequest,
 ) {
   return axios.get<getProductStatisticsByProductIdReply>(
-    `${PrefixUriAdmin + UriProduct}/product-statistics/${request.productId}`
+    `${PrefixUriAdmin + UriProduct}/product-statistics/${request.productId}`,
   );
 }

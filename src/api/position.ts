@@ -27,7 +27,7 @@ export interface CreatePositionReply {
 export function createPosition(request: CreatePositionRequest) {
   return axios.post<CreatePositionReply>(
     '/api/v1/admin/position/positions',
-    request
+    request,
   );
 }
 
@@ -44,7 +44,7 @@ export type PatchPositionReply = Position;
 export function patchPosition(request: PatchPositionRequest) {
   return axios.patch<PatchPositionReply>(
     `/api/v1/admin/position/positions/${request.id}`,
-    request
+    request,
   );
 }
 
@@ -58,7 +58,7 @@ export interface DeletePositionReply {
 
 export function deletePosition(request: DeletePositionRequest) {
   return axios.delete<DeletePositionReply>(
-    `/api/v1/admin/position/positions/${request.id}`
+    `/api/v1/admin/position/positions/${request.id}`,
   );
 }
 
@@ -84,6 +84,6 @@ export type GetPositionReply = Position;
 
 export function getPosition(request: GetPositionRequest) {
   return axios.get<GetPositionReply>(
-    `/api/v1/admin/position/positions/${request.id}`
+    `/api/v1/admin/position/positions/${request.id}`,
   );
 }

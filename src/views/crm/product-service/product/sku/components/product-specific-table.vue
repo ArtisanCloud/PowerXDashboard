@@ -145,7 +145,7 @@
   });
 
   const fetchProductSpecificList = async (
-    req: ListProductSpecificsPageRequest
+    req: ListProductSpecificsPageRequest,
   ) => {
     state.loading = true;
     try {

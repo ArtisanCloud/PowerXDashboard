@@ -28,9 +28,7 @@
 
           <!--配置价格按钮-->
 
-          <a-button
-            :href="`price-book/price-book-entry?priceBookId=${record.id}`"
-          >
+          <a-button @click="onConfigClick(record.id)">
             <template #icon>
               <icon-book :style="{ fontSize: '16px', color: '#d7ee8f' }" />
             </template>
@@ -90,6 +88,9 @@
   import EditPriceBook from '@/views/crm/product-service/price-book/components/edit-price-book.vue';
   import { Message } from '@arco-design/web-vue';
   import { DefaultPageSize } from '@/api';
+  import { useRouter } from 'vue-router';
+
+  const router = useRouter();
 
   const priceBookList = ref<PriceBook[]>([]);
 
@@ -181,6 +182,10 @@
   const pageSizeChanged = (pageSize: number) => {
     // console.log("pagesize",pageSize)
     fetchPriceBookList({ pageIndex: pagination.currentPage, pageSize });
+  };
+
+  const onConfigClick = (id: number) => {
+    router.push(`price-book/price-book-entry?priceBookId=${id}`);
   };
 
   defineExpose({ fetchPriceBookList });

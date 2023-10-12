@@ -8,7 +8,7 @@ const Plugin: AppRouteRecordRaw = {
   redirect: '/home/index',
   meta: {
     order: 100,
-    locale: '插件列表',
+    locale: 'menu.plugin',
     requiresAuth: true,
     icon: 'icon-plus',
   },

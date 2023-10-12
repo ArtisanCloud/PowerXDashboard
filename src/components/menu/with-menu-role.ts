@@ -62,7 +62,7 @@ export default async function withRoleClientMenu(clientMenus: any[]) {
   // 缓存菜单角色
   sessionStorage.setItem(
     formatSessionKey('menu-roles'),
-    JSON.stringify(menuRoles)
+    JSON.stringify(menuRoles),
   );
 
   return withRoleClientMenus;

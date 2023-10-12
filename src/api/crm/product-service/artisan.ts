@@ -39,21 +39,21 @@ export function listArtisans(request: ListArtisanPageRequest) {
     `${PrefixUriAdmin + UriProduct + UriArtisan}/page-list`,
     {
       params: request,
-    }
+    },
   );
 }
 
 export function createArtisan(request: Artisan) {
   return axios.post<Artisan>(
     `${PrefixUriAdmin + UriProduct + UriArtisan}`,
-    request
+    request,
   );
 }
 
 export function updateArtisan(request: Artisan) {
   return axios.put<Artisan>(
     `${PrefixUriAdmin + UriProduct + UriArtisan}/${request.id}`,
-    request
+    request,
   );
 }
 
@@ -67,7 +67,7 @@ export interface DeleteArtisanReply {
 
 export function deleteArtisan(request: DeleteArtisanRequest) {
   return axios.delete<DeleteArtisanReply>(
-    `${PrefixUriAdmin + UriProduct + UriArtisan}/${request.id}`
+    `${PrefixUriAdmin + UriProduct + UriArtisan}/${request.id}`,
   );
 }
 
@@ -83,6 +83,6 @@ export interface BindArtisanToStoreReply {
 export function bindArtisanToStore(request: BindArtisanToStoreRequest) {
   return axios.post<BindArtisanToStoreReply>(
     `${PrefixUriAdmin + UriProduct + UriArtisan}/bind/stores`,
-    request
+    request,
   );
 }

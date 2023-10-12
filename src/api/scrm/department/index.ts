@@ -49,7 +49,7 @@ export interface GetDepartmentTreeReplyList {
 
 export function getDepartmentTree() {
   return axios.post<GetDepartmentTreeReply>(
-    `/api/v1/admin/scrm/organization/wechat/partment/page`
+    `/api/v1/admin/scrm/organization/wechat/partment/page`,
   );
 }
 
@@ -71,7 +71,7 @@ export interface CreateDepartmentReply {
 export function createDepartment(request: CreateDepartmentRequest) {
   return axios.post<CreateDepartmentReply>(
     '/api/v1/admin/department/departments',
-    request
+    request,
   );
 }
 
@@ -85,7 +85,7 @@ export interface DeleteDepartmentReply {
 
 export function deleteDepartment(request: DeleteDepartmentRequest) {
   return axios.delete<DeleteDepartmentReply>(
-    `/api/v1/admin/department/departments/${request.id}`
+    `/api/v1/admin/department/departments/${request.id}`,
   );
 }
 
@@ -108,6 +108,6 @@ export interface GetDepartmentReply {
 
 export function getDepartment(request: GetDepartmentRequest) {
   return axios.get<GetDepartmentReply>(
-    `/api/v1/admin/department/departments/${request.id}`
+    `/api/v1/admin/department/departments/${request.id}`,
   );
 }

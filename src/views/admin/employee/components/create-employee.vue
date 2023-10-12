@@ -66,10 +66,7 @@
 <script lang="ts" setup>
   import { onMounted, ref } from 'vue';
   import { FieldRule, Message } from '@arco-design/web-vue';
-  import {
-    getEmployeeQueryOptions,
-    getOptions
-  } from "@/api/common";
+  import { getEmployeeQueryOptions, getOptions } from '@/api/common';
   import { createEmployee } from '@/api/employee';
 
   const emit = defineEmits(['submitSuccess', 'submitFailed']);

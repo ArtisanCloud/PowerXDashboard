@@ -32,7 +32,7 @@ export function listPriceBooks(request: ListPriceBooksRequest) {
     `${PrefixUriAdmin + UriProduct}/price-books/page-list`,
     {
       params: request,
-    }
+    },
   );
 }
 
@@ -41,14 +41,14 @@ export function getPriceBook(request: GetPriceBooksRequest) {
     `${PrefixUriAdmin + UriProduct}/price-books/${request.priceBookId}`,
     {
       params: request,
-    }
+    },
   );
 }
 
 export function createPriceBook(request: PriceBook) {
   return axios.post<PriceBook>(
     `${PrefixUriAdmin + UriProduct}/price-books`,
-    request
+    request,
   );
 }
 
@@ -62,6 +62,6 @@ export interface DeletePriceBookReply {
 
 export function deletePriceBook(request: DeletePriceBookRequest) {
   return axios.delete<DeletePriceBookReply>(
-    `${PrefixUriAdmin + UriProduct}/price-books/${request.id}`
+    `${PrefixUriAdmin + UriProduct}/price-books/${request.id}`,
   );
 }

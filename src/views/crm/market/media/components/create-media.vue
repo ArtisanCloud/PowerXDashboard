@@ -123,7 +123,7 @@
   });
 
   const uploadCoverImage: (option: RequestOption) => UploadRequest = (
-    option: RequestOption
+    option: RequestOption,
   ) => {
     return uploadMediaImages(option, 0, (data: any) => {
       formModel.value.coverImageId = data.id!;
@@ -131,7 +131,7 @@
   };
 
   const uploadDetailImages: (option: RequestOption) => UploadRequest = (
-    option: RequestOption
+    option: RequestOption,
   ) => {
     return uploadMediaImages(option, 0, (data: any) => {
       formModel.value.detailImageIds?.push(data.id!);

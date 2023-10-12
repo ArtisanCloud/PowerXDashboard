@@ -135,7 +135,7 @@
   });
 
   const uploadCoverImage: (option: RequestOption) => UploadRequest = (
-    option: RequestOption
+    option: RequestOption,
   ) => {
     return uploadMediaImages(option, 0, (data: any) => {
       formModel.value.RealQrcodeLink = apiUrl + data.url;
@@ -172,7 +172,7 @@
         {
           ...formModelData,
         },
-        formModelData.qid
+        formModelData.qid,
       )
         .then(() => {
           handlereset();
@@ -225,6 +225,6 @@
         const newDate = Date.parse(currentDate.toDateString());
         formModel.value.expiryDate = newDate;
       }
-    }
+    },
   );
 </script>

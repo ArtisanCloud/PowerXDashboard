@@ -26,7 +26,7 @@ export function getCategoryTree(request: GetCategoryTreeRequest) {
     `${PrefixUriAdmin + UriProduct}/product-category-tree`,
     {
       params: request,
-    }
+    },
   );
 }
 
@@ -40,14 +40,14 @@ export type UpdateCategoryReply = ProductCategory;
 export function createCategory(request: CreateCategoryRequest) {
   return axios.post<CreateCategoryReply>(
     `${PrefixUriAdmin + UriProduct}/product-categories`,
-    request
+    request,
   );
 }
 
 export function updateCategory(request: UpdateCategoryRequest) {
   return axios.put<UpdateCategoryReply>(
     `${PrefixUriAdmin + UriProduct}/product-categories/${request.id}`,
-    request
+    request,
   );
 }
 
@@ -61,6 +61,6 @@ export interface DeleteCategoryReply {
 
 export function deleteCategory(request: DeleteCategoryRequest) {
   return axios.delete<DeleteCategoryReply>(
-    `${PrefixUriAdmin + UriProduct}/product-categories/${request.id}`
+    `${PrefixUriAdmin + UriProduct}/product-categories/${request.id}`,
   );
 }

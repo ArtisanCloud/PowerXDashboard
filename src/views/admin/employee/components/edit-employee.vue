@@ -60,10 +60,7 @@
 <script lang="ts" setup>
   import { computed, onMounted, ref } from 'vue';
   import { FieldRule, Message } from '@arco-design/web-vue';
-  import {
-    getEmployeeQueryOptions,
-    getOptions
-  } from "@/api/common";
+  import { getEmployeeQueryOptions, getOptions } from '@/api/common';
   import {
     getEmployee,
     updateEmployee,

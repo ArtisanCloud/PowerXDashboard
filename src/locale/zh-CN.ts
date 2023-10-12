@@ -7,6 +7,7 @@ import localeSettings from './zh-CN/settings';
 
 export default {
   'menu.home': '主页',
+  'menu.plugin': '插件列表',
   'menu.home.index': '首页',
   'menu.dashboard': '看板',
   'menu.list': '列表页',

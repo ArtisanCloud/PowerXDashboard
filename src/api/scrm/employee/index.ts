@@ -36,7 +36,7 @@ export interface GetEmployeeRequest {
 export type GetEmployeeReply = Employee;
 export function getEmployee(request: GetEmployeeRequest) {
   return axios.get<GetEmployeeReply>(
-    `/api/v1/admin/employee/employees/${request.id}`
+    `/api/v1/admin/employee/employees/${request.id}`,
   );
 }
 
@@ -66,7 +66,7 @@ export interface ListEmployeesReply {
 export function listEmployees(request: ListEmployeesRequest) {
   return axios.post<ListEmployeesReply>(
     '/api/v1/admin/scrm/organization/wechat/employee/page',
-    request
+    request,
   );
 }
 
@@ -82,6 +82,6 @@ export interface SyncEmployeesReply {
 export function syncEmployees(request: SyncEmployeesRequest) {
   return axios.post<SyncEmployeesReply>(
     '/api/v1/admin/employee/employees/actions/sync',
-    request
+    request,
   );
 }

@@ -54,12 +54,12 @@
             `${employee.name}(${employee.email})` !== ''
               ? `${employee.name}`
               : '',
-        } as any)
-    )
+        }) as any,
+    ),
   );
 
   const selected = computed(() =>
-    data.value.map((employee) => employee.id.toString())
+    data.value.map((employee) => employee.id.toString()),
   );
 
   const selectValue = ref([] as number[]);

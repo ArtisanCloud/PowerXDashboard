@@ -137,7 +137,7 @@
       });
       options.searchedProducts = mergeObjectArrays(
         options.searchedProducts,
-        res.data.list
+        res.data.list,
       );
     } finally {
       state.loading = false;
@@ -155,7 +155,7 @@
     // console.log(state.productIds);
     const selectedProducts = getObjectsByIds(
       options.searchedProducts,
-      state.productIds
+      state.productIds,
     );
 
     emits('onSelectedItems', selectedProducts);

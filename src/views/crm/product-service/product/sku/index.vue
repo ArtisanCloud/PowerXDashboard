@@ -314,7 +314,7 @@
     // Check for duplicated names in state.productSpecifics array
     const duplicates = state.productSpecifics.filter(
       (specific, index, array) =>
-        array.findIndex((item) => item.name === specific.name) !== index
+        array.findIndex((item) => item.name === specific.name) !== index,
     );
 
     // Return true if duplicates exist, indicating that the name is duplicated
@@ -333,7 +333,7 @@
     // Check for duplicated names in options array
     const duplicates = options?.filter(
       (option, optionIndex, array) =>
-        array.findIndex((item) => item.name === option.name) !== optionIndex
+        array.findIndex((item) => item.name === option.name) !== optionIndex,
     );
 
     // Return true if duplicates exist, indicating that the name is duplicated
