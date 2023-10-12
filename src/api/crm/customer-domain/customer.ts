@@ -39,21 +39,21 @@ export function listCustomers(request: ListCustomerPageRequest) {
     `${PrefixUriAdmin + UriCustomerDomain}/customers/page-list`,
     {
       params: request,
-    }
+    },
   );
 }
 
 export function createCustomer(request: Customer) {
   return axios.post<Customer>(
     `${PrefixUriAdmin + UriCustomerDomain}/customers`,
-    request
+    request,
   );
 }
 
 export function updateCustomer(request: Customer) {
   return axios.put<Customer>(
     `${PrefixUriAdmin + UriCustomerDomain}/customers/${request.id}`,
-    request
+    request,
   );
 }
 
@@ -67,6 +67,6 @@ export interface DeleteCustomerReply {
 
 export function deleteCustomer(request: DeleteCustomerRequest) {
   return axios.delete<DeleteCustomerReply>(
-    `${PrefixUriAdmin + UriCustomerDomain}/customers/${request.id}`
+    `${PrefixUriAdmin + UriCustomerDomain}/customers/${request.id}`,
   );
 }

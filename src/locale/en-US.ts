@@ -7,6 +7,7 @@ import localeSettings from './en-US/settings';
 
 export default {
   'menu.home': 'Home',
+  'menu.plugin': 'Plugin List',
   'menu.home.index': 'Homepage',
   'menu.dashboard': 'Dashboard',
   'menu.list': 'List Page',

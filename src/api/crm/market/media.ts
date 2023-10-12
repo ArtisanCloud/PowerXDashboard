@@ -42,7 +42,7 @@ export function listMedias(request: ListMediaPageRequest) {
     `${PrefixUriAdmin + UriMarket + UriMedia}/page-list`,
     {
       params: request,
-    }
+    },
   );
 }
 
@@ -53,7 +53,7 @@ export function createMedia(request: Media) {
 export function updateMedia(request: Media) {
   return axios.put<Media>(
     `${PrefixUriAdmin + UriMarket + UriMedia}/${request.id}`,
-    request
+    request,
   );
 }
 
@@ -67,6 +67,6 @@ export interface DeleteMediaReply {
 
 export function deleteMedia(request: DeleteMediaRequest) {
   return axios.delete<DeleteMediaReply>(
-    `${PrefixUriAdmin + UriMarket + UriMedia}/${request.id}`
+    `${PrefixUriAdmin + UriMarket + UriMedia}/${request.id}`,
   );
 }

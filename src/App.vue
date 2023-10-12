@@ -11,6 +11,7 @@
   import zhCN from '@arco-design/web-vue/es/locale/lang/zh-cn';
   import GlobalSetting from '@/components/global-setting/index.vue';
   import useLocale from '@/hooks/locale';
+  import consola from 'consola';
 
   const { currentLocale } = useLocale();
   const locale = computed(() => {
@@ -23,4 +24,6 @@
         return enUS;
     }
   });
+
+  consola.info('PowerX Dashboard Base On Arco Design');
 </script>

@@ -41,7 +41,7 @@
 
   const getTransferData = (
     treeData: any[] = [],
-    transferDataSource: any[] = []
+    transferDataSource: any[] = [],
   ) => {
     // console.log(treeData, transferDataSource);
     treeData.forEach((item) => {

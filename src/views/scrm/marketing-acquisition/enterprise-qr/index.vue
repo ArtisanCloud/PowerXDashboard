@@ -400,7 +400,7 @@
       false,
       false,
       0,
-      null
+      null,
     );
     saveLink.dispatchEvent(event);
     setTimeout(() => {

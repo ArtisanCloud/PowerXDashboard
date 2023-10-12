@@ -32,7 +32,7 @@ export function listProductSpecifics(request: ListProductSpecificsPageRequest) {
     `${PrefixUriAdmin + UriProduct}/product-specifics/page-list`,
     {
       params: request,
-    }
+    },
   );
 }
 
@@ -46,7 +46,7 @@ export interface ConfigProductSpecificReply {
 export function configProductSpecific(request: ConfigProductSpecificRequest) {
   return axios.post<ConfigProductSpecificReply>(
     `${PrefixUriAdmin + UriProduct}/product-specifics/config`,
-    request
+    request,
   );
 }
 
@@ -59,7 +59,7 @@ export interface UpdateProductSpecificReply {
 export function updateProductSpecific(request: UpdateProductSpecificRequest) {
   return axios.post<UpdateProductSpecificReply>(
     `${PrefixUriAdmin + UriProduct}/product-specifics/${request.id}`,
-    request
+    request,
   );
 }
 
@@ -73,6 +73,6 @@ export interface DeleteProductSpecificReply {
 
 export function deleteProductSpecific(request: DeleteProductSpecificRequest) {
   return axios.delete<DeleteProductSpecificReply>(
-    `${PrefixUriAdmin + UriProduct}/product-specifics/${request.id}`
+    `${PrefixUriAdmin + UriProduct}/product-specifics/${request.id}`,
   );
 }

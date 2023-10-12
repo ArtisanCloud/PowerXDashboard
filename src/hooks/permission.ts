@@ -7,7 +7,7 @@ export default function usePermission() {
   // 检查用户是否具有访问特定路由的权限
   function hasAccess(
     userRoles: string[] | undefined,
-    routeRoles: string[]
+    routeRoles: string[],
   ): boolean {
     return (
       routeRoles.includes('*') ||
@@ -18,7 +18,7 @@ export default function usePermission() {
   // 在给定的路由列表中查找用户可以访问的第一个路由
   function findAccessibleRoute(
     routes: RouteRecordRaw[],
-    userRoles: string[]
+    userRoles: string[],
   ): RouteRecordRaw | null {
     return routes.reduce((route) => {
       if (route.children) {
@@ -51,7 +51,7 @@ export default function usePermission() {
     // 在给定的路由列表中查找用户可以访问的第一个路由
     findFirstPermissionRoute(
       routers: RouteRecordRaw[],
-      userRoles: string[] = []
+      userRoles: string[] = [],
     ): RouteRecordRaw | null {
       return findAccessibleRoute(routers, userRoles || userStore.roles);
     },

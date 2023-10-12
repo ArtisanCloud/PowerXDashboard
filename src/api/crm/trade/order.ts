@@ -65,7 +65,7 @@ export function listOrders(request: ListOrderPageRequest) {
     `${PrefixUriAdmin + UriTrade + UriOrder}/page-list`,
     {
       params: request,
-    }
+    },
   );
 }
 
@@ -79,7 +79,7 @@ export function ExportOrders(request: ListOrderPageRequest) {
     `${PrefixUriAdmin + UriTrade + UriOrder}/export`,
     {
       params: request,
-    }
+    },
   );
 }
 
@@ -90,7 +90,7 @@ export function createOrder(request: Order) {
 export function updateOrder(request: Order) {
   return axios.put<Order>(
     `${PrefixUriAdmin + UriTrade + UriOrder}/${request.id}`,
-    request
+    request,
   );
 }
 
@@ -104,7 +104,7 @@ export interface DeleteOrderReply {
 
 export function deleteOrder(request: DeleteOrderRequest) {
   return axios.delete<DeleteOrderReply>(
-    `${PrefixUriAdmin + UriTrade + UriOrder}/${request.id}`
+    `${PrefixUriAdmin + UriTrade + UriOrder}/${request.id}`,
   );
 }
 
@@ -126,13 +126,13 @@ export function UploadOrders(option: any) {
   // 发送自定义请求
   return axios.post<UploadOrdersReply>(
     `${PrefixUriAdmin + UriTrade}/orders/import`,
-    formData
+    formData,
   );
 }
 
 export function uploadOrdersWithTrackingNumbers(
   option: RequestOption,
-  onSuccess: (data: any) => void
+  onSuccess: (data: any) => void,
 ): UploadRequest {
   let isAborted = false; // 标记是否中止上传
 

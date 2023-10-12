@@ -33,14 +33,14 @@ export type GetTagReply = ReplyList;
 export function getTagList(request: GetTagRequest) {
   return axios.post<GetTagReply>(
     `/api/v1/admin/scrm/tag/wechat/corp/page`,
-    request
+    request,
   );
 }
 
 export function getGroupTagList(request: GetTagRequest) {
   return axios.post<GetTagReply>(
     `/api/v1/admin/scrm/tag/wechat/group/page`,
-    request
+    request,
   );
 }
 
@@ -64,7 +64,7 @@ export interface CreateTagReply {
 export function addTag(request: AddTagRequest) {
   return axios.post<CreateTagReply>(
     `/api/v1/admin/scrm/tag/wechat/crop/create`,
-    request
+    request,
   );
 }
 /**
@@ -82,7 +82,7 @@ export interface EditTagRequest {
 export function editTag(request: EditTagRequest) {
   return axios.post<CreateTagReply>(
     `/api/v1/admin/scrm/tag/wechat/group/action`,
-    request
+    request,
   );
 }
 
@@ -116,6 +116,6 @@ export interface CustomerTagList {
 export function customerTag(request: CustomerTagList) {
   return axios.post<any>(
     `/api/v1/admin/scrm/tag/wechat/customer/action`,
-    request
+    request,
   );
 }

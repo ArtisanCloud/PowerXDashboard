@@ -39,7 +39,7 @@ export interface GetEmployeeRequest {
 export type GetEmployeeReply = Employee;
 export function getEmployee(request: GetEmployeeRequest) {
   return axios.get<GetEmployeeReply>(
-    `/api/v1/admin/employee/employees/${request.id}`
+    `/api/v1/admin/employee/employees/${request.id}`,
   );
 }
 
@@ -76,7 +76,7 @@ export interface SyncEmployeesReply {
 export function syncEmployees(request: SyncEmployeesRequest) {
   return axios.post<SyncEmployeesReply>(
     '/api/v1/admin/employee/employees/actions/sync',
-    request
+    request,
   );
 }
 
@@ -103,7 +103,7 @@ export interface CreateEmployeeReply {
 export function createEmployee(request: CreateEmployeeRequest) {
   return axios.post<CreateEmployeeReply>(
     '/api/v1/admin/employee/employees',
-    request
+    request,
   );
 }
 
@@ -129,7 +129,7 @@ export type UpdateEmployeeReply = Employee;
 export function updateEmployee(request: UpdateEmployeeRequest) {
   return axios.patch<UpdateEmployeeReply>(
     `/api/v1/admin/employee/employees/${request.id}`,
-    request
+    request,
   );
 }
 
@@ -143,7 +143,7 @@ export interface DeleteEmployeeReply {
 
 export function deleteEmployee(request: DeleteEmployeeRequest) {
   return axios.delete<DeleteEmployeeReply>(
-    `/api/v1/admin/employee/employees/${request.id}`
+    `/api/v1/admin/employee/employees/${request.id}`,
   );
 }
 
@@ -156,6 +156,6 @@ export function resetPassword(userId: number) {
     `/api/v1/admin/employee/employees/actions/reset-password`,
     {
       userId,
-    }
+    },
   );
 }

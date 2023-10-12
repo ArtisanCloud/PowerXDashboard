@@ -3,7 +3,6 @@ import eslint from 'vite-plugin-eslint';
 import baseConfig from './vite.config.base';
 
 const loadedEnv = loadEnv('development', process.cwd());
-// console.log(loadedEnv);
 
 export default mergeConfig(
   {
@@ -46,5 +45,5 @@ export default mergeConfig(
       }),
     ],
   },
-  baseConfig
+  baseConfig,
 );

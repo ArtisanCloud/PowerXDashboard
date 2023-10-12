@@ -35,21 +35,21 @@ export function listLeads(request: ListLeadPageRequest) {
     `${PrefixUriAdmin + UriCustomerDomain}/leads/page-list`,
     {
       params: request,
-    }
+    },
   );
 }
 
 export function createLead(request: Lead) {
   return axios.post<Lead>(
     `${PrefixUriAdmin + UriCustomerDomain}/leads`,
-    request
+    request,
   );
 }
 
 export function updateLead(request: Lead) {
   return axios.put<Lead>(
     `${PrefixUriAdmin + UriCustomerDomain}/leads/${request.id}`,
-    request
+    request,
   );
 }
 
@@ -63,6 +63,6 @@ export interface DeleteLeadReply {
 
 export function deleteLead(request: DeleteLeadRequest) {
   return axios.delete<DeleteLeadReply>(
-    `${PrefixUriAdmin + UriCustomerDomain}/leads/${request.id}`
+    `${PrefixUriAdmin + UriCustomerDomain}/leads/${request.id}`,
   );
 }

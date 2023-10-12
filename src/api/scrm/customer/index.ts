@@ -38,7 +38,7 @@ export type GetCustomersReply = Customers;
 export function getCustomers(request: GetCustomersRequest) {
   return axios.post<GetCustomersReply>(
     `/api/v1/admin/scrm/customer/wechat/page`,
-    request
+    request,
   );
 }
 
@@ -56,20 +56,20 @@ export type GetCustomersGroupsReReply = Customers;
 export function getCustomersGroups(request: GetCustomersGroupsRequest) {
   return axios.post<GetCustomersGroupsReReply>(
     `/api/v1/admin/scrm/customer/wechat/group/list`,
-    request
+    request,
   );
 }
 export interface GetCustomersGroupsDetailRequest {
   chatId: string;
 }
 export function getCustomersGroupsDetail(
-  request: GetCustomersGroupsDetailRequest
+  request: GetCustomersGroupsDetailRequest,
 ) {
   return axios.get<GetCustomersGroupsReReply>(
     `/api/v1/admin/scrm/app/wechat/group/list`,
     {
       params: request,
-    }
+    },
   );
 }
 
@@ -84,7 +84,7 @@ export function wechatAppList(request: any) {
     '/api/v1/admin/scrm/app/wechat/options',
     {
       params: request,
-    }
+    },
   );
 }
 
@@ -116,14 +116,14 @@ export interface GetWechatGroupReReply {
 export function wechatGroup(request: any) {
   return axios.get<GetWechatGroupReReply>(
     '/api/v1/admin/scrm/app/wechat/group/list',
-    request
+    request,
   );
 }
 
 export function getWechatSync(request: any) {
   return axios.get<GetCustomersReply>(
     '/api/v1/admin/scrm/organization/wechat/sync',
-    request
+    request,
   );
 }
 /**
@@ -144,7 +144,7 @@ export interface GetWechatGroupArticlesRequest {
 export function wechatGroupArticles(request: GetWechatGroupArticlesRequest) {
   return axios.post<GetCustomersReply>(
     '/api/v1/admin/scrm/app/wechat/group/message/articles',
-    request
+    request,
   );
 }
 
@@ -164,7 +164,7 @@ export interface CreateWechatGroupReply {
 export function createWechatGroup(request: CreateWechatGroupRequest) {
   return axios.post<CreateWechatGroupReply>(
     '/api/v1/admin/scrm/app/wechat/group/create',
-    request
+    request,
   );
 }
 
@@ -199,7 +199,7 @@ export interface GetMessageArticlesRequest {
 export function wechatMessageArticles(request: GetMessageArticlesRequest) {
   return axios.post<GetCustomersReply>(
     '/api/v1/admin/scrm/app/wechat/message/articles',
-    request
+    request,
   );
 }
 
@@ -214,6 +214,6 @@ export interface GetMessageTemplateRequest {
 export function wechatMessageTemplate(request: GetMessageTemplateRequest) {
   return axios.post<GetCustomersReply>(
     '/api/v1/admin/scrm/customer/wechat/group/message/template',
-    request
+    request,
   );
 }

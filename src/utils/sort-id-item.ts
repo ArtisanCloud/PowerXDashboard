@@ -4,7 +4,7 @@ export interface SortIdItem {
 }
 
 export const sortBySortIndexAndGetSortedIds = (
-  array: SortIdItem[]
+  array: SortIdItem[],
 ): number[] => {
   const sortedArray = array.slice().sort((a, b) => a.sortIndex - b.sortIndex);
   const sortedIds = sortedArray.map((item) => item.id);
@@ -19,7 +19,7 @@ export const rebuildSortIndex = (array: SortIdItem[]) => {
 
 export const removeSortItemById = (
   array: SortIdItem[],
-  idToRemove: number
+  idToRemove: number,
 ): SortIdItem[] => {
   return array.filter((item) => item.id !== idToRemove);
 };

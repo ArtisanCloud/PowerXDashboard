@@ -28,7 +28,7 @@ export function getTagTree(request: GetTagTreeRequest) {
     `${PrefixUriAdmin + UriInfoOrganization}/tag-tree`,
     {
       params: request,
-    }
+    },
   );
 }
 
@@ -42,14 +42,14 @@ export type UpdateTagReply = Tag;
 export function createTag(request: CreateTagRequest) {
   return axios.post<CreateTagReply>(
     `${PrefixUriAdmin + UriInfoOrganization + UriTag}`,
-    request
+    request,
   );
 }
 
 export function updateTag(request: UpdateTagRequest) {
   return axios.put<UpdateTagReply>(
     `${PrefixUriAdmin + UriInfoOrganization + UriTag}/${request.id}`,
-    request
+    request,
   );
 }
 
@@ -63,6 +63,6 @@ export interface DeleteTagReply {
 
 export function deleteTag(request: DeleteTagRequest) {
   return axios.delete<DeleteTagReply>(
-    `${PrefixUriAdmin + UriInfoOrganization + UriTag}/${request.id}`
+    `${PrefixUriAdmin + UriInfoOrganization + UriTag}/${request.id}`,
   );
 }

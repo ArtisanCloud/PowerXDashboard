@@ -38,21 +38,21 @@ export function listMGMRules(request: ListMGMRulePageRequest) {
     `${PrefixUriAdmin + UriMarket + UriMGMRule}/page-list`,
     {
       params: request,
-    }
+    },
   );
 }
 
 export function createMGMRule(request: MGMRule) {
   return axios.post<MGMRule>(
     `${PrefixUriAdmin + UriMarket + UriMGMRule}`,
-    request
+    request,
   );
 }
 
 export function updateMGMRule(request: MGMRule) {
   return axios.put<MGMRule>(
     `${PrefixUriAdmin + UriMarket + UriMGMRule}/${request.id}`,
-    request
+    request,
   );
 }
 
@@ -66,6 +66,6 @@ export interface DeleteMGMRuleReply {
 
 export function deleteMGMRule(request: DeleteMGMRuleRequest) {
   return axios.delete<DeleteMGMRuleReply>(
-    `${PrefixUriAdmin + UriMarket + UriMGMRule}/${request.id}`
+    `${PrefixUriAdmin + UriMarket + UriMGMRule}/${request.id}`,
   );
 }

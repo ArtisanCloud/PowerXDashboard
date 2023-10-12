@@ -37,7 +37,7 @@ export function listSKUs(request: ListSKUsPageRequest) {
     `${PrefixUriAdmin + UriProduct}/skus/page-list`,
     {
       params: request,
-    }
+    },
   );
 }
 
@@ -51,7 +51,7 @@ export interface ConfigSKUReply {
 export function configSKU(request: ConfigSKURequest) {
   return axios.post<ConfigSKUReply>(
     `${PrefixUriAdmin + UriProduct}/skus/config`,
-    request
+    request,
   );
 }
 
@@ -64,7 +64,7 @@ export interface UpdateSKUReply {
 export function updateSKU(request: UpdateSKURequest) {
   return axios.post<UpdateSKUReply>(
     `${PrefixUriAdmin + UriProduct}/skus/${request.id}`,
-    request
+    request,
   );
 }
 
@@ -78,6 +78,6 @@ export interface DeleteSKUReply {
 
 export function deleteSKU(request: DeleteSKURequest) {
   return axios.delete<DeleteSKUReply>(
-    `${PrefixUriAdmin + UriProduct}/skus/${request.id}`
+    `${PrefixUriAdmin + UriProduct}/skus/${request.id}`,
   );
 }

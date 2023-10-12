@@ -1,7 +1,5 @@
 <template>
-  <div class="container">
-    TODO: 群活码
-  </div>
+  <div class="container"> TODO: 群活码 </div>
 </template>
 
 <script lang="ts" setup></script>

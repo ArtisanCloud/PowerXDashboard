@@ -24,7 +24,7 @@ interface MessageStatus {
 export function setMessageStatus(data: MessageStatus) {
   return axios.post<MessageListType>(
     '/api/v1/admin/message/actions/read',
-    data
+    data,
   );
 }
 

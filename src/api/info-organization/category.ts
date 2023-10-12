@@ -28,7 +28,7 @@ export function getCategoryTree(request: GetCategoryTreeRequest) {
     `${PrefixUriAdmin + UriInfoOrganization}/category-tree`,
     {
       params: request,
-    }
+    },
   );
 }
 
@@ -42,14 +42,14 @@ export type UpdateCategoryReply = Category;
 export function createCategory(request: CreateCategoryRequest) {
   return axios.post<CreateCategoryReply>(
     `${PrefixUriAdmin + UriInfoOrganization + UriCategory}`,
-    request
+    request,
   );
 }
 
 export function updateCategory(request: UpdateCategoryRequest) {
   return axios.put<UpdateCategoryReply>(
     `${PrefixUriAdmin + UriInfoOrganization + UriCategory}/${request.id}`,
-    request
+    request,
   );
 }
 
@@ -63,6 +63,6 @@ export interface DeleteCategoryReply {
 
 export function deleteCategory(request: DeleteCategoryRequest) {
   return axios.delete<DeleteCategoryReply>(
-    `${PrefixUriAdmin + UriInfoOrganization + UriCategory}/${request.id}`
+    `${PrefixUriAdmin + UriInfoOrganization + UriCategory}/${request.id}`,
   );
 }

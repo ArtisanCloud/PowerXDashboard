@@ -57,7 +57,7 @@ axios.interceptors.request.use(
       duration: 5 * 1000,
     });
     return Promise.reject(error);
-  }
+  },
 );
 // add response interceptors
 axios.interceptors.response.use(
@@ -73,7 +73,7 @@ axios.interceptors.response.use(
         duration: 5 * 1000,
       });
       return Promise.reject(
-        new Error((res.data as ErrorResponse).msg || '违规请求')
+        new Error((res.data as ErrorResponse).msg || '违规请求'),
       );
     }
     // 如果返回 5xx, 则提示错误
@@ -87,8 +87,8 @@ axios.interceptors.response.use(
       return Promise.reject(
         new Error(
           (res.data as ErrorResponse).msg ||
-            '服务器错误, 请稍后重试或联系技术支持'
-        )
+            '服务器错误, 请稍后重试或联系技术支持',
+        ),
       );
     }
     return res;
@@ -99,5 +99,5 @@ axios.interceptors.response.use(
       duration: 5 * 1000,
     });
     return Promise.reject(error);
-  }
+  },
 );

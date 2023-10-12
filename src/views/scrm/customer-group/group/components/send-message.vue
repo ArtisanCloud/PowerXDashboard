@@ -144,7 +144,7 @@
   });
 
   const uploadCoverImage: (option: RequestOption) => UploadRequest = (
-    option: RequestOption
+    option: RequestOption,
   ) => {
     return uploadMediaImages(option, 0, (data: any) => {
       formModel.value.picUrl = apiUrl + data.url;

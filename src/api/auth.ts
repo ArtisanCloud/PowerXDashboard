@@ -25,13 +25,13 @@ export interface ExchangeReply {
 export function login(request: LoginRequest) {
   return axios.post<LoginReply>(
     '/api/v1/admin/auth/access/actions/basic-login',
-    request
+    request,
   );
 }
 
 export function exchangeToken(request: ExchangeRequest) {
   return axios.post<ExchangeReply>(
     '/api/v1/admin/auth/access/actions/exchange-token',
-    request
+    request,
   );
 }

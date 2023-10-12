@@ -8,7 +8,7 @@ export const contains = <T>(array: T[], element: T): boolean => {
 
 export const getObjectsByIds = <T extends { id?: number }>(
   objects: T[],
-  ids: number[]
+  ids: number[],
 ): T[] => {
   return objects.filter((obj) => obj.id !== undefined && ids.includes(obj.id));
 };

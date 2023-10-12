@@ -1,6 +1,7 @@
 <template>
   <div class="content">
     <a-table
+      v-if="departmentTree.length > 0"
       :data="departmentTree"
       :loading="state.loading"
       default-expand-all-rows

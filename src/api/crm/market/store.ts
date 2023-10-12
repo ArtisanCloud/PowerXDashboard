@@ -34,7 +34,7 @@ export function listStores(request: ListStorePageRequest) {
     `${PrefixUriAdmin + UriMarket + UriStore}/page-list`,
     {
       params: request,
-    }
+    },
   );
 }
 
@@ -45,7 +45,7 @@ export function createStore(request: Store) {
 export function updateStore(request: Store) {
   return axios.put<Store>(
     `${PrefixUriAdmin + UriMarket + UriStore}/${request.id}`,
-    request
+    request,
   );
 }
 
@@ -59,6 +59,6 @@ export interface DeleteStoreReply {
 
 export function deleteStore(request: DeleteStoreRequest) {
   return axios.delete<DeleteStoreReply>(
-    `${PrefixUriAdmin + UriMarket + UriStore}/${request.id}`
+    `${PrefixUriAdmin + UriMarket + UriStore}/${request.id}`,
   );
 }

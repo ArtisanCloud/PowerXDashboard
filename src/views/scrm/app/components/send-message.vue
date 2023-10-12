@@ -140,7 +140,7 @@
   });
 
   const uploadCoverImage: (option: RequestOption) => UploadRequest = (
-    option: RequestOption
+    option: RequestOption,
   ) => {
     return uploadMediaImages(option, 0, (data: any) => {
       formModel.value.picurl = apiUrl + data.url;
@@ -189,7 +189,7 @@
     () => prop.agentid,
     () => {
       formModelData.agentid = prop.agentid;
-    }
+    },
   );
   async function fetchtEmployees() {
     const res = await listEmployees({});

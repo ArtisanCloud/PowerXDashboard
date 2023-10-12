@@ -47,7 +47,7 @@ const useOptionsStore = defineStore('options', {
   actions: {
     GetOptionById(
       options: DictionaryItem[],
-      id: number
+      id: number,
     ): DictionaryItem | undefined {
       for (let i = 0; i < options.length; i += 1) {
         if (options[i].id === id) {
@@ -58,7 +58,7 @@ const useOptionsStore = defineStore('options', {
     },
     GetOptionByKey(
       options: DictionaryItem[],
-      key: string
+      key: string,
     ): DictionaryItem | undefined {
       for (let i = 0; i < options.length; i += 1) {
         if (options[i].key === key) {
@@ -77,7 +77,7 @@ const useOptionsStore = defineStore('options', {
         const res = await listDictionaryItems({ type });
         sessionStorage.setItem(
           formatItemSessionKey(type),
-          JSON.stringify(res.data.list)
+          JSON.stringify(res.data.list),
         );
         return res.data.list;
       } finally {

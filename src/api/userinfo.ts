@@ -53,6 +53,6 @@ export interface ModifyPasswordRequest {
 export function modifyUserPassword(request: ModifyPasswordRequest) {
   return axios.post(
     '/api/v1/admin/user-center/users/actions/modify-password',
-    request
+    request,
   );
 }

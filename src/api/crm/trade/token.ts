@@ -31,21 +31,21 @@ export function listTokenProducts(request: ListTokenProductPageRequest) {
     `${PrefixUriAdmin + UriTrade + UriTokenProduct}/page-list`,
     {
       params: request,
-    }
+    },
   );
 }
 
 export function createTokenProduct(request: TokenProduct) {
   return axios.post<TokenProduct>(
     `${PrefixUriAdmin + UriTrade + UriTokenProduct}`,
-    request
+    request,
   );
 }
 
 export function updateTokenProduct(request: TokenProduct) {
   return axios.put<TokenProduct>(
     `${PrefixUriAdmin + UriTrade + UriTokenProduct}/${request.id}`,
-    request
+    request,
   );
 }
 
@@ -59,6 +59,6 @@ export interface DeleteTokenProductReply {
 
 export function deleteTokenProduct(request: DeleteTokenProductRequest) {
   return axios.delete<DeleteTokenProductReply>(
-    `${PrefixUriAdmin + UriTrade + UriTokenProduct}/${request.id}`
+    `${PrefixUriAdmin + UriTrade + UriTokenProduct}/${request.id}`,
   );
 }
