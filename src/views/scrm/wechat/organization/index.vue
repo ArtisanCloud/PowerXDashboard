@@ -6,7 +6,7 @@
  * @LastEditTime: 2023-08-17 14:18:06
 -->
 <template>
-  <div class="content">
+  <div class="container">
     <a-table
       :data="departmentTree.list"
       :loading="state.loading"
