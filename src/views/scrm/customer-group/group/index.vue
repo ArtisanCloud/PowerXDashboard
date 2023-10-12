@@ -6,7 +6,7 @@
  * @LastEditTime: 2023-07-10 22:23:50
 -->
 <template>
-  <div class="content">
+  <div class="container">
     <a-form
       :model="customersParams"
       layout="vertical"

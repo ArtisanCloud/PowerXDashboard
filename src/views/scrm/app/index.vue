@@ -6,7 +6,7 @@
  * @LastEditTime: 2023-07-10 11:09:04
 -->
 <template>
-  <div class="content">
+  <div class="container">
     <a-table
       :data="customersList.list"
       :loading="state.loading"
