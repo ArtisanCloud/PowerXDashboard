@@ -6,7 +6,7 @@
  * @LastEditTime: 2023-07-30 23:13:38
 -->
 <template>
-  <div class="content">
+  <div class="container">
     <a-form
       :model="tagParams"
       layout="vertical"
