@@ -53,7 +53,7 @@
         const backtrack = (
           item: RouteRecordRaw,
           keys: string[],
-          target: string
+          target: string,
         ) => {
           if (item.name === target) {
             isFind = true;
@@ -76,7 +76,7 @@
         const { requiresAuth, activeMenu, hideInMenu } = newRoute.meta;
         if (requiresAuth && (!hideInMenu || activeMenu)) {
           const menuOpenKeys = findMenuOpenKeys(
-            (activeMenu || newRoute.name) as string
+            (activeMenu || newRoute.name) as string,
           );
 
           const keySet = new Set([...menuOpenKeys, ...openKeys.value]);
@@ -94,11 +94,14 @@
 
       const getIcon = (iconName: string) => {
         if (iconName.startsWith('iconfont-')) {
-          return h(
-            compile(`<icon-font type="${iconName.replace('iconfont-', '')}"/>`)
-          );
+          return () =>
+            h(
+              compile(
+                `<icon-font type="${iconName.replace('iconfont-', '')}"/>`,
+              ),
+            );
         }
-        return h(compile(`<${iconName}/>`));
+        return () => h(compile(`<${iconName}/>`));
       };
 
       const renderSubMenu = () => {
