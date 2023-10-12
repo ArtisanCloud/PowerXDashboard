@@ -1,8 +1,8 @@
 import type { RouteRecordNormalized } from 'vue-router';
 import { EMPTY_LAYOUT_TAG } from '@/router/constants';
 import { cloneDeep } from 'lodash';
-import { getSeverPluginRoutes } from "@/api/plugin";
-import { BuildPluginRoutes } from "@/utils/plugin";
+import { getSeverPluginRoutes } from '@/api/plugin';
+import { BuildPluginRoutes } from '@/utils/plugin';
 
 const modules = import.meta.globEager('./modules/*.ts');
 const externalModules = import.meta.globEager('./externalModules/*.ts');
@@ -87,6 +87,7 @@ export async function loadPluginRoutes(router: any) {
       router.getRoutes().find((route: any) => route.name === 'Plugin')
     );
     if (!pluginRoute) return;
+    if (!res.data.routes) return;
     pluginRoute.children = BuildPluginRoutes(res.data.routes as any) as any[];
 
     router.removeRoute(pluginRoute.name as string);
