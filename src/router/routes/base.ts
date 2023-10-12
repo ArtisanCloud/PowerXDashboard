@@ -1,5 +1,9 @@
 import type { RouteRecordRaw } from 'vue-router';
-import { LOGIN_ROUTE_NAME, NOT_FOUND_ROUTE_NAME, REDIRECT_ROUTE_NAME } from "@/router/constants";
+import {
+  LOGIN_ROUTE_NAME,
+  NOT_FOUND_ROUTE_NAME,
+  REDIRECT_ROUTE_NAME,
+} from '@/router/constants';
 
 export const DEFAULT_LAYOUT = () => import('@/layout/default-layout.vue');
 export const EMPTY_LAYOUT = () => import('@/layout/empty-layout.vue');
