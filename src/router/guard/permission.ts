@@ -1,6 +1,4 @@
 import type { Router, RouteRecordNormalized } from 'vue-router';
-import NProgress from 'nprogress'; // 进度条
-
 import usePermission from '@/hooks/permission';
 import { useUserStore, useAppStore } from '@/store';
 import { appRoutes } from '../routes';
@@ -56,7 +54,5 @@ export default function setupPermissionGuard(router: Router) {
         NOT_FOUND;
       next(destination);
     }
-    // 结束进度条
-    NProgress.done();
   });
 }
