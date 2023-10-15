@@ -151,7 +151,7 @@
         <a-col :span="12">
           <a-form-item label="上传头图" field="coverUrl">
             <a-upload
-              :limit="4"
+              :limit="8"
               :multiple="true"
               :draggable="true"
               list-type="picture-card"
