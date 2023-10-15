@@ -1,8 +1,12 @@
 <template>
-  <a-layout-footer class="footer">Powered by ArtisanCloud</a-layout-footer>
+  <a-layout-footer class="footer"
+    >Powered by ArtisanCloud, Version {{ PowerXVersion }}</a-layout-footer
+  >
 </template>
 
-<script lang="ts" setup></script>
+<script lang="ts" setup>
+  import { PowerXVersion } from '@/api';
+</script>
 
 <style lang="less" scoped>
   .footer {
