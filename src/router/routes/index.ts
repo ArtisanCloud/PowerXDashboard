@@ -87,7 +87,7 @@ export async function loadPluginRoutes(router: any) {
       router.getRoutes().find((route: any) => route.name === 'Plugin'),
     );
     if (!pluginRoute) return;
-    if (!res.data.routes) return;
+    if (!res.data?.routes) return;
     pluginRoute.children = BuildPluginRoutes(res.data.routes as any) as any[];
 
     router.removeRoute(pluginRoute.name as string);
