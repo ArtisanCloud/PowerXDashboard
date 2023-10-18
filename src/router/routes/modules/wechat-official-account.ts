@@ -22,6 +22,17 @@ const OfficialAccount: AppRouteRecordRaw = {
         roles: ['*'],
       },
     },
+    {
+      path: '/wechat-official-account/media',
+      name: 'Wechat Official Account Media',
+      component: () =>
+        import('@/views/wechat/official-account/media/index.vue'),
+      meta: {
+        locale: 'menu.wechat.official.media',
+        requiresAuth: true,
+        roles: ['*'],
+      },
+    },
   ],
 };
 
