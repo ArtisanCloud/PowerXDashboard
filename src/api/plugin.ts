@@ -1,5 +1,7 @@
 import axios from 'axios';
 
+const PrefixUriPlugin = 'api/v1/plugin/v1';
+
 export interface ServerPluginRoute {
   name: string;
   path: string;
@@ -14,5 +16,7 @@ export interface GetSeverPluginRoutesResult {
 }
 
 export function getSeverPluginRoutes() {
-  return axios.get<GetSeverPluginRoutesResult>('/plugin/v1/frontend-routes');
+  return axios.get<GetSeverPluginRoutesResult>(
+    `${PrefixUriPlugin}/frontend-routes`,
+  );
 }
