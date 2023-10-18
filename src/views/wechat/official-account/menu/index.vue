@@ -15,7 +15,7 @@
     getOAMenuTree,
     GetOAMenuTreeReply,
     syncOAMenu,
-  } from '@/api/wechat/official-account';
+  } from '@/api/wechat/official-account/menu';
   import { Message } from '@arco-design/web-vue';
 
   const submitMenuData = async (menuData: any) => {

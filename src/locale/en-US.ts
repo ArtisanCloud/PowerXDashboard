@@ -98,6 +98,7 @@ export default {
 
   'menu.wechat.official': 'Wechat Official Account',
   'menu.wechat.official.menu': 'Menu',
+  'menu.wechat.official.media': 'Media',
 
   'menu.infoOrganization.index': 'Info Organization',
 
