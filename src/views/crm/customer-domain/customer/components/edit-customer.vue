@@ -16,6 +16,9 @@
       <a-form-item label="邮箱地址" field="email">
         <a-input v-model="formModel.email" />
       </a-form-item>
+      <a-form-item label="唯一识别号" field="uuid">
+        <a-input v-model="formModel.uuid" disabled />
+      </a-form-item>
       <a-form-item label="客源" field="source">
         <a-select
           v-model="formModel.source"
@@ -87,18 +90,17 @@
 
   const options = useOptionsStore();
 
-  const fileList = [];
-
   const formRef = ref();
   const formModel = ref({
     id: prop.node.id,
     name: prop.node.name,
     mobile: prop.node.mobile,
     email: prop.node.email,
-    inviter: prop.node.inviter,
-    inviterId: prop.node.inviterId,
-    source: prop.node.source,
-    type: prop.node.type,
+    // email: prop.node.uuid,
+    // inviter: prop.node.inviter,
+    // inviterId: prop.node.inviterId,
+    // source: prop.node.source,
+    // type: prop.node.type,
     isActivated: prop.node.isActivated,
   } as Customer);
 
