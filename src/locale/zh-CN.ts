@@ -97,6 +97,7 @@ export default {
 
   'menu.wechat.official': '微信公众号',
   'menu.wechat.official.menu': '菜单配置',
+  'menu.wechat.official.media': '媒体库管理',
 
   'menu.infoOrganization': '信息组织',
   'menu.infoOrganization.label': '框架标签',
