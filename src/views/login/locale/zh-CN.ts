@@ -1,5 +1,5 @@
 export default {
-  'login.form.title': '登录 小裂匠',
+  'login.form.title': '登录 PowerX',
   'login.form.userName.errMsg': '用户名不能为空',
   'login.form.password.errMsg': '密码不能为空',
   'login.form.login.errMsg': '登录出错，请刷新重试',
