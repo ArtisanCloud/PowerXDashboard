@@ -17,7 +17,11 @@
         <a-input v-model="formModel.email" />
       </a-form-item>
       <a-form-item label="唯一识别号" field="uuid">
-        <a-input v-model="formModel.uuid" disabled />
+        <a-typography-text>{{
+          prop.node.uuid !== ''
+            ? prop.node.uuid
+            : '提交保存后会自动生成唯一识别号'
+        }}</a-typography-text>
       </a-form-item>
       <a-form-item label="客源" field="source">
         <a-select
@@ -96,11 +100,11 @@
     name: prop.node.name,
     mobile: prop.node.mobile,
     email: prop.node.email,
-    // email: prop.node.uuid,
+    // uuid: prop.node.uuid,
     // inviter: prop.node.inviter,
     // inviterId: prop.node.inviterId,
-    // source: prop.node.source,
-    // type: prop.node.type,
+    source: prop.node.source,
+    type: prop.node.type,
     isActivated: prop.node.isActivated,
   } as Customer);
 
