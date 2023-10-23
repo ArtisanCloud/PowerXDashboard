@@ -15,6 +15,7 @@ export interface Customer extends PowerModel, CustomerExternalId {
   name: string;
   mobile: string;
   email: string;
+  uuid: string;
   inviterId: number;
   source: number;
   type: number;
