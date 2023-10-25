@@ -81,22 +81,36 @@ export const appExternalRoutes: RouteRecordNormalized[] = formatModules(
 );
 
 export async function loadPluginRoutes(router: any) {
-  getSeverPluginRoutes().then((res) => {
-    // find plugin route
+  const insertPluginRoutes = (routes: any) => {
     const pluginRoute = cloneDeep(
       router.getRoutes().find((route: any) => route.name === 'Plugin'),
     );
     if (!pluginRoute) return;
-    if (!res.data?.routes) return;
-    pluginRoute.children = BuildPluginRoutes(res.data.routes as any) as any[];
-
-    router.removeRoute(pluginRoute.name as string);
-    router.addRoute(pluginRoute);
+    pluginRoute.children = BuildPluginRoutes(routes as any) as any[];
 
     menuRoutes.forEach((route) => {
       if (route.name === 'Plugin') {
-        route.children = BuildPluginRoutes(res.data.routes as any) as any[];
+        route.children = pluginRoute.children;
       }
     });
-  });
+
+    // -tmp
+    setTimeout(() => {
+      router.removeRoute(pluginRoute.name as string);
+      router.addRoute(pluginRoute);
+    }, 1000);
+  };
+  // find from session storage
+  const cacheRoutes = sessionStorage.getItem('plugin-routes');
+  if (cacheRoutes) {
+    insertPluginRoutes(JSON.parse(cacheRoutes));
+  } else {
+    getSeverPluginRoutes().then((res) => {
+      const { routes } = res.data;
+      if (routes) {
+        sessionStorage.setItem('plugin-routes', JSON.stringify(routes));
+        insertPluginRoutes(routes);
+      }
+    });
+  }
 }

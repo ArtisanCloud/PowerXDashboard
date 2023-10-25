@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const PrefixUriPlugin = 'api/v1/plugin/v1';
+const PrefixUriPlugin = '/api/v1/plugin/v1';
 
 export interface ServerPluginRoute {
   name: string;

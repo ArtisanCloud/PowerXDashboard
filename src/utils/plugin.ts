@@ -24,7 +24,7 @@ export function CreateWujieComponent(option: Option) {
     },
     template: `
       <div class="container">
-        <WujieVue3 v-bind="option" />
+        <WujieVue3 v-bind="option"/>
       </div>
     `,
   });
@@ -37,9 +37,11 @@ export function BuildPluginRoutes(
     route.component = CreateWujieComponent({
       key: route.name,
       name: route.name,
-      url: `${pluginEndpoint}${route.path}`,
+      url: pluginEndpoint ?  `${pluginEndpoint}${route.path}` : route.path,
+      alive: true,
+      sync:true
     });
-    route.path = `/plugin${route.path}`;
+    route.path = `/powerx-plugins${route.path}`;
     return route as AppRouteRecordRaw;
   });
 }
