@@ -37,9 +37,9 @@ export function BuildPluginRoutes(
     route.component = CreateWujieComponent({
       key: route.name,
       name: route.name,
-      url: `${pluginEndpoint}${route.path}`,
+      url: pluginEndpoint ?  `${pluginEndpoint}${route.path}` : route.path,
       alive: true,
-      sync: true
+      sync:true
     });
     route.path = `/powerx-plugins${route.path}`;
     return route as AppRouteRecordRaw;
