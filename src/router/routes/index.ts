@@ -98,7 +98,7 @@ export async function loadPluginRoutes(router: any) {
     setTimeout(() => {
       router.removeRoute(pluginRoute.name as string);
       router.addRoute(pluginRoute);
-    }, 2000);
+    }, 1000);
   };
   // find from session storage
   const cacheRoutes = sessionStorage.getItem('plugin-routes');
