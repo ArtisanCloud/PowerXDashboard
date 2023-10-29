@@ -59,11 +59,15 @@ export interface Product extends PowerModel, ProductAttribute, MediaSet {
 export interface ListProductPageRequest extends Pagination {
   ids?: number[];
   likeName?: string;
-  startAt?: string;
-  endAt?: string;
+  sku?: string;
   typeIds?: number[];
-  statusIds?: number[];
+  productCategoryId?: number;
+  productCategoryIds?: number[];
+  needActivated?: boolean;
   storeIds?: number[];
+  salesStartAt?: string;
+  salesEndAt?: string;
+  saleDatesIn?: Date[];
 }
 
 export interface ListProductPageReply extends Pagination {

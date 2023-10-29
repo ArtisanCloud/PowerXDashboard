@@ -1,6 +1,14 @@
 <template>
   <div class="container">
     <a-card>
+      <filter-product
+        ref="RefFilerProduct"
+        @on-submit="onSearch"
+        @on-reset="onResetSearch"
+      ></filter-product>
+    </a-card>
+    <br />
+    <a-card>
       <a-space size="large">
         <a-button type="primary" @click="openAddProduct()">新增商品 </a-button>
       </a-space>
@@ -28,12 +36,22 @@
   import { reactive, ref } from 'vue';
   import ProductTable from '@/views/crm/product-service/product/components/product-table.vue';
   import CreateProduct from '@/views/crm/product-service/product/components/create-product.vue';
+  import FilterProduct from '@/views/crm/product-service/product/components/filter-product.vue';
   import { DefaultPageSize } from '@/api';
+  import { ListProductPageRequest } from '@/api/crm/product-service/product';
 
+  const RefFilerProduct = ref<any>();
   const RefProductTable = ref<any>();
 
+  const state = ref({
+    createProduct: {
+      visible: false,
+      parentNode: {},
+    },
+  });
+
   const openAddProduct = () => {
-    state.createProduct.visible = true;
+    state.value.createProduct.visible = true;
   };
 
   const pagination = reactive({
@@ -46,24 +64,19 @@
     'show-page-size': true,
   });
 
-  const state = reactive({
-    createProduct: {
-      visible: false,
-      parentNode: {},
-    },
-  });
-
   const refreshProductList = () => {
     RefProductTable.value.fetchProductList({
       pageIndex: pagination.currentPage,
       pageSize: pagination.pageSize,
     });
   };
-</script>
 
-<script lang="ts">
-  export default {
-    name: '商品管理',
+  const onResetSearch = () => {
+    refreshProductList();
+  };
+
+  const onSearch = (data: ListProductPageRequest) => {
+    RefProductTable.value.fetchProductList(data);
   };
 </script>
 
