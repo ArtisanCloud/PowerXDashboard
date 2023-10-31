@@ -10,6 +10,7 @@
       :bordered="{ cell: true }"
       @page-change="pageChanged"
       @page-size-change="pageSizeChanged"
+      @sorter-change="sortProducts"
     >
       <template #ID="{ rowIndex }">
         <a-typography-text>{{ rowIndex + 1 }}</a-typography-text>
@@ -151,13 +152,14 @@
   import CreatePriceBookEntry from '@/views/crm/product-service/price-book-entry/components/create-price-book-entry.vue';
   import EditProduct from '@/views/crm/product-service/product/components/edit-product.vue';
   import EditProductStatistics from '@/views/crm/product-service/product/components/edit-product-statistics.vue';
-  import { Message } from '@arco-design/web-vue';
+  import { Message, TableColumnData } from '@arco-design/web-vue';
 
   import useOptionsStore from '@/store/modules/data-dictionary';
   import { dayjs } from '@arco-design/web-vue/es/_utils/date';
   import { DefaultPageSize } from '@/api';
 
   const options = useOptionsStore();
+  const emits = defineEmits(['onSortBy']);
 
   const productList = ref([] as Product[]);
 
@@ -166,11 +168,18 @@
       title: 'ID',
       width: 60,
       slotName: 'ID',
+      dataIndex: 'id',
+      // sortable: {
+      //   sortDirections: ['ascend', 'descend'],
+      // },
     },
     {
       title: '产品名称',
-      dataIndex: 'name',
       width: 150,
+      dataIndex: 'name',
+      sortable: {
+        sortDirections: ['ascend', 'descend'],
+      },
     },
     {
       title: '头图',
@@ -208,6 +217,9 @@
         }
         return '未设置';
       },
+      sortable: {
+        sortDirections: ['ascend', 'descend'],
+      },
     },
     {
       title: '销售结束时间',
@@ -227,7 +239,7 @@
       title: '操作',
       slotName: 'optional',
     },
-  ]);
+  ] as TableColumnData[]);
 
   const pagination = reactive({
     'total': 0,
@@ -327,6 +339,11 @@
   const pageSizeChanged = (pageSize: number) => {
     // console.log("pagesize", pageSize)
     fetchProductList({ pageIndex: pagination.currentPage, pageSize });
+  };
+
+  const sortProducts = (dataIndex: string, direction: string) => {
+    // console.log(dataIndex, direction);
+    emits('onSortBy', dataIndex, direction);
   };
 
   defineExpose({ fetchProductList });

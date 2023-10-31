@@ -15,7 +15,7 @@
     </a-card>
     <br />
     <a-card>
-      <ProductTable ref="RefProductTable" />
+      <ProductTable ref="RefProductTable" @on-sort-by="onSortBy" />
     </a-card>
     <a-drawer
       v-model:visible="state.createProduct.visible"
@@ -39,6 +39,19 @@
   import FilterProduct from '@/views/crm/product-service/product/components/filter-product.vue';
   import { DefaultPageSize } from '@/api';
   import { ListProductPageRequest } from '@/api/crm/product-service/product';
+
+  type ProductSortType = {
+    // id: string;
+    name: string;
+    saleStartDate: string;
+    [key: string]: string; // 添加索引签名
+  };
+  const productsSortBy = ref<ProductSortType>({
+    // id: '',
+    name: '',
+    saleStartDate: '',
+  });
+  const formSearch = ref<ListProductPageRequest>({});
 
   const RefFilerProduct = ref<any>();
   const RefProductTable = ref<any>();
@@ -75,8 +88,45 @@
     refreshProductList();
   };
 
+  const getSearchRequestParams = () => {
+    let strSortBy = '';
+    let isFirst = true;
+    let separate = '';
+    Object.keys(productsSortBy.value).forEach((key) => {
+      let sortValue = productsSortBy.value[key as keyof ProductSortType];
+      if (sortValue !== '') {
+        sortValue = sortValue === 'ascend' ? 'asc' : 'desc';
+
+        if (isFirst) {
+          isFirst = false;
+        } else {
+          separate = ', ';
+        }
+        strSortBy += `${separate}${key} ${sortValue}`;
+      }
+    });
+
+    if (strSortBy !== '') {
+      formSearch.value.orderBy = strSortBy;
+    }
+    // console.log(formSearch.value.orderBy);
+
+    return formSearch;
+  };
+
+  const onSortBy = (dataIndex: string, direction: string) => {
+    // console.log(dataIndex, direction);
+    productsSortBy.value[dataIndex] = direction;
+    const params = getSearchRequestParams();
+    // console.log(params.value);
+    RefProductTable.value.fetchProductList(params.value);
+  };
+
   const onSearch = (data: ListProductPageRequest) => {
-    RefProductTable.value.fetchProductList(data);
+    formSearch.value = data;
+    const params = getSearchRequestParams();
+    // console.log(params.value);
+    RefProductTable.value.fetchProductList(params.value);
   };
 </script>
 
