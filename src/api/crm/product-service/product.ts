@@ -68,6 +68,7 @@ export interface ListProductPageRequest extends Pagination {
   salesStartAt?: string;
   salesEndAt?: string;
   saleDatesIn?: Date[];
+  orderBy?: string;
 }
 
 export interface ListProductPageReply extends Pagination {
