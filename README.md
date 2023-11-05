@@ -28,18 +28,12 @@
 > 提供基础功能的开源小程序，因为前端的应用比较多样性，所以我们只会开源一部分基础的功能，给予演示。
 
 
-
-
-## PowerX社区交流群
-
-<img src="https://powerx.artisan-cloud.com/assets/contact_me_qr.304649f9.jpg" alt="请扫我" style="display:inline; width: 150px;"/>
-
-## 企业微信主要维护者
+## 产品主要维护者
 
 Matrix-X
 
-<img src="https://powerx.artisan-cloud.com/assets/contact-qr-matrix-x.b70d53f1.png" alt="请扫我" style="display:inline; width: 150px;"/>
+<img src="https://powerx.artisan-cloud.com/assets/contact-qr-matrix-x.f35142ca.jpg" alt="请扫我" style="display:inline; width: 150px;"/>
 
 North
 
-<img src="https://raw.githubusercontent.com/ArtisanCloud/PowerX/develop/resource/images/contact_qr_north.png" alt="请扫我" style="display:inline; width: 150px;"/>
+<img src="https://powerx.artisan-cloud.com/assets/contact_qr_north.d68f0fd0.jpg" alt="请扫我" style="display:inline; width: 150px;"/>
