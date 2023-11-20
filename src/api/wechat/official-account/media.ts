@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { PrefixUriAdmin } from '@/api';
 
-const UriOAMedia = '/wechat/official-account/medias';
+export const UriOAMedia = '/wechat/official-account/medias';
 
 export interface GetMediaRequest {
   mediaId: string;
@@ -34,5 +34,36 @@ export function GetMediaOtherList(request: GetMediaOtherListRequest) {
   return axios.post<GetMediaOtherListReply>(
     `${PrefixUriAdmin + UriOAMedia}/page-list`,
     request,
+  );
+}
+
+export interface UploadMediaRequest {
+  media: any;
+}
+
+export interface UploadMediaReply {
+  success: boolean;
+  data: any;
+}
+
+export function UploadMedia(request: UploadMediaRequest) {
+  return axios.post<UploadMediaReply>(
+    `${PrefixUriAdmin + UriOAMedia}`,
+    request,
+  );
+}
+
+export interface DeleteMediaRequest {
+  mediaId: string;
+}
+
+export interface DeleteMediaReply {
+  success: boolean;
+  data: any;
+}
+
+export function DeleteMedia(request: DeleteMediaRequest) {
+  return axios.delete<DeleteMediaReply>(
+    `${PrefixUriAdmin + UriOAMedia}/${request.mediaId}`,
   );
 }
