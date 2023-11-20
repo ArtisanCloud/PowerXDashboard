@@ -1,19 +1,20 @@
 <template>
   <div class="content">
     <w-offi-account-media
-      action="/api/wechat/media/uploadOtherMedia"
+      :action="`${PrefixUriAdmin + UriOAMedia}/upload`"
+      :headers="header"
       :media-data="mediaData"
       :total="total"
       :current="current"
       :page-size="pageSize"
-      :page-size-options="[10, 20, 30, 50, 100]"
+      :page-size-options="[5, 10, 20, 30, 50, 100]"
       :tem-url="temUrl"
       @on-down-load="downLoadImage"
-      @on-delete="deleteImg"
+      @on-delete="onDeleteMedia"
       @page-change="pageChange"
       @page-size-change="pageSizeChange"
-      @on-change-tab="onChangeTab"
-      @on-preview="onPreview"
+      @onChangeTab="onChangeTab"
+      @onPreview="onPreview"
     />
   </div>
 </template>
@@ -22,9 +23,17 @@
   import { onMounted, ref } from 'vue';
   import { WOffiAccountMedia } from '@yaoyaochi/weyui';
   import {
+    DeleteMedia,
     GetMedia,
     GetMediaOtherList,
+    UriOAMedia,
   } from '@/api/wechat/official-account/media';
+  import { PrefixUriAdmin } from '@/api';
+  import { getToken } from '@/utils/auth';
+
+  const header = ref<Record<string, any>>({});
+  const token = getToken();
+  header.value.Authorization = `Bearer ${token}`;
 
   const total = ref(0); // 总条数
   const pageSize = ref(10); // 每页条数
@@ -36,10 +45,11 @@
 
   const refreshMediaList = async (type: string) => {
     const res = await GetMediaOtherList({
-      type: dataType.value,
+      type,
       offset: current.value,
       count: pageSize.value,
     });
+    console.log(res);
     mediaData.value.item = res.data.item;
     total.value = res.data.total_count;
   };
@@ -53,6 +63,15 @@
     }
     if (res.data) {
       temUrl.value = URL.createObjectURL(res.data);
+    }
+  };
+
+  const onDeleteMedia = async (itemId: string) => {
+    // 删除图片
+    console.log(itemId);
+    const res = await DeleteMedia({ mediaId: itemId });
+    if (res.data.success) {
+      await refreshMediaList(dataType.value);
     }
   };
 
