@@ -1,6 +1,6 @@
 <template>
   <div class="content">
-    <w-offi-account-media
+    <w-media
       :action="`${PrefixUriAdmin + UriOAMedia}/upload`"
       :headers="header"
       :media-data="mediaData"
@@ -8,23 +8,25 @@
       :current="current"
       :page-size="pageSize"
       :page-size-options="[5, 10, 20, 30, 50, 100]"
-      :tem-url="temUrl"
+      :preview-url="temUrl"
       @on-down-load="downLoadImage"
       @on-delete="onDeleteMedia"
       @page-change="pageChange"
       @page-size-change="pageSizeChange"
       @onChangeTab="onChangeTab"
       @onPreview="onPreview"
+      @on-upload-success="onUploadSuccess"
     />
   </div>
 </template>
 
 <script lang="ts" setup>
   import { onMounted, ref } from 'vue';
-  import { WOffiAccountMedia } from '@yaoyaochi/weyui';
+  import { WMedia } from '@yaoyaochi/weyui';
   import {
     DeleteMedia,
     GetMedia,
+    GetMediaByVideo,
     GetMediaOtherList,
     UriOAMedia,
   } from '@/api/wechat/official-account/media';
@@ -49,26 +51,39 @@
       offset: current.value,
       count: pageSize.value,
     });
-    console.log(res);
+    // console.log(res);
     mediaData.value.item = res.data.item;
     total.value = res.data.total_count;
+    // console.log(total.value);
   };
 
   const getMediaById = async (mediaId: string, type: string) => {
     // 获取素材
-    const res: any = await GetMedia({ mediaId });
-    if ((res.data && type === 'video') || type === 'news') {
-      temUrl.value = res.data.data.down_url;
-      return;
-    }
-    if (res.data) {
-      temUrl.value = URL.createObjectURL(res.data);
+    // console.log(mediaId, type);
+    // if ((res.data && type === 'video') || type === 'news') {
+    if (type === 'video') {
+      const res: any = await GetMediaByVideo({ mediaId });
+      temUrl.value = res.data.down_url;
+      // console.log(temUrl);
+    } else {
+      const res: any = await GetMedia({ mediaId });
+      // 将 Base64 字符串转换为 Uint8Array
+      const arrayBuffer = Uint8Array.from(atob(res.data.media), (c) =>
+        c.charCodeAt(0),
+      );
+
+      // 创建 Blob 对象
+      const blob = new Blob([arrayBuffer], {
+        type: 'application/octet-stream',
+      });
+
+      temUrl.value = URL.createObjectURL(blob);
     }
   };
 
   const onDeleteMedia = async (itemId: string) => {
     // 删除图片
-    console.log(itemId);
+    // console.log(itemId);
     const res = await DeleteMedia({ mediaId: itemId });
     if (res.data.success) {
       await refreshMediaList(dataType.value);
@@ -79,11 +94,16 @@
     // 切换tab
     dataType.value = item;
     await refreshMediaList(item);
-    console.log(dataType.value);
+    // console.log(dataType.value);
   };
   const downLoadImage = (item: any) => {
     // 获取图片URL
-    console.log(item);
+    // console.log(item);
+  };
+
+  const onUploadSuccess = async () => {
+    // console.log('onUploadSuccess', dataType.value);
+    await refreshMediaList(dataType.value);
   };
 
   const deleteImg = (item: any) => {

@@ -17,6 +17,11 @@ export function GetMedia(request: GetMediaRequest) {
     `${PrefixUriAdmin + UriOAMedia}/${request.mediaId}`,
   );
 }
+export function GetMediaByVideo(request: GetMediaRequest) {
+  return axios.get<GetMediaReply>(
+    `${PrefixUriAdmin + UriOAMedia}/video/${request.mediaId}`,
+  );
+}
 
 export interface GetMediaOtherListRequest {
   type: string;
