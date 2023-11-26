@@ -15,6 +15,7 @@
     "lib": ["es2020", "dom"],
     "skipLibCheck": true,
     "types": [
+      "node",
       "@yaoyaochi/weyui/components.d.ts",
     ]
   },
