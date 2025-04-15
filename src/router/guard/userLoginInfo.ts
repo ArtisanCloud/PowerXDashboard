@@ -14,7 +14,9 @@ export default function setupUserLoginInfoGuard(router: Router) {
         try {
           await userStore.info();
           return true;
-        } catch (error) {
+        } catch (error: any) {
+          // eslint-disable-next-line no-console
+          console.error(error);
           await userStore.logout();
           return false;
         }

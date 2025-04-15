@@ -63,7 +63,7 @@ export interface ListUsersReply {
 
 export function listUsers(request: ListUsersRequest) {
   return axios.post<ListUsersReply>(
-    '/api/v1/admin/scrm/organization/wechat/user/page',
+    '/api/v1/admin/scrm/wechat/wecom/organization/users/page',
     request,
   );
 }

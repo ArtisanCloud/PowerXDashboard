@@ -49,7 +49,7 @@ export interface GetDepartmentTreeReplyList {
 
 export function getDepartmentTree() {
   return axios.post<GetDepartmentTreeReply>(
-    `/api/v1/admin/scrm/organization/wechat/partment/page`,
+    `/api/v1/admin/scrm/wechat/wecom/organization/department/page`,
   );
 }
 

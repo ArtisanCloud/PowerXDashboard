@@ -37,7 +37,7 @@ export type GetCustomersReply = Customers;
  */
 export function getCustomers(request: GetCustomersRequest) {
   return axios.post<GetCustomersReply>(
-    `/api/v1/admin/scrm/customer/wechat/page`,
+    `/api/v1/scrm/wechat/wecom/customers/page`,
     request,
   );
 }
@@ -55,7 +55,7 @@ export type GetCustomersGroupsReReply = Customers;
  */
 export function getCustomersGroups(request: GetCustomersGroupsRequest) {
   return axios.post<GetCustomersGroupsReReply>(
-    `/api/v1/admin/scrm/customer/wechat/group/list`,
+    `/api/v1/admin/scrm/wechat/wecom/customers/group/list`,
     request,
   );
 }
@@ -66,7 +66,7 @@ export function getCustomersGroupsDetail(
   request: GetCustomersGroupsDetailRequest,
 ) {
   return axios.get<GetCustomersGroupsReReply>(
-    `/api/v1/admin/scrm/app/wechat/group/list`,
+    `/api/v1/admin/scrm/wechat/wecom/app/group/list`,
     {
       params: request,
     },
@@ -81,7 +81,7 @@ export type GetWechatAppReReply = Customers;
 
 export function wechatAppList(request: any) {
   return axios.get<GetWechatAppReReply>(
-    '/api/v1/admin/scrm/app/wechat/options',
+    '/api/v1/admin/scrm/wechat/wecom/app/options',
     {
       params: request,
     },
@@ -97,7 +97,7 @@ export interface GetWechatAppDetailRequest {
 }
 
 export function wechatAppDetail(request: GetWechatAppDetailRequest) {
-  return axios.get<any>('/api/v1/admin/scrm/app/wechat/detail', {
+  return axios.get<any>('/api/v1/admin/scrm/wechat/wecom/app/detail', {
     params: request,
   });
 }
@@ -115,14 +115,14 @@ export interface GetWechatGroupReReply {
 }
 export function wechatGroup(request: any) {
   return axios.get<GetWechatGroupReReply>(
-    '/api/v1/admin/scrm/app/wechat/group/list',
+    '/api/v1/admin/scrm/wechat/wecom/app/group/list',
     request,
   );
 }
 
 export function getWechatSync(request: any) {
   return axios.get<GetCustomersReply>(
-    '/api/v1/admin/scrm/organization/wechat/sync',
+    '/api/v1/admin/scrm/wechat/wecom/organization/users/sync',
     request,
   );
 }
@@ -143,7 +143,7 @@ export interface GetWechatGroupArticlesRequest {
 }
 export function wechatGroupArticles(request: GetWechatGroupArticlesRequest) {
   return axios.post<GetCustomersReply>(
-    '/api/v1/admin/scrm/app/wechat/group/message/articles',
+    '/api/v1/admin/scrm/wechat/wecom/app/group/message/articles',
     request,
   );
 }
@@ -163,7 +163,7 @@ export interface CreateWechatGroupReply {
 }
 export function createWechatGroup(request: CreateWechatGroupRequest) {
   return axios.post<CreateWechatGroupReply>(
-    '/api/v1/admin/scrm/app/wechat/group/create',
+    '/api/v1/admin/scrm/wechat/wecom/app/group/create',
     request,
   );
 }
@@ -198,7 +198,7 @@ export interface GetMessageArticlesRequest {
 
 export function wechatMessageArticles(request: GetMessageArticlesRequest) {
   return axios.post<GetCustomersReply>(
-    '/api/v1/admin/scrm/app/wechat/message/articles',
+    '/api/v1/admin/scrm/wechat/wecom/app/message/articles',
     request,
   );
 }
@@ -213,7 +213,7 @@ export interface GetMessageTemplateRequest {
 }
 export function wechatMessageTemplate(request: GetMessageTemplateRequest) {
   return axios.post<GetCustomersReply>(
-    '/api/v1/admin/scrm/customer/wechat/group/message/template',
+    '/api/v1/admin/scrm/wechat/wecom/customers/group/message/template',
     request,
   );
 }

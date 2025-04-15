@@ -61,10 +61,10 @@ const useAppStore = defineStore('app', {
           content: '成功',
           closable: true,
         });
-      } catch (error) {
+      } catch (error: any) {
         Notification.error({
           id: 'menuNotice',
-          content: '错误',
+          content: `错误${error.message}`,
           closable: true,
         });
       }

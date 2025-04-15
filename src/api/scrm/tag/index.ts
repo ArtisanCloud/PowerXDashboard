@@ -32,14 +32,14 @@ export type GetTagReply = ReplyList;
 
 export function getTagList(request: GetTagRequest) {
   return axios.post<GetTagReply>(
-    `/api/v1/admin/scrm/tag/wechat/corp/page`,
+    `/api/v1/admin/scrm/wechat/wecom/tags/corp/page`,
     request,
   );
 }
 
 export function getGroupTagList(request: GetTagRequest) {
   return axios.post<GetTagReply>(
-    `/api/v1/admin/scrm/tag/wechat/group/page`,
+    `/api/v1/admin/scrm/wechat/wecom/tags/group/page`,
     request,
   );
 }
@@ -63,7 +63,7 @@ export interface CreateTagReply {
 }
 export function addTag(request: AddTagRequest) {
   return axios.post<CreateTagReply>(
-    `/api/v1/admin/scrm/tag/wechat/crop/create`,
+    `/api/v1/admin/scrm/wechat/wecom/tags/crop/create`,
     request,
   );
 }
@@ -81,7 +81,7 @@ export interface EditTagRequest {
 
 export function editTag(request: EditTagRequest) {
   return axios.post<CreateTagReply>(
-    `/api/v1/admin/scrm/tag/wechat/group/action`,
+    `/api/v1/admin/scrm/wechat/wecom/tags/group/action`,
     request,
   );
 }
@@ -91,21 +91,21 @@ interface DeleteTagRequest {
   groupIds?: string[];
 }
 export function deleteTag(request: DeleteTagRequest) {
-  return axios.delete<any>(`/api/v1/admin/scrm/tag/wechat/crop/delete`, {
+  return axios.delete<any>(`/api/v1/admin/scrm/wechat/wecom/tags/crop/delete`, {
     data: request,
   });
 }
 
 export function wechatTagSync() {
-  return axios.put<any>(`/api/v1/admin/scrm/tag/wechat/sync`);
+  return axios.put<any>(`/api/v1/admin/scrm/wechat/wecom/tags/sync`);
 }
 
 export function corpOption() {
-  return axios.get<any>(`/api/v1/admin/scrm/tag/wechat/corp/option`);
+  return axios.get<any>(`/api/v1/admin/scrm/wechat/wecom/tags/corp/option`);
 }
 
 export function groupOption() {
-  return axios.get<any>(`/api/v1/admin/scrm/tag/wechat/group/option`);
+  return axios.get<any>(`/api/v1/admin/scrm/wechat/wecom/tags/group/option`);
 }
 export interface CustomerTagList {
   userId: string;
@@ -115,7 +115,7 @@ export interface CustomerTagList {
 }
 export function customerTag(request: CustomerTagList) {
   return axios.post<any>(
-    `/api/v1/admin/scrm/tag/wechat/customer/action`,
+    `/api/v1/admin/scrm/wechat/wecom/tags/customer/action`,
     request,
   );
 }

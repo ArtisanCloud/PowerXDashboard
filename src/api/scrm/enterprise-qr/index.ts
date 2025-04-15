@@ -30,7 +30,7 @@ export type GetQrcodeReply = ReplyList;
 
 export function getQrcodeList(request: GetQrcodeRequest) {
   return axios.post<GetQrcodeReply>(
-    `/api/v1/admin/scrm/qrcode/wechat/group/page`,
+    `/api/v1/admin/scrm/wechat/wecom/qrcodes/group/page`,
     request,
   );
 }
@@ -53,29 +53,31 @@ export interface CreateQrcodeReply {
 }
 export function createQrcode(request: CreateQrcodeRequest) {
   return axios.post<CreateQrcodeReply>(
-    `/api/v1/admin/scrm/qrcode/wechat/group/create`,
+    `/api/v1/admin/scrm/wechat/wecom/qrcodes/group/create`,
     request,
   );
 }
 
 export function editQrcode(request: CreateQrcodeRequest, qid: string) {
   return axios.patch<CreateQrcodeReply>(
-    `/api/v1/admin/scrm/qrcode/wechat/group/update/${qid}`,
+    `/api/v1/admin/scrm/wechat/wecom/qrcodes/group/update/${qid}`,
     request,
   );
 }
 
 export function deleteQrcode(qid: string) {
-  return axios.delete<any>(`/api/v1/admin/scrm/qrcode/wechat/group/${qid}`);
+  return axios.delete<any>(
+    `/api/v1/admin/scrm/wechat/wecom/qrcodes/group/${qid}`,
+  );
 }
 
 export function enableQrcode(qid: string) {
   return axios.patch<any>(
-    `/api/v1/admin/scrm/qrcode/wechat/group/enable/${qid}`,
+    `/api/v1/admin/scrm/wechat/wecom/qrcodes/group/enable/${qid}`,
   );
 }
 export function disableQrcode(qid: string) {
   return axios.patch<any>(
-    `/api/v1/admin/scrm/qrcode/wechat/group/disable/${qid}`,
+    `/api/v1/admin/scrm/wechat/wecom/qrcodes/group/disable/${qid}`,
   );
 }
