@@ -41,7 +41,7 @@
       "
     >
       <a-table
-        v-model:selectedKeys="state.productIds"
+        v-model:selected-keys="state.productIds"
         style="width: 100%"
         row-key="id"
         :columns="columns"

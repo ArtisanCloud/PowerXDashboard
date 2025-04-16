@@ -20,8 +20,8 @@ export interface DepartmentLeader {
 }
 
 export interface DepartmentNode {
-  weWorkParentId?: number;
-  weWorkDepId?: number;
+  WeComParentId?: number;
+  WeComDepId?: number;
   refDepartmentId?: number;
   order?: number;
   name?: string;

@@ -41,7 +41,7 @@
           <a-option
             v-for="(item, index) in prop.usersList"
             :key="index"
-            :value="item.weWorkUserId"
+            :value="item.WeComUserId"
             >{{ item.name }}</a-option
           >
         </a-select>

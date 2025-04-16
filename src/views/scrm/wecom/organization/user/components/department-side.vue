@@ -14,7 +14,7 @@
     :show-line="true"
     :field-names="{
       title: 'name',
-      key: 'weWorkDepId',
+      key: 'WeComDepId',
       children: 'children',
     }"
     checked-strategy="child"
@@ -67,8 +67,8 @@
   const departNodes = (data: DepartmentNode[], parentId = 0) => {
     const departNodesList: DepartmentNode[] = [];
     data.forEach((item) => {
-      if (item.weWorkParentId === parentId) {
-        const children = departNodes(data, item.weWorkDepId);
+      if (item.WeComParentId === parentId) {
+        const children = departNodes(data, item.WeComDepId);
         if (children.length > 0) {
           item.children = children;
         }

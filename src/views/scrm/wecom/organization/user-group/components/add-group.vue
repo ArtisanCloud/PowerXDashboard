@@ -14,13 +14,13 @@
       <a-form-item label="群主" field="owner">
         <a-select
           v-model="formModel.owner"
-          value-key="weWorkUserId"
+          value-key="WeComUserId"
           placeholder="请选择群主..."
         >
           <a-option
             v-for="(item, index) in usersList?.list"
             :key="index"
-            :value="item.weWorkUserId"
+            :value="item.WeComUserId"
             :label="item.name"
           ></a-option>
         </a-select>
@@ -29,14 +29,14 @@
       <a-form-item label="群成员" field="userlist">
         <a-select
           v-model="formModel.userlist"
-          value-key="weWorkUserId"
+          value-key="WeComUserId"
           placeholder="请选择群成员..."
           multiple
         >
           <a-option
             v-for="(item, index) in usersList?.list"
             :key="index"
-            :value="item.weWorkUserId"
+            :value="item.WeComUserId"
             :label="item.name"
           ></a-option>
         </a-select>
@@ -87,11 +87,12 @@
   const state = reactive({
     submitLoading: false,
   });
-  async function fetchtUsers() {
+  async function fetchUsers() {
     const res = await listUsers({});
     try {
       usersList.list = res.data?.list;
-    } catch (err) {
+    } catch (err: any) {
+      Message.error(err.message);
       usersList.list = [];
     }
   }
@@ -122,6 +123,6 @@
   };
 
   onMounted(() => {
-    fetchtUsers();
+    fetchUsers();
   });
 </script>

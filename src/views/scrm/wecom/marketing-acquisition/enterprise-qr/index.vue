@@ -43,7 +43,7 @@
             <a-option
               v-for="(item, index) in usersList.list"
               :key="index"
-              :value="item.weWorkUserId"
+              :value="item.WeComUserId"
               >{{ item.name }}</a-option
             >
           </a-select>
@@ -423,7 +423,7 @@
     pagination.pageSize = pageSize;
     fetchQrcodeList();
   };
-  async function fetchtUsers() {
+  async function fetchUsers() {
     const res = await listUsers({});
     try {
       usersList.list = res.data?.list;
@@ -443,7 +443,7 @@
   }
   onMounted(() => {
     fetchQrcodeList();
-    fetchtUsers();
+    fetchUsers();
   });
 </script>
 

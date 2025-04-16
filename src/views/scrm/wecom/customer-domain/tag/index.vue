@@ -46,7 +46,7 @@
           </div>
 
           <a-table
-            v-model:selectedKeys="selectedKeys"
+            v-model:selected-keys="selectedKeys"
             :pagination="pagination"
             :data="tagList.list"
             :loading="state.loading"

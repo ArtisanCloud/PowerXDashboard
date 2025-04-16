@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { PrefixUriAdmin } from '@/api';
 
-export const UriOAMedia = '/wechat/official-account/medias';
+export const UriOAMedia = '/scrm/official-account-1/medias';
 
 export interface GetMediaRequest {
   mediaId: string;

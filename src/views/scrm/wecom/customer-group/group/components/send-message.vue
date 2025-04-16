@@ -10,35 +10,35 @@
       <a-form-item label="标题" field="title">
         <a-input v-model="formModel.title" placeholder="请输入标题" />
       </a-form-item>
-
       <a-form-item label="描述" field="description">
         <a-input v-model="formModel.description" placeholder="请输入描述" />
       </a-form-item>
-
-      <a-form-item label="群成员" field="touser">
-        <a-select
-          v-model="formModel.touser"
-          value-key="weWorkUserId"
-          placeholder="请选择群成员..."
-          multiple
-        >
-          <a-option
-            v-for="(item, index) in usersList?.list"
-            :key="index"
-            :value="item.weWorkUserId"
-            :label="item.name"
-          ></a-option>
-        </a-select>
+      <a-form-item label="链接" field="url">
+        <a-input v-model="formModel.url" placeholder="请输入描述" />
       </a-form-item>
-
-      <a-form-item label="跳转连接" field="url">
-        <a-input v-model="formModel.url" placeholder="请输入跳转连接" />
+      <a-form-item label="群发员工" direction="vertical" field="owner">
+        <div>
+          <a-select
+            v-model="formModel.sender"
+            allow-search
+            placeholder="请选择员工"
+            allow-clear
+          >
+            <a-option
+              v-for="(item, index) in usersList.list"
+              :key="index"
+              :value="item.WeComUserId"
+              >{{ item.name }}</a-option
+            >
+          </a-select>
+          <p class="tips" style="color: rgb(255, 165, 0); font-size: 12px"
+            >说明：选择群发的成员，即该条消息发送至该成员下的所有客户群</p
+          >
+        </div>
       </a-form-item>
-
-      <a-divider />
       <a-row :gutter="32">
         <a-col :span="12">
-          <a-form-item label="消息图片" field="picurl">
+          <a-form-item label="消息图片" field="picUrl">
             <a-upload
               :limit="1"
               list-type="picture-card"
@@ -50,7 +50,6 @@
           </a-form-item>
         </a-col>
       </a-row>
-      <a-divider />
       <a-form-item label="发送时间">
         <a-date-picker
           v-model="formModel.sendTime"
@@ -71,7 +70,7 @@
 </template>
 
 <script lang="ts" setup>
-  import { onMounted, watch, reactive, ref } from 'vue';
+  import { onMounted, reactive, ref } from 'vue';
   import {
     FieldRule,
     Message,
@@ -80,45 +79,49 @@
   } from '@arco-design/web-vue';
   import uploadMediaImages from '@/utils/media-resource';
   import {
-    wechatMessageArticles,
-    GetMessageArticlesRequest,
-    Articles,
+    wechatMessageTemplate,
+    GetWechatGroupArticlesRequest,
+    GetMessageTemplateRequest,
   } from '@/api/scrm/customer';
   import { listUsers } from '@/api/scrm/user';
-
-  const prop = defineProps({
-    agentid: {
-      type: Number,
-    },
-  });
 
   const emits = defineEmits(['submitSuccess', 'submitFailed', 'update:id']);
 
   const apiUrl = import.meta.env.VITE_API_API_URL;
-
   const usersList = reactive<any>({
     list: [],
   });
   const formRef = ref();
   const formModel = ref({
+    chatIds: [],
     title: '',
     description: '',
     url: '',
-    picurl: '',
-    appid: '',
-    pagepath: '',
-    touser: [],
-    sendTime: '',
-  } as Articles);
-  const formModelData = reactive({
-    agentid: prop.agentid,
+    picUrl: '',
     sendTime: null,
-    msgtype: 'news',
-    touser: '@all',
-    news: {
-      articles: [formModel.value],
+    sender: '',
+  } as GetWechatGroupArticlesRequest);
+
+  const formModelData = reactive({
+    text: {
+      content: '',
     },
-  } as GetMessageArticlesRequest);
+    chatType: 'group',
+    externalUserid: [],
+    attachments: [
+      {
+        link: {
+          msgType: 'link',
+          title: '',
+          desc: '',
+          picUrl: formModel.value.picUrl,
+          url: '',
+        },
+      },
+    ],
+    sender: '',
+    sendTime: null,
+  } as GetMessageTemplateRequest);
 
   const rules = {
     title: [
@@ -130,7 +133,8 @@
       { max: 512, message: '图文图文描述长度不能超过 512 个字符' },
     ],
     url: [{ required: true, message: '请输入跳转链接' }],
-    picurl: [{ required: true, message: '请选择消息图片' }],
+    sender: [{ required: true, message: '请选择群发员工' }],
+    picUrl: [{ required: true, message: '请选择消息图片' }],
   } as Record<string, FieldRule[]>;
 
   const state = reactive({
@@ -143,18 +147,27 @@
     option: RequestOption,
   ) => {
     return uploadMediaImages(option, 0, (data: any) => {
-      formModel.value.picurl = apiUrl + data.url;
+      formModel.value.picUrl = apiUrl + data.url;
     });
   };
-  const changeCoverImage = async () => {
-    return true;
-  };
   const handlereset = () => {
-    formModel.value.picurl = '';
+    formModel.value.picUrl = '';
     formModel.value.sendTime = null;
     state.coverUrlList = [];
     formRef.value.resetFields();
   };
+
+  const changeCoverImage = async () => {
+    return true;
+  };
+  async function fetchUsers() {
+    const res = await listUsers({});
+    try {
+      usersList.list = res.data?.list;
+    } catch (err) {
+      usersList.list = [];
+    }
+  }
   const onSubmit = async () => {
     if (state.submitLoading) {
       return;
@@ -164,17 +177,19 @@
       return;
     }
     state.submitLoading = true;
+    // formModelData.text.content = formModel.value.title
+    formModelData.attachments[0].link.picUrl = formModel.value.picUrl;
+    formModelData.attachments[0].link.title = formModel.value.title;
+    formModelData.attachments[0].link.desc = formModel.value.description;
+    formModelData.attachments[0].link.url = formModel.value.url;
+    formModelData.sender = formModel.value.sender || '';
     if (formModel.value.sendTime) {
       const date: any = new Date(formModel.value.sendTime);
       formModelData.sendTime = Date.parse(date);
     }
-    if (formModel.value.touser && formModel.value.touser.length > 0) {
-      formModelData.touser = formModel.value.touser.join('|');
-    }
-    wechatMessageArticles(formModelData)
+    wechatMessageTemplate(formModelData)
       .then(() => {
-        formRef.value.resetFields();
-        formModel.value.picurl = '';
+        handlereset();
         Message.success('图文消息发生成功');
         emits('submitSuccess');
       })
@@ -185,21 +200,13 @@
         state.submitLoading = false;
       });
   };
-  watch(
-    () => prop.agentid,
-    () => {
-      formModelData.agentid = prop.agentid;
-    },
-  );
-  async function fetchtUsers() {
-    const res = await listUsers({});
-    try {
-      usersList.list = res.data?.list;
-    } catch (err) {
-      usersList.list = [];
-    }
-  }
   onMounted(() => {
-    fetchtUsers();
+    fetchUsers();
   });
+  // watch(
+  //   () => prop.sender,
+  //   () => {
+  //     formModelData.sender = prop.sender
+  //   }
+  // );
 </script>

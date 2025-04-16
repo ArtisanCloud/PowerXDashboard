@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { PrefixUriAdmin } from '@/api';
 
-const UriOAMenu = '/wechat/official-account/menus';
+const UriOAMenu = '/scrm/official-account-1/menus';
 
 export interface GetOAMenuTreeReply {
   button: any;

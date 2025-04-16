@@ -60,11 +60,11 @@
 
 <script lang="ts" setup>
   import { onMounted, reactive, ref } from 'vue';
-  import DepartmentSide from '@/views/scrm/wechat/user/components/department-side.vue';
   import { listUsers, ListUsersReply, ListUsersRequest } from '@/api/scrm/user';
+  import DepartmentSide from '@/views/scrm/official-account/user/components/department-side.vue';
 
   const queryForm = reactive({
-    weWorkMainDepartmentId: null,
+    WeComMainDepartmentId: null,
   } as ListUsersRequest);
   const state = reactive({
     tableLoading: false,
@@ -92,7 +92,7 @@
       });
   };
   const handleDepartmentChange = (data: number | undefined) => {
-    queryForm.weWorkMainDepartmentId = data;
+    queryForm.WeComMainDepartmentId = data;
     queryChange();
   };
 

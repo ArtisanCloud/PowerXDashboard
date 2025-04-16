@@ -44,8 +44,8 @@ export interface ListUsersRequest {
   email?: string;
   alias?: number[];
   status?: string[];
-  weWorkUserId?: string | number | null;
-  weWorkMainDepartmentId?: any;
+  WeComUserId?: string | number | null;
+  WeComMainDepartmentId?: any;
   roleCodes?: string[];
   isEnable?: any;
   pageIndex?: number;
