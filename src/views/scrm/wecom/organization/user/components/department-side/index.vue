@@ -1,34 +1,3 @@
-<!--
- * @Description: 
- * @Author: George
- * @Date: 2023-08-24 00:13:28
- * @LastEditors: George
- * @LastEditTime: 2023-08-24 00:41:28
--->
-<template>
-  <a-tree
-    v-if="
-      departmentTree && departmentTree.list && departmentTree.list.length > 0
-    "
-    :data="departmentTree.list"
-    :show-line="true"
-    :field-names="{
-      title: 'name',
-      key: 'WeComDepId',
-      children: 'children',
-    }"
-    checked-strategy="child"
-    @select="onSelect"
-  >
-    <template #title="nodeData">
-      <span>{{ nodeData.name }}</span>
-    </template>
-    <template #switcher-icon>
-      <icon-user-group />
-    </template>
-  </a-tree>
-</template>
-
 <script lang="ts" setup>
   import { computed, onMounted, PropType, ref } from 'vue';
   import {
@@ -36,6 +5,7 @@
     getDepartmentTree,
     GetDepartmentTreeReply,
   } from '@/api/scrm/department';
+  import styles from './index.module.less';
 
   const prop = defineProps({
     modelValue: {
@@ -90,3 +60,29 @@
     fetchDepartmentTree();
   });
 </script>
+
+<template>
+  <div :class="styles.container">
+    <a-tree
+      v-if="
+        departmentTree && departmentTree.list && departmentTree.list.length > 0
+      "
+      :data="departmentTree.list"
+      :show-line="true"
+      :field-names="{
+        title: 'name',
+        key: 'WeComDepId',
+        children: 'children',
+      }"
+      checked-strategy="child"
+      @select="onSelect"
+    >
+      <template #title="nodeData">
+        <span>{{ nodeData.name }}</span>
+      </template>
+      <template #switcher-icon>
+        <icon-user-group />
+      </template>
+    </a-tree>
+  </div>
+</template>

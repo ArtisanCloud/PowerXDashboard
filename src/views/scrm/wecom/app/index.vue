@@ -71,7 +71,7 @@
 <script lang="ts" setup>
   import { onMounted, reactive, ref } from 'vue';
   import { wechatAppList } from '@/api/scrm/customer';
-  import SendMessage from '@/views/scrm/app/components/send-message.vue';
+  import SendMessage from '@/views/scrm/wecom/app/components/send-message.vue';
 
   const state = reactive({
     loading: false,

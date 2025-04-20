@@ -1,40 +1,3 @@
-<!--
- * @Description: 
- * @Author: George
- * @Date: 2023-08-17 11:51:43
- * @LastEditors: George
- * @LastEditTime: 2023-08-17 14:18:06
--->
-<template>
-  <div class="container">
-    <a-table
-      :data="departmentTree.list"
-      :loading="state.loading"
-      default-expand-all-rows
-      row-key="id"
-      :pagination="pagination"
-      :tree-props="{ children: 'children' }"
-    >
-      <template #columns>
-        <a-table-column title="部门名称" data-index="name" />
-        <a-table-column title="负责人" data-index="leader.name">
-          <template #cell="{ record }">
-            <span
-              v-if="
-                record.departmentLeader && record.departmentLeader.length > 0
-              "
-              >{{ record.departmentLeader.join(',') }}</span
-            >
-          </template>
-        </a-table-column>
-        <a-table-column title="电话" data-index="phoneNumber" />
-        <a-table-column title="邮箱" data-index="email" />
-        <a-table-column title="备注" data-index="remark" />
-      </template>
-    </a-table>
-  </div>
-</template>
-
 <script lang="ts" setup>
   import { onMounted, reactive, ref } from 'vue';
   import {
@@ -42,7 +5,13 @@
     GetDepartmentTreeReply,
     getDepartmentTree,
   } from '@/api/scrm/department';
+  // import DepartmentSide from '@/views/admin/user/components/department-side.vue';
+  import DepartmentSide from '@/views/scrm/wecom/organization/user/components/department-side/index.vue';
+  import styles from './index.module.less';
 
+  /**
+   * 部门树
+   */
   const departmentTree = ref<GetDepartmentTreeReply>({
     total: 0,
     pageIndex: 0,
@@ -100,5 +69,35 @@
     fetchDepartmentTree();
   });
 </script>
+
+<template>
+  <div :class="styles.container">
+    <a-table
+      :data="departmentTree.list"
+      :loading="state.loading"
+      default-expand-all-rows
+      row-key="id"
+      :pagination="pagination"
+      :tree-props="{ children: 'children' }"
+    >
+      <template #columns>
+        <a-table-column title="部门名称" data-index="name" />
+        <a-table-column title="负责人" data-index="leader.name">
+          <template #cell="{ record }">
+            <span
+              v-if="
+                record.departmentLeader && record.departmentLeader.length > 0
+              "
+              >{{ record.departmentLeader.join(',') }}</span
+            >
+          </template>
+        </a-table-column>
+        <a-table-column title="电话" data-index="phoneNumber" />
+        <a-table-column title="邮箱" data-index="email" />
+        <a-table-column title="备注" data-index="remark" />
+      </template>
+    </a-table>
+  </div>
+</template>
 
 <style scoped></style>

@@ -33,6 +33,9 @@ module.exports = {
       typescript: {
         project: path.resolve(__dirname, './tsconfig.json'),
       },
+      node: {
+        extensions: ['.js', '.jsx', '.ts', '.tsx', '.vue', '.less'],
+      },
     },
   },
   rules: {

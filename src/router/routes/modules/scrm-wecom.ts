@@ -15,8 +15,7 @@ const SCRMWecom: AppRouteRecordRaw = {
     {
       path: '/scrm/wecom/organization',
       name: 'WeCom Organization',
-      // component: () => import('@/views/scrm/wecom/organization/index_.vue'),
-      component: () => import('@/views/scrm/wecom/organization/index.vue'),
+      component: () => import('@/views/scrm/wecom/organization/user/index.vue'),
       meta: {
         icon: 'icon-stamp',
         locale: 'menu.scrm.wecom.organization',

@@ -31,7 +31,8 @@ export default defineConfig({
         replacement: 'vue/dist/vue.esm-bundler.js', // compile template
       },
     ],
-    extensions: ['.ts', '.js'],
+    // extensions: ['.ts', '.js'],
+    extensions: ['.ts', '.js', '.vue', '.less'],
   },
   define: {
     'process.env': {},
@@ -40,6 +41,7 @@ export default defineConfig({
     '__VUE_PROD_HYDRATION_MISMATCH_DETAILS__': false,
   },
   css: {
+    postcss: './postcss.config.mjs',
     preprocessorOptions: {
       less: {
         modifyVars: {
