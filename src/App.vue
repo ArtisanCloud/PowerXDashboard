@@ -2,6 +2,7 @@
   <a-config-provider :locale="locale">
     <router-view />
     <global-setting />
+    <global-loading />
   </a-config-provider>
 </template>
 
@@ -10,8 +11,9 @@
   import enUS from '@arco-design/web-vue/es/locale/lang/en-us';
   import zhCN from '@arco-design/web-vue/es/locale/lang/zh-cn';
   import GlobalSetting from '@/components/global-setting/index.vue';
+  import GlobalLoading from '@/components/global-loading/index.vue';
   import useLocale from '@/hooks/locale';
-  import consola from 'consola';
+  import { consola } from 'consola';
 
   const { currentLocale } = useLocale();
   const locale = computed(() => {

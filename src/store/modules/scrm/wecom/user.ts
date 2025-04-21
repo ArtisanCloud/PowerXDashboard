@@ -1,11 +1,10 @@
 import { defineStore } from 'pinia';
 
-// TODO: 替换为实际类型定义
 type DepartmentTree = any;
 type TagTree = any;
 type UserList = any;
 
-type ViewType = 'department' | 'tag';
+export type ViewType = 'department' | 'tag';
 
 interface UserState {
   departmentTree: DepartmentTree | null;
@@ -16,7 +15,7 @@ interface UserState {
   selectedViewType: ViewType;
 }
 
-const useWeComUserStore = defineStore('user', {
+const useWeComUserStore = defineStore('weComUser', {
   state: (): UserState => ({
     departmentTree: null,
     tagTree: null,
@@ -42,6 +41,7 @@ const useWeComUserStore = defineStore('user', {
       this.selectedTag = id;
     },
     setSelectedViewType(type: ViewType) {
+      // console.log('setSelectedViewType', type);
       this.selectedViewType = type;
     },
   },

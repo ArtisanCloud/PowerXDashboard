@@ -36,7 +36,7 @@
             <a-button
               style="margin: 0 10px"
               type="primary"
-              @click="fetchWechatSync"
+              @click="fetchPullSyncWeComDepartmentsAndUsers"
               >同步群信息</a-button
             >
             <a-button type="primary" @click="handleSendMsgAll"
@@ -127,7 +127,7 @@
   import {
     getCustomersGroups,
     GetCustomersGroupsRequest,
-    getWechatSync,
+    pullSyncWeComDepartmentsAndUsers,
   } from '@/api/scrm/customer';
 
   const sender = ref('');
@@ -162,9 +162,9 @@
       state.loading = false;
     }
   }
-  async function fetchWechatSync() {
+  async function fetchPullSyncWeComDepartmentsAndUsers() {
     state.loading = true;
-    const res = await getWechatSync({
+    const res = await pullSyncWeComDepartmentsAndUsers({
       sync: 1,
     });
     try {

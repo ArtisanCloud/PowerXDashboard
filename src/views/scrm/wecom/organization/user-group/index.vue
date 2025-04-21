@@ -77,7 +77,7 @@
                     <a-button
                       type="text"
                       status="success"
-                      @click="fetchWechatSync"
+                      @click="fetchPullSyncWeComDepartmentsAndUsers"
                       >同步群信息</a-button
                     >
                     <a-button type="text" @click="handleSendMsg(record)"
@@ -118,7 +118,7 @@
   import {
     wechatGroup,
     GetWechatGroupReReply,
-    getWechatSync,
+    pullSyncWeComDepartmentsAndUsers,
   } from '@/api/scrm/customer';
   import { Message } from '@arco-design/web-vue';
   import AddGroup from '@/views/scrm/official-account/group/components/add-group.vue';
@@ -148,9 +148,9 @@
       state.loading = false;
     }
   }
-  async function fetchWechatSync() {
+  async function fetchPullSyncWeComDepartmentsAndUsers() {
     state.loading = true;
-    const res = await getWechatSync({
+    const res = await pullSyncWeComDepartmentsAndUsers({
       sync: 1,
     });
     try {
@@ -187,7 +187,7 @@
   };
   const handleAddGroupSuccess = () => {
     state.addGroudvisible = false;
-    fetchWechatSync();
+    fetchPullSyncWeComDepartmentsAndUsers();
   };
   onMounted(() => {
     fetchWechatAppList();

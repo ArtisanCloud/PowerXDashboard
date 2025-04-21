@@ -6,6 +6,9 @@
  * @LastEditTime: 2023-07-16 01:48:33
  */
 import axios from 'axios';
+import { PrefixUriAdmin } from '@/api';
+import { UriCustomerDomain } from '@/api/crm/customer-domain/customer';
+import { UriWeCom, UriWeComUser } from '../base';
 
 /**
  * customer
@@ -115,14 +118,14 @@ export interface GetWechatGroupReReply {
 }
 export function wechatGroup(request: any) {
   return axios.get<GetWechatGroupReReply>(
-    '/api/v1/admin/scrm/wechat/wecom/app/group/list',
+    `${PrefixUriAdmin + UriWeCom}/app/group/list`,
     request,
   );
 }
 
-export function getWechatSync(request: any) {
+export function pullSyncWeComDepartmentsAndUsers(request: any) {
   return axios.get<GetCustomersReply>(
-    '/api/v1/admin/scrm/wechat/wecom/organization/users/sync',
+    `${PrefixUriAdmin + UriWeComUser}/sync`,
     request,
   );
 }

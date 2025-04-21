@@ -44,14 +44,8 @@
   const onBatchExportOrImport = () => {
     console.log('batch export or import');
   };
-  const onBatchUpdateUser = () => {
-    console.log('update user');
-  };
-  const onDeleteUser = () => {
-    console.log('delete');
-  };
-  const onWechatInvite = () => {
-    console.log('wechat_invite');
+  const onRemoveUser = () => {
+    console.log('remove');
   };
 
   onMounted(() => {
@@ -62,24 +56,16 @@
 <template>
   <div :class="styles.container">
     <div :class="styles.title">
-      <span>组织名称（0人）</span>
+      <span>Tag名称（0人）</span>
     </div>
     <div :class="styles.action">
-      <a-button :class="styles.actionBtn" @click="onAddUser">添加成员</a-button>
+      <a-button :class="styles.actionBtn" @click="onAddUser"
+        >添加部门/成员</a-button
+      >
       <a-button :class="styles.actionBtn" @click="onBatchExportOrImport"
         >批量导入/导出</a-button
       >
-      <a-button :class="styles.actionBtn" @click="onBatchUpdateUser"
-        >批量设置成员信息</a-button
-      >
-      <a-button :class="styles.actionBtn" @click="onDeleteUser">删除</a-button>
-      <a-divider direction="vertical" :class="styles.divider" />
-      <a-button
-        class="flex gap-1"
-        :class="styles.actionBtn"
-        @click="onWechatInvite"
-        ><icon-qrcode />微信邀请</a-button
-      >
+      <a-button :class="styles.actionBtn" @click="onRemoveUser">移除</a-button>
     </div>
     <a-table
       :data="pageData.list"
@@ -90,16 +76,12 @@
       :class="styles.userTable"
     >
       <template #columns>
-        <a-table-column title="用户ID" data-index="userid" :width="100" />
-        <a-table-column title="姓名">
+        <a-table-column title="名称" :width="170">
           <template #cell="{ record }">
             {{ record.name }}
           </template>
         </a-table-column>
-        <a-table-column title="职务" data-index="position" ellipsis />
         <a-table-column title="部门" data-index="department" ellipsis />
-        <a-table-column title="手机" data-index="mobile" ellipsis />
-        <a-table-column title="企业邮箱" data-index="Email" ellipsis />
       </template>
     </a-table>
   </div>
