@@ -7,14 +7,16 @@
   import { pullSyncWeComDepartmentsAndUsers } from '@/api/scrm/wecom/user';
   import { Message } from '@arco-design/web-vue';
   import useLoadingStore from '@/store/modules/loading';
+  import { consola } from 'consola';
   import styles from './index.module.less';
 
   const useWeComUser = useWeComUserStore();
   const loadingStore = useLoadingStore();
 
   const checkedViewType = ref('department');
-  const handleDepartmentChange = (data: number | undefined) => {
-    useWeComUser.setSelectedDepartment(data!);
+  const handleDepartmentChange = (data: number) => {
+    useWeComUser.setSelectedDepartment(data);
+    // consola.log(data, useWeComUser.selectedDepartmentId);
     // queryChange();
   };
 
@@ -34,8 +36,8 @@
       });
       if (res) {
         Message.success('同步成功');
-        // await useWeComUser.loadDepartmentTree(0);
-        // await useWeComUser.loadCurrentUserByDepartmentId(0);
+        await useWeComUser.loadDepartmentTree(1);
+        // await useWeComUser.loadUsersByDepartmentId(0);
       }
     } catch (err: any) {
       Message.error(err.message);
@@ -105,12 +107,7 @@
         >
       </a-radio-group>
       <a-divider :margin="8" />
-      <a-scrollbar>
-        <DepartmentSide
-          style="min-height: 65vh"
-          @update:model-value="handleDepartmentChange"
-        />
-      </a-scrollbar>
+      <DepartmentSide @update:model-value="handleDepartmentChange" />
     </div>
     <div :class="styles.userTable">
       <UserList v-if="useWeComUser.selectedViewType === 'department'" />

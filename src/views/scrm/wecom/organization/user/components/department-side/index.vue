@@ -1,11 +1,7 @@
 <script lang="ts" setup>
   import { computed, onMounted, PropType, ref } from 'vue';
-  import {
-    DepartmentNode,
-    getDepartmentTree,
-    GetDepartmentTreeReply,
-  } from '@/api/scrm/wecom/department';
   import useWeComUserStore from '@/store/modules/scrm/wecom/user';
+  import { consola } from 'consola';
   import styles from './index.module.less';
 
   const prop = defineProps({
@@ -26,55 +22,44 @@
     },
   });
 
-  const departmentTree = ref<GetDepartmentTreeReply>({
-    total: 0,
-    pageIndex: 0,
-    pageSize: 10,
-    list: [],
-  });
+  const onSelect = (selectedKeys: number[]) => {
+    depId.value = selectedKeys[0] === 1 ? 1 : selectedKeys[0];
+  };
 
-  const onSelect = (selectedKeys: any) => {
-    depId.value = selectedKeys[0] === 1 ? 0 : selectedKeys[0];
-  };
-  const departNodes = (data: DepartmentNode[], parentId = 0) => {
-    const departNodesList: DepartmentNode[] = [];
-    data.forEach((item) => {
-      if (item.WeComParentId === parentId) {
-        const children = departNodes(data, item.WeComDepId);
-        if (children.length > 0) {
-          item.children = children;
+  const expandedKeys = ref<number[]>([]);
+
+  const getAllKeys = (tree: any[]) => {
+    const keys: number[] = [];
+    const traverse = (nodes: any[]) => {
+      nodes.forEach((node) => {
+        keys.push(node.weComDepId);
+        if (Array.isArray(node.children)) {
+          traverse(node.children);
         }
-        departNodesList.push(item);
-      }
-    });
-    return departNodesList;
+      });
+    };
+    traverse(tree);
+    return keys;
   };
-  // function fetchDepartmentTree() {
-  //   getDepartmentTree().then((res: any) => {
-  //     const list: DepartmentNode | any = res.data.list || [];
-  //     const departNodesList = departNodes(list);
-  //     res.data.list = departNodesList;
-  //     departmentTree.value = res.data;
-  //   });
-  // }
 
   onMounted(async () => {
-    // fetchDepartmentTree();
-    await useWeComUser.loadDepartmentTree(0);
+    // 默认拉取根目录的部门树
+    await useWeComUser.loadDepartmentTree(1);
+    // consola.log(useWeComUser.departmentTree);
+    expandedKeys.value = getAllKeys(useWeComUser.departmentTree);
   });
 </script>
 
 <template>
   <div :class="styles.container">
     <a-tree
-      v-if="
-        departmentTree && departmentTree.list && departmentTree.list.length > 0
-      "
-      :data="departmentTree.list"
+      :data="useWeComUser.departmentTree"
+      :expanded-keys="expandedKeys"
       :show-line="true"
+      :default-expand-all="true"
       :field-names="{
         title: 'name',
-        key: 'WeComDepId',
+        key: 'weComDepId',
         children: 'children',
       }"
       checked-strategy="child"
@@ -83,8 +68,13 @@
       <template #title="nodeData">
         <span>{{ nodeData.name }}</span>
       </template>
-      <template #switcher-icon>
-        <icon-user-group />
+      <template #switcher-icon="{ children }">
+        <icon-caret-down
+          v-if="Array.isArray(children) && children.length > 0"
+        />
+      </template>
+      <template #icon>
+        <icon-folder />
       </template>
     </a-tree>
   </div>

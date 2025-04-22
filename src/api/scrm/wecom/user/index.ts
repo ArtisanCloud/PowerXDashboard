@@ -50,12 +50,13 @@ export interface listUsersPageRequest {
   alias?: number[];
   status?: string[];
   WeComUserId?: string | number | null;
-  WeComMainDepartmentId?: any;
   roleCodes?: string[];
   isEnable?: any;
   pageIndex?: number;
   pageSize?: number;
   likeName?: string;
+  departmentId?: number;
+  departmentIds?: number[];
 }
 
 export interface listUsersPageReply {
@@ -63,7 +64,6 @@ export interface listUsersPageReply {
   pageIndex: number;
   pageSize: number;
   total: number;
-  children?: any[];
 }
 
 export function listUsersPage(request: listUsersPageRequest) {

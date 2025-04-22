@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia';
 import { getDepartment, WeComDepartment } from '@/api/scrm/wecom/department';
 import { Message } from '@arco-design/web-vue';
+import { listUsersPage } from '@/api/scrm/wecom/user';
 
 type TagTree = any;
 type UserList = any;
@@ -8,26 +9,28 @@ type UserList = any;
 export type ViewType = 'department' | 'tag';
 
 interface UserState {
-  departmentTree: WeComDepartment | null;
+  departmentTree: WeComDepartment[];
   tagTree: TagTree | null;
   userList: UserList | null;
-  selectedDepartment: number | null;
+  selectedDepartmentId: number;
+  selectedDepartmentIds: number[];
   selectedTag: number | null;
   selectedViewType: ViewType;
 }
 
 const useWeComUserStore = defineStore('weComUser', {
   state: (): UserState => ({
-    departmentTree: null,
+    departmentTree: [],
     tagTree: null,
     userList: null,
-    selectedDepartment: null,
+    selectedDepartmentId: 0,
+    selectedDepartmentIds: [0],
     selectedTag: null,
     selectedViewType: 'department',
   }),
   actions: {
     setDepartmentTree(tree: WeComDepartment) {
-      this.departmentTree = tree;
+      this.departmentTree = [tree];
     },
     setTagTree(tree: TagTree) {
       this.tagTree = tree;
@@ -35,8 +38,29 @@ const useWeComUserStore = defineStore('weComUser', {
     setUserList(list: UserList) {
       this.userList = list;
     },
-    setSelectedDepartment(id: number) {
-      this.selectedDepartment = id;
+    setSelectedDepartment(departmentId: number) {
+      this.selectedDepartmentId = departmentId;
+      // 清空 selectedDepartmentIds 数组，只保留当前选中的部门 ID
+      this.selectedDepartmentIds = [departmentId];
+
+      // 遍历 departmentTree 中的所有部门
+      const findDepartments = (departments: WeComDepartment[]) => {
+        departments.forEach((department) => {
+          // 检查当前部门的 weComParentId 是否与 selectedDepartmentId 匹配
+          if (department.weComParentId === this.selectedDepartmentId) {
+            // 如果匹配，将部门的 ID 添加到 selectedDepartmentIds 中
+            this.selectedDepartmentIds.push(department.weComDepId);
+          }
+
+          // 如果有子部门，递归调用 findDepartments 处理子部门
+          if (department.children && department.children.length > 0) {
+            findDepartments(department.children);
+          }
+        });
+      };
+
+      // 启动查找
+      findDepartments(this.departmentTree);
     },
     setSelectedTag(id: number) {
       this.selectedTag = id;
@@ -48,13 +72,26 @@ const useWeComUserStore = defineStore('weComUser', {
     async loadDepartmentTree(departmentId: number) {
       const res = await getDepartment({ departmentId });
       if (res.data) {
-        this.departmentTree = res.data.department;
+        this.departmentTree = [res.data.department];
       } else {
         Message.error('获取部门信息失败');
       }
     },
-    async loadCurrentUserByDepartmentId(departmentId: number) {
-      const res = await getDepartment({ departmentId });
+    async loadUsersByDepartmentId(departmentId: number) {
+      const res = await listUsersPage({ departmentId });
+      if (res.data) {
+        this.userList = [res.data.list];
+      } else {
+        Message.error('获取部门用户列表失败');
+      }
+    },
+    async loadUsersByDepartmentIds(departmentIds: number[]) {
+      const res = await listUsersPage({ departmentIds });
+      if (res.data) {
+        this.userList = [res.data.list];
+      } else {
+        Message.error('获取部门用户列表失败');
+      }
     },
   },
 });

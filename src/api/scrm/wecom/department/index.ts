@@ -93,11 +93,14 @@ export function deleteDepartment(request: DeleteDepartmentRequest) {
 
 export interface WeComDepartment {
   id: number;
-  depName: string;
-  leader: DepartmentLeader;
-  phoneNumber: string;
-  email: string;
-  remark: string;
+  departmentLeader: null;
+  name: string;
+  nameEn: string;
+  order: number;
+  refDepartmentId: number;
+  weComDepId: number;
+  weComParentId: number;
+  children: WeComDepartment[];
 }
 
 export interface GetDepartmentRequest {

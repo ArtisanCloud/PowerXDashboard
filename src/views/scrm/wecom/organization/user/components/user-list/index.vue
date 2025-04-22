@@ -1,15 +1,16 @@
 <script setup lang="ts">
-  import { onMounted, reactive, ref } from 'vue';
+  import { onMounted, reactive, ref, watch } from 'vue';
   import {
     listUsersPage,
     listUsersPageReply,
     listUsersPageRequest,
   } from '@/api/scrm/wecom/user';
+  import useWeComUserStore from '@/store/modules/scrm/wecom/user';
+  import { consola } from 'consola';
   import styles from './index.module.less';
 
-  const queryForm = reactive({
-    WeComMainDepartmentId: null,
-  } as listUsersPageRequest);
+  const useWeComUser = useWeComUserStore();
+
   const state = reactive({
     tableLoading: false,
     deleteUserLoading: false,
@@ -27,7 +28,9 @@
       return;
     }
     state.tableLoading = true;
-    listUsersPage(queryForm)
+    listUsersPage({
+      departmentIds: useWeComUser.selectedDepartmentIds,
+    } as listUsersPageRequest)
       .then((res) => {
         pageData.value = res.data;
       })
@@ -41,6 +44,14 @@
     showCheckedAll: true,
     onlyCurrent: false,
   });
+
+  watch(
+    () => useWeComUser.selectedDepartmentIds,
+    () => {
+      // consola.log('changed:', useWeComUser.selectedDepartmentIds);
+      queryChange();
+    },
+  );
 
   const onAddUser = () => {
     console.log('add user');
