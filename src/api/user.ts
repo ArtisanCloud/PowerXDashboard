@@ -41,7 +41,7 @@ export function getUser(request: GetUserRequest) {
   return axios.get<GetUserReply>(`/api/v1/admin/user/users/${request.id}`);
 }
 
-export interface ListUsersRequest extends Pagination {
+export interface listUsersPageRequest extends Pagination {
   ids?: number[];
   likeName?: string;
   likeEmail?: string;
@@ -52,12 +52,12 @@ export interface ListUsersRequest extends Pagination {
   isEnable?: any;
 }
 
-export interface ListUsersReply extends Pagination {
+export interface listUsersPageReply extends Pagination {
   list: User[];
 }
 
-export function listUsers(request: ListUsersRequest) {
-  return axios.get<ListUsersReply>('/api/v1/admin/user/users', {
+export function listUsersPage(request: listUsersPageRequest) {
+  return axios.get<listUsersPageReply>('/api/v1/admin/user/users', {
     params: request,
   });
 }

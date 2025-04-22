@@ -119,7 +119,7 @@
     wechatGroup,
     GetWechatGroupReReply,
     pullSyncWeComDepartmentsAndUsers,
-  } from '@/api/scrm/customer';
+  } from '@/api/scrm/wecom/customer';
   import { Message } from '@arco-design/web-vue';
   import AddGroup from '@/views/scrm/official-account/group/components/add-group.vue';
   import SendMessage from '@/views/scrm/official-account/group/components/send-message.vue';

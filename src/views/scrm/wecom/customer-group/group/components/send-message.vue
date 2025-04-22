@@ -82,8 +82,8 @@
     wechatMessageTemplate,
     GetWechatGroupArticlesRequest,
     GetMessageTemplateRequest,
-  } from '@/api/scrm/customer';
-  import { listUsers } from '@/api/scrm/user';
+  } from '@/api/scrm/wecom/customer';
+  import { listUsersPage } from '@/api/scrm/wecom/user';
 
   const emits = defineEmits(['submitSuccess', 'submitFailed', 'update:id']);
 
@@ -161,7 +161,7 @@
     return true;
   };
   async function fetchUsers() {
-    const res = await listUsers({});
+    const res = await listUsersPage({});
     try {
       usersList.list = res.data?.list;
     } catch (err) {

@@ -200,8 +200,8 @@
 
 <script lang="ts" setup>
   import { onMounted, reactive, ref, toRaw } from 'vue';
-  import { corpOption } from '@/api/scrm/tag';
-  import { getCustomers, GetCustomersRequest } from '@/api/scrm/customer';
+  import { corpOption } from '@/api/scrm/wecom/tag';
+  import { getCustomers, GetCustomersRequest } from '@/api/scrm/wecom/customer';
 
   const state = reactive({
     loading: false,

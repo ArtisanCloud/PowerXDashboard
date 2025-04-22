@@ -1,13 +1,14 @@
 import { defineStore } from 'pinia';
+import { getDepartment, WeComDepartment } from '@/api/scrm/wecom/department';
+import { Message } from '@arco-design/web-vue';
 
-type DepartmentTree = any;
 type TagTree = any;
 type UserList = any;
 
 export type ViewType = 'department' | 'tag';
 
 interface UserState {
-  departmentTree: DepartmentTree | null;
+  departmentTree: WeComDepartment | null;
   tagTree: TagTree | null;
   userList: UserList | null;
   selectedDepartment: number | null;
@@ -25,7 +26,7 @@ const useWeComUserStore = defineStore('weComUser', {
     selectedViewType: 'department',
   }),
   actions: {
-    setDepartmentTree(tree: DepartmentTree) {
+    setDepartmentTree(tree: WeComDepartment) {
       this.departmentTree = tree;
     },
     setTagTree(tree: TagTree) {
@@ -43,6 +44,17 @@ const useWeComUserStore = defineStore('weComUser', {
     setSelectedViewType(type: ViewType) {
       // console.log('setSelectedViewType', type);
       this.selectedViewType = type;
+    },
+    async loadDepartmentTree(departmentId: number) {
+      const res = await getDepartment({ departmentId });
+      if (res.data) {
+        this.departmentTree = res.data.department;
+      } else {
+        Message.error('获取部门信息失败');
+      }
+    },
+    async loadCurrentUserByDepartmentId(departmentId: number) {
+      const res = await getDepartment({ departmentId });
     },
   },
 });

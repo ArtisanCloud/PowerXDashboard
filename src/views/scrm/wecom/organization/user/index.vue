@@ -4,11 +4,13 @@
   import TagUserList from '@/views/scrm/wecom/organization/user/components/tag-user-list/index.vue';
   import useWeComUserStore, { ViewType } from '@/store/modules/scrm/wecom/user';
   import { ref } from 'vue';
-  import { pullSyncWeComDepartmentsAndUsers } from '@/api/scrm/customer';
+  import { pullSyncWeComDepartmentsAndUsers } from '@/api/scrm/wecom/user';
   import { Message } from '@arco-design/web-vue';
+  import useLoadingStore from '@/store/modules/loading';
   import styles from './index.module.less';
 
   const useWeComUser = useWeComUserStore();
+  const loadingStore = useLoadingStore();
 
   const checkedViewType = ref('department');
   const handleDepartmentChange = (data: number | undefined) => {
@@ -25,20 +27,21 @@
     console.log('add department');
   };
   const onSyncWeComDepartments = async () => {
-    // state.loading = true;
-    // const res = await pullSyncWeComDepartmentsAndUsers({
-    //   sync: 1,
-    // });
-    // try {
-    //   if (res) {
-    //     Message.success('同步成功');
-    //     fetchCustomers();
-    //   }
-    // } catch (err) {
-    //   state.loading = false;
-    // } finally {
-    //   state.loading = false;
-    // }
+    loadingStore.setLoading(true);
+    try {
+      const res = await pullSyncWeComDepartmentsAndUsers({
+        sync: 1,
+      });
+      if (res) {
+        Message.success('同步成功');
+        // await useWeComUser.loadDepartmentTree(0);
+        // await useWeComUser.loadCurrentUserByDepartmentId(0);
+      }
+    } catch (err: any) {
+      Message.error(err.message);
+    } finally {
+      loadingStore.setLoading(false);
+    }
   };
   const onAddTag = () => {
     console.log('add tag');

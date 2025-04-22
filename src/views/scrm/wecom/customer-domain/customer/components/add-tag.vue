@@ -54,7 +54,7 @@
     customerTag,
     CustomerTagList,
     getGroupTagList,
-  } from '@/api/scrm/tag';
+  } from '@/api/scrm/wecom/tag';
 
   const prop = defineProps({
     usersList: {

@@ -4,7 +4,8 @@
     DepartmentNode,
     getDepartmentTree,
     GetDepartmentTreeReply,
-  } from '@/api/scrm/department';
+  } from '@/api/scrm/wecom/department';
+  import useWeComUserStore from '@/store/modules/scrm/wecom/user';
   import styles from './index.module.less';
 
   const prop = defineProps({
@@ -15,6 +16,7 @@
   });
   const emit = defineEmits(['update:modelValue', 'departmentSelect']);
 
+  const useWeComUser = useWeComUserStore();
   const depId = computed({
     get() {
       return prop.modelValue;
@@ -47,17 +49,18 @@
     });
     return departNodesList;
   };
-  function fetchDepartmentTree() {
-    getDepartmentTree().then((res: any) => {
-      const list: DepartmentNode | any = res.data.list || [];
-      const departNodesList = departNodes(list);
-      res.data.list = departNodesList;
-      departmentTree.value = res.data;
-    });
-  }
+  // function fetchDepartmentTree() {
+  //   getDepartmentTree().then((res: any) => {
+  //     const list: DepartmentNode | any = res.data.list || [];
+  //     const departNodesList = departNodes(list);
+  //     res.data.list = departNodesList;
+  //     departmentTree.value = res.data;
+  //   });
+  // }
 
-  onMounted(() => {
-    fetchDepartmentTree();
+  onMounted(async () => {
+    // fetchDepartmentTree();
+    await useWeComUser.loadDepartmentTree(0);
   });
 </script>
 

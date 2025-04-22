@@ -34,7 +34,12 @@
 <script lang="ts" setup>
   import { onMounted, reactive, ref } from 'vue';
   import { FieldRule, Message } from '@arco-design/web-vue';
-  import { addTag, AddTagRequest, groupOption, TagList } from '@/api/scrm/tag';
+  import {
+    addTag,
+    AddTagRequest,
+    groupOption,
+    TagList,
+  } from '@/api/scrm/wecom/tag';
 
   const emits = defineEmits(['submitSuccess', 'submitFailed', 'update:id']);
   const formRef = ref();

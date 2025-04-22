@@ -1,11 +1,15 @@
 <script setup lang="ts">
   import { onMounted, reactive, ref } from 'vue';
-  import { listUsers, ListUsersReply, ListUsersRequest } from '@/api/scrm/user';
+  import {
+    listUsersPage,
+    listUsersPageReply,
+    listUsersPageRequest,
+  } from '@/api/scrm/wecom/user';
   import styles from './index.module.less';
 
   const queryForm = reactive({
     WeComMainDepartmentId: null,
-  } as ListUsersRequest);
+  } as listUsersPageRequest);
   const state = reactive({
     tableLoading: false,
     deleteUserLoading: false,
@@ -16,14 +20,14 @@
     },
   });
 
-  const pageData = ref({} as ListUsersReply);
+  const pageData = ref({} as listUsersPageReply);
 
   const queryChange = () => {
     if (state.tableLoading) {
       return;
     }
     state.tableLoading = true;
-    listUsers(queryForm)
+    listUsersPage(queryForm)
       .then((res) => {
         pageData.value = res.data;
       })

@@ -123,12 +123,6 @@ export function wechatGroup(request: any) {
   );
 }
 
-export function pullSyncWeComDepartmentsAndUsers(request: any) {
-  return axios.get<GetCustomersReply>(
-    `${PrefixUriAdmin + UriWeComUser}/sync`,
-    request,
-  );
-}
 /**
  * customer
  * @description 群聊信息发送

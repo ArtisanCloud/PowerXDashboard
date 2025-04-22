@@ -13,8 +13,8 @@
       @on-delete="onDeleteMedia"
       @page-change="pageChange"
       @page-size-change="pageSizeChange"
-      @onChangeTab="onChangeTab"
-      @onPreview="onPreview"
+      @on-change-tab="onChangeTab"
+      @on-preview="onPreview"
       @on-upload-success="onUploadSuccess"
     />
   </div>
@@ -29,7 +29,7 @@
     GetMediaByVideo,
     GetMediaOtherList,
     UriOAMedia,
-  } from '@/api/wechat/official-account/media';
+  } from '@/api/scrm/official-account/media';
   import { PrefixUriAdmin } from '@/api';
   import { getToken } from '@/utils/auth';
 

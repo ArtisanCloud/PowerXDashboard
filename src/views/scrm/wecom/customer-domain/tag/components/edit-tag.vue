@@ -58,7 +58,7 @@
 <script lang="ts" setup>
   import { watch, reactive, ref, PropType } from 'vue';
   import { FieldRule, Message } from '@arco-design/web-vue';
-  import { editTag, EditTagRequest } from '@/api/scrm/tag';
+  import { editTag, EditTagRequest } from '@/api/scrm/wecom/tag';
 
   const prop = defineProps({
     usersList: {

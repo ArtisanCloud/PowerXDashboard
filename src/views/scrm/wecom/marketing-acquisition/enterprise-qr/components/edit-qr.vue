@@ -82,7 +82,7 @@
     createQrcode,
     CreateQrcodeRequest,
     editQrcode,
-  } from '@/api/scrm/enterprise-qr';
+  } from '@/api/scrm/wecom/enterprise-qr';
 
   const prop = defineProps({
     usersList: {

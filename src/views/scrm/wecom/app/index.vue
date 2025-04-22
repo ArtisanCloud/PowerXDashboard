@@ -70,7 +70,7 @@
 
 <script lang="ts" setup>
   import { onMounted, reactive, ref } from 'vue';
-  import { wechatAppList } from '@/api/scrm/customer';
+  import { wechatAppList } from '@/api/scrm/wecom/customer';
   import SendMessage from '@/views/scrm/wecom/app/components/send-message.vue';
 
   const state = reactive({

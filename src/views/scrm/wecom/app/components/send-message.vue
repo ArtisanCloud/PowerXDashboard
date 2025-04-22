@@ -83,8 +83,8 @@
     wechatMessageArticles,
     GetMessageArticlesRequest,
     Articles,
-  } from '@/api/scrm/customer';
-  import { listUsers } from '@/api/scrm/user';
+  } from '@/api/scrm/wecom/customer';
+  import { listUsersPage } from '@/api/scrm/wecom/user';
 
   const prop = defineProps({
     agentid: {
@@ -192,7 +192,7 @@
     },
   );
   async function fetchUsers() {
-    const res = await listUsers({});
+    const res = await listUsersPage({});
     try {
       usersList.list = res.data?.list;
     } catch (err) {

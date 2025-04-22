@@ -66,7 +66,7 @@
   import {
     wechatGroupArticles,
     GetWechatGroupArticlesRequest,
-  } from '@/api/scrm/customer';
+  } from '@/api/scrm/wecom/customer';
 
   const prop = defineProps({
     chatIds: {

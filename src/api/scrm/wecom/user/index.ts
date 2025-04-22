@@ -1,4 +1,7 @@
 import axios from 'axios';
+import { PrefixUriAdmin } from '@/api';
+import { UriWeComUser } from '@/api/scrm/wecom/base';
+import { GetCustomersReply } from '@/api/scrm/wecom/customer';
 
 /**
  * User
@@ -10,7 +13,7 @@ export interface UserDepartment {
   depName: string;
 }
 
-export interface User {
+export interface WeComUser {
   id: number;
   account: string;
   name: string;
@@ -33,12 +36,14 @@ export interface GetUserRequest {
   id: string;
 }
 
-export type GetUserReply = User;
+export type GetUserReply = WeComUser;
 export function getUser(request: GetUserRequest) {
-  return axios.get<GetUserReply>(`/api/v1/admin/user/users/${request.id}`);
+  return axios.get<GetUserReply>(
+    `${PrefixUriAdmin + UriWeComUser}/${request.id}`,
+  );
 }
 
-export interface ListUsersRequest {
+export interface listUsersPageRequest {
   id?: any;
   name?: string;
   email?: string;
@@ -53,17 +58,31 @@ export interface ListUsersRequest {
   likeName?: string;
 }
 
-export interface ListUsersReply {
-  list: User[];
+export interface listUsersPageReply {
+  list: WeComUser[];
   pageIndex: number;
   pageSize: number;
   total: number;
   children?: any[];
 }
 
-export function listUsers(request: ListUsersRequest) {
-  return axios.post<ListUsersReply>(
-    '/api/v1/admin/scrm/wechat/wecom/organization/users/page',
+export function listUsersPage(request: listUsersPageRequest) {
+  return axios.post<listUsersPageReply>(
+    `${PrefixUriAdmin + UriWeComUser}/page`,
+    request,
+  );
+}
+
+export interface listUsersRequest {
+  departmentId: number;
+}
+export interface listUsersReply {
+  list: WeComUser[];
+}
+
+export function listUsers(request: listUsersRequest) {
+  return axios.post<listUsersReply>(
+    `${PrefixUriAdmin + UriWeComUser}/`,
     request,
   );
 }
@@ -79,7 +98,14 @@ export interface SyncUsersReply {
 
 export function syncUsers(request: SyncUsersRequest) {
   return axios.post<SyncUsersReply>(
-    '/api/v1/admin/user/users/actions/sync',
+    `${PrefixUriAdmin + UriWeComUser}/actions/sync`,
+    request,
+  );
+}
+
+export function pullSyncWeComDepartmentsAndUsers(request: any) {
+  return axios.get<GetCustomersReply>(
+    `${PrefixUriAdmin + UriWeComUser}/sync`,
     request,
   );
 }

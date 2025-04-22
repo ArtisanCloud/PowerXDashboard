@@ -248,8 +248,8 @@
     deleteQrcode,
     enableQrcode,
     disableQrcode,
-  } from '@/api/scrm/enterprise-qr';
-  import { listUsers } from '@/api/scrm/user';
+  } from '@/api/scrm/wecom/enterprise-qr';
+  import { listUsersPage } from '@/api/scrm/wecom/user';
 
   const qrcodeUrl = import.meta.env.VITE_BASE_QRCODE_URL;
   const state = reactive({
@@ -424,7 +424,7 @@
     fetchQrcodeList();
   };
   async function fetchUsers() {
-    const res = await listUsers({});
+    const res = await listUsersPage({});
     try {
       usersList.list = res.data?.list;
     } catch (err) {

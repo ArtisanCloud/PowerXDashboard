@@ -6,6 +6,8 @@
  * @LastEditTime: 2023-08-24 00:40:33
  */
 import axios from 'axios';
+import { PrefixUriAdmin } from '@/api';
+import { UriWeComDepartment } from '@/api/scrm/wecom/base';
 
 /**
  * Department
@@ -89,7 +91,7 @@ export function deleteDepartment(request: DeleteDepartmentRequest) {
   );
 }
 
-export interface Department {
+export interface WeComDepartment {
   id: number;
   depName: string;
   leader: DepartmentLeader;
@@ -99,15 +101,16 @@ export interface Department {
 }
 
 export interface GetDepartmentRequest {
-  id: number;
+  departmentId: number;
 }
 
 export interface GetDepartmentReply {
-  department: Department;
+  department: WeComDepartment;
 }
 
 export function getDepartment(request: GetDepartmentRequest) {
-  return axios.get<GetDepartmentReply>(
-    `/api/v1/admin/department/departments/${request.id}`,
+  return axios.post<GetDepartmentReply>(
+    `${PrefixUriAdmin + UriWeComDepartment}/tree`,
+    request,
   );
 }

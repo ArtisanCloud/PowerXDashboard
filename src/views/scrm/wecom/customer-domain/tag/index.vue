@@ -191,7 +191,7 @@
     GetTagRequest,
     wechatTagSync,
     corpOption,
-  } from '@/api/scrm/tag';
+  } from '@/api/scrm/wecom/tag';
   import EditTag from './components/edit-tag.vue';
   import AddTag from './components/add-tag.vue';
 

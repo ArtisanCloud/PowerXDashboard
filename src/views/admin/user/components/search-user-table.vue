@@ -144,9 +144,9 @@
   import EditUser from '@/views/admin/user/components/edit-user.vue';
   import {
     deleteUser,
-    listUsers,
-    ListUsersReply,
-    ListUsersRequest,
+    listUsersPage,
+    listUsersPageReply,
+    listUsersPageRequest,
     updateUser,
   } from '@/api/user';
 
@@ -181,7 +181,7 @@
     roleCodes: [] as string[],
     isEnable: undefined as undefined | boolean,
     depIds: [],
-  } as ListUsersRequest);
+  } as listUsersPageRequest);
 
   const state = reactive({
     tableLoading: false,
@@ -193,7 +193,7 @@
     },
   });
 
-  const pageData = ref({} as ListUsersReply);
+  const pageData = ref({} as listUsersPageReply);
 
   function fetchOption() {
     getUserQueryOptions().then((res) => {
@@ -210,7 +210,7 @@
       return;
     }
     state.tableLoading = true;
-    listUsers(queryForm)
+    listUsersPage(queryForm)
       .then((res) => {
         pageData.value = res.data;
       })

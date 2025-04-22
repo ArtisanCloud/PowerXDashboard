@@ -127,8 +127,8 @@
   import {
     getCustomersGroups,
     GetCustomersGroupsRequest,
-    pullSyncWeComDepartmentsAndUsers,
-  } from '@/api/scrm/customer';
+  } from '@/api/scrm/wecom/customer';
+  import { pullSyncWeComDepartmentsAndUsers } from '@/api/scrm/wecom/user';
 
   const sender = ref('');
   const chatIds = ref([] as string[]);
