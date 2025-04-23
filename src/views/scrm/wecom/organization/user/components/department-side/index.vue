@@ -47,6 +47,9 @@
     await useWeComUser.loadDepartmentTree(1);
     // consola.log(useWeComUser.departmentTree);
     expandedKeys.value = getAllKeys(useWeComUser.departmentTree);
+
+    // 加载完部部树后，设置默认选中的部门
+    await useWeComUser.setSelectedDepartment(1);
   });
 </script>
 

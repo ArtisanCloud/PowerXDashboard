@@ -25,7 +25,7 @@ export interface WeComUser {
   avatar?: string;
   externalEmail?: string;
   roles: string[];
-  department?: UserDepartment;
+  departments?: string;
   position: string;
   jobTitle: string;
   isEnabled: boolean;

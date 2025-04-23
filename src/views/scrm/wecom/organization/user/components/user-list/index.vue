@@ -22,6 +22,11 @@
   });
 
   const pageData = ref({} as listUsersPageReply);
+  const pagination = {
+    pageIndex: 1,
+    pageSize: 5,
+    total: 0,
+  };
 
   const queryChange = () => {
     if (state.tableLoading) {
@@ -30,9 +35,13 @@
     state.tableLoading = true;
     listUsersPage({
       departmentIds: useWeComUser.selectedDepartmentIds,
+      pageIndex: pagination.pageIndex,
+      pageSize: pagination.pageSize,
     } as listUsersPageRequest)
       .then((res) => {
         pageData.value = res.data;
+        pagination.pageIndex = res.data.pageIndex;
+        pagination.total = res.data.total;
       })
       .finally(() => {
         state.tableLoading = false;
@@ -69,9 +78,15 @@
     console.log('wechat_invite');
   };
 
-  onMounted(() => {
+  const handlePageChange = (page: number) => {
+    pagination.pageIndex = page;
     queryChange();
-  });
+  };
+
+  // onMounted(async () => {
+  //   await useWeComUser.setSelectedDepartment(1);
+  //   queryChange();
+  // });
 </script>
 
 <template>
@@ -103,18 +118,30 @@
       column-resizable
       scrollbar
       :class="styles.userTable"
+      :pagination="pagination"
+      @page-change="(page: number) => handlePageChange(page)"
     >
       <template #columns>
-        <a-table-column title="用户ID" data-index="userid" :width="100" />
-        <a-table-column title="姓名">
+        <a-table-column title="用户ID" data-index="userId" :width="100" />
+        <a-table-column title="姓名" :width="100">
           <template #cell="{ record }">
             {{ record.name }}
           </template>
         </a-table-column>
-        <a-table-column title="职务" data-index="position" ellipsis />
-        <a-table-column title="部门" data-index="department" ellipsis />
-        <a-table-column title="手机" data-index="mobile" ellipsis />
-        <a-table-column title="企业邮箱" data-index="Email" ellipsis />
+        <a-table-column
+          title="职务"
+          data-index="position"
+          :width="100"
+          ellipsis
+        />
+        <a-table-column title="部门" data-index="departments" ellipsis />
+        <a-table-column
+          title="手机"
+          data-index="mobile"
+          :width="150"
+          ellipsis
+        />
+        <a-table-column title="企业邮箱" data-index="email" ellipsis />
       </template>
     </a-table>
   </div>
