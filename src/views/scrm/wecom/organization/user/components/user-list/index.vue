@@ -116,6 +116,7 @@
       :loading="state.tableLoading"
       :row-selection="rowSelection"
       column-resizable
+      row-key="userId"
       scrollbar
       :class="styles.userTable"
       :pagination="pagination"

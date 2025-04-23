@@ -7,11 +7,13 @@
   import { pullSyncWeComDepartmentsAndUsers } from '@/api/scrm/wecom/user';
   import { Message } from '@arco-design/web-vue';
   import useLoadingStore from '@/store/modules/loading';
+  import AddDepartment from '@/views/scrm/wecom/organization/user/components/add-department/index.vue';
   import { consola } from 'consola';
   import styles from './index.module.less';
 
   const useWeComUser = useWeComUserStore();
   const loadingStore = useLoadingStore();
+  const addDepartmentRef = ref<InstanceType<typeof AddDepartment> | null>(null);
 
   const checkedViewType = ref('department');
   const handleDepartmentChange = (data: number) => {
@@ -26,8 +28,10 @@
   };
 
   const onAddDepartment = () => {
-    console.log('add department');
+    addDepartmentRef.value?.resetForm();
+    useWeComUser.showCreateDepartmentModal = true;
   };
+
   const onSyncWeComDepartments = async () => {
     loadingStore.setLoading(true);
     try {
@@ -113,6 +117,7 @@
       <UserList v-if="useWeComUser.selectedViewType === 'department'" />
       <TagUserList v-if="useWeComUser.selectedViewType === 'tag'" />
     </div>
+    <AddDepartment ref="addDepartmentRef" />
   </div>
 </template>
 

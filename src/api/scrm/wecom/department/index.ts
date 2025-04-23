@@ -34,6 +34,18 @@ export interface DepartmentNode {
   children?: DepartmentNode[];
 }
 
+export interface WeComDepartment {
+  id: number;
+  departmentLeader: null;
+  name: string;
+  nameEn: string;
+  order: number;
+  refDepartmentId: number;
+  weComDepId: number;
+  weComParentId: number;
+  children: WeComDepartment[];
+}
+
 export interface GetDepartmentTreeRequest {
   depId?: number;
 }
@@ -55,64 +67,56 @@ export function getDepartmentTree() {
   );
 }
 
-export interface CreateDepartmentRequest {
-  depName: string;
-  leaderId: number;
-  leaderIds: number[];
-  pId: number;
-  desc?: string;
-  phoneNumber?: string;
-  email?: string;
-  remark?: string;
+export type CreateWeComDepartmentRequest = WeComDepartment;
+
+export interface CreateWeComDepartmentReply {
+  success: boolean;
 }
 
-export interface CreateDepartmentReply {
-  id: number;
-}
-
-export function createDepartment(request: CreateDepartmentRequest) {
-  return axios.post<CreateDepartmentReply>(
-    '/api/v1/admin/department/departments',
+export function createWeComDepartment(request: CreateWeComDepartmentRequest) {
+  return axios.post<CreateWeComDepartmentReply>(
+    `${PrefixUriAdmin + UriWeComDepartment}`,
     request,
   );
 }
 
-export interface DeleteDepartmentRequest {
+export type PatchWeComDepartmentRequest = WeComDepartment;
+
+export interface PatchWeComDepartmentReply {
   id: number;
 }
 
-export interface DeleteDepartmentReply {
-  id: number;
-}
-
-export function deleteDepartment(request: DeleteDepartmentRequest) {
-  return axios.delete<DeleteDepartmentReply>(
-    `/api/v1/admin/department/departments/${request.id}`,
+export function patchWeComDepartment(request: PatchWeComDepartmentRequest) {
+  return axios.patch<PatchWeComDepartmentReply>(
+    `${PrefixUriAdmin + UriWeComDepartment}`,
+    request,
   );
 }
 
-export interface WeComDepartment {
+export interface DeleteWeComDepartmentRequest {
   id: number;
-  departmentLeader: null;
-  name: string;
-  nameEn: string;
-  order: number;
-  refDepartmentId: number;
-  weComDepId: number;
-  weComParentId: number;
-  children: WeComDepartment[];
 }
 
-export interface GetDepartmentRequest {
+export interface DeleteWeComDepartmentReply {
+  id: number;
+}
+
+export function deleteWeComDepartment(request: DeleteWeComDepartmentRequest) {
+  return axios.delete<DeleteWeComDepartmentReply>(
+    `${PrefixUriAdmin + UriWeComDepartment}/${request.id}`,
+  );
+}
+
+export interface GetWeComDepartmentRequest {
   departmentId: number;
 }
 
-export interface GetDepartmentReply {
+export interface GetWeComDepartmentReply {
   department: WeComDepartment;
 }
 
-export function getDepartment(request: GetDepartmentRequest) {
-  return axios.post<GetDepartmentReply>(
+export function getWeComDepartment(request: GetWeComDepartmentRequest) {
+  return axios.post<GetWeComDepartmentReply>(
     `${PrefixUriAdmin + UriWeComDepartment}/tree`,
     request,
   );
