@@ -49,12 +49,13 @@ export interface listUsersPageRequest {
   email?: string;
   alias?: number[];
   status?: string[];
-  WeComUserId?: string | number | null;
+  weComUserId?: string | number | null;
   roleCodes?: string[];
   isEnable?: any;
   pageIndex?: number;
   pageSize?: number;
   likeName?: string;
+  weComTagId?: number;
   departmentId?: number;
   departmentIds?: number[];
 }

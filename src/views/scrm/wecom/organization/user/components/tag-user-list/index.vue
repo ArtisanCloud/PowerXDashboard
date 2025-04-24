@@ -5,11 +5,11 @@
     listUsersPageReply,
     listUsersPageRequest,
   } from '@/api/scrm/wecom/user';
+  import useWeComUserStore from '@/store/modules/scrm/wecom/user';
   import styles from './index.module.less';
 
-  const queryForm = reactive({
-    WeComMainDepartmentId: null,
-  } as listUsersPageRequest);
+  const useWeComUser = useWeComUserStore();
+
   const state = reactive({
     tableLoading: false,
     deleteUserLoading: false,
@@ -21,13 +21,21 @@
   });
 
   const pageData = ref({} as listUsersPageReply);
-
+  const pagination = {
+    pageIndex: 1,
+    pageSize: 5,
+    total: 0,
+  };
   const queryChange = () => {
     if (state.tableLoading) {
       return;
     }
     state.tableLoading = true;
-    listUsersPage(queryForm)
+    listUsersPage({
+      weComTagId: useWeComUser.selectedTag!,
+      pageIndex: pagination.pageIndex,
+      pageSize: pagination.pageSize,
+    })
       .then((res) => {
         pageData.value = res.data;
       })

@@ -1,7 +1,4 @@
 <script lang="ts" setup>
-  import DepartmentSide from '@/views/scrm/wecom/organization/user/components/department-side/index.vue';
-  import UserList from '@/views/scrm/wecom/organization/user/components/user-list/index.vue';
-  import TagUserList from '@/views/scrm/wecom/organization/user/components/tag-user-list/index.vue';
   import useWeComUserStore, { ViewType } from '@/store/modules/scrm/wecom/user';
   import { ref } from 'vue';
   import { pullSyncWeComDepartmentsAndUsers } from '@/api/scrm/wecom/user';
@@ -9,6 +6,14 @@
   import useLoadingStore from '@/store/modules/loading';
   import AddDepartment from '@/views/scrm/wecom/organization/user/components/add-department/index.vue';
   import { consola } from 'consola';
+  import DepartmentUserList from '@/views/scrm/wecom/organization/user/components/department-user-list/index.vue';
+  import DepartmentTree from '@/views/scrm/wecom/organization/user/components/department-tree/index.vue';
+  import TagList from '@/views/scrm/wecom/organization/user/components/tag-list/index.vue';
+  import TagUserList from '@/views/scrm/wecom/organization/user/components/tag-user-list/index.vue';
+  import {
+    pullSyncWeComTagsAndUsers,
+    WeComTagTypeTag,
+  } from '@/api/scrm/wecom/tag/tag';
   import styles from './index.module.less';
 
   const useWeComUser = useWeComUserStore();
@@ -52,8 +57,22 @@
   const onAddTag = () => {
     console.log('add tag');
   };
-  const onSyncWeComTags = () => {
-    console.log('sync wecom tags');
+  const onSyncWeComTags = async () => {
+    loadingStore.setLoading(true);
+    try {
+      const res = await pullSyncWeComTagsAndUsers({
+        tagType: WeComTagTypeTag,
+      });
+      if (res) {
+        Message.success('同步成功');
+        await useWeComUser.loadTagList();
+        // await useWeComUser.loadUsersByDepartmentId(0);
+      }
+    } catch (err: any) {
+      Message.error(err.message);
+    } finally {
+      loadingStore.setLoading(false);
+    }
   };
 </script>
 
@@ -111,10 +130,16 @@
         >
       </a-radio-group>
       <a-divider :margin="8" />
-      <DepartmentSide @update:model-value="handleDepartmentChange" />
+      <DepartmentTree
+        v-if="useWeComUser.selectedViewType === 'department'"
+        @update:model-value="handleDepartmentChange"
+      />
+      <TagList v-if="useWeComUser.selectedViewType === 'tag'" />
     </div>
     <div :class="styles.userTable">
-      <UserList v-if="useWeComUser.selectedViewType === 'department'" />
+      <DepartmentUserList
+        v-if="useWeComUser.selectedViewType === 'department'"
+      />
       <TagUserList v-if="useWeComUser.selectedViewType === 'tag'" />
     </div>
     <AddDepartment ref="addDepartmentRef" />

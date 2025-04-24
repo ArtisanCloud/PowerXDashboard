@@ -4,17 +4,19 @@ import {
   WeComDepartment,
 } from '@/api/scrm/wecom/department';
 import { Message } from '@arco-design/web-vue';
-import { listUsersPage } from '@/api/scrm/wecom/user';
-
-type TagTree = any;
-type UserList = any;
+import { listUsersPage, WeComUser } from '@/api/scrm/wecom/user';
+import {
+  getWeComTagPageList,
+  WeComTag,
+  WeComTagTypeTag,
+} from '@/api/scrm/wecom/tag/tag';
 
 export type ViewType = 'department' | 'tag';
 
 interface UserState {
   departmentTree: WeComDepartment[];
-  tagTree: TagTree | null;
-  userList: UserList | null;
+  tagList: WeComTag[];
+  userList: WeComUser[];
   selectedDepartmentId: number;
   selectedDepartmentIds: number[];
   selectedTag: number | null;
@@ -25,22 +27,23 @@ interface UserState {
 const useWeComUserStore = defineStore('weComUser', {
   state: (): UserState => ({
     departmentTree: [],
-    tagTree: null,
-    userList: null,
+    tagList: [],
+    userList: [],
     selectedDepartmentId: 1,
     selectedDepartmentIds: [],
     selectedTag: null,
-    selectedViewType: 'department',
+    // selectedViewType: 'department',
+    selectedViewType: 'tag',
     showCreateDepartmentModal: false,
   }),
   actions: {
     setDepartmentTree(tree: WeComDepartment) {
       this.departmentTree = [tree];
     },
-    setTagTree(tree: TagTree) {
-      this.tagTree = tree;
+    setTagList(list: WeComTag[]) {
+      this.tagList = list;
     },
-    setUserList(list: UserList) {
+    setUserList(list: WeComUser[]) {
       this.userList = list;
     },
     setSelectedDepartment(departmentId: number) {
@@ -82,10 +85,22 @@ const useWeComUserStore = defineStore('weComUser', {
         Message.error('获取部门信息失败');
       }
     },
+    async loadTagList() {
+      const res = await getWeComTagPageList({
+        tagType: WeComTagTypeTag,
+        pageIndex: 1,
+        pageSize: 100,
+      });
+      if (res.data) {
+        this.tagList = res.data.list;
+      } else {
+        Message.error('获取企微标签列表失败');
+      }
+    },
     async loadUsersByDepartmentId(departmentId: number) {
       const res = await listUsersPage({ departmentId });
       if (res.data) {
-        this.userList = [res.data.list];
+        this.userList = res.data.list;
       } else {
         Message.error('获取部门用户列表失败');
       }
@@ -93,7 +108,7 @@ const useWeComUserStore = defineStore('weComUser', {
     async loadUsersByDepartmentIds(departmentIds: number[]) {
       const res = await listUsersPage({ departmentIds });
       if (res.data) {
-        this.userList = [res.data.list];
+        this.userList = res.data.list;
       } else {
         Message.error('获取部门用户列表失败');
       }

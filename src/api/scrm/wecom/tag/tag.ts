@@ -1,45 +1,78 @@
 /*
- * @Description: 标签
- * @Author: George
- * @Date: 2023-06-30 14:00:31
- * @LastEditors: George
- * @LastEditTime: 2023-07-25 22:22:41
+ * @Description: 企微标签
+ * @Author: Matrix-X
+ * @Date: 2025-04-24 15:00:00
+ * @LastEditors: Matrix-X
+ * @LastEditTime: 2025-04-24 15:00:00
  */
 import axios from 'axios';
+import { PrefixUriAdmin } from '@/api';
+import { UriWeComTag } from '@/api/scrm/wecom/base';
+import { GetCustomersReply } from '@/api/scrm/wecom/customer';
 
-/**
- * @description 客户群活码列表
- */
+export type WeComTagType = number;
+export const WeComTagTypeTag: WeComTagType = 1;
+export const WeComTagTypeCorpTag: WeComTagType = 2;
+export const WeComTagTypeStrategy: WeComTagType = 3;
 
-export interface ReplyList {
-  list: any[];
-  total: number;
-  pageIndex?: number;
-  pageSize?: number;
+export interface WeComCorpTagGroup {
+  agentId: number;
+  groupId: string;
+  name: string;
+  sort: number;
+  isDelete: string;
 }
 
-export interface GetTagRequest {
-  tagIds?: string[];
-  groupIds?: string[];
-  groupName?: string;
-  name?: string;
-  Sync?: number | string;
-  pageIndex?: number;
-  pageSize?: number;
+export interface WeComTag {
+  type: number;
+  isSelf: number;
+  tagId: string;
+  groupId: string;
+  groupName: string;
+  name: string;
+  sort: number;
+  CorpTagGroup: WeComCorpTagGroup;
 }
 
-export type GetTagReply = ReplyList;
-
-export function getTagList(request: GetTagRequest) {
-  return axios.post<GetTagReply>(
-    `/api/v1/admin/scrm/wechat/wecom/tags/corp/page`,
+export function pullSyncWeComTagsAndUsers(request: any) {
+  return axios.post<GetCustomersReply>(
+    `${PrefixUriAdmin + UriWeComTag}/sync`,
     request,
   );
 }
 
-export function getGroupTagList(request: GetTagRequest) {
-  return axios.post<GetTagReply>(
-    `/api/v1/admin/scrm/wechat/wecom/tags/group/page`,
+export interface GetWeComTagPageListRequest {
+  tagIds?: string[];
+  groupIds?: string[];
+  groupName?: string;
+  name?: string;
+  sync?: number | string;
+  tagType?: number;
+  pageIndex?: number;
+  pageSize?: number;
+}
+
+export interface GetWeComTagPageListReply {
+  list: WeComTag[];
+}
+
+export function getWeComTagPageList(request: GetWeComTagPageListRequest) {
+  return axios.post<GetWeComTagPageListReply>(
+    `${PrefixUriAdmin + UriWeComTag}/page`,
+    request,
+  );
+}
+
+export interface GetTagGroupRequest {
+  groupId: string;
+}
+export interface GetTagGroupReply {
+  list: WeComTag[];
+}
+
+export function getTagGroupList(request: GetTagGroupRequest) {
+  return axios.post<GetTagGroupReply>(
+    `${PrefixUriAdmin + UriWeComTag}/groups`,
     request,
   );
 }
@@ -47,16 +80,13 @@ export function getGroupTagList(request: GetTagRequest) {
 /**
  * @description 新增标签
  */
-export interface TagList {
-  name: string;
-  sort: number;
-}
+
 export interface AddTagRequest {
   groupId: string;
   groupName: string;
   sort: number;
   agentId?: number;
-  tag: TagList[];
+  tag: WeComTag[];
 }
 export interface CreateTagReply {
   status: number | string;
@@ -107,6 +137,7 @@ export function corpOption() {
 export function groupOption() {
   return axios.get<any>(`/api/v1/admin/scrm/wechat/wecom/tags/group/option`);
 }
+
 export interface CustomerTagList {
   userId: string;
   externalUserId: string;

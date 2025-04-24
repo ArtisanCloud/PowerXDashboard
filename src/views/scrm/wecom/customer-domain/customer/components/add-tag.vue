@@ -10,7 +10,7 @@
       <a-form-item>
         <div class="tag-list" style="width: 100%">
           <div
-            v-for="(params, index) in groupTagList.list"
+            v-for="(params, index) in TagGroupList.list"
             :key="index"
             style="width: 100%; margin: 8px 0"
           >
@@ -53,7 +53,7 @@
   import {
     customerTag,
     CustomerTagList,
-    getGroupTagList,
+    getTagGroupList,
   } from '@/api/scrm/wecom/tag';
 
   const prop = defineProps({
@@ -85,7 +85,7 @@
     removeTag: [],
   } as CustomerTagList);
 
-  const groupTagList = reactive<any>({
+  const TagGroupList = reactive<any>({
     list: [],
   });
 
@@ -105,13 +105,13 @@
   const handlereset = () => {
     formRef.value.resetFields();
   };
-  async function fetchGroupTagList() {
-    const res = await getGroupTagList({
+  async function fetchTagGroupList() {
+    const res = await getTagGroupList({
       pageIndex: 1,
       pageSize: 30,
     });
     try {
-      groupTagList.list = res.data.list.map((data) => {
+      TagGroupList.list = res.data.list.map((data) => {
         if (data.tags && data.tags.length > 0) {
           data.tags.forEach((params: TagItem) => {
             if (tagIds.value.includes(params.tagId)) {
@@ -124,7 +124,7 @@
         return data;
       });
     } catch (err) {
-      groupTagList.list = [];
+      TagGroupList.list = [];
     }
   }
 
@@ -139,7 +139,7 @@
       checked: boolean;
       tags: [];
     }
-    groupTagList.list.forEach((data: TagParams) => {
+    TagGroupList.list.forEach((data: TagParams) => {
       if (data.tags && data.tags.length > 0) {
         data.tags.forEach((params: TagItem) => {
           if (params.checked) {
@@ -174,7 +174,7 @@
     }
   };
   onMounted(async () => {
-    await fetchGroupTagList();
+    await fetchTagGroupList();
   });
   watch(
     () => prop.editData,
@@ -184,7 +184,7 @@
         formModel.value.userId = editData.userId;
         formModel.value.externalUserId = editData.externalUserId;
         tagIds.value = editData.tags;
-        fetchGroupTagList();
+        fetchTagGroupList();
       }
     },
     { deep: true },

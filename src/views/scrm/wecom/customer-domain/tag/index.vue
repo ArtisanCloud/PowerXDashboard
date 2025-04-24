@@ -187,7 +187,7 @@
   import { onMounted, reactive, ref, toRaw } from 'vue';
   import { Message } from '@arco-design/web-vue';
   import {
-    getGroupTagList,
+    getTagGroupList,
     GetTagRequest,
     wechatTagSync,
     corpOption,
@@ -242,7 +242,7 @@
   async function fetchTagList() {
     const data = tagParams.value;
     state.loading = true;
-    const res = await getGroupTagList({
+    const res = await getTagGroupList({
       ...data,
     });
     try {

@@ -299,7 +299,7 @@ const SCRMWecom: AppRouteRecordRaw = {
         },
         {
           path: '/scrm/wecom/customer-user-group/tag',
-          name: 'WeComGroupTag',
+          name: 'WeComTagGroup',
           component: () =>
             import('@/views/scrm/wecom/customer-group/tag/index.vue'),
           meta: {

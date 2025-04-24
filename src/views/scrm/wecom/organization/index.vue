@@ -5,7 +5,7 @@
     GetDepartmentTreeReply,
     getDepartmentTree,
   } from '@/api/scrm/wecom/department';
-  // import DepartmentSide from '@/views/admin/user/components/department-side.vue';
+  // import DepartmentSide from '@/views/admin/user/components/department-tree.vue';
   import DepartmentSide from '@/views/scrm/wecom/organization/user/components/department-side/index.vue';
   import styles from './index.module.less';
 

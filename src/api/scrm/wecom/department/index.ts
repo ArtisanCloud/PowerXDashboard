@@ -46,27 +46,6 @@ export interface WeComDepartment {
   children: WeComDepartment[];
 }
 
-export interface GetDepartmentTreeRequest {
-  depId?: number;
-}
-
-export interface GetDepartmentTreeReply {
-  pageIndex: number;
-  pageSize: number;
-  total: number;
-  list?: DepartmentNode[];
-}
-
-export interface GetDepartmentTreeReplyList {
-  list: DepartmentNode[];
-}
-
-export function getDepartmentTree() {
-  return axios.post<GetDepartmentTreeReply>(
-    `/api/v1/admin/scrm/wechat/wecom/organization/department/page`,
-  );
-}
-
 export type CreateWeComDepartmentRequest = WeComDepartment;
 
 export interface CreateWeComDepartmentReply {

@@ -28,6 +28,7 @@
   .container {
     display: flex;
     height: 100vh;
+    //border: 1px solid red;
 
     .banner {
       width: 550px;
