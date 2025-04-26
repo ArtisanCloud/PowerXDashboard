@@ -46,11 +46,17 @@
     // 默认拉取根目录的部门树
     await useWeComUser.loadDepartmentTree(1);
     // consola.log(useWeComUser.departmentTree);
-    expandedKeys.value = getAllKeys(useWeComUser.departmentTree);
+    // expandedKeys.value = getAllKeys(useWeComUser.departmentTree);
+    expandedKeys.value = [1]; // 只展开根节点，可改成 getAllKeys(...) 全部展开
 
     // 加载完部部树后，设置默认选中的部门
     await useWeComUser.setSelectedDepartment(1);
   });
+
+  // 监听展开事件，更新 expandedKeys
+  const onExpand = (keys: number[]) => {
+    expandedKeys.value = keys;
+  };
 </script>
 
 <template>
@@ -59,7 +65,6 @@
       :data="useWeComUser.departmentTree"
       :expanded-keys="expandedKeys"
       :show-line="true"
-      :default-expand-all="true"
       :field-names="{
         title: 'name',
         key: 'weComDepId',
@@ -67,6 +72,7 @@
       }"
       checked-strategy="child"
       @select="onSelect"
+      @expand="onExpand"
     >
       <template #title="nodeData">
         <span>{{ nodeData.name }}</span>

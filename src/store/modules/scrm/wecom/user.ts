@@ -32,8 +32,8 @@ const useWeComUserStore = defineStore('weComUser', {
     selectedDepartmentId: 1,
     selectedDepartmentIds: [],
     selectedTag: null,
-    // selectedViewType: 'department',
-    selectedViewType: 'tag',
+    selectedViewType: 'department',
+    // selectedViewType: 'tag',
     showCreateDepartmentModal: false,
   }),
   actions: {

@@ -125,71 +125,6 @@ const SCRMWecom: AppRouteRecordRaw = {
 
     // customer management
     {
-      path: '/scrm/wecom/operation',
-      name: 'WeComOperation',
-      component: EMPTY_LAYOUT,
-      meta: {
-        icon: 'icon-shake',
-        locale: 'menu.scrm.wecom.operation',
-        requiresAuth: true,
-        roles: ['*'],
-      },
-      children: [
-        {
-          path: '/scrm/wecom/operation/user-group-send',
-          name: 'WeComGroupSend',
-          component: () =>
-            import('@/views/scrm/wecom/operation/group-send/index.vue'),
-          meta: {
-            locale: 'menu.scrm.wecom.operation.groupSend',
-            requiresAuth: true,
-            roles: ['*'],
-            hideChildrenInMenu: true,
-          },
-        },
-        {
-          path: '/scrm/wecom/operation/welcome-script',
-          name: 'WeComWelcomeScript',
-          component: () =>
-            import('@/views/scrm/wecom/operation/welcome-script/index.vue'),
-          meta: {
-            locale: 'menu.scrm.wecom.operation.welcomeScript',
-            requiresAuth: true,
-            roles: ['*'],
-            hideChildrenInMenu: true,
-          },
-        },
-        {
-          path: '/scrm/wecom/operation/moment',
-          name: 'WeComMoment',
-          component: () =>
-            import('@/views/scrm/wecom/operation/moment/index.vue'),
-          meta: {
-            locale: 'menu.scrm.wecom.operation.moment',
-            requiresAuth: true,
-            roles: ['*'],
-            hideChildrenInMenu: true,
-          },
-        },
-        {
-          path: '/scrm/wecom/operation/user-user-group-send-history',
-          name: 'WeComUserGroupSendHistory',
-          component: () =>
-            import(
-              '@/views/scrm/wecom/operation/user-group-send-history/index.vue'
-            ),
-          meta: {
-            locale: 'menu.scrm.wecom.operation.userGroupSendHistory',
-            requiresAuth: true,
-            roles: ['*'],
-            hideChildrenInMenu: true,
-          },
-        },
-      ],
-    },
-
-    // customer management
-    {
       path: '/scrm/wecom/customer-domain',
       name: 'WeComCustomerDomain',
       component: EMPTY_LAYOUT,
@@ -204,7 +139,7 @@ const SCRMWecom: AppRouteRecordRaw = {
           path: '/scrm/wecom/customer-domain/customer',
           name: 'WeComCustomer',
           component: EMPTY_LAYOUT,
-          redirect: '/scrm/customer-domain/customer/list',
+          redirect: '/scrm/wecom/customer-domain/customer/list',
           meta: {
             locale: 'menu.scrm.wecom.customerDomain.customer',
             requiresAuth: true,
@@ -274,6 +209,71 @@ const SCRMWecom: AppRouteRecordRaw = {
       ],
     },
 
+    // customer management
+    {
+      path: '/scrm/wecom/operation',
+      name: 'WeComOperation',
+      component: EMPTY_LAYOUT,
+      meta: {
+        icon: 'icon-shake',
+        locale: 'menu.scrm.wecom.operation',
+        requiresAuth: true,
+        roles: ['*'],
+      },
+      children: [
+        {
+          path: '/scrm/wecom/operation/user-group-send',
+          name: 'WeComGroupSend',
+          component: () =>
+            import('@/views/scrm/wecom/operation/group-send/index.vue'),
+          meta: {
+            locale: 'menu.scrm.wecom.operation.groupSend',
+            requiresAuth: true,
+            roles: ['*'],
+            hideChildrenInMenu: true,
+          },
+        },
+        {
+          path: '/scrm/wecom/operation/welcome-script',
+          name: 'WeComWelcomeScript',
+          component: () =>
+            import('@/views/scrm/wecom/operation/welcome-script/index.vue'),
+          meta: {
+            locale: 'menu.scrm.wecom.operation.welcomeScript',
+            requiresAuth: true,
+            roles: ['*'],
+            hideChildrenInMenu: true,
+          },
+        },
+        {
+          path: '/scrm/wecom/operation/moment',
+          name: 'WeComMoment',
+          component: () =>
+            import('@/views/scrm/wecom/operation/moment/index.vue'),
+          meta: {
+            locale: 'menu.scrm.wecom.operation.moment',
+            requiresAuth: true,
+            roles: ['*'],
+            hideChildrenInMenu: true,
+          },
+        },
+        {
+          path: '/scrm/wecom/operation/user-user-group-send-history',
+          name: 'WeComUserGroupSendHistory',
+          component: () =>
+            import(
+              '@/views/scrm/wecom/operation/user-group-send-history/index.vue'
+            ),
+          meta: {
+            locale: 'menu.scrm.wecom.operation.userGroupSendHistory',
+            requiresAuth: true,
+            roles: ['*'],
+            hideChildrenInMenu: true,
+          },
+        },
+      ],
+    },
+
     // customer user-group management
     {
       path: '/scrm/wecom/customer-user-group/',
@@ -290,7 +290,7 @@ const SCRMWecom: AppRouteRecordRaw = {
           path: '/scrm/wecom/customer-user-group/user-group',
           name: 'WeComGroup',
           component: () =>
-            import('@/views/scrm/wecom/customer-group/group/index.vue'),
+            import('@/views/scrm/wecom/customer-operation/group/index.vue'),
           meta: {
             locale: 'menu.scrm.wecom.customerGroup.group',
             requiresAuth: true,
@@ -301,7 +301,7 @@ const SCRMWecom: AppRouteRecordRaw = {
           path: '/scrm/wecom/customer-user-group/tag',
           name: 'WeComTagGroup',
           component: () =>
-            import('@/views/scrm/wecom/customer-group/tag/index.vue'),
+            import('@/views/scrm/wecom/customer-operation/tag/index.vue'),
           meta: {
             locale: 'menu.scrm.wecom.customerGroup.tag',
             requiresAuth: true,

@@ -7,8 +7,7 @@
  */
 import axios from 'axios';
 import { PrefixUriAdmin } from '@/api';
-import { UriCustomerDomain } from '@/api/crm/customer-domain/customer';
-import { UriWeCom, UriWeComUser } from '../base';
+import { UriWeCom } from '../base';
 
 /**
  * customer
@@ -76,34 +75,6 @@ export function getCustomersGroupsDetail(
   );
 }
 
-/**
- * customer
- * @description 应用管理
- */
-export type GetWechatAppReReply = Customers;
-
-export function wechatAppList(request: any) {
-  return axios.get<GetWechatAppReReply>(
-    '/api/v1/admin/scrm/wechat/wecom/app/options',
-    {
-      params: request,
-    },
-  );
-}
-
-/**
- * customer
- * @description 应用详情
- */
-export interface GetWechatAppDetailRequest {
-  agentId: number;
-}
-
-export function wechatAppDetail(request: GetWechatAppDetailRequest) {
-  return axios.get<any>('/api/v1/admin/scrm/wechat/wecom/app/detail', {
-    params: request,
-  });
-}
 export interface GetWechatGroup {
   name?: string;
   owner?: string;
@@ -169,6 +140,26 @@ export function createWechatGroup(request: CreateWechatGroupRequest) {
  * customer
  * @description 应用信息发送
  */
+
+export interface GetMessageTemplateRequest {
+  text: any;
+  externalUserid: string[];
+  chatType: string;
+  attachments: any;
+  sender: string;
+  sendTime: any;
+}
+export function wechatMessageTemplate(request: GetMessageTemplateRequest) {
+  return axios.post<GetCustomersReply>(
+    '/api/v1/admin/scrm/wechat/wecom/customers/group/message/template',
+    request,
+  );
+}
+
+/**
+ * customer
+ * @description 应用信息发送
+ */
 export interface Articles {
   title: string;
   description: string;
@@ -196,21 +187,6 @@ export interface GetMessageArticlesRequest {
 export function wechatMessageArticles(request: GetMessageArticlesRequest) {
   return axios.post<GetCustomersReply>(
     '/api/v1/admin/scrm/wechat/wecom/app/message/articles',
-    request,
-  );
-}
-
-export interface GetMessageTemplateRequest {
-  text: any;
-  externalUserid: string[];
-  chatType: string;
-  attachments: any;
-  sender: string;
-  sendTime: any;
-}
-export function wechatMessageTemplate(request: GetMessageTemplateRequest) {
-  return axios.post<GetCustomersReply>(
-    '/api/v1/admin/scrm/wechat/wecom/customers/group/message/template',
     request,
   );
 }
