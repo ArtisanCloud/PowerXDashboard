@@ -175,7 +175,7 @@ const SCRMWecom: AppRouteRecordRaw = {
         },
         {
           path: '/scrm/wecom/customer-domain/tag',
-          name: 'WeComTag',
+          name: 'WeComCorpTag',
           component: () =>
             import('@/views/scrm/wecom/customer-domain/tag/index.vue'),
           meta: {

@@ -39,7 +39,7 @@
     AddTagRequest,
     groupOption,
     TagList,
-  } from '@/api/scrm/wecom/tag';
+  } from '@/api/scrm/wecom/tag/corp-tag';
 
   const emits = defineEmits(['submitSuccess', 'submitFailed', 'update:id']);
   const formRef = ref();

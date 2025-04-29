@@ -1,0 +1,74 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  justify-content: start;
+  align-items: center;
+  //border: 1px solid red;
+  background-color: #fff;
+  padding:15px 25px;
+  .topBox{
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 15px;
+    width: 100%;
+    //border: 1px solid yellow;
+    .title{
+      color: #000;
+      font-size: 18px;
+    }
+    .desc{
+      padding-top: 5px;
+      font-size: 14px;
+      line-height: 22px;
+      color: #787878;
+    }
+  }
+
+  .resultBox{
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    align-items: start;
+    gap: 15px;
+  }
+
+  #qrcode {
+    width: 100px;
+    height: 100px;
+  }
+
+  #qrcode1 {
+    width: 150px;
+    height: 150px;
+  }
+
+  .header {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+  }
+
+  .right {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 12px;
+  }
+
+  :deep(.arco-table-cell) {
+    display: block;
+    width: 100%;
+    text-align: center;
+  }
+
+  :deep(.arco-table-td-content) {
+    display: block;
+    width: 100%;
+    text-align: center;
+  }
+
+  .arco-table-cell .arco-table-th-title {
+    display: inline-block;
+    width: 100%;
+    text-align: center;
+  }
+}

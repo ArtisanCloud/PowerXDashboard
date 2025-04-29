@@ -48,7 +48,7 @@
       <a-form-item>
         <a-space size="large">
           <a-button type="primary" html-type="submit">提交</a-button>
-          <a-button @click="handlereset">重置</a-button>
+          <a-button @click="handleReset">重置</a-button>
         </a-space>
       </a-form-item>
     </a-form>
@@ -58,7 +58,7 @@
 <script lang="ts" setup>
   import { watch, reactive, ref, PropType } from 'vue';
   import { FieldRule, Message } from '@arco-design/web-vue';
-  import { editTag, EditTagRequest } from '@/api/scrm/wecom/tag';
+  import { editTag, EditTagRequest } from '@/api/scrm/wecom/tag/corp-tag';
 
   const prop = defineProps({
     usersList: {
@@ -70,7 +70,7 @@
     editData: {
       type: Object as PropType<any>,
       default: () => {
-        return [];
+        return {};
       },
     },
   });
@@ -109,7 +109,7 @@
     submitLoading: false,
   });
 
-  const handlereset = () => {
+  const handleReset = () => {
     formRef.value.resetFields();
     tagList.value = tagListCopy.value;
     removetagIds.value = [];
@@ -153,7 +153,7 @@
       ...formModel.value,
     })
       .then(() => {
-        handlereset();
+        handleReset();
         Message.success('标签编辑成功');
         emits('submitSuccess');
         state.submitLoading = false;

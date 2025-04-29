@@ -1,125 +1,3 @@
-<!--
- * @Description:客户群管理 
- * @Author: George
- * @Date: 2023-06-13 23:39:18
- * @LastEditors: George
- * @LastEditTime: 2023-07-10 22:23:50
--->
-<template>
-  <div class="container">
-    <a-form
-      :model="customersParams"
-      layout="vertical"
-      auto-label-width
-      @submit="handleSubmit"
-    >
-      <a-space>
-        <a-form-item field="name" label-width="0">
-          <a-input
-            v-model="customersParams.name"
-            allow-clear
-            placeholder="请输入群名称"
-          />
-        </a-form-item>
-        <a-form-item>
-          <a-button type="primary" html-type="submit">搜索</a-button>
-        </a-form-item>
-        <a-form-item>
-          <a-button type="primary" @click="handleReset">重置</a-button>
-        </a-form-item>
-      </a-space>
-    </a-form>
-    <a-row :gutter="{ xs: 24, sm: 24, md: 24, lg: 24 }">
-      <a-col :xs="24" :sm="24" :md="24" :lg="24">
-        <a-card>
-          <div class="right">
-            <a-button
-              style="margin: 0 10px"
-              type="primary"
-              @click="fetchPullSyncWeComDepartmentsAndUsers"
-              >同步群信息</a-button
-            >
-            <a-button type="primary" @click="handleSendMsgAll"
-              >批量发送群消息</a-button
-            >
-          </div>
-          <a-table
-            :pagination="true"
-            :data="customersList.list"
-            :loading="state.loading"
-            column-resizable
-            scrollbar
-            :bordered="{ cell: true }"
-            @select="handleSelect"
-          >
-            <template #columns>
-              <!-- <a-table-column title="chatId" :width="200">
-                <template #cell="{ record }">
-                  {{ record.chatId}}
-                </template>
-              </a-table-column> -->
-              <a-table-column
-                title="群名称"
-                :width="200"
-                :ellipsis="true"
-                :tooltip="true"
-              >
-                <template #cell="{ record }">
-                  {{ record.name }}
-                </template>
-              </a-table-column>
-              <a-table-column
-                title="群主"
-                :width="200"
-                data-index="owner"
-                :ellipsis="true"
-                :tooltip="true"
-              ></a-table-column>
-              <a-table-column
-                title="群成员"
-                :width="200"
-                :ellipsis="true"
-                :tooltip="true"
-              >
-                <template #cell="{ record }">
-                  <p
-                    v-for="(item, index) in record.memberList"
-                    :key="index"
-                    style="display: inline-block"
-                    >{{ item.name }}
-                    <span v-if="index < record.memberList.length - 1">、</span>
-                  </p>
-                </template>
-              </a-table-column>
-              <a-table-column title="创建时间" data-index="Mobile" :width="180">
-                <template #cell="{ record }">
-                  <span>{{ getTime(record.createTime) }}</span>
-                </template>
-              </a-table-column>
-              <!-- <a-table-column  title="操作"  :width="100" :ellipsis="true" :tooltip="true">
-                <template #cell="{ record }">
-                  <a-button type="text" @click="handleSendMsg(record)">发送群消息</a-button>
-                  </template>
-              </a-table-column> -->
-            </template>
-          </a-table>
-        </a-card>
-      </a-col>
-    </a-row>
-    <a-drawer
-      v-model:visible="state.visible"
-      width="500px"
-      ok-text="关闭抽屉"
-      :hide-cancel="true"
-    >
-      <SendMessage
-        :sender="sender"
-        @submit-success="handleSendSuccess"
-      ></SendMessage>
-    </a-drawer>
-  </div>
-</template>
-
 <script lang="ts" setup>
   import { onMounted, reactive, ref, toRaw } from 'vue';
   import SendMessage from '@/views/scrm/wecom/customer-operation/group/components/send-message.vue';
@@ -129,6 +7,7 @@
     GetCustomersGroupsRequest,
   } from '@/api/scrm/wecom/customer';
   import { pullSyncWeComDepartmentsAndUsers } from '@/api/scrm/wecom/user';
+  import styles from './index.module.less';
 
   const sender = ref('');
   const chatIds = ref([] as string[]);
@@ -220,30 +99,147 @@
   });
 </script>
 
-<style lang="less" scoped>
-  .header {
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-  }
-  .right {
-    display: flex;
-    justify-content: flex-end;
-    margin-bottom: 12px;
-  }
-  :deep(.arco-table-cell) {
-    display: block;
-    width: 100%;
-    text-align: center;
-  }
-  :deep(.arco-table-td-content) {
-    display: block;
-    width: 100%;
-    text-align: center;
-  }
-  .arco-table-cell .arco-table-th-title {
-    display: inline-block;
-    width: 100%;
-    text-align: center;
-  }
-</style>
+<template>
+  <div :class="styles.container">
+    <div :class="styles.topBox">
+      <span :class="styles.title">客户群</span>
+      <span :class="styles.desc"
+        >成员可创建包含微信用户的客户群，并可由企业统一管理
+      </span>
+    </div>
+    <a-divider />
+    <div :class="styles.mainBox">
+      <div :class="styles.filter">
+        <a-button-group>
+          <span>群主：</span>
+          <a-button :class="styles.btnFilter">不限</a-button>
+          <a-button>
+            <template #icon>
+              <icon-down />
+            </template>
+          </a-button>
+        </a-button-group>
+        <a-button-group>
+          <span>群名：</span>
+          <a-button :class="styles.btnFilter">全部</a-button>
+          <a-button>
+            <template #icon>
+              <icon-down />
+            </template>
+          </a-button>
+        </a-button-group>
+        <div>
+          <span>时间：</span>
+          <a-range-picker
+            :class="styles.btnFilter"
+            style="width: 360px"
+            show-time
+            :time-picker-props="{ defaultValue: ['00:00:00', '09:09:06'] }"
+            format="YYYY-MM-DD HH:mm"
+            @change="onChangeFilterDateRange"
+            @select="onSelectFilterDateRange"
+            @ok="onOkFilterDateRange"
+          />
+        </div>
+      </div>
+      <a-divider />
+      <div :class="styles.resultBox">
+        <div :class="styles.navBox">
+          <span>共{{ customersList.list.length }}个群聊</span>
+          <div class="mr-4">
+            <a-tooltip content="导出">
+              <a-button>
+                <template #icon>
+                  <icon-export />
+                </template>
+              </a-button>
+            </a-tooltip>
+          </div>
+        </div>
+
+        <div class="right">
+          <a-button
+            style="margin: 0 10px"
+            type="primary"
+            @click="fetchPullSyncWeComDepartmentsAndUsers"
+            >同步群信息</a-button
+          >
+          <a-button type="primary" @click="handleSendMsgAll"
+            >批量发送群消息</a-button
+          >
+        </div>
+        <a-table
+          :pagination="true"
+          :data="customersList.list"
+          :loading="state.loading"
+          column-resizable
+          scrollbar
+          :bordered="{ cell: true }"
+          @select="handleSelect"
+        >
+          <template #columns>
+            <!-- <a-table-column title="chatId" :width="200">
+              <template #cell="{ record }">
+                {{ record.chatId}}
+              </template>
+            </a-table-column> -->
+            <a-table-column
+              title="群名称"
+              :width="200"
+              :ellipsis="true"
+              :tooltip="true"
+            >
+              <template #cell="{ record }">
+                {{ record.name }}
+              </template>
+            </a-table-column>
+            <a-table-column
+              title="群主"
+              :width="200"
+              data-index="owner"
+              :ellipsis="true"
+              :tooltip="true"
+            ></a-table-column>
+            <a-table-column
+              title="群成员"
+              :width="200"
+              :ellipsis="true"
+              :tooltip="true"
+            >
+              <template #cell="{ record }">
+                <p
+                  v-for="(item, index) in record.memberList"
+                  :key="index"
+                  style="display: inline-block"
+                  >{{ item.name }}
+                  <span v-if="index < record.memberList.length - 1">、</span>
+                </p>
+              </template>
+            </a-table-column>
+            <a-table-column title="创建时间" data-index="Mobile" :width="180">
+              <template #cell="{ record }">
+                <span>{{ getTime(record.createTime) }}</span>
+              </template>
+            </a-table-column>
+            <!-- <a-table-column  title="操作"  :width="100" :ellipsis="true" :tooltip="true">
+              <template #cell="{ record }">
+                <a-button type="text" @click="handleSendMsg(record)">发送群消息</a-button>
+                </template>
+            </a-table-column> -->
+          </template>
+        </a-table>
+      </div>
+    </div>
+    <a-drawer
+      v-model:visible="state.visible"
+      width="500px"
+      ok-text="关闭抽屉"
+      :hide-cancel="true"
+    >
+      <SendMessage
+        :sender="sender"
+        @submit-success="handleSendSuccess"
+      ></SendMessage>
+    </a-drawer>
+  </div>
+</template>
