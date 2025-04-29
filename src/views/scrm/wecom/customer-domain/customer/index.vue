@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-  import { onMounted, reactive, ref, toRaw } from 'vue';
+  import { onMounted, reactive, ref } from 'vue';
   import { corpOption } from '@/api/scrm/wecom/tag/corp-tag';
   import { getCustomers, GetCustomersRequest } from '@/api/scrm/wecom/customer';
   import useLoadingStore from '@/store/modules/loading';
@@ -126,9 +126,18 @@
       </div>
       <a-divider />
       <div :class="styles.resultBox">
-        <div :class="styles.totalBox"
-          >共{{ customersList.list.length }}个客户</div
-        >
+        <div :class="styles.navBox">
+          <span>共{{ customersList.list.length }}个客户</span>
+          <div class="mr-4">
+            <a-tooltip content="从企微同步客户">
+              <a-button>
+                <template #icon>
+                  <icon-sync />
+                </template>
+              </a-button>
+            </a-tooltip>
+          </div>
+        </div>
         <a-table :data="customersList.list" column-resizable scrollbar>
           <template #columns>
             <a-table-column

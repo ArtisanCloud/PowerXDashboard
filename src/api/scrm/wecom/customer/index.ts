@@ -7,20 +7,29 @@
  */
 import axios from 'axios';
 import { PrefixUriAdmin } from '@/api';
-import { UriWeCom } from '../base';
+import { UriWeCom, UriWeComUser } from '../base';
 
 /**
  * customer
  * @description scrm客户管理
  */
 
-export interface UserDepartment {
-  depId: number;
-  depName: string;
-}
-
-export interface Customers {
-  list: any[];
+export interface WeComCustomer {
+  name: string;
+  adderId: number;
+  addTime: string;
+  updateTime: string;
+  addChannel: string;
+  tagGroupIdList: number[];
+  tagIdList: number[];
+  personalTagList: string[];
+  age: number;
+  email: string;
+  phoneNumber: string;
+  address: string;
+  birthday: string;
+  remark: string;
+  groupChatId: number;
 }
 
 export interface GetCustomersRequest {
@@ -31,7 +40,9 @@ export interface GetCustomersRequest {
   pageSize?: number;
 }
 
-export type GetCustomersReply = Customers;
+export interface GetCustomersReply {
+  list: WeComCustomer[];
+}
 
 /**
  * customer
@@ -39,7 +50,7 @@ export type GetCustomersReply = Customers;
  */
 export function getCustomers(request: GetCustomersRequest) {
   return axios.post<GetCustomersReply>(
-    `/api/v1/scrm/wechat/wecom/customers/page`,
+    `${PrefixUriAdmin + UriWeComUser}/page`,
     request,
   );
 }
@@ -50,7 +61,9 @@ export interface GetCustomersGroupsRequest {
   limit?: number;
   name?: string;
 }
-export type GetCustomersGroupsReReply = Customers;
+export interface GetCustomersGroupsReReply {
+  list: WeComCustomer[];
+}
 /**
  * customer
  * @description 客户群列表
