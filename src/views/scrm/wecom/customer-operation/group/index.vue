@@ -7,15 +7,17 @@
     GetCustomersGroupsRequest,
   } from '@/api/scrm/wecom/customer';
   import { pullSyncWeComDepartmentsAndUsers } from '@/api/scrm/wecom/user';
+  import useLoadingStore from '@/store/modules/loading';
   import styles from './index.module.less';
 
   const sender = ref('');
   const chatIds = ref([] as string[]);
 
   const state = reactive({
-    loading: false,
     visible: false,
   });
+
+  const loadingStore = useLoadingStore();
   const customersParams = ref({
     status_filter: 0,
     limit: 100,
@@ -31,30 +33,30 @@
     ...customersParams.value,
   });
   async function fetchCustomers() {
-    state.loading = true;
-    const res = await getCustomersGroups({
-      ...customersParams.value,
-    });
+    loadingStore.setLoading(true);
     try {
+      const res = await getCustomersGroups({
+        ...customersParams.value,
+      });
       customersList.list = res.data?.list;
     } finally {
-      state.loading = false;
+      loadingStore.setLoading(false);
     }
   }
   async function fetchPullSyncWeComDepartmentsAndUsers() {
-    state.loading = true;
-    const res = await pullSyncWeComDepartmentsAndUsers({
-      sync: 1,
-    });
+    loadingStore.setLoading(true);
     try {
+      const res = await pullSyncWeComDepartmentsAndUsers({
+        sync: 1,
+      });
       if (res) {
         Message.success('同步成功');
         fetchCustomers();
       }
-    } catch (err) {
-      state.loading = false;
+    } catch (err: any) {
+      Message.error(err.message);
     } finally {
-      state.loading = false;
+      loadingStore.setLoading(false);
     }
   }
   const handleSubmit = () => {
@@ -66,6 +68,16 @@
   };
   const handleSendSuccess = () => {
     state.visible = false;
+  };
+
+  const onChangeFilterDateRange = () => {
+    console.log('onChangeFilterDateRange');
+  };
+  const onSelectFilterDateRange = () => {
+    console.log('onSelectFilterDateRange');
+  };
+  const onOkFilterDateRange = () => {
+    console.log('onOkFilterDateRange');
   };
 
   const handleSendMsgAll = () => {

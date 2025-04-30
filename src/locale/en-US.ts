@@ -71,6 +71,7 @@ export default {
   'menu.scrm.wecom.marketingAcquisition': 'Marketing Acquisition',
   'menu.scrm.wecom.marketingAcquisition.enterpriseQR': 'Enterprise QR Code',
   'menu.scrm.wecom.marketingAcquisition.groupQR': 'Group QR Code',
+  'menu.scrm.wecom.marketingAcquisition.assistant': 'Acquisition Assistant',
   'menu.scrm.wecom.cms': 'Content Management',
   'menu.scrm.wecom.cms.scriptLib': 'Script Library',
   'menu.scrm.wecom.cms.media': 'Media Library',
@@ -95,6 +96,7 @@ export default {
   'menu.scrm.wecom.app': 'Application Management',
   'menu.scrm.wecom.sessionArchive': 'Session Archive',
   'menu.scrm.wecom.smartCS': 'Smart Customer Service',
+  'menu.scrm.wecom.smartCS.chatReply': 'Chat Reply',
 
   'menu.scrm.official': 'Wechat Official Account',
   'menu.scrm.official.menu': 'Menu',

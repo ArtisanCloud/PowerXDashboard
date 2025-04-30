@@ -60,7 +60,7 @@ const SCRMWecom: AppRouteRecordRaw = {
       children: [
         {
           path: '/scrm/wecom/marketing-acquisition/enterprise-qr',
-          name: 'WeComEnterpriseQR',
+          name: 'WeComMarketingAcquisitionEnterpriseQR',
           component: () =>
             import(
               '@/views/scrm/wecom/marketing-acquisition/enterprise-qr/index.vue'
@@ -73,13 +73,26 @@ const SCRMWecom: AppRouteRecordRaw = {
         },
         {
           path: '/scrm/wecom/marketing-acquisition/user-group-qr',
-          name: 'WeComGroupQR',
+          name: 'WeComMarketingAcquisitionGroupQR',
           component: () =>
             import(
               '@/views/scrm/wecom/marketing-acquisition/group-qr/index.vue'
             ),
           meta: {
             locale: 'menu.scrm.wecom.marketingAcquisition.groupQR',
+            requiresAuth: true,
+            roles: ['*'],
+          },
+        },
+        {
+          path: '/scrm/wecom/marketing-acquisition/assistant',
+          name: 'WeComMarketingAcquisitionAssistant',
+          component: () =>
+            import(
+              '@/views/scrm/wecom/marketing-acquisition/assistant/index.vue'
+            ),
+          meta: {
+            locale: 'menu.scrm.wecom.marketingAcquisition.assistant',
             requiresAuth: true,
             roles: ['*'],
           },
@@ -222,6 +235,17 @@ const SCRMWecom: AppRouteRecordRaw = {
       },
       children: [
         {
+          path: '/scrm/wecom/operation/user-group',
+          name: 'WeComGroup',
+          component: () =>
+            import('@/views/scrm/wecom/customer-operation/group/index.vue'),
+          meta: {
+            locale: 'menu.scrm.wecom.customerGroup.group',
+            requiresAuth: true,
+            roles: ['*'],
+          },
+        },
+        {
           path: '/scrm/wecom/operation/user-group-send',
           name: 'WeComGroupSend',
           component: () =>
@@ -274,43 +298,6 @@ const SCRMWecom: AppRouteRecordRaw = {
       ],
     },
 
-    // customer user-group management
-    {
-      path: '/scrm/wecom/customer-user-group/',
-      name: 'WeComCustomerGroup',
-      component: EMPTY_LAYOUT,
-      meta: {
-        icon: 'icon-user-group',
-        locale: 'menu.scrm.wecom.customerGroup',
-        requiresAuth: true,
-        roles: ['*'],
-      },
-      children: [
-        {
-          path: '/scrm/wecom/customer-user-group/user-group',
-          name: 'WeComGroup',
-          component: () =>
-            import('@/views/scrm/wecom/customer-operation/group/index.vue'),
-          meta: {
-            locale: 'menu.scrm.wecom.customerGroup.group',
-            requiresAuth: true,
-            roles: ['*'],
-          },
-        },
-        {
-          path: '/scrm/wecom/customer-user-group/tag',
-          name: 'WeComTagGroup',
-          component: () =>
-            import('@/views/scrm/wecom/customer-operation/tag/index.vue'),
-          meta: {
-            locale: 'menu.scrm.wecom.customerGroup.tag',
-            requiresAuth: true,
-            roles: ['*'],
-          },
-        },
-      ],
-    },
-
     // app management
     {
       path: '/scrm/wecom/app',
@@ -341,13 +328,26 @@ const SCRMWecom: AppRouteRecordRaw = {
     {
       path: '/scrm/wecom/smart-cs',
       name: 'WeComSmartCS',
-      component: () => import('@/views/scrm/wecom/smart-cs/index.vue'),
+      component: EMPTY_LAYOUT,
       meta: {
         icon: 'icon-robot',
         locale: 'menu.scrm.wecom.smartCS',
         requiresAuth: true,
         roles: ['*'],
       },
+      children: [
+        {
+          path: '/scrm/wecom/smart-cs',
+          name: 'WeComCustomerServiceChatReply',
+          component: () =>
+            import('@/views/scrm/wecom/smart-cs/chat-reply/index.vue'),
+          meta: {
+            locale: 'menu.scrm.wecom.smartCS.chatReply',
+            requiresAuth: true,
+            roles: ['*'],
+          },
+        },
+      ],
     },
   ],
 };

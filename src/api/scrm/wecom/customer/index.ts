@@ -66,7 +66,7 @@ export interface GetCustomersGroupsReReply {
 }
 /**
  * customer
- * @description 客户群列表
+ * @description 客户群
  */
 export function getCustomersGroups(request: GetCustomersGroupsRequest) {
   return axios.post<GetCustomersGroupsReReply>(
