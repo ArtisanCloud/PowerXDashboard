@@ -1,0 +1,82 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  justify-content: start;
+  align-items: center;
+  width: 1080px;
+  height: 100%;
+  box-sizing: border-box;
+  background-color: #fff;
+  margin: 2px 4px;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, .15);
+
+  .titleBox {
+    width: 100%;
+    height: 40px;
+    padding: 0 18px;
+    background-color: #F5F5F5;
+    border-bottom: 1px solid #DCE1E6;
+    border-radius: 4px 4px 0 0;
+    text-align: center;
+    .title {
+      left: 18px;
+      right: 18px;
+      top: 0;
+      z-index: 1;
+      height: 40px;
+      line-height: 40px;
+      font-size: 16px;
+      background-color: #F5F5F5;
+    }
+  }
+
+  .mainBox {
+    display: block;
+    width: 100%;
+    padding: 0 120px 30px 120px;
+    background-color: #fff;
+    //border: 1px solid red;
+    .filter {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 30px 0 0 0;
+      color: #787878;
+      font-size: 14px;
+      .btnFilter{
+        text-align: left !important;
+        font-size: 12px;
+        color: #222;
+        width: 80px;
+      }
+    }
+    .actionBox{
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    .resultBox{
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      .navBox{
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        padding-top: 3px;
+        height: 22px;
+        float: left;
+        font-size: 16px;
+        font-weight: 400;
+        line-height: 22.4px;
+        text-align: left;
+        //border:1px solid red;
+        color: var(--ww_base_black);
+      }
+    }
+  }
+}

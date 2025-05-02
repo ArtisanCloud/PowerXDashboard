@@ -1,244 +1,3 @@
-<!--
- * @Description: 活码
- * @Author: George
- * @Date: 2023-06-13 23:39:18
- * @LastEditors: George
- * @LastEditTime: 2023-08-02 17:22:37
--->
-<template>
-  <div class="container">
-    <a-form
-      :model="qrcodeParams"
-      layout="vertical"
-      auto-label-width
-      @submit="handleSubmit"
-    >
-      <a-space>
-        <a-form-item label-width="0">
-          <a-input
-            v-model="qrcodeParams.name"
-            allow-clear
-            placeholder="请输入场景码标题"
-          />
-        </a-form-item>
-        <a-form-item label-width="0">
-          <a-select
-            v-model="qrcodeParams.state"
-            :style="{ width: '200px' }"
-            placeholder="请选择场景码状态"
-            allow-clear
-          >
-            <a-option :value="1">启用</a-option>
-            <a-option :value="2">禁用</a-option>
-          </a-select>
-        </a-form-item>
-        <a-form-item label-width="0">
-          <a-select
-            v-model="qrcodeParams.userId"
-            allow-search
-            :style="{ width: '200px' }"
-            placeholder="请选择员工"
-            allow-clear
-          >
-            <a-option
-              v-for="(item, index) in usersList.list"
-              :key="index"
-              :value="item.WeComUserId"
-              >{{ item.name }}</a-option
-            >
-          </a-select>
-        </a-form-item>
-        <a-form-item>
-          <a-button type="primary" html-type="submit">搜索</a-button>
-        </a-form-item>
-        <a-form-item>
-          <a-button type="primary" @click="handleReset">重置</a-button>
-        </a-form-item>
-      </a-space>
-    </a-form>
-    <a-row :gutter="{ xs: 24, sm: 24, md: 24, lg: 24 }">
-      <a-col :xs="24" :sm="24" :md="24" :lg="24">
-        <a-card>
-          <div class="right">
-            <a-button type="primary" @click="handleAddQrcode"
-              >新增活码</a-button
-            >
-          </div>
-          <a-table
-            :pagination="pagination"
-            :data="customersList.list"
-            :loading="state.loading"
-            column-resizable
-            scrollbar
-            :bordered="{ cell: true }"
-            @page-change="pageChanged"
-            @page-size-change="pageSizeChanged"
-          >
-            <template #columns>
-              <a-table-column title="序号" :width="70">
-                <template #cell="{ rowIndex }">
-                  {{ rowIndex + 1 }}
-                </template>
-              </a-table-column>
-              <a-table-column
-                title="场景码标题"
-                data-index="name"
-                :width="200"
-                :ellipsis="true"
-                :tooltip="true"
-              ></a-table-column>
-              <a-table-column
-                title="场景码"
-                :width="200"
-                data-index="RealQrcodeLink"
-                :ellipsis="true"
-                :tooltip="true"
-              >
-                <template #cell="{ record }">
-                  <a-popover>
-                    <vue-qr
-                      :id="'qrcode' + record.qid"
-                      class="qrcode"
-                      logo-src="/logo.png"
-                      :text="qrcodeUrl + '?qid=' + record.qid"
-                      :size="300"
-                    ></vue-qr>
-                    <template #content>
-                      <vue-qr
-                        class="qrcode1"
-                        logo-src="/logo.png"
-                        :text="qrcodeUrl + '?qid=' + record.qid"
-                        :size="300"
-                      ></vue-qr>
-                    </template>
-                  </a-popover>
-                </template>
-              </a-table-column>
-              <a-table-column
-                title="使用员工"
-                :width="200"
-                :ellipsis="true"
-                :tooltip="true"
-              >
-                <template #cell="{ record }">
-                  <template v-if="record && record.owner.length > 0">
-                    {{ record.owner.join(',') }}
-                  </template>
-                </template>
-              </a-table-column>
-              <a-table-column
-                title="累计访问次数"
-                :width="120"
-                data-index="cpa"
-                :ellipsis="true"
-                :tooltip="true"
-              ></a-table-column>
-              <a-table-column title="二维码到期时间" :width="150">
-                <template #cell="{ record }">
-                  <span>{{ getTime(record.expiryDate) }}</span>
-                </template>
-              </a-table-column>
-              <a-table-column title="场景码状态" :width="120">
-                <template #cell="{ record }">
-                  <a-tag v-if="record.state === 1" color="#7bc616">启用</a-tag>
-                  <a-tag v-if="record.state === 2" color="#f53f3f">禁用</a-tag>
-                </template>
-              </a-table-column>
-              <a-table-column title="二维码状态" :width="120">
-                <template #cell="{ record }">
-                  <a-tag v-if="record.expiryState > 0" color="#7bc616"
-                    >正常</a-tag
-                  >
-                  <a-tag v-if="record.expiryState === 0" color="#f53f3f"
-                    >过期</a-tag
-                  >
-                </template>
-              </a-table-column>
-              <a-table-column
-                title="描述信息"
-                data-index="desc"
-                :width="200"
-                :ellipsis="true"
-                :tooltip="true"
-              ></a-table-column>
-              <a-table-column
-                fixed="right"
-                title="操作"
-                data-index="Mobile"
-                :width="320"
-              >
-                <template #cell="{ record }">
-                  <a-link @click="handleEdit(record)"> 编辑 </a-link>
-                  <a-divider direction="vertical" />
-                  <a-link @click="handleDownload(record)"> 下载 </a-link>
-                  <a-divider v-if="record.state === 1" direction="vertical" />
-                  <a-link
-                    v-if="record.state === 1"
-                    @click="handlePreview(record)"
-                  >
-                    预览
-                  </a-link>
-                  <a-divider direction="vertical" />
-                  <a-link>
-                    <a-popconfirm
-                      content="确定要删除当前活码？"
-                      type="warning"
-                      @ok="handleDelete(record)"
-                    >
-                      <span>删除</span>
-                    </a-popconfirm>
-                  </a-link>
-                  <a-divider
-                    v-if="record.state === 1 || record.state === 2"
-                    direction="vertical"
-                  />
-                  <a-link
-                    v-if="record.state === 1 || record.state === 2"
-                    @click="handleEnableQrcode(record)"
-                  >
-                    <span v-if="record.state === 1">禁用</span>
-                    <span v-if="record.state === 2">启用</span>
-                  </a-link>
-                </template>
-              </a-table-column>
-            </template>
-          </a-table>
-        </a-card>
-      </a-col>
-    </a-row>
-    <a-drawer
-      v-model:visible="state.visible"
-      width="500px"
-      ok-text="关闭抽屉"
-      :title="state.title"
-      :hide-cancel="true"
-    >
-      <edit-qr
-        :users-list="usersList.list"
-        :edit-data="state.recordObj"
-        @submit-success="handleSendSuccess"
-      ></edit-qr>
-    </a-drawer>
-    <a-drawer
-      v-model:visible="state.preViewvisible"
-      width="375px"
-      ok-text="关闭抽屉"
-      :hide-cancel="true"
-    >
-      <iframe
-        v-if="state.preViewvisible"
-        id="iframeid"
-        height="600"
-        :src="
-          'https://scrm.superman.net.cn/h5/#/pages/index/index?qid=' +
-          state.recordObj.qid
-        "
-        frameborder="0"
-      ></iframe>
-    </a-drawer>
-  </div>
-</template>
-
 <script lang="ts" setup>
   import { onMounted, reactive, ref, toRaw } from 'vue';
   import { Message } from '@arco-design/web-vue';
@@ -250,19 +9,24 @@
     disableQrcode,
   } from '@/api/scrm/wecom/enterprise-qr';
   import { listUsersPage } from '@/api/scrm/wecom/user';
+  import useLoadingStore from '@/store/modules/loading';
+  import VueQR from 'vue-qr/src/packages/vue-qr.vue';
+  import EditQR from './components/edit-qr.vue';
+  import styles from './index.module.less';
+
+  const loadingStore = useLoadingStore();
 
   const qrcodeUrl = import.meta.env.VITE_BASE_QRCODE_URL;
   const state = reactive({
-    loading: false,
     visible: false,
-    preViewvisible: false,
+    preViewVisible: false,
     title: '新增活码',
     recordObj: {
       qid: '',
       state: 1,
     },
   });
-  const qrcodeParams = ref({
+  const qrCodeParams = ref({
     userId: '',
     name: '',
     cursor: '',
@@ -277,8 +41,8 @@
   });
   const pagination = reactive({
     'total': 0,
-    'currentPage': qrcodeParams.value.pageSize,
-    'pageSize': qrcodeParams.value.pageSize,
+    'currentPage': qrCodeParams.value.pageSize,
+    'pageSize': qrCodeParams.value.pageSize,
     'show-total': true,
     'show-jumper': true,
     'show-page-size': true,
@@ -287,47 +51,48 @@
   const customersList = reactive<any>({
     list: [],
   });
-  async function fetchQrcodeList() {
-    const data = qrcodeParams.value;
-    if (!qrcodeParams.value.state) {
+  async function fetchQRCodeList() {
+    const data = qrCodeParams.value;
+    if (!qrCodeParams.value.state) {
       data.state = undefined;
     }
-    state.loading = true;
-    const res = await getQrcodeList({
-      ...data,
-    });
+    loadingStore.setLoading(true);
     try {
+      const res = await getQrcodeList({
+        ...data,
+      });
       customersList.list = res.data?.list;
       pagination.total = res.data?.total;
     } finally {
-      state.loading = false;
+      loadingStore.setLoading(false);
     }
   }
-  async function fetchtDeleteQrcode() {
+  async function fetchDeleteQrcode() {
     const recordQid = state.recordObj.qid;
     const res = await deleteQrcode(recordQid);
+    loadingStore.setLoading(true);
     try {
       if (res.status) {
         Message.success('删除成功');
-        fetchQrcodeList();
+        fetchQRCodeList();
       }
     } finally {
-      state.loading = false;
+      loadingStore.setLoading(false);
     }
   }
   const handleSubmit = () => {
-    fetchQrcodeList();
+    fetchQRCodeList();
   };
   const formData = toRaw({
-    ...qrcodeParams.value,
+    ...qrCodeParams.value,
   });
   const handleReset = () => {
-    qrcodeParams.value = { ...formData };
-    fetchQrcodeList();
+    qrCodeParams.value = { ...formData };
+    fetchQRCodeList();
   };
   const handleSendSuccess = () => {
     state.visible = false;
-    fetchQrcodeList();
+    fetchQRCodeList();
   };
   const handleAddQrcode = () => {
     state.title = '新增活码';
@@ -344,11 +109,11 @@
   };
   const handlePreview = (record: any) => {
     state.recordObj = record;
-    state.preViewvisible = true;
+    state.preViewVisible = true;
   };
   const handleDelete = (record: any) => {
     state.recordObj = record;
-    fetchtDeleteQrcode();
+    fetchDeleteQrcode();
   };
   async function getQrcodeState() {
     const qrcodeQid = state.recordObj.qid;
@@ -357,7 +122,7 @@
       try {
         if (res.status) {
           Message.success('禁用成功');
-          fetchQrcodeList();
+          fetchQRCodeList();
         }
       } finally {
         Message.error('禁用失败');
@@ -367,10 +132,10 @@
       try {
         if (res.status) {
           Message.success('启用成功');
-          fetchQrcodeList();
+          fetchQRCodeList();
         }
       } finally {
-        state.loading = false;
+        loadingStore.setLoading(false);
       }
     }
   }
@@ -415,13 +180,13 @@
   };
   const pageChanged = (page: number) => {
     pagination.currentPage = page;
-    qrcodeParams.value.pageIndex = page;
-    fetchQrcodeList();
+    qrCodeParams.value.pageIndex = page;
+    fetchQRCodeList();
   };
   const pageSizeChanged = (pageSize: number) => {
-    qrcodeParams.value.pageSize = pageSize;
+    qrCodeParams.value.pageSize = pageSize;
     pagination.pageSize = pageSize;
-    fetchQrcodeList();
+    fetchQRCodeList();
   };
   async function fetchUsers() {
     const res = await listUsersPage({});
@@ -442,40 +207,243 @@
     return `${Y} - ${M} - ${D}`;
   }
   onMounted(() => {
-    fetchQrcodeList();
+    fetchQRCodeList();
     fetchUsers();
   });
 </script>
 
-<style lang="less" scoped>
-  .qrcode {
-    width: 100px;
-    height: 100px;
-  }
-  .qrcode1 {
-    width: 150px;
-    height: 150px;
-  }
-  .header {
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-  }
-  .right {
-    display: flex;
-    justify-content: flex-end;
-    margin-bottom: 12px;
-  }
-  .arco-table-cell {
-    text-align: center;
-  }
-  :deep(.arco-table-td-content) {
-    display: block;
-    width: 100%;
-    text-align: center;
-  }
-  .arco-table-cell .arco-table-th-title {
-    display: inline-block;
-    width: 100%;
-  }
-</style>
+<template>
+  <div :class="styles.container">
+    <div :class="styles.titleBox"
+      ><span :class="styles.title">联系我</span></div
+    >
+    <div :class="styles.mainBox">
+      <div :class="styles.filter">
+        <a-form
+          :model="qrCodeParams"
+          layout="vertical"
+          auto-label-width
+          @submit="handleSubmit"
+        >
+          <a-space>
+            <a-form-item label-width="0">
+              <a-input
+                v-model="qrCodeParams.name"
+                allow-clear
+                placeholder="请输入场景码标题"
+              />
+            </a-form-item>
+            <a-form-item label-width="0">
+              <a-select
+                v-model="qrCodeParams.state"
+                :style="{ width: '200px' }"
+                placeholder="请选择场景码状态"
+                allow-clear
+              >
+                <a-option :value="1">启用</a-option>
+                <a-option :value="2">禁用</a-option>
+              </a-select>
+            </a-form-item>
+            <a-form-item label-width="0">
+              <a-select
+                v-model="qrCodeParams.userId"
+                allow-search
+                :style="{ width: '200px' }"
+                placeholder="请选择员工"
+                allow-clear
+              >
+                <a-option
+                  v-for="(item, index) in usersList.list"
+                  :key="index"
+                  :value="item.WeComUserId"
+                  >{{ item.name }}</a-option
+                >
+              </a-select>
+            </a-form-item>
+            <a-form-item>
+              <a-button type="primary" html-type="submit">搜索</a-button>
+            </a-form-item>
+            <a-form-item>
+              <a-button type="primary" @click="handleReset">重置</a-button>
+            </a-form-item>
+          </a-space>
+        </a-form>
+      </div>
+      <div :class="styles.actionBox">
+        <a-button type="primary" @click="handleAddQrcode">新增活码</a-button>
+      </div>
+
+      <div :class="styles.resultBox">
+        <a-table
+          :pagination="pagination"
+          :data="customersList.list"
+          :loading="loadingStore.loading"
+          column-resizable
+          scrollbar
+          :bordered="{ cell: true }"
+          @page-change="pageChanged"
+          @page-size-change="pageSizeChanged"
+        >
+          <template #columns>
+            <a-table-column title="序号" :width="70">
+              <template #cell="{ rowIndex }">
+                {{ rowIndex + 1 }}
+              </template>
+            </a-table-column>
+            <a-table-column
+              title="场景码标题"
+              data-index="name"
+              :width="200"
+              :ellipsis="true"
+              :tooltip="true"
+            ></a-table-column>
+            <a-table-column
+              title="场景码"
+              :width="200"
+              data-index="RealQrcodeLink"
+              :ellipsis="true"
+              :tooltip="true"
+            >
+              <template #cell="{ record }">
+                <a-popover>
+                  <VueQR
+                    :id="'qrcode' + record.qid"
+                    class="qrcode"
+                    logo-src="/logo.png"
+                    :text="qrcodeUrl + '?qid=' + record.qid"
+                    :size="300"
+                  ></VueQR>
+                  <template #content>
+                    <vue-qr
+                      class="qrcode1"
+                      logo-src="/logo.png"
+                      :text="qrcodeUrl + '?qid=' + record.qid"
+                      :size="300"
+                    ></vue-qr>
+                  </template>
+                </a-popover>
+              </template>
+            </a-table-column>
+            <a-table-column
+              title="使用员工"
+              :width="200"
+              :ellipsis="true"
+              :tooltip="true"
+            >
+              <template #cell="{ record }">
+                <template v-if="record && record.owner.length > 0">
+                  {{ record.owner.join(',') }}
+                </template>
+              </template>
+            </a-table-column>
+            <a-table-column
+              title="累计访问次数"
+              :width="120"
+              data-index="cpa"
+              :ellipsis="true"
+              :tooltip="true"
+            ></a-table-column>
+            <a-table-column title="二维码到期时间" :width="150">
+              <template #cell="{ record }">
+                <span>{{ getTime(record.expiryDate) }}</span>
+              </template>
+            </a-table-column>
+            <a-table-column title="场景码状态" :width="120">
+              <template #cell="{ record }">
+                <a-tag v-if="record.state === 1" color="#7bc616">启用</a-tag>
+                <a-tag v-if="record.state === 2" color="#f53f3f">禁用</a-tag>
+              </template>
+            </a-table-column>
+            <a-table-column title="二维码状态" :width="120">
+              <template #cell="{ record }">
+                <a-tag v-if="record.expiryState > 0" color="#7bc616"
+                  >正常</a-tag
+                >
+                <a-tag v-if="record.expiryState === 0" color="#f53f3f"
+                  >过期</a-tag
+                >
+              </template>
+            </a-table-column>
+            <a-table-column
+              title="描述信息"
+              data-index="desc"
+              :width="200"
+              :ellipsis="true"
+              :tooltip="true"
+            ></a-table-column>
+            <a-table-column
+              fixed="right"
+              title="操作"
+              data-index="Mobile"
+              :width="320"
+            >
+              <template #cell="{ record }">
+                <a-link @click="handleEdit(record)"> 编辑 </a-link>
+                <a-divider direction="vertical" />
+                <a-link @click="handleDownload(record)"> 下载 </a-link>
+                <a-divider v-if="record.state === 1" direction="vertical" />
+                <a-link
+                  v-if="record.state === 1"
+                  @click="handlePreview(record)"
+                >
+                  预览
+                </a-link>
+                <a-divider direction="vertical" />
+                <a-link>
+                  <a-popconfirm
+                    content="确定要删除当前活码？"
+                    type="warning"
+                    @ok="handleDelete(record)"
+                  >
+                    <span>删除</span>
+                  </a-popconfirm>
+                </a-link>
+                <a-divider
+                  v-if="record.state === 1 || record.state === 2"
+                  direction="vertical"
+                />
+                <a-link
+                  v-if="record.state === 1 || record.state === 2"
+                  @click="handleEnableQrcode(record)"
+                >
+                  <span v-if="record.state === 1">禁用</span>
+                  <span v-if="record.state === 2">启用</span>
+                </a-link>
+              </template>
+            </a-table-column>
+          </template>
+        </a-table>
+      </div>
+    </div>
+    <a-drawer
+      v-model:visible="state.visible"
+      width="500px"
+      ok-text="关闭抽屉"
+      :title="state.title"
+      :hide-cancel="true"
+    >
+      <EditQR
+        :users-list="usersList.list"
+        :edit-data="state.recordObj"
+        @submit-success="handleSendSuccess"
+      ></EditQR>
+    </a-drawer>
+    <a-drawer
+      v-model:visible="state.preViewVisible"
+      width="375px"
+      ok-text="关闭抽屉"
+      :hide-cancel="true"
+    >
+      <iframe
+        v-if="state.preViewVisible"
+        id="iframeid"
+        height="600"
+        :src="
+          'https://scrm.superman.net.cn/h5/#/pages/index/index?qid=' +
+          state.recordObj.qid
+        "
+        frameborder="0"
+      ></iframe>
+    </a-drawer>
+  </div>
+</template>

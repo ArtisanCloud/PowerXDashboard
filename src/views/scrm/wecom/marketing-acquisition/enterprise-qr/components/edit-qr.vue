@@ -94,7 +94,7 @@
     editData: {
       type: Object as PropType<any>,
       default: () => {
-        return [];
+        return {};
       },
     },
   });
