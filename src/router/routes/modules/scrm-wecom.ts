@@ -1,7 +1,7 @@
 import { DEFAULT_LAYOUT, EMPTY_LAYOUT } from '../base';
 import { AppRouteRecordRaw } from '../types';
 
-const SCRMWecom: AppRouteRecordRaw = {
+const SCRMWeCom: AppRouteRecordRaw = {
   path: '/scrm/wecom',
   name: 'Scrm WeCom',
   meta: {
@@ -59,27 +59,40 @@ const SCRMWecom: AppRouteRecordRaw = {
       },
       children: [
         {
-          path: '/scrm/wecom/marketing-acquisition/enterprise-qr',
-          name: 'WeComMarketingAcquisitionEnterpriseQR',
+          path: '/scrm/wecom/marketing-acquisition/contact-way',
+          name: 'WeComMarketingAcquisitionContactWay',
           component: () =>
             import(
-              '@/views/scrm/wecom/marketing-acquisition/enterprise-qr/index.vue'
+              '@/views/scrm/wecom/marketing-acquisition/contact-way/index.vue'
             ),
           meta: {
-            locale: 'menu.scrm.wecom.marketingAcquisition.enterpriseQR',
+            locale: 'menu.scrm.wecom.marketingAcquisition.contactWay',
             requiresAuth: true,
             roles: ['*'],
           },
         },
         {
-          path: '/scrm/wecom/marketing-acquisition/user-group-qr',
-          name: 'WeComMarketingAcquisitionGroupQR',
+          path: '/scrm/wecom/marketing-acquisition/list-group-chat-join-way',
+          name: 'WeComMarketingAcquisitionGroupChatJoinWay',
           component: () =>
             import(
-              '@/views/scrm/wecom/marketing-acquisition/group-qr/index.vue'
+              '@/views/scrm/wecom/marketing-acquisition/group-chat-join-way/index.vue'
             ),
           meta: {
-            locale: 'menu.scrm.wecom.marketingAcquisition.groupQR',
+            locale: 'menu.scrm.wecom.marketingAcquisition.groupChatJoinWay',
+            requiresAuth: true,
+            roles: ['*'],
+          },
+        },
+        {
+          path: '/scrm/wecom/marketing-acquisition/channel-way',
+          name: 'WeComMarketingAcquisitionChannelWay',
+          component: () =>
+            import(
+              '@/views/scrm/wecom/marketing-acquisition/channel-way/index.vue'
+            ),
+          meta: {
+            locale: 'menu.scrm.wecom.marketingAcquisition.channelWay',
             requiresAuth: true,
             roles: ['*'],
           },
@@ -352,4 +365,4 @@ const SCRMWecom: AppRouteRecordRaw = {
   ],
 };
 
-export default SCRMWecom;
+export default SCRMWeCom;

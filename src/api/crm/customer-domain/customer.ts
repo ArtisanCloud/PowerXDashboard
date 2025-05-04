@@ -3,7 +3,7 @@ import axios from 'axios';
 import { Pagination } from '@/types/global';
 import { PrefixUriAdmin } from '@/api';
 
-export const UriCustomerDomain = '/customerdomain';
+export const UriCustomerDomain = '/customerDomain';
 
 export interface CustomerExternalId {
   openIdInMiniProgram?: string;

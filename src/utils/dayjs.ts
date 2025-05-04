@@ -54,3 +54,12 @@ export function formatStoreTime(storeWorkTime: string) {
   return '';
   // return dayjs(reservedTime).format('MM-DD HH:mm');
 }
+
+export function getTime(timestamp: number): string {
+  const date = new Date(timestamp);
+  const Y = date.getFullYear();
+  const M =
+    date.getMonth() + 1 < 10 ? `0${date.getMonth() + 1}` : date.getMonth() + 1;
+  const D = date.getDate() < 10 ? `0${date.getDate()}` : date.getDate();
+  return `${Y} - ${M} - ${D}`;
+}

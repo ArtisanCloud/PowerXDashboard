@@ -1,16 +1,16 @@
 <script lang="ts" setup>
   import { onMounted, reactive, ref, toRaw } from 'vue';
   import { Message } from '@arco-design/web-vue';
+  import { listUsersPage } from '@/api/scrm/wecom/user';
+  import useLoadingStore from '@/store/modules/loading';
+  import VueQR from 'vue-qr/src/packages/vue-qr.vue';
   import {
     getQrcodeList,
     GetQrcodeRequest,
     deleteQrcode,
     enableQrcode,
     disableQrcode,
-  } from '@/api/scrm/wecom/enterprise-qr';
-  import { listUsersPage } from '@/api/scrm/wecom/user';
-  import useLoadingStore from '@/store/modules/loading';
-  import VueQR from 'vue-qr/src/packages/vue-qr.vue';
+  } from '@/api/scrm/wecom/marketing-acquisition/contact-way';
   import EditQR from './components/edit-qr.vue';
   import styles from './index.module.less';
 

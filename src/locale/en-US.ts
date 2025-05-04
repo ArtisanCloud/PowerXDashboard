@@ -69,8 +69,10 @@ export default {
   'menu.scrm': 'SCRM',
   'menu.scrm.wecom': 'Enterprise Wechat',
   'menu.scrm.wecom.marketingAcquisition': 'Marketing Acquisition',
-  'menu.scrm.wecom.marketingAcquisition.enterpriseQR': 'Enterprise QR Code',
-  'menu.scrm.wecom.marketingAcquisition.groupQR': 'Group QR Code',
+  'menu.scrm.wecom.marketingAcquisition.contactWay': 'Conact Way',
+  'menu.scrm.wecom.marketingAcquisition.groupChatJoinWay':
+    'Group Chat Join Way',
+  'menu.scrm.wecom.marketingAcquisition.channelWay': 'Channel Way',
   'menu.scrm.wecom.marketingAcquisition.assistant': 'Acquisition Assistant',
   'menu.scrm.wecom.cms': 'Content Management',
   'menu.scrm.wecom.cms.scriptLib': 'Script Library',
