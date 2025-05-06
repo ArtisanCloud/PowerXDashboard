@@ -8,6 +8,7 @@
   import { Message } from '@arco-design/web-vue';
   import useContactWayStore from '@/store/modules/qrcode/contact-way';
   import useLoadingStore from '@/store/modules/loading';
+  import { getTime } from '@/utils/dayjs';
   import styles from './index.module.less';
 
   const contactWayStore = useContactWayStore();
@@ -120,7 +121,7 @@
       >
         <template #columns>
           <a-table-column
-            title="样式"
+            title="活码名称"
             :width="80"
             data-index="RealContactWayLink"
             :ellipsis="true"

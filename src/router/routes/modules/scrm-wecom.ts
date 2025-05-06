@@ -85,19 +85,6 @@ const SCRMWeCom: AppRouteRecordRaw = {
           },
         },
         {
-          path: '/scrm/wecom/marketing-acquisition/channel-way',
-          name: 'WeComMarketingAcquisitionChannelWay',
-          component: () =>
-            import(
-              '@/views/scrm/wecom/marketing-acquisition/channel-way/index.vue'
-            ),
-          meta: {
-            locale: 'menu.scrm.wecom.marketingAcquisition.channelWay',
-            requiresAuth: true,
-            roles: ['*'],
-          },
-        },
-        {
           path: '/scrm/wecom/marketing-acquisition/assistant',
           name: 'WeComMarketingAcquisitionAssistant',
           component: () =>

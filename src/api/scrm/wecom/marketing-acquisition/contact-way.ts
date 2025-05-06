@@ -35,7 +35,7 @@ export function getContactWayList(request: GetContactWayListRequest) {
  */
 
 export interface CreateContactWayRequest {
-  qid?: string;
+  qId?: string;
   name: string;
   desc: string;
   owner: string[];
@@ -55,7 +55,7 @@ export function createContactWay(request: CreateContactWayRequest) {
 
 export function updateContactWay(
   request: CreateContactWayRequest,
-  qid: string,
+  qId: string,
 ) {
   return axios.patch<CreateContactWayReply>(
     `${PrefixUriAdmin + UriWeComContactWay}/update`,
@@ -63,18 +63,18 @@ export function updateContactWay(
   );
 }
 
-export function deleteContactWay(qid: string) {
-  return axios.delete<any>(`${PrefixUriAdmin + UriWeComContactWay}/${qid}`);
+export function deleteContactWay(qId: string) {
+  return axios.delete<any>(`${PrefixUriAdmin + UriWeComContactWay}/${qId}`);
 }
 
-export function enableContactWay(qid: string) {
+export function enableContactWay(qId: string) {
   return axios.patch<any>(
-    `${PrefixUriAdmin + UriWeComContactWay}/enable/${qid}`,
+    `${PrefixUriAdmin + UriWeComContactWay}/enable/${qId}`,
   );
 }
-export function disableContactWay(qid: string) {
+export function disableContactWay(qId: string) {
   return axios.patch<any>(
-    `${PrefixUriAdmin + UriWeComContactWay}/disable/${qid}`,
+    `${PrefixUriAdmin + UriWeComContactWay}/disable/${qId}`,
   );
 }
 

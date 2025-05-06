@@ -4,8 +4,7 @@
 
   import useContactWayStore from '@/store/modules/qrcode/contact-way';
   import EditContactWay from './components/edit-contact-way/index.vue';
-  import ListContactWayQRCode from './components/list-contact-way-qr-code/index.vue';
-  import ListContactWayWorkCard from './components/list-contact-way-work-card/index.vue';
+  import ListContactWay from './components/list-contact-way/index.vue';
   import styles from './index.module.less';
 
   const contactWayStore = useContactWayStore();
@@ -65,25 +64,16 @@
         <a-button type="primary" @click="handleAddContactWay"
           >新建联系方式</a-button
         >
-        <a-button @click="handleAddContactWay"
-          ><icon-sync /> 从企微同步</a-button
-        >
+        <!--        <a-button @click="handleAddContactWay"-->
+        <!--          ><icon-sync /> 从企微同步</a-button-->
+        <!--        >-->
       </div>
       <a-divider />
-      <a-tabs default-active-key="1">
-        <a-tab-pane key="1">
-          <template #title>「联系我」二维码</template>
-          <ListContactWayQRCode />
-        </a-tab-pane>
-        <a-tab-pane key="2">
-          <template #title>「联系我」工卡</template>
-          <ListContactWayWorkCard />
-        </a-tab-pane>
-      </a-tabs>
+      <ListContactWay />
     </div>
     <a-drawer
       v-model:visible="contactWayStore.visible"
-      width="500px"
+      width="768px"
       ok-text="关闭抽屉"
       :title="contactWayStore.title"
       :hide-cancel="true"

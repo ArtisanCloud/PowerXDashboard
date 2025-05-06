@@ -69,7 +69,7 @@ export default {
   'menu.scrm': 'SCRM',
   'menu.scrm.wecom': '企业微信',
   'menu.scrm.wecom.marketingAcquisition': '营销获客',
-  'menu.scrm.wecom.marketingAcquisition.contactWay': '联系我',
+  'menu.scrm.wecom.marketingAcquisition.contactWay': '渠道活码',
   'menu.scrm.wecom.marketingAcquisition.groupChatJoinWay': '加入群聊',
   'menu.scrm.wecom.marketingAcquisition.channelWay': '渠道活码',
   'menu.scrm.wecom.marketingAcquisition.assistant': '获客助手',
