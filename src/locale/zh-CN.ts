@@ -75,7 +75,7 @@ export default {
   'menu.scrm.wecom.marketingAcquisition.assistant': '获客助手',
   'menu.scrm.wecom.cms': '内容管理',
   'menu.scrm.wecom.cms.scriptLib': '话术库',
-  'menu.scrm.wecom.cms.media': '媒体库',
+  'menu.scrm.wecom.cms.media': '素材库',
   'menu.scrm.wecom.operation': '客户运营',
   'menu.scrm.wecom.operation.groupSend': '群发工具',
   'menu.scrm.wecom.operation.welcomeScript': '入群欢迎语',

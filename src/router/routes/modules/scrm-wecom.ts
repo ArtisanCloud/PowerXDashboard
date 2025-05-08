@@ -113,22 +113,22 @@ const SCRMWeCom: AppRouteRecordRaw = {
       },
       children: [
         {
+          path: '/scrm/wecom/cms/media',
+          name: 'WeComMedia',
+          component: () => import('@/views/scrm/wecom/cms/media/index.vue'),
+          meta: {
+            locale: 'menu.scrm.wecom.cms.media',
+            requiresAuth: true,
+            roles: ['*'],
+          },
+        },
+        {
           path: '/scrm/wecom/cms/script-lib',
           name: 'WeComScriptLib',
           component: () =>
             import('@/views/scrm/wecom/cms/script-lib/index.vue'),
           meta: {
             locale: 'menu.scrm.wecom.cms.scriptLib',
-            requiresAuth: true,
-            roles: ['*'],
-          },
-        },
-        {
-          path: '/scrm/wecom/cms/media',
-          name: 'WeComMedia',
-          component: () => import('@/views/scrm/wecom/cms/media/index.vue'),
-          meta: {
-            locale: 'menu.scrm.wecom.cms.media',
             requiresAuth: true,
             roles: ['*'],
           },
