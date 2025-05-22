@@ -11,9 +11,9 @@ import { UriWeComTag } from '@/api/scrm/wecom/base';
 import { GetCustomersReply } from '@/api/scrm/wecom/customer';
 
 export type WeComTagType = number;
-export const WeComTagTypeTag: WeComTagType = 1;
-export const WeComTagTypeCorpTag: WeComTagType = 2;
-export const WeComTagTypeStrategy: WeComTagType = 3;
+export const WeComTagTypeTag: WeComTagType = 0;
+export const WeComTagTypeCorpTag: WeComTagType = 1;
+export const WeComTagTypeStrategy: WeComTagType = 2;
 
 export interface WeComCorpTagGroup {
   agentId: number;
@@ -26,7 +26,7 @@ export interface WeComCorpTagGroup {
 export interface WeComTag {
   type: number;
   isSelf: number;
-  tagId: string;
+  tagId: number;
   groupId: string;
   groupName: string;
   name: string;

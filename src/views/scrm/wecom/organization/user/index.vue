@@ -5,7 +5,6 @@
   import { Message } from '@arco-design/web-vue';
   import useLoadingStore from '@/store/modules/loading';
   import AddDepartment from '@/views/scrm/wecom/organization/user/components/add-department/index.vue';
-  import { consola } from 'consola';
   import DepartmentUserList from '@/views/scrm/wecom/organization/user/components/department-user-list/index.vue';
   import DepartmentTree from '@/views/scrm/wecom/organization/user/components/department-tree/index.vue';
   import TagList from '@/views/scrm/wecom/organization/user/components/tag-list/index.vue';
@@ -106,7 +105,7 @@
             <a-doption
               v-if="useWeComUser.selectedViewType === 'tag'"
               @click="onSyncWeComTags"
-              ><icon-sync /> 从企微同步标签</a-doption
+              ><icon-sync /> 从企微同步员工标签</a-doption
             >
           </template>
         </a-dropdown>

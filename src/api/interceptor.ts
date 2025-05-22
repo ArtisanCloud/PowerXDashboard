@@ -3,6 +3,7 @@ import axios from 'axios';
 import { Message } from '@arco-design/web-vue';
 import { getToken } from '@/utils/auth';
 import qs from 'query-string';
+import { consola } from 'consola';
 
 export interface HttpResponse<T = unknown> {
   status: number;
@@ -66,38 +67,38 @@ axios.interceptors.response.use(
     if (res.status >= 200 && res.status < 300) {
       return res;
     }
-    // 如果返回 4xx, 则提示错误
-    if (res.status >= 400 && res.status < 500) {
-      Message.error({
-        content: (res.data as ErrorResponse).msg || '违规请求',
-        duration: 5 * 1000,
-      });
-      return Promise.reject(
-        new Error((res.data as ErrorResponse).msg || '违规请求'),
-      );
-    }
-    // 如果返回 5xx, 则提示错误
-    if (res.status >= 500 && res.status < 600) {
-      Message.error({
-        content:
-          (res.data as ErrorResponse).msg ||
-          '服务器错误, 请稍后重试或联系技术支持',
-        duration: 5 * 1000,
-      });
-      return Promise.reject(
-        new Error(
-          (res.data as ErrorResponse).msg ||
-            '服务器错误, 请稍后重试或联系技术支持',
-        ),
-      );
-    }
+    // // 如果返回 4xx, 则提示错误
+    // if (res.status >= 400 && res.status < 500) {
+    //   Message.error({
+    //     content: (res.data as ErrorResponse).msg || '违规请求',
+    //     duration: 5 * 1000,
+    //   });
+    //   return Promise.reject(
+    //     new Error((res.data as ErrorResponse).msg || '违规请求'),
+    //   );
+    // }
+    // // 如果返回 5xx, 则提示错误
+    // if (res.status >= 500 && res.status < 600) {
+    //   Message.error({
+    //     content:
+    //       (res.data as ErrorResponse).msg ||
+    //       '服务器错误, 请稍后重试或联系技术支持',
+    //     duration: 5 * 1000,
+    //   });
+    //   return Promise.reject(
+    //     new Error(
+    //       (res.data as ErrorResponse).msg ||
+    //         '服务器错误, 请稍后重试或联系技术支持',
+    //     ),
+    //   );
+    // }
     return res;
   },
   (error) => {
-    Message.error({
-      content: error.response.data.msg || '请求错误',
-      duration: 5 * 1000,
-    });
+    // Message.error({
+    //   content: error.response.data.msg || '请求错误',
+    //   duration: 5 * 1000,
+    // });
     return Promise.reject(error);
   },
 );

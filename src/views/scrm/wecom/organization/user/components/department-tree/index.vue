@@ -1,7 +1,6 @@
 <script lang="ts" setup>
   import { computed, onMounted, PropType, ref } from 'vue';
   import useWeComUserStore from '@/store/modules/scrm/wecom/user';
-  import { consola } from 'consola';
   import styles from './index.module.less';
 
   const prop = defineProps({

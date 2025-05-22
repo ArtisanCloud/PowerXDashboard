@@ -1,11 +1,8 @@
 <script setup lang="ts">
   import { onMounted, reactive, ref } from 'vue';
-  import {
-    listUsersPage,
-    listUsersPageReply,
-    listUsersPageRequest,
-  } from '@/api/scrm/wecom/user';
+  import { listUsersPage, listUsersPageReply } from '@/api/scrm/wecom/user';
   import useWeComUserStore from '@/store/modules/scrm/wecom/user';
+  import { consola } from 'consola';
   import styles from './index.module.less';
 
   const useWeComUser = useWeComUserStore();
@@ -51,13 +48,13 @@
   });
 
   const onAddUser = () => {
-    console.log('add user');
+    consola.log('add user');
   };
   const onBatchExportOrImport = () => {
-    console.log('batch export or import');
+    consola.log('batch export or import');
   };
   const onRemoveUser = () => {
-    console.log('remove');
+    consola.log('remove');
   };
 
   onMounted(() => {

@@ -1,12 +1,11 @@
 <script setup lang="ts">
-  import { onMounted, reactive, ref, watch } from 'vue';
+  import { reactive, ref, watch } from 'vue';
   import {
     listUsersPage,
     listUsersPageReply,
     listUsersPageRequest,
   } from '@/api/scrm/wecom/user';
   import useWeComUserStore from '@/store/modules/scrm/wecom/user';
-  import { consola } from 'consola';
   import styles from './index.module.less';
 
   const useWeComUser = useWeComUserStore();

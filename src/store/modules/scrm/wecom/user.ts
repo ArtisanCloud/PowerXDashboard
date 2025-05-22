@@ -78,10 +78,12 @@ const useWeComUserStore = defineStore('weComUser', {
       this.selectedViewType = type;
     },
     async loadDepartmentTree(departmentId: number) {
-      const res = await getWeComDepartment({ departmentId });
-      if (res.data) {
-        this.departmentTree = [res.data.department];
-      } else {
+      try {
+        const res = await getWeComDepartment({ departmentId });
+        if (res.data) {
+          this.departmentTree = [res.data.department];
+        }
+      } catch (err) {
         Message.error('获取部门信息失败');
       }
     },
