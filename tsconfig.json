@@ -20,7 +20,6 @@
     "skipLibCheck": true,
     "types": [
       "node",
-//      "@yaoyaochi/weyui/components.d.ts",
     ]
   },
   "include": ["src/**/*.ts", "src/**/*.vue"],
