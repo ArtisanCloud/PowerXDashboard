@@ -3,7 +3,6 @@ import axios from 'axios';
 import { Message } from '@arco-design/web-vue';
 import { getToken } from '@/utils/auth';
 import qs from 'query-string';
-import { consola } from 'consola';
 
 export interface HttpResponse<T = unknown> {
   status: number;

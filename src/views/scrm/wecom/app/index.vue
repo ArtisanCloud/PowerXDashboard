@@ -90,10 +90,7 @@
       ok-text="关闭抽屉"
       :hide-cancel="true"
     >
-      <send-message
-        :agentid="agentid"
-        @submit-success="handleSendSuccess"
-      ></send-message>
+      <send-message @submit-success="handleSendSuccess"></send-message>
     </a-drawer>
   </div>
 </template>

@@ -1,11 +1,12 @@
 <script setup lang="ts">
   import { reactive, ref, watch } from 'vue';
   import {
-    listUsersPage,
-    listUsersPageReply,
-    listUsersPageRequest,
+    listWeComUsersPage,
+    listWeComUsersPageReply,
+    listWeComUsersPageRequest,
   } from '@/api/scrm/wecom/user';
   import useWeComUserStore from '@/store/modules/scrm/wecom/user';
+  import { consola } from 'consola';
   import styles from './index.module.less';
 
   const useWeComUser = useWeComUserStore();
@@ -20,7 +21,7 @@
     },
   });
 
-  const pageData = ref({} as listUsersPageReply);
+  const pageData = ref({} as listWeComUsersPageReply);
   const pagination = {
     pageIndex: 1,
     pageSize: 5,
@@ -32,11 +33,11 @@
       return;
     }
     state.tableLoading = true;
-    listUsersPage({
+    listWeComUsersPage({
       departmentIds: useWeComUser.selectedDepartmentIds,
       pageIndex: pagination.pageIndex,
       pageSize: pagination.pageSize,
-    } as listUsersPageRequest)
+    } as listWeComUsersPageRequest)
       .then((res) => {
         pageData.value = res.data;
         pagination.pageIndex = res.data.pageIndex;
@@ -62,19 +63,19 @@
   );
 
   const onAddUser = () => {
-    console.log('add user');
+    consola.log('add user');
   };
   const onBatchExportOrImport = () => {
-    console.log('batch export or import');
+    consola.log('batch export or import');
   };
   const onBatchUpdateUser = () => {
-    console.log('update user');
+    consola.log('update user');
   };
   const onDeleteUser = () => {
-    console.log('delete');
+    consola.log('delete');
   };
   const onWechatInvite = () => {
-    console.log('wechat_invite');
+    consola.log('wechat_invite');
   };
 
   const handlePageChange = (page: number) => {

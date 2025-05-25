@@ -1,5 +1,5 @@
 <!--
- * @Description:应用管理 
+ * @Description:应用管理
  * @Author: George
  * @Date: 2023-06-13 23:39:18
  * @LastEditors: George
@@ -120,6 +120,7 @@
     GetWechatGroupReReply,
   } from '@/api/scrm/wecom/customer';
   import { Message } from '@arco-design/web-vue';
+  import { pullSyncWeComDepartmentsAndUsers } from '@/api/scrm/wecom/user';
   import AddGroup from '@/views/scrm/official-account/group/components/add-group.vue';
   import SendMessage from '@/views/scrm/official-account/group/components/send-message.vue';
 

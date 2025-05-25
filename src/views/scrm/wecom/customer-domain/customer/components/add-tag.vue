@@ -54,7 +54,7 @@
     customerTag,
     CustomerTagList,
     getTagGroupList,
-  } from '@/api/scrm/wecom/tag';
+  } from '@/api/scrm/wecom/tag/tag';
 
   const prop = defineProps({
     usersList: {
@@ -66,12 +66,12 @@
     editData: {
       type: Object as PropType<any>,
       default: () => {
-        return [];
+        return {};
       },
     },
   });
   interface TagItem {
-    tagId: never;
+    tagId?: never;
     checked?: boolean;
     tagName?: string;
   }
@@ -107,14 +107,13 @@
   };
   async function fetchTagGroupList() {
     const res = await getTagGroupList({
-      pageIndex: 1,
-      pageSize: 30,
+      groupId: '',
     });
     try {
-      TagGroupList.list = res.data.list.map((data) => {
+      TagGroupList.list = res.data.list.map((data: any) => {
         if (data.tags && data.tags.length > 0) {
           data.tags.forEach((params: TagItem) => {
-            if (tagIds.value.includes(params.tagId)) {
+            if (tagIds.value.includes(params.tagId!)) {
               params.checked = true;
             } else {
               params.checked = false;
@@ -146,7 +145,7 @@
             addTag.push(params.tagId);
           }
           if (!addTag.includes(params.tagId)) {
-            removeTag.push(params.tagId);
+            removeTag.push(params.tagId!);
           }
         });
       }

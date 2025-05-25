@@ -4,7 +4,7 @@ import {
   WeComDepartment,
 } from '@/api/scrm/wecom/department';
 import { Message } from '@arco-design/web-vue';
-import { listUsersPage, WeComUser } from '@/api/scrm/wecom/user';
+import { listWeComUsersPage, WeComUser } from '@/api/scrm/wecom/user';
 import {
   getWeComTagPageList,
   WeComTag,
@@ -17,6 +17,7 @@ interface UserState {
   departmentTree: WeComDepartment[];
   tagList: WeComTag[];
   userList: WeComUser[];
+  tagUserList: WeComUser[];
   selectedDepartmentId: number;
   selectedDepartmentIds: number[];
   selectedTag: number | null;
@@ -29,6 +30,7 @@ const useWeComUserStore = defineStore('weComUser', {
     departmentTree: [],
     tagList: [],
     userList: [],
+    tagUserList: [],
     selectedDepartmentId: 1,
     selectedDepartmentIds: [],
     selectedTag: null,
@@ -84,7 +86,7 @@ const useWeComUserStore = defineStore('weComUser', {
           this.departmentTree = [res.data.department];
         }
       } catch (err) {
-        Message.error('获取部门信息失败');
+        Message.error(`获取部门信息失败${err}`);
       }
     },
     async loadTagList() {
@@ -100,7 +102,7 @@ const useWeComUserStore = defineStore('weComUser', {
       }
     },
     async loadUsersByDepartmentId(departmentId: number) {
-      const res = await listUsersPage({ departmentId });
+      const res = await listWeComUsersPage({ departmentId });
       if (res.data) {
         this.userList = res.data.list;
       } else {
@@ -108,7 +110,7 @@ const useWeComUserStore = defineStore('weComUser', {
       }
     },
     async loadUsersByDepartmentIds(departmentIds: number[]) {
-      const res = await listUsersPage({ departmentIds });
+      const res = await listWeComUsersPage({ departmentIds });
       if (res.data) {
         this.userList = res.data.list;
       } else {

@@ -1,6 +1,6 @@
 <script lang="ts" setup>
   import { onMounted, reactive, ref, toRaw } from 'vue';
-  import { listUsersPage } from '@/api/scrm/wecom/user';
+  import { listWeComUsersPage } from '@/api/scrm/wecom/user';
 
   import useGroupChatJoinWayStore from '@/store/modules/qrcode/group-chat-join-way';
   import ListGroupChatJoinWay from './components/list-group-chat-join-way/index.vue';
@@ -41,7 +41,7 @@
   };
 
   async function fetchUsers() {
-    const res = await listUsersPage({});
+    const res = await listWeComUsersPage({});
     try {
       usersList.list = res.data?.list;
     } catch (err) {

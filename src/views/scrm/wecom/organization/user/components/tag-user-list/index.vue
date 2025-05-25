@@ -1,8 +1,8 @@
 <script setup lang="ts">
-  import { onMounted, reactive, ref } from 'vue';
-  import { listUsersPage, listUsersPageReply } from '@/api/scrm/wecom/user';
+  import { onMounted, reactive } from 'vue';
   import useWeComUserStore from '@/store/modules/scrm/wecom/user';
   import { consola } from 'consola';
+  import { listWeComUsersPage } from '@/api/scrm/wecom/user';
   import styles from './index.module.less';
 
   const useWeComUser = useWeComUserStore();
@@ -17,7 +17,6 @@
     },
   });
 
-  const pageData = ref({} as listUsersPageReply);
   const pagination = {
     pageIndex: 1,
     pageSize: 5,
@@ -28,13 +27,13 @@
       return;
     }
     state.tableLoading = true;
-    listUsersPage({
+    listWeComUsersPage({
       weComTagId: useWeComUser.selectedTag!,
       pageIndex: pagination.pageIndex,
       pageSize: pagination.pageSize,
     })
-      .then((res) => {
-        pageData.value = res.data;
+      .then((res: any) => {
+        useWeComUser.tagUserList = res.data.list || [];
       })
       .finally(() => {
         state.tableLoading = false;
@@ -77,7 +76,7 @@
       <a-button :class="styles.actionBtn" @click="onRemoveUser">移除</a-button>
     </div>
     <a-table
-      :data="pageData.list"
+      :data="useWeComUser.tagUserList"
       :loading="state.tableLoading"
       :row-selection="rowSelection"
       column-resizable

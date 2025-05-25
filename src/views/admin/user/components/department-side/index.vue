@@ -2,7 +2,7 @@
   import { computed, onMounted, PropType, reactive } from 'vue';
   import { DepartmentNode, getDepartmentTree } from '@/api/department';
   import CreateDepartment from '@/views/admin/user/components/create-department.vue';
-  import styles from '@/views/scrm/wecom/organization/user/components/department-side/index.module.less';
+  import styles from '@/views/admin/user/components/department-side/index.module.less';
 
   const prop = defineProps({
     modelValue: {

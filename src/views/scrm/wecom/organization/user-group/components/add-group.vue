@@ -59,7 +59,7 @@
     CreateWechatGroupRequest,
     createWechatGroup,
   } from '@/api/scrm/wecom/customer';
-  import { listUsersPage } from '@/api/scrm/wecom/user';
+  import { listWeComUsersPage } from '@/api/scrm/wecom/user';
 
   const usersList = reactive<any>({
     list: [],
@@ -88,7 +88,7 @@
     submitLoading: false,
   });
   async function fetchUsers() {
-    const res = await listUsersPage({});
+    const res = await listWeComUsersPage({});
     try {
       usersList.list = res.data?.list;
     } catch (err: any) {

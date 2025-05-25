@@ -9,6 +9,7 @@ import axios from 'axios';
 import { PrefixUriAdmin } from '@/api';
 import { UriWeComTag } from '@/api/scrm/wecom/base';
 import { GetCustomersReply } from '@/api/scrm/wecom/customer';
+import { PowerModel } from '@/api/common';
 
 export type WeComTagType = number;
 export const WeComTagTypeTag: WeComTagType = 0;
@@ -23,7 +24,7 @@ export interface WeComCorpTagGroup {
   isDelete: string;
 }
 
-export interface WeComTag {
+export interface WeComTag extends PowerModel {
   type: number;
   isSelf: number;
   tagId: number;
@@ -42,7 +43,7 @@ export function pullSyncWeComTagsAndUsers(request: any) {
 }
 
 export interface GetWeComTagPageListRequest {
-  tagIds?: string[];
+  tagIds?: number[];
   groupIds?: string[];
   groupName?: string;
   name?: string;
@@ -81,17 +82,18 @@ export function getTagGroupList(request: GetTagGroupRequest) {
  * @description 新增标签
  */
 
-export interface AddTagRequest {
+export interface CreateTagRequest {
   groupId: string;
   groupName: string;
   sort: number;
   agentId?: number;
   tag: WeComTag[];
 }
+
 export interface CreateTagReply {
   status: number | string;
 }
-export function addTag(request: AddTagRequest) {
+export function addTag(request: CreateTagRequest) {
   return axios.post<CreateTagReply>(
     `/api/v1/admin/scrm/wechat/wecom/tags/crop/create`,
     request,
@@ -101,9 +103,10 @@ export function addTag(request: AddTagRequest) {
  * @description 编辑标签
  */
 export interface ActionTagGroup {
-  tagId?: string;
+  tagId?: number;
   tagName?: string;
 }
+
 export interface EditTagRequest {
   groupId: string;
   tags: ActionTagGroup[];
@@ -116,12 +119,28 @@ export function editTag(request: EditTagRequest) {
   );
 }
 
-interface DeleteTagRequest {
-  tagIds?: string[];
+export interface PatchTagRequest {
+  tagId: number;
+  WeComTag: WeComTag;
+}
+export type PatchTagReply = WeComTag;
+
+export function patchTag(request: PatchTagRequest) {
+  return axios.patch<PatchTagReply>(
+    `${PrefixUriAdmin + UriWeComTag}/patch`,
+    request,
+  );
+}
+
+export interface DeleteTagRequest {
+  tagIds?: number[];
   groupIds?: string[];
 }
+export interface DeleteTagReply {
+  tagId: number;
+}
 export function deleteTag(request: DeleteTagRequest) {
-  return axios.delete<any>(`/api/v1/admin/scrm/wechat/wecom/tags/crop/delete`, {
+  return axios.delete<DeleteTagReply>(`${PrefixUriAdmin + UriWeComTag}/patch`, {
     data: request,
   });
 }
@@ -144,6 +163,7 @@ export interface CustomerTagList {
   addTag?: string[];
   removeTag?: string[];
 }
+
 export function customerTag(request: CustomerTagList) {
   return axios.post<any>(
     `/api/v1/admin/scrm/wechat/wecom/tags/customer/action`,

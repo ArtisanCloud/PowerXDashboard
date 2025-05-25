@@ -84,7 +84,7 @@
     GetMessageArticlesRequest,
     Articles,
   } from '@/api/scrm/wecom/customer';
-  import { listUsersPage } from '@/api/scrm/wecom/user';
+  import { listWeComUsersPage } from '@/api/scrm/wecom/user';
 
   const prop = defineProps({
     agentid: {
@@ -192,7 +192,7 @@
     },
   );
   async function fetchUsers() {
-    const res = await listUsersPage({});
+    const res = await listWeComUsersPage({});
     try {
       usersList.list = res.data?.list;
     } catch (err) {

@@ -81,7 +81,7 @@
   const tagName = ref('');
   interface TagList {
     tagName: string;
-    tagId?: string;
+    tagId?: number;
   }
   type TagType = {
     name: string;

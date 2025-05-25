@@ -6,6 +6,9 @@
     "moduleResolution": "node",
     "strict": true,
     "jsx": "preserve",
+    "jsxImportSource": "vue",
+    "jsxFactory": "h",
+    "jsxFragmentFactory": "Fragment",
     "sourceMap": true,
     "resolveJsonModule": true,
     "esModuleInterop": true,
@@ -17,7 +20,7 @@
     "skipLibCheck": true,
     "types": [
       "node",
-      "@yaoyaochi/weyui/components.d.ts",
+//      "@yaoyaochi/weyui/components.d.ts",
     ]
   },
   "include": ["src/**/*.ts", "src/**/*.vue"],

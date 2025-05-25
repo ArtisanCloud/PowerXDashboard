@@ -19,7 +19,7 @@ export interface ReplyList {
 }
 
 export interface GetTagRequest {
-  tagIds?: string[];
+  tagIds?: number[];
   groupIds?: string[];
   groupName?: string;
   name?: string;
@@ -51,7 +51,7 @@ export interface TagList {
   name: string;
   sort: number;
 }
-export interface AddTagRequest {
+export interface CreateTagRequest {
   groupId: string;
   groupName: string;
   sort: number;
@@ -61,7 +61,7 @@ export interface AddTagRequest {
 export interface CreateTagReply {
   status: number | string;
 }
-export function addTag(request: AddTagRequest) {
+export function addTag(request: CreateTagRequest) {
   return axios.post<CreateTagReply>(
     `/api/v1/admin/scrm/wechat/wecom/tags/crop/create`,
     request,
@@ -71,7 +71,7 @@ export function addTag(request: AddTagRequest) {
  * @description 编辑标签
  */
 export interface ActionTagGroup {
-  tagId?: string;
+  tagId?: number;
   tagName?: string;
 }
 export interface EditTagRequest {
@@ -87,7 +87,7 @@ export function editTag(request: EditTagRequest) {
 }
 
 interface DeleteTagRequest {
-  tagIds?: string[];
+  tagIds?: number[];
   groupIds?: string[];
 }
 export function deleteTag(request: DeleteTagRequest) {

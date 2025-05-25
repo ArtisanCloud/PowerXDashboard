@@ -43,7 +43,7 @@ export function getUser(request: GetUserRequest) {
   );
 }
 
-export interface listUsersPageRequest {
+export interface listWeComUsersPageRequest {
   id?: any;
   name?: string;
   email?: string;
@@ -60,30 +60,16 @@ export interface listUsersPageRequest {
   departmentIds?: number[];
 }
 
-export interface listUsersPageReply {
+export interface listWeComUsersPageReply {
   list: WeComUser[];
   pageIndex: number;
   pageSize: number;
   total: number;
 }
 
-export function listUsersPage(request: listUsersPageRequest) {
-  return axios.post<listUsersPageReply>(
+export function listWeComUsersPage(request: listWeComUsersPageRequest) {
+  return axios.post<listWeComUsersPageReply>(
     `${PrefixUriAdmin + UriWeComUser}/page`,
-    request,
-  );
-}
-
-export interface listUsersRequest {
-  departmentId: number;
-}
-export interface listUsersReply {
-  list: WeComUser[];
-}
-
-export function listUsers(request: listUsersRequest) {
-  return axios.post<listUsersReply>(
-    `${PrefixUriAdmin + UriWeComUser}/`,
     request,
   );
 }

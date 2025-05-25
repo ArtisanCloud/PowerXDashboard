@@ -52,7 +52,7 @@
     "query-string": "^8.0.3",
     "sortablejs": "^1.15.0",
     "tailwindcss": "^4.1.4",
-    "vue": "^3.3.4",
+    "vue": "^3.5.14",
     "vue-i18n": "^9.2.2",
     "vue-qr": "^4.0.9",
     "vue-router": "^4.0.14",
@@ -89,18 +89,18 @@
     "rollup": "3.29.4",
     "rollup-plugin-visualizer": "5.9.2",
     "sass": "^1.69.5",
-    "stylelint": "^15.10.3",
+    "stylelint": "^16.19.1",
     "stylelint-config-rational-order-fix": "^0.1.9",
     "stylelint-config-recommended-vue": "^1.5.0",
     "stylelint-config-standard": "^34.0.0",
     "stylelint-order": "^6.0.3",
-    "typescript": "^5.2.2",
+    "typescript": "^5.8.3",
     "unplugin-vue-components": "^0.25.2",
     "vite": "4.4.11",
     "vite-plugin-compression": "^0.5.1",
     "vite-plugin-eslint": "^1.8.1",
     "vite-svg-loader": "^4.0.0",
-    "vue-tsc": "^1.8.19"
+    "vue-tsc": "^2.2.10"
   },
   "engines": {
     "node": ">=16.0.0"

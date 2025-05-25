@@ -1,6 +1,6 @@
 <script lang="ts" setup>
   import { onMounted, reactive, toRaw } from 'vue';
-  import { listUsersPage } from '@/api/scrm/wecom/user';
+  import { listWeComUsersPage } from '@/api/scrm/wecom/user';
 
   import useContactWayStore from '@/store/modules/qrcode/contact-way';
   import EditContactWay from './components/edit-contact-way/index.vue';
@@ -37,7 +37,7 @@
   };
 
   async function fetchUsers() {
-    const res = await listUsersPage({});
+    const res = await listWeComUsersPage({});
     try {
       usersList.list = res.data?.list;
     } catch (err) {

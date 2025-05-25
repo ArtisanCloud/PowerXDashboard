@@ -36,7 +36,7 @@
   import { FieldRule, Message } from '@arco-design/web-vue';
   import {
     addTag,
-    AddTagRequest,
+    CreateTagRequest,
     groupOption,
     TagList,
   } from '@/api/scrm/wecom/tag/corp-tag';
@@ -60,7 +60,7 @@
         sort: 0,
       },
     ],
-  } as AddTagRequest);
+  } as CreateTagRequest);
 
   const rules = {
     groupName: [{ required: true, message: '请选择标签组名称' }],

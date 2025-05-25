@@ -15,6 +15,7 @@
 
   const state = reactive({
     visible: false,
+    loading: false,
   });
 
   const loadingStore = useLoadingStore();

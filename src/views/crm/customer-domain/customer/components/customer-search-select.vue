@@ -8,12 +8,12 @@
     allow-clear
     multiple
     @change="
-      (v) => {
+      (v: any) => {
         emits('update:modelValue', v);
       }
     "
     @search="
-      (v) => {
+      (v: any) => {
         fetch([], v);
       }
     "

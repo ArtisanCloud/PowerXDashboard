@@ -1,25 +1,31 @@
 <script setup lang="ts">
-  import { onMounted, ref } from 'vue';
+  import { onMounted } from 'vue';
   import useWeComUserStore from '@/store/modules/scrm/wecom/user';
-  import { consola } from 'consola';
+
+  import {
+    listWeComUsersPage,
+    listWeComUsersPageRequest,
+  } from '@/api/scrm/wecom/user';
   import styles from './index.module.less';
 
   const useWeComUser = useWeComUserStore();
-  const selectedTag = ref<number | null>(null);
 
-  const handleSelectTag = (tagId: number) => {
-    consola.log(tagId);
-    selectedTag.value = tagId;
+  const handleSelectTag = async (tagId: number) => {
     // 这里可以添加其他业务逻辑
+    const res = await listWeComUsersPage({
+      weComTagId: tagId,
+    } as listWeComUsersPageRequest);
+    if (res) {
+      useWeComUser.tagUserList = res.data.list || [];
+    }
   };
 
   onMounted(async () => {
     // 默认拉取根目录的部门树
     await useWeComUser.loadTagList();
     // 加载完部部树后，设置默认选中的部门
-    selectedTag.value = 1; // 初始化选中状态
 
-    await useWeComUser.setSelectedTag(selectedTag.value);
+    await useWeComUser.setSelectedTag(1);
   });
 </script>
 
@@ -28,8 +34,11 @@
     <div
       v-for="item in useWeComUser.tagList"
       :key="item.tagId"
-      :class="[styles.row, { [styles.selected]: selectedTag === item.tagId }]"
-      @click="handleSelectTag(item.tagId)"
+      :class="[
+        styles.row,
+        { [styles.selected]: useWeComUser.selectedTag === item.tagId },
+      ]"
+      @click="handleSelectTag(item.id!)"
     >
       <div :class="styles.left">
         <icon-tag :class="styles.icon" />

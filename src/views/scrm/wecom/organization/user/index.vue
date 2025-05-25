@@ -13,6 +13,7 @@
     pullSyncWeComTagsAndUsers,
     WeComTagTypeTag,
   } from '@/api/scrm/wecom/tag/tag';
+  import { consola } from 'consola';
   import styles from './index.module.less';
 
   const useWeComUser = useWeComUserStore();
@@ -54,7 +55,7 @@
     }
   };
   const onAddTag = () => {
-    console.log('add tag');
+    consola.log('add tag');
   };
   const onSyncWeComTags = async () => {
     loadingStore.setLoading(true);

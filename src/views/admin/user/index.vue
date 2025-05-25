@@ -47,7 +47,7 @@
   import { computed, reactive, ref } from 'vue';
   import CreateUser from '@/views/admin/user/components/create-user.vue';
   import SearchUserTable from '@/views/admin/user/components/search-user-table.vue';
-  import DepartmentSide from '@/views/admin/user/components/department-side.vue';
+  import DepartmentSide from '@/views/admin/user/components/department-side/index.vue';
 
   const createUserRef = ref();
   const searchUserTableRef = ref();

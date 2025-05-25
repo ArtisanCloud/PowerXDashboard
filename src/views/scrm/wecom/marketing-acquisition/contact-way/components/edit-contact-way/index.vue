@@ -106,11 +106,11 @@
   const formRef = ref();
   const qrcodeUrl = import.meta.env.VITE_BASE_QRCODE_URL;
   const formModel = ref({
-    qid: '',
+    qId: '',
     name: '',
     desc: '',
     owner: [],
-    RealQrcodeLink: '',
+    RealContactWayLink: '',
     sceneLink: qrcodeUrl,
     expiryDate: '',
   } as CreateContactWayRequest);
@@ -138,12 +138,12 @@
     option: RequestOption,
   ) => {
     return uploadMediaImages(option, 0, (data: any) => {
-      formModel.value.RealQrcodeLink = apiUrl + data.url;
+      formModel.value.RealContactWayLink = apiUrl + data.url;
     });
   };
   const handlereset = () => {
     formModel.value.owner = [];
-    formModel.value.RealQrcodeLink = '';
+    formModel.value.RealContactWayLink = '';
     state.coverUrlList = [];
     formRef.value.resetFields();
   };
@@ -167,12 +167,12 @@
       formModelData.expiryDate = Date.parse(date);
     }
     state.submitLoading = true;
-    if (formModelData.qid) {
+    if (formModelData.qId) {
       updateContactWay(
         {
           ...formModelData,
         },
-        formModelData.qid,
+        formModelData.qId,
       )
         .then(() => {
           handlereset();
@@ -215,7 +215,7 @@
           },
         ];
       } else {
-        formModel.value.qid = '';
+        formModel.value.qId = '';
         handlereset();
         // 获取当前日期
         const currentDate = new Date();
