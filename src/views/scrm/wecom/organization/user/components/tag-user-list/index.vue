@@ -55,6 +55,9 @@
   const onRemoveUser = () => {
     consola.log('remove');
   };
+  const onTagDetail = () => {
+    consola.log('tag detail');
+  };
 
   onMounted(() => {
     queryChange();
@@ -67,14 +70,24 @@
       <span>Tag名称（0人）</span>
     </div>
     <div :class="styles.action">
-      <a-button :class="styles.actionBtn" @click="onAddUser"
-        >添加部门/成员</a-button
-      >
-      <a-button :class="styles.actionBtn" @click="onBatchExportOrImport"
-        >批量导入/导出</a-button
-      >
-      <a-button :class="styles.actionBtn" @click="onRemoveUser">移除</a-button>
+      <div :class="styles.left">
+        <a-button :class="styles.actionBtn" @click="onAddUser"
+          >添加部门/成员</a-button
+        >
+        <a-button :class="styles.actionBtn" @click="onBatchExportOrImport"
+          >批量导入/导出</a-button
+        >
+        <a-button :class="styles.actionBtn" @click="onRemoveUser"
+          >移除</a-button
+        >
+      </div>
+      <div :class="styles.right">
+        <a-button :class="styles.actionBtn" @click="onTagDetail"
+          >标签详情</a-button
+        >
+      </div>
     </div>
+
     <a-table
       :data="useWeComUser.tagUserList"
       :loading="state.tableLoading"
@@ -89,7 +102,11 @@
             {{ record.name }}
           </template>
         </a-table-column>
-        <a-table-column title="部门" data-index="department" ellipsis />
+        <a-table-column title="部门" data-index="department" ellipsis>
+          <template #cell="{ record }">
+            {{ record.departments }}
+          </template>
+        </a-table-column>
       </template>
     </a-table>
   </div>

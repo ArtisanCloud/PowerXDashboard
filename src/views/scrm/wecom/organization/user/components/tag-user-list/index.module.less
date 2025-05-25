@@ -14,10 +14,27 @@
   }
 
   .action {
-  @apply flex flex-row w-full items-center justify-start w-full;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
     background-color: #E0E9F5;
     gap: 10px;
     padding: 10px 20px;
+    //border:1px solid red;
+
+    .left {
+    @apply flex flex-row w-full items-center justify-start w-full;
+      //border:1px solid yellow;
+      width: 100%;
+    }
+
+    .right {
+    @apply flex flex-row w-full items-center justify-end w-full;
+      //border:1px solid yellow;
+      width: 100%;
+    }
 
     .actionBtn {
       font-size: 12px !important;

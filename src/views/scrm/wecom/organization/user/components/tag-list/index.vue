@@ -6,17 +6,23 @@
     listWeComUsersPage,
     listWeComUsersPageRequest,
   } from '@/api/scrm/wecom/user';
+  import { consola } from 'consola';
   import styles from './index.module.less';
 
   const useWeComUser = useWeComUserStore();
 
   const handleSelectTag = async (tagId: number) => {
+    if (tagId == null || tagId <= 0 || tagId === useWeComUser.selectedTag) {
+      return;
+    }
+    // consola.log(tagId);
     // 这里可以添加其他业务逻辑
     const res = await listWeComUsersPage({
       weComTagId: tagId,
     } as listWeComUsersPageRequest);
     if (res) {
       useWeComUser.tagUserList = res.data.list || [];
+      useWeComUser.selectedTag = tagId;
     }
   };
 
@@ -36,7 +42,7 @@
       :key="item.tagId"
       :class="[
         styles.row,
-        { [styles.selected]: useWeComUser.selectedTag === item.tagId },
+        { [styles.selected]: useWeComUser.selectedTag === item.id },
       ]"
       @click="handleSelectTag(item.id!)"
     >
