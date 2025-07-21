@@ -36,6 +36,10 @@
     contactWayStore.visible = true;
   };
 
+  const handleSyncContactWay = () => {
+    console.log('handleSyncContactWay');
+  };
+
   async function fetchUsers() {
     const res = await listWeComUsersPage({});
     try {
@@ -64,9 +68,9 @@
         <a-button type="primary" @click="handleAddContactWay"
           >新建联系方式</a-button
         >
-        <!--        <a-button @click="handleAddContactWay"-->
-        <!--          ><icon-sync /> 从企微同步</a-button-->
-        <!--        >-->
+        <a-button @click="handleSyncContactWay"
+          ><icon-sync /> 从企微同步</a-button
+        >
       </div>
       <a-divider />
       <ListContactWay />
