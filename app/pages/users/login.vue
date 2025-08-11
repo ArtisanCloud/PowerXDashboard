@@ -17,7 +17,7 @@ const error = ref('')
 // 登录处理
 const handleLogin = async () => {
   if (!form.email || !form.password) {
-    error.value = '请填写完整的登录信息'
+    error.value = '请填写所有必填字段'
     return
   }
   
@@ -31,7 +31,7 @@ const handleLogin = async () => {
     // 登录成功后跳转到仪表板
     await navigateTo('/dashboard')
   } catch (err) {
-    error.value = '登录失败，请检查用户名和密码'
+    error.value = '登录失败，请检查您的凭据'
   } finally {
     loading.value = false
   }
@@ -47,8 +47,8 @@ const handleForgotPassword = () => {
 <template>
   <div class="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center p-4">
     <div class="max-w-md w-full">
-      <!-- 返回首页链接 - 左对齐 -->
-      <div class="mb-6">
+      <!-- 顶部区域：返回首页 -->
+      <div class="mb-6 flex justify-between items-center">
         <NuxtLink 
           to="/" 
           class="inline-flex items-center text-gray-600 hover:text-blue-600 transition-colors text-sm"
@@ -61,94 +61,94 @@ const handleForgotPassword = () => {
       </div>
 
       <!-- 登录卡片 -->
-      <UCard class="shadow-xl border-0">
-        <template #header>
-          <div class="text-center py-6">
-            <!-- Logo -->
-            <h1 class="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-3">
-              PowerX
-            </h1>
-            <h2 class="text-xl font-semibold text-gray-900 mb-2">欢迎回来</h2>
-            <p class="text-gray-600 text-sm">登录您的账户继续使用</p>
-          </div>
-        </template>
+      <div class="bg-white rounded-lg shadow-xl border-0 overflow-hidden">
+        <!-- 头部 -->
+        <div class="text-center py-6 px-6">
+          <!-- Logo -->
+          <h1 class="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-3">
+            PowerX
+          </h1>
+          <h2 class="text-xl font-semibold text-gray-900 mb-2">欢迎回来</h2>
+          <p class="text-gray-600 text-sm">请登录您的账户</p>
+        </div>
 
         <div class="px-6 pb-6">
-          <form @submit.prevent="handleLogin" class="space-y-8">
+          <form @submit.prevent="handleLogin" class="space-y-6">
             <!-- 错误提示 -->
-            <UAlert 
+            <div 
               v-if="error" 
-              color="red" 
-              variant="soft" 
-              :title="error"
-              :close-button="{ icon: 'i-heroicons-x-mark-20-solid', color: 'gray', variant: 'link', padded: false }"
-              @close="error = ''"
-              class="mb-1"
-            />
+              class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md text-sm"
+            >
+              {{ error }}
+              <button 
+                @click="error = ''" 
+                class="float-right text-red-500 hover:text-red-700"
+              >
+                ×
+              </button>
+            </div>
 
             <!-- 邮箱输入 -->
-            <div class="mb-8">
-              <label for="email" class="block text-sm font-medium text-gray-700 mb-3">
-                邮箱地址 <span class="text-red-500">*</span>
+            <div>
+              <label for="email" class="block text-sm font-medium text-gray-700 mb-2">
+                邮箱 <span class="text-red-500">*</span>
               </label>
-              <UInput
+              <input
                 id="email"
                 name="email"
                 v-model="form.email"
                 type="email"
-                placeholder="请输入您的邮箱"
-                size="lg"
+                placeholder="请输入邮箱"
                 :disabled="loading"
-                class="w-full"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100"
               />
             </div>
 
             <!-- 密码输入 -->
-            <div class="mb-8">
-              <label for="password" class="block text-sm font-medium text-gray-700 mb-3">
+            <div>
+              <label for="password" class="block text-sm font-medium text-gray-700 mb-2">
                 密码 <span class="text-red-500">*</span>
               </label>
-              <UInput
+              <input
                 id="password"
                 name="password"
                 v-model="form.password"
                 type="password"
-                placeholder="请输入您的密码"
-                size="lg"
+                placeholder="请输入密码"
                 :disabled="loading"
-                class="w-full"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100"
               />
             </div>
 
             <!-- 记住我和忘记密码 -->
-            <div class="flex items-center justify-between pt-1">
-              <UCheckbox 
-                v-model="form.remember" 
-                label="记住我" 
-                :disabled="loading"
-              />
-              <UButton 
-                variant="link" 
-                class="p-0 text-sm text-blue-600 hover:text-blue-700"
+            <div class="flex items-center justify-between">
+              <label class="flex items-center">
+                <input 
+                  v-model="form.remember" 
+                  type="checkbox"
+                  :disabled="loading"
+                  class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                />
+                <span class="ml-2 text-sm text-gray-600">记住我</span>
+              </label>
+              <button 
+                type="button"
+                class="text-sm text-blue-600 hover:text-blue-700"
                 @click="handleForgotPassword"
                 :disabled="loading"
               >
                 忘记密码？
-              </UButton>
+              </button>
             </div>
 
             <!-- 登录按钮 -->
-            <div class="pt-2">
-              <UButton
-                type="submit"
-                block
-                size="lg"
-                :loading="loading"
-                class="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
-              >
-                {{ loading ? '登录中...' : '登录' }}
-              </UButton>
-            </div>
+            <button
+              type="submit"
+              :disabled="loading"
+              class="w-full py-2 px-4 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-medium rounded-md transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {{ loading ? '登录中...' : '登录' }}
+            </button>
           </form>
 
           <!-- 注册链接 -->
@@ -164,7 +164,7 @@ const handleForgotPassword = () => {
             </p>
           </div>
         </div>
-      </UCard>
+      </div>
     </div>
   </div>
 </template>

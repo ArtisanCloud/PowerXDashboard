@@ -16,21 +16,20 @@ definePageMeta({
         </h1>
       </div>
       
-      <!-- 登录注册按钮 -->
+      <!-- 右侧区域：登录注册按钮 -->
       <div class="flex items-center space-x-4">
-        <UButton 
-          variant="ghost" 
+        <NuxtLink 
           to="/users/login"
-          class="text-gray-700 hover:text-blue-600"
+          class="px-4 py-2 text-gray-700 hover:text-blue-600 transition-colors"
         >
           登录
-        </UButton>
-        <UButton 
+        </NuxtLink>
+        <NuxtLink 
           to="/users/register"
-          class="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+          class="px-6 py-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-lg transition-all"
         >
           注册
-        </UButton>
+        </NuxtLink>
       </div>
     </div>
 
@@ -40,33 +39,29 @@ definePageMeta({
         <!-- 左侧信息区域 -->
         <div class="text-center lg:text-left">
           <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-6">
-            欢迎来到
+            欢迎使用
             <span class="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent block">
               PowerX
             </span>
           </h1>
           <p class="text-xl md:text-2xl text-gray-600 mb-8 leading-relaxed">
-            新一代企业级管理平台<br>
-            让您的业务管理更加高效、智能、安全
+            现代化的企业级管理系统，助力您的业务腾飞
           </p>
           
           <!-- CTA 按钮 -->
           <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-            <UButton 
-              size="xl" 
+            <NuxtLink 
               to="/users/register"
-              class="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 px-8 py-4 text-lg"
+              class="px-8 py-4 text-lg bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-lg transition-all text-center"
             >
-              立即开始
-            </UButton>
-            <UButton 
-              variant="outline" 
-              size="xl"
+              立即注册
+            </NuxtLink>
+            <NuxtLink 
               to="/home/intro"
-              class="px-8 py-4 text-lg border-gray-300 text-gray-700 hover:border-blue-600 hover:text-blue-600"
+              class="px-8 py-4 text-lg border border-gray-300 text-gray-700 hover:border-blue-600 hover:text-blue-600 rounded-lg transition-all text-center"
             >
               了解更多
-            </UButton>
+            </NuxtLink>
           </div>
         </div>
         
@@ -106,7 +101,7 @@ definePageMeta({
     <!-- 底部简单信息 -->
     <div class="text-center py-8 px-6">
       <p class="text-gray-500 text-sm">
-        &copy; 2024 PowerX. 让管理更简单，让业务更高效
+        &copy; 2024 PowerX. 保留所有权利
       </p>
     </div>
   </div>

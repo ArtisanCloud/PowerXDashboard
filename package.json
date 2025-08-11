@@ -13,6 +13,7 @@
     "@nuxt/content": "^3.6.3",
     "@nuxt/eslint": "^1.8.0",
     "@nuxt/image": "^1.11.0",
+    "@nuxtjs/i18n": "^10.0.4",
     "eslint": "^9.33.0",
     "nuxt": "^4.0.3",
     "typescript": "^5.9.2",

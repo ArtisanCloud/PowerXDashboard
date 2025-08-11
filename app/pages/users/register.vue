@@ -3,6 +3,8 @@ definePageMeta({
   layout: false   // 禁用layout
 })
 
+const { t } = useI18n()
+
 // 表单数据
 const form = reactive({
   username: '',
@@ -29,39 +31,39 @@ const passwordStrength = computed(() => {
   if (/[0-9]/.test(password)) score++
   if (/[^A-Za-z0-9]/.test(password)) score++
   
-  if (score <= 2) return { level: score, text: '弱', color: 'red' }
-  if (score <= 3) return { level: score, text: '中等', color: 'yellow' }
-  return { level: score, text: '强', color: 'green' }
+  if (score <= 2) return { level: score, text: t('passwordStrength.weak'), color: 'red' }
+  if (score <= 3) return { level: score, text: t('passwordStrength.medium'), color: 'yellow' }
+  return { level: score, text: t('passwordStrength.strong'), color: 'green' }
 })
 
 // 表单验证
 const validateForm = () => {
   if (!form.username.trim()) {
-    error.value = '请输入用户名'
+    error.value = t('required')
     return false
   }
   if (!form.email.trim()) {
-    error.value = '请输入邮箱地址'
+    error.value = t('required')
     return false
   }
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
-    error.value = '请输入有效的邮箱地址'
+    error.value = t('invalidEmail')
     return false
   }
   if (!form.password) {
-    error.value = '请输入密码'
+    error.value = t('required')
     return false
   }
   if (form.password.length < 6) {
-    error.value = '密码长度至少6位'
+    error.value = t('passwordTooShort')
     return false
   }
   if (form.password !== form.confirmPassword) {
-    error.value = '两次输入的密码不一致'
+    error.value = t('passwordMismatch')
     return false
   }
   if (!form.agree) {
-    error.value = '请同意服务条款和隐私政策'
+    error.value = t('mustAgreeTerms')
     return false
   }
   return true
@@ -85,7 +87,7 @@ const handleRegister = async () => {
       navigateTo('/users/login')
     }, 2000)
   } catch (err) {
-    error.value = '注册失败，请稍后重试'
+    error.value = t('registerFailed')
   } finally {
     loading.value = false
   }
@@ -116,8 +118,8 @@ const handleRegister = async () => {
             <h1 class="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-3">
               PowerX
             </h1>
-            <h2 class="text-xl font-semibold text-gray-900 mb-2">创建账户</h2>
-            <p class="text-gray-600 text-sm">加入PowerX，开启高效管理之旅</p>
+            <h2 class="text-xl font-semibold text-gray-900 mb-2">{{ $t('createAccount') }}</h2>
+            <p class="text-gray-600 text-sm">{{ $t('registerSubtitle') }}</p>
           </div>
         </template>
 
@@ -147,13 +149,13 @@ const handleRegister = async () => {
             <!-- 用户名输入 -->
             <div class="mb-6">
               <label for="username" class="block text-sm font-medium text-gray-700 mb-3">
-                用户名 <span class="text-red-500">*</span>
+                {{ $t('username') }} <span class="text-red-500">*</span>
               </label>
               <UInput
                 id="username"
                 name="username"
                 v-model="form.username"
-                placeholder="请输入用户名"
+                :placeholder="$t('username')"
                 size="lg"
                 :disabled="loading"
                 class="w-full"
@@ -163,14 +165,14 @@ const handleRegister = async () => {
             <!-- 邮箱输入 -->
             <div class="mb-6">
               <label for="email" class="block text-sm font-medium text-gray-700 mb-3">
-                邮箱地址 <span class="text-red-500">*</span>
+                {{ $t('email') }} <span class="text-red-500">*</span>
               </label>
               <UInput
                 id="email"
                 name="email"
                 v-model="form.email"
                 type="email"
-                placeholder="请输入您的邮箱"
+                :placeholder="$t('email')"
                 size="lg"
                 :disabled="loading"
                 class="w-full"
@@ -180,14 +182,14 @@ const handleRegister = async () => {
             <!-- 密码输入 -->
             <div class="mb-6">
               <label for="password" class="block text-sm font-medium text-gray-700 mb-3">
-                密码 <span class="text-red-500">*</span>
+                {{ $t('password') }} <span class="text-red-500">*</span>
               </label>
               <UInput
                 id="password"
                 name="password"
                 v-model="form.password"
                 type="password"
-                placeholder="请输入密码（至少6位）"
+                :placeholder="$t('password')"
                 size="lg"
                 :disabled="loading"
                 class="w-full"
@@ -223,14 +225,14 @@ const handleRegister = async () => {
             <!-- 确认密码输入 -->
             <div class="mb-6">
               <label for="confirmPassword" class="block text-sm font-medium text-gray-700 mb-3">
-                确认密码 <span class="text-red-500">*</span>
+                {{ $t('confirmPassword') }} <span class="text-red-500">*</span>
               </label>
               <UInput
                 id="confirmPassword"
                 name="confirmPassword"
                 v-model="form.confirmPassword"
                 type="password"
-                placeholder="请再次输入密码"
+                :placeholder="$t('confirmPassword')"
                 size="lg"
                 :disabled="loading"
                 class="w-full"
@@ -245,10 +247,10 @@ const handleRegister = async () => {
                 class="mt-0.5"
               />
               <p class="text-sm text-gray-600 leading-relaxed">
-                我已阅读并同意
-                <a href="#" class="text-blue-600 hover:text-blue-700">服务条款</a>
-                和
-                <a href="#" class="text-blue-600 hover:text-blue-700">隐私政策</a>
+                {{ $t('agreeTerms') }}
+                <a href="#" class="text-blue-600 hover:text-blue-700">{{ $t('termsOfService') }}</a>
+                {{ $t('and') }}
+                <a href="#" class="text-blue-600 hover:text-blue-700">{{ $t('privacyPolicy') }}</a>
               </p>
             </div>
 
@@ -262,7 +264,7 @@ const handleRegister = async () => {
                 :disabled="!form.agree"
                 class="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
               >
-                {{ loading ? '注册中...' : '创建账户' }}
+                {{ loading ? $t('creatingAccount') : $t('createAccount') }}
               </UButton>
             </div>
           </form>
