@@ -18,19 +18,20 @@ const { t } = useI18n()
         </h1>
       </div>
       
-      <!-- 右侧区域：登录注册按钮 -->
+      <!-- 右侧区域：语言切换器、登录注册按钮 -->
       <div class="flex items-center space-x-4">
+        <LanguageSwitcher />
         <NuxtLink 
           to="/users/login"
           class="px-4 py-2 text-gray-700 hover:text-blue-600 transition-colors"
         >
-          登录
+          {{ $t('login') }}
         </NuxtLink>
         <NuxtLink 
           to="/users/register"
           class="px-6 py-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-lg transition-all"
         >
-          注册
+          {{ $t('register') }}
         </NuxtLink>
       </div>
     </div>

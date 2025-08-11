@@ -86,32 +86,33 @@ const products = computed(() => [
           <div class="hidden md:block">
             <div class="ml-10 flex items-baseline space-x-4">
               <a href="#features" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
-                特性
+                {{ $t('intro.nav.features') }}
               </a>
               <a href="#products" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
-                产品
+                {{ $t('intro.nav.products') }}
               </a>
               <a href="#about" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
-                关于
+                {{ $t('intro.nav.about') }}
               </a>
             </div>
           </div>
           
-          <!-- 登录注册按钮 -->
+          <!-- 语言切换器和登录注册按钮 -->
           <div class="flex items-center space-x-4">
-            <UButton 
+            <LanguageSwitcher />
+            <NuxtLink 
+              to="/users/login"
               variant="ghost" 
-              @click="showLoginModal = true"
-              class="text-gray-700 hover:text-blue-600"
+              class="text-gray-700 hover:text-blue-600 px-4 py-2 transition-colors"
             >
-              登录
-            </UButton>
-            <UButton 
-              @click="showRegisterModal = true"
-              class="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+              {{ $t('login') }}
+            </NuxtLink>
+            <NuxtLink 
+              to="/users/register"
+              class="px-6 py-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-lg transition-all"
             >
-              注册
-            </UButton>
+              {{ $t('register') }}
+            </NuxtLink>
           </div>
         </div>
       </div>
@@ -123,32 +124,29 @@ const products = computed(() => [
         <div class="text-center">
           <!-- 欢迎语 -->
           <h1 class="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
-            欢迎来到
+            {{ $t('intro.hero.welcomeTo') }}
             <span class="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
               PowerX
             </span>
           </h1>
           <p class="text-xl md:text-2xl text-gray-600 mb-8 max-w-3xl mx-auto">
-            新一代企业级管理平台，让您的业务管理更加高效、智能、安全
+            {{ $t('home.subtitle') }}
           </p>
           
           <!-- CTA 按钮 -->
           <div class="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16">
-            <UButton 
-              size="xl" 
-              to="/register"
-              class="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 px-8 py-4 text-lg"
+            <NuxtLink 
+              to="/users/register"
+              class="px-8 py-4 text-lg bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-lg transition-all text-center"
             >
-              立即开始
-            </UButton>
-            <UButton 
-              variant="outline" 
-              size="xl"
-              to="#products"
-              class="px-8 py-4 text-lg border-gray-300 text-gray-700 hover:border-blue-600 hover:text-blue-600"
+              {{ $t('home.getStarted') }}
+            </NuxtLink>
+            <a 
+              href="#products"
+              class="px-8 py-4 text-lg border border-gray-300 text-gray-700 hover:border-blue-600 hover:text-blue-600 rounded-lg transition-all text-center"
             >
-              了解更多
-            </UButton>
+              {{ $t('home.learnMore') }}
+            </a>
           </div>
           
           <!-- 头图 -->

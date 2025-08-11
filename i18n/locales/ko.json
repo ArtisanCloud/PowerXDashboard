@@ -48,8 +48,66 @@
   "home": {
     "title": "PowerX 관리 시스템",
     "subtitle": "효율적이고 지능적이며 안전한 비즈니스 관리를 위한 차세대 기업 관리 플랫폼",
+    "dashboardDesc": "효율적인 비즈니스 관리와 데이터 인사이트를 위한 종합 대시보드 개요",
     "learnMore": "자세히 보기",
     "getStarted": "시작하기",
     "footer": "관리를 더 간단하게, 비즈니스를 더 효율적으로"
+  },
+  "intro": {
+    "nav": {
+      "features": "기능",
+      "products": "제품",
+      "about": "회사소개"
+    },
+    "hero": {
+      "welcomeTo": "환영합니다"
+    },
+    "features": {
+      "performance": {
+        "title": "고성능",
+        "description": "최적화된 아키텍처 설계로 시스템의 빠른 응답 보장"
+      },
+      "design": {
+        "title": "모던 디자인",
+        "description": "깔끔하고 아름다운 인터페이스로 사용자 경험 향상"
+      },
+      "usability": {
+        "title": "사용 편의성",
+        "description": "직관적인 작업 흐름으로 학습 비용 절감"
+      },
+      "security": {
+        "title": "안전하고 신뢰할 수 있는",
+        "description": "기업급 보안 보호로 데이터를 안전하게 보호"
+      }
+    },
+    "products": {
+      "admin": {
+        "description": "포괄적인 백엔드 관리 시스템",
+        "features": {
+          "userManagement": "사용자 관리",
+          "permissionControl": "권한 제어",
+          "dataAnalysis": "데이터 분석",
+          "systemMonitoring": "시스템 모니터링"
+        }
+      },
+      "analytics": {
+        "description": "강력한 데이터 분석 플랫폼",
+        "features": {
+          "realTimeAnalysis": "실시간 분석",
+          "visualReports": "시각적 보고서",
+          "predictiveModels": "예측 모델",
+          "customDashboard": "사용자 정의 대시보드"
+        }
+      },
+      "cloud": {
+        "description": "확장 가능한 클라우드 솔루션",
+        "features": {
+          "cloudStorage": "클라우드 스토리지",
+          "multiDeviceSync": "다중 기기 동기화",
+          "elasticScaling": "탄력적 확장",
+          "support247": "24시간 지원"
+        }
+      }
+    }
   }
 }

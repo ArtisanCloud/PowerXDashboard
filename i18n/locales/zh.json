@@ -48,8 +48,66 @@
   "home": {
     "title": "PowerX 管理系统",
     "subtitle": "新一代企业级管理平台，让您的业务管理更加高效、智能、安全",
+    "dashboardDesc": "全面的仪表板概览，助力高效业务管理和数据洞察",
     "learnMore": "了解更多",
     "getStarted": "立即开始",
     "footer": "让管理更简单，让业务更高效"
+  },
+  "intro": {
+    "nav": {
+      "features": "特性",
+      "products": "产品",
+      "about": "关于"
+    },
+    "hero": {
+      "welcomeTo": "欢迎来到"
+    },
+    "features": {
+      "performance": {
+        "title": "高性能",
+        "description": "优化的架构设计，确保系统快速响应"
+      },
+      "design": {
+        "title": "现代设计",
+        "description": "简洁美观的界面，提升用户体验"
+      },
+      "usability": {
+        "title": "易用性",
+        "description": "直观的操作流程，降低学习成本"
+      },
+      "security": {
+        "title": "安全可靠",
+        "description": "企业级安全保障，保护您的数据"
+      }
+    },
+    "products": {
+      "admin": {
+        "description": "全面的后台管理系统",
+        "features": {
+          "userManagement": "用户管理",
+          "permissionControl": "权限控制",
+          "dataAnalysis": "数据分析",
+          "systemMonitoring": "系统监控"
+        }
+      },
+      "analytics": {
+        "description": "强大的数据分析平台",
+        "features": {
+          "realTimeAnalysis": "实时分析",
+          "visualReports": "可视化报表",
+          "predictiveModels": "预测模型",
+          "customDashboard": "自定义仪表板"
+        }
+      },
+      "cloud": {
+        "description": "可扩展的云端解决方案",
+        "features": {
+          "cloudStorage": "云端存储",
+          "multiDeviceSync": "多设备同步",
+          "elasticScaling": "弹性扩展",
+          "support247": "7x24小时支持"
+        }
+      }
+    }
   }
 }

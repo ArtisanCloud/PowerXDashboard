@@ -48,8 +48,66 @@
   "home": {
     "title": "PowerX 管理システム",
     "subtitle": "効率的で知的、安全なビジネス管理のための次世代企業管理プラットフォーム",
+    "dashboardDesc": "効率的なビジネス管理とデータ洞察のための包括的なダッシュボード概要",
     "learnMore": "詳細を見る",
     "getStarted": "今すぐ始める",
     "footer": "管理をより簡単に、ビジネスをより効率的に"
+  },
+  "intro": {
+    "nav": {
+      "features": "機能",
+      "products": "製品",
+      "about": "会社概要"
+    },
+    "hero": {
+      "welcomeTo": "ようこそ"
+    },
+    "features": {
+      "performance": {
+        "title": "高性能",
+        "description": "最適化されたアーキテクチャ設計により、システムの高速応答を保証"
+      },
+      "design": {
+        "title": "モダンデザイン",
+        "description": "シンプルで美しいインターフェースでユーザー体験を向上"
+      },
+      "usability": {
+        "title": "使いやすさ",
+        "description": "直感的な操作フローで学習コストを削減"
+      },
+      "security": {
+        "title": "安全で信頼性",
+        "description": "企業レベルのセキュリティ保護でデータを守る"
+      }
+    },
+    "products": {
+      "admin": {
+        "description": "包括的なバックエンド管理システム",
+        "features": {
+          "userManagement": "ユーザー管理",
+          "permissionControl": "権限制御",
+          "dataAnalysis": "データ分析",
+          "systemMonitoring": "システム監視"
+        }
+      },
+      "analytics": {
+        "description": "強力なデータ分析プラットフォーム",
+        "features": {
+          "realTimeAnalysis": "リアルタイム分析",
+          "visualReports": "視覚的レポート",
+          "predictiveModels": "予測モデル",
+          "customDashboard": "カスタムダッシュボード"
+        }
+      },
+      "cloud": {
+        "description": "スケーラブルなクラウドソリューション",
+        "features": {
+          "cloudStorage": "クラウドストレージ",
+          "multiDeviceSync": "マルチデバイス同期",
+          "elasticScaling": "弾性スケーリング",
+          "support247": "24時間365日サポート"
+        }
+      }
+    }
   }
 }

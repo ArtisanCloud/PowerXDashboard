@@ -48,8 +48,66 @@
   "home": {
     "title": "PowerX Management System",
     "subtitle": "Next-generation enterprise management platform for efficient, intelligent, and secure business management",
+    "dashboardDesc": "Comprehensive dashboard overview for efficient business management and data insights",
     "learnMore": "Learn More",
     "getStarted": "Get Started",
     "footer": "Making management simpler, making business more efficient"
+  },
+  "intro": {
+    "nav": {
+      "features": "Features",
+      "products": "Products",
+      "about": "About"
+    },
+    "hero": {
+      "welcomeTo": "Welcome to"
+    },
+    "features": {
+      "performance": {
+        "title": "High Performance",
+        "description": "Optimized architecture design ensures fast system response"
+      },
+      "design": {
+        "title": "Modern Design",
+        "description": "Clean and beautiful interface enhances user experience"
+      },
+      "usability": {
+        "title": "Easy to Use",
+        "description": "Intuitive workflow reduces learning costs"
+      },
+      "security": {
+        "title": "Secure & Reliable",
+        "description": "Enterprise-grade security protection for your data"
+      }
+    },
+    "products": {
+      "admin": {
+        "description": "Comprehensive backend management system",
+        "features": {
+          "userManagement": "User Management",
+          "permissionControl": "Permission Control",
+          "dataAnalysis": "Data Analysis",
+          "systemMonitoring": "System Monitoring"
+        }
+      },
+      "analytics": {
+        "description": "Powerful data analytics platform",
+        "features": {
+          "realTimeAnalysis": "Real-time Analysis",
+          "visualReports": "Visual Reports",
+          "predictiveModels": "Predictive Models",
+          "customDashboard": "Custom Dashboard"
+        }
+      },
+      "cloud": {
+        "description": "Scalable cloud solutions",
+        "features": {
+          "cloudStorage": "Cloud Storage",
+          "multiDeviceSync": "Multi-device Sync",
+          "elasticScaling": "Elastic Scaling",
+          "support247": "24/7 Support"
+        }
+      }
+    }
   }
 }
