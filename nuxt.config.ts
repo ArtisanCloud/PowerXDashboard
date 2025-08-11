@@ -10,7 +10,7 @@ export default defineNuxtConfig({
   ui: { fonts: false },
 
 
-  // i18n 配置 - 临时禁用来测试
+  // i18n 配置
   i18n: {
     defaultLocale: 'zh',
     locales: [
@@ -19,7 +19,7 @@ export default defineNuxtConfig({
       { code: 'ja', name: '日本語', file: 'ja.json' },
       { code: 'ko', name: '한국어', file: 'ko.json' }
     ],
-    langDir: 'locales/',
+    langDir: 'locales',
     detectBrowserLanguage: {
       useCookie: true,
       cookieKey: 'i18n_redirected',

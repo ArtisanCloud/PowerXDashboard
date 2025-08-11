@@ -1,0 +1,60 @@
+{
+  "welcome": "欢迎使用",
+  "login": "登录",
+  "register": "注册",
+  "home": {
+    "subtitle": "现代化的企业级管理系统，助力您的业务腾飞",
+    "learnMore": "了解更多",
+    "dashboardDesc": "现代化的管理界面",
+    "footer": "保留所有权利"
+  },
+  "intro": {
+    "features": {
+      "performance": {
+        "title": "高性能",
+        "description": "基于 Nuxt 4 构建，提供极致的性能体验"
+      },
+      "design": {
+        "title": "现代设计",
+        "description": "采用最新的 UI 设计理念，界面简洁美观"
+      },
+      "usability": {
+        "title": "易于使用",
+        "description": "直观的操作界面，让管理变得更加简单"
+      },
+      "security": {
+        "title": "安全可靠",
+        "description": "企业级安全保障，数据安全有保证"
+      }
+    },
+    "products": {
+      "admin": {
+        "description": "强大的后台管理系统，助力企业数字化转型",
+        "features": {
+          "userManagement": "用户管理",
+          "permissionControl": "权限控制",
+          "dataAnalysis": "数据分析",
+          "systemMonitoring": "系统监控"
+        }
+      },
+      "analytics": {
+        "description": "智能数据分析平台，洞察业务增长机会",
+        "features": {
+          "realTimeAnalysis": "实时分析",
+          "visualReports": "可视化报表",
+          "predictiveModels": "预测模型",
+          "customDashboard": "自定义仪表板"
+        }
+      },
+      "cloud": {
+        "description": "云端解决方案，随时随地访问您的数据",
+        "features": {
+          "cloudStorage": "云端存储",
+          "multiDeviceSync": "多端同步",
+          "elasticScaling": "弹性扩展",
+          "support247": "7x24支持"
+        }
+      }
+    }
+  }
+}

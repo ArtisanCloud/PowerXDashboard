@@ -3,6 +3,8 @@ definePageMeta({
   alias: ['/'],   // 让 /home 这个页面同时匹配 "/"
   layout: false   // 禁用layout
 })
+
+const { t } = useI18n()
 </script>
 
 <template>
@@ -39,13 +41,13 @@ definePageMeta({
         <!-- 左侧信息区域 -->
         <div class="text-center lg:text-left">
           <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-6">
-            欢迎使用
+            {{ $t('welcome') }}
             <span class="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent block">
               PowerX
             </span>
           </h1>
           <p class="text-xl md:text-2xl text-gray-600 mb-8 leading-relaxed">
-            现代化的企业级管理系统，助力您的业务腾飞
+            {{ $t('home.subtitle') }}
           </p>
           
           <!-- CTA 按钮 -->
@@ -54,13 +56,13 @@ definePageMeta({
               to="/users/register"
               class="px-8 py-4 text-lg bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-lg transition-all text-center"
             >
-              立即注册
+              {{ $t('register') }}
             </NuxtLink>
             <NuxtLink 
               to="/home/intro"
               class="px-8 py-4 text-lg border border-gray-300 text-gray-700 hover:border-blue-600 hover:text-blue-600 rounded-lg transition-all text-center"
             >
-              了解更多
+              {{ $t('home.learnMore') }}
             </NuxtLink>
           </div>
         </div>
@@ -73,7 +75,7 @@ definePageMeta({
               <div class="text-center z-10">
                 <div class="text-8xl mb-6">🚀</div>
                 <h3 class="text-2xl md:text-3xl font-bold text-gray-800 mb-3">PowerX Dashboard</h3>
-                <p class="text-gray-600 text-lg">现代化的管理界面</p>
+                <p class="text-gray-600 text-lg">{{ $t('home.dashboardDesc') }}</p>
               </div>
               
               <!-- 装饰性图形元素 -->
@@ -101,7 +103,7 @@ definePageMeta({
     <!-- 底部简单信息 -->
     <div class="text-center py-8 px-6">
       <p class="text-gray-500 text-sm">
-        &copy; 2024 PowerX. 保留所有权利
+        &copy; 2024 PowerX. {{ $t('home.footer') }}
       </p>
     </div>
   </div>

@@ -1,54 +1,70 @@
 <script setup lang="ts">
 definePageMeta({
-  alias: ['/'],   // 让 /home 这个页面同时匹配 "/"
   layout: false   // 禁用layout
 })
 
+const { t } = useI18n()
+
 // 产品特性数据
-const features = [
+const features = computed(() => [
   {
     icon: '🚀',
-    title: '高性能',
-    description: '基于 Nuxt 4 构建，提供极致的性能体验'
+    title: t('intro.features.performance.title'),
+    description: t('intro.features.performance.description')
   },
   {
     icon: '🎨',
-    title: '现代设计',
-    description: '采用最新的 UI 设计理念，界面简洁美观'
+    title: t('intro.features.design.title'),
+    description: t('intro.features.design.description')
   },
   {
     icon: '🔧',
-    title: '易于使用',
-    description: '直观的操作界面，让管理变得更加简单'
+    title: t('intro.features.usability.title'),
+    description: t('intro.features.usability.description')
   },
   {
     icon: '🛡️',
-    title: '安全可靠',
-    description: '企业级安全保障，数据安全有保证'
+    title: t('intro.features.security.title'),
+    description: t('intro.features.security.description')
   }
-]
+])
 
 // 产品信息
-const products = [
+const products = computed(() => [
   {
     name: 'PowerX Admin',
-    description: '强大的后台管理系统，助力企业数字化转型',
+    description: t('intro.products.admin.description'),
     image: '/api/placeholder/300/200',
-    features: ['用户管理', '权限控制', '数据分析', '系统监控']
+    features: [
+      t('intro.products.admin.features.userManagement'),
+      t('intro.products.admin.features.permissionControl'),
+      t('intro.products.admin.features.dataAnalysis'),
+      t('intro.products.admin.features.systemMonitoring')
+    ]
   },
   {
     name: 'PowerX Analytics',
-    description: '智能数据分析平台，洞察业务增长机会',
+    description: t('intro.products.analytics.description'),
     image: '/api/placeholder/300/200',
-    features: ['实时分析', '可视化报表', '预测模型', '自定义仪表板']
+    features: [
+      t('intro.products.analytics.features.realTimeAnalysis'),
+      t('intro.products.analytics.features.visualReports'),
+      t('intro.products.analytics.features.predictiveModels'),
+      t('intro.products.analytics.features.customDashboard')
+    ]
   },
   {
     name: 'PowerX Cloud',
-    description: '云端解决方案，随时随地访问您的数据',
+    description: t('intro.products.cloud.description'),
     image: '/api/placeholder/300/200',
-    features: ['云端存储', '多端同步', '弹性扩展', '7x24支持']
+    features: [
+      t('intro.products.cloud.features.cloudStorage'),
+      t('intro.products.cloud.features.multiDeviceSync'),
+      t('intro.products.cloud.features.elasticScaling'),
+      t('intro.products.cloud.features.support247')
+    ]
   }
-]
+])
 </script>
 
 <template>

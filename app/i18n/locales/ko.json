@@ -1,0 +1,60 @@
+{
+  "welcome": "환영합니다",
+  "login": "로그인",
+  "register": "회원가입",
+  "home": {
+    "subtitle": "현대적인 기업 관리 시스템으로 비즈니스의 성장을 도와드립니다",
+    "learnMore": "자세히 보기",
+    "dashboardDesc": "현대적인 관리 인터페이스",
+    "footer": "모든 권리 보유"
+  },
+  "intro": {
+    "features": {
+      "performance": {
+        "title": "고성능",
+        "description": "Nuxt 4 기반으로 구축되어 최고의 성능 경험을 제공합니다"
+      },
+      "design": {
+        "title": "모던 디자인",
+        "description": "최신 UI 디자인 개념을 채택하여 깔끔하고 아름다운 인터페이스"
+      },
+      "usability": {
+        "title": "사용하기 쉬움",
+        "description": "직관적인 조작 인터페이스로 관리를 더욱 간단하게"
+      },
+      "security": {
+        "title": "안전하고 신뢰할 수 있음",
+        "description": "기업급 보안 보장, 데이터 안전성 확보"
+      }
+    },
+    "products": {
+      "admin": {
+        "description": "기업의 디지털 전환을 지원하는 강력한 백엔드 관리 시스템",
+        "features": {
+          "userManagement": "사용자 관리",
+          "permissionControl": "권한 제어",
+          "dataAnalysis": "데이터 분석",
+          "systemMonitoring": "시스템 모니터링"
+        }
+      },
+      "analytics": {
+        "description": "비즈니스 성장 기회를 발견하는 지능형 데이터 분석 플랫폼",
+        "features": {
+          "realTimeAnalysis": "실시간 분석",
+          "visualReports": "시각화 보고서",
+          "predictiveModels": "예측 모델",
+          "customDashboard": "사용자 정의 대시보드"
+        }
+      },
+      "cloud": {
+        "description": "클라우드 솔루션, 언제 어디서나 데이터에 액세스",
+        "features": {
+          "cloudStorage": "클라우드 스토리지",
+          "multiDeviceSync": "멀티 디바이스 동기화",
+          "elasticScaling": "탄력적 확장",
+          "support247": "24시간 지원"
+        }
+      }
+    }
+  }
+}
