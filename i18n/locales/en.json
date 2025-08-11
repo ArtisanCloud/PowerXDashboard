@@ -60,9 +60,12 @@
       "about": "About"
     },
     "hero": {
-      "welcomeTo": "Welcome to"
+      "welcomeTo": "Welcome to",
+      "dashboardPreview": "Modern management interface preview"
     },
     "features": {
+      "title": "Why Choose PowerX?",
+      "subtitle": "We provide the most advanced technology and thoughtful service to make your business management twice as effective",
       "performance": {
         "title": "High Performance",
         "description": "Optimized architecture design ensures fast system response"
@@ -81,6 +84,9 @@
       }
     },
     "products": {
+      "title": "Our Products",
+      "subtitle": "Comprehensive solutions to meet your different business needs",
+      "learnMore": "Learn More",
       "admin": {
         "description": "Comprehensive backend management system",
         "features": {
@@ -108,6 +114,45 @@
           "support247": "24/7 Support"
         }
       }
+    },
+    "about": {
+      "title": "About PowerX",
+      "subtitle": "We are committed to providing enterprises with the most advanced management solutions, allowing every enterprise to enjoy the convenience brought by digital transformation",
+      "mission": {
+        "title": "Our Mission",
+        "paragraph1": "PowerX was founded in 2024, focusing on providing comprehensive digital management solutions for small and medium enterprises and large enterprises. We believe that technology should make management simpler, not more complex.",
+        "paragraph2": "Through continuous technological innovation and user experience optimization, we have helped more than 1,000 enterprises achieve digital transformation and improve their operational efficiency and competitiveness.",
+        "paragraph3": "Our team consists of excellent engineers, designers and product managers from all over the world, working together to create the best enterprise management platform."
+      },
+      "stats": {
+        "companies": "Companies Served",
+        "users": "Active Users",
+        "uptime": "System Uptime"
+      },
+      "enterprise": {
+        "title": "Enterprise Solutions",
+        "description": "Secure, Stable, Scalable"
+      },
+      "values": {
+        "title": "Our Values",
+        "innovation": {
+          "title": "Innovation Driven",
+          "description": "Continuous innovation, using technology to drive industry progress"
+        },
+        "userFirst": {
+          "title": "User First",
+          "description": "User-centered, providing the best experience"
+        },
+        "excellence": {
+          "title": "Pursuit of Excellence",
+          "description": "Striving for perfection, creating industry benchmark products"
+        }
+      }
+    },
+    "footer": {
+      "aboutUs": "About Us",
+      "contactUs": "Contact Us",
+      "copyright": "© 2024 PowerX. All rights reserved."
     }
   }
 }

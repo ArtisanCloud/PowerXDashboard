@@ -60,9 +60,12 @@
       "about": "关于"
     },
     "hero": {
-      "welcomeTo": "欢迎来到"
+      "welcomeTo": "欢迎来到",
+      "dashboardPreview": "现代化的管理界面预览"
     },
     "features": {
+      "title": "为什么选择 PowerX？",
+      "subtitle": "我们提供最先进的技术和最贴心的服务，让您的业务管理事半功倍",
       "performance": {
         "title": "高性能",
         "description": "优化的架构设计，确保系统快速响应"
@@ -81,6 +84,9 @@
       }
     },
     "products": {
+      "title": "我们的产品",
+      "subtitle": "全方位的解决方案，满足您不同的业务需求",
+      "learnMore": "了解详情",
       "admin": {
         "description": "全面的后台管理系统",
         "features": {
@@ -108,6 +114,45 @@
           "support247": "7x24小时支持"
         }
       }
+    },
+    "about": {
+      "title": "关于 PowerX",
+      "subtitle": "我们致力于为企业提供最先进的管理解决方案，让每一个企业都能享受到数字化转型带来的便利",
+      "mission": {
+        "title": "我们的使命",
+        "paragraph1": "PowerX 成立于2024年，专注于为中小企业和大型企业提供全方位的数字化管理解决方案。我们相信技术应该让管理变得更简单，而不是更复杂。",
+        "paragraph2": "通过不断的技术创新和用户体验优化，我们已经帮助超过1000家企业实现了数字化转型，提升了他们的运营效率和竞争力。",
+        "paragraph3": "我们的团队由来自世界各地的优秀工程师、设计师和产品经理组成，共同致力于打造最好用的企业管理平台。"
+      },
+      "stats": {
+        "companies": "服务企业",
+        "users": "活跃用户",
+        "uptime": "系统稳定性"
+      },
+      "enterprise": {
+        "title": "企业级解决方案",
+        "description": "安全、稳定、可扩展"
+      },
+      "values": {
+        "title": "我们的价值观",
+        "innovation": {
+          "title": "创新驱动",
+          "description": "持续创新，用技术推动行业进步"
+        },
+        "userFirst": {
+          "title": "用户至上",
+          "description": "以用户需求为中心，提供最佳体验"
+        },
+        "excellence": {
+          "title": "追求卓越",
+          "description": "精益求精，打造行业标杆产品"
+        }
+      }
+    },
+    "footer": {
+      "aboutUs": "关于我们",
+      "contactUs": "联系我们",
+      "copyright": "© 2024 PowerX. All rights reserved."
     }
   }
 }

@@ -84,7 +84,7 @@ const handleRegister = async () => {
     
     // 注册成功后延迟跳转到登录页面
     setTimeout(() => {
-      navigateTo('/users/login')
+      navigateTo($localePath('/users/login'))
     }, 2000)
   } catch (err) {
     error.value = t('registerFailed')
@@ -97,17 +97,18 @@ const handleRegister = async () => {
 <template>
   <div class="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center p-4">
     <div class="max-w-md w-full">
-      <!-- 返回首页链接 - 左对齐 -->
-      <div class="mb-6">
+      <!-- 返回首页链接和语言切换器 -->
+      <div class="mb-6 flex justify-between items-center">
         <NuxtLink 
-          to="/" 
+          :to="$localePath('/')" 
           class="inline-flex items-center text-gray-600 hover:text-blue-600 transition-colors text-sm"
         >
           <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
           </svg>
-          返回首页
+          {{ $t('backToHome') }}
         </NuxtLink>
+        <LanguageSwitcher />
       </div>
 
       <!-- 注册卡片 -->
@@ -127,10 +128,10 @@ const handleRegister = async () => {
           <!-- 成功提示 -->
           <UAlert 
             v-if="success" 
-            color="green" 
+            color="success" 
             variant="soft" 
-            title="注册成功！"
-            description="正在跳转到登录页面..."
+            :title="$t('registerSuccess')"
+            :description="$t('redirectingToLogin')"
             class="mb-6"
           />
 
@@ -138,7 +139,7 @@ const handleRegister = async () => {
             <!-- 错误提示 -->
             <UAlert 
               v-if="error" 
-              color="red" 
+              color="error" 
               variant="soft" 
               :title="error"
               :close-button="{ icon: 'i-heroicons-x-mark-20-solid', color: 'gray', variant: 'link', padded: false }"
@@ -272,12 +273,12 @@ const handleRegister = async () => {
           <!-- 登录链接 -->
           <div class="text-center mt-6 pt-4 border-t border-gray-200">
             <p class="text-gray-600 text-sm">
-              已有账户？
+              {{ $t('hasAccount') }}
               <NuxtLink 
-                to="/users/login" 
+                :to="$localePath('/users/login')" 
                 class="text-blue-600 hover:text-blue-700 font-medium"
               >
-                立即登录
+                {{ $t('signInNow') }}
               </NuxtLink>
             </p>
           </div>

@@ -22,13 +22,13 @@ const { t } = useI18n()
       <div class="flex items-center space-x-4">
         <LanguageSwitcher />
         <NuxtLink 
-          to="/users/login"
+          :to="$localePath('/users/login')"
           class="px-4 py-2 text-gray-700 hover:text-blue-600 transition-colors"
         >
           {{ $t('login') }}
         </NuxtLink>
         <NuxtLink 
-          to="/users/register"
+          :to="$localePath('/users/register')"
           class="px-6 py-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-lg transition-all"
         >
           {{ $t('register') }}
@@ -54,13 +54,13 @@ const { t } = useI18n()
           <!-- CTA 按钮 -->
           <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
             <NuxtLink 
-              to="/users/register"
+              :to="$localePath('/users/register')"
               class="px-8 py-4 text-lg bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-lg transition-all text-center"
             >
               {{ $t('register') }}
             </NuxtLink>
             <NuxtLink 
-              to="/home/intro"
+              :to="$localePath('/home/intro')"
               class="px-8 py-4 text-lg border border-gray-300 text-gray-700 hover:border-blue-600 hover:text-blue-600 rounded-lg transition-all text-center"
             >
               {{ $t('home.learnMore') }}

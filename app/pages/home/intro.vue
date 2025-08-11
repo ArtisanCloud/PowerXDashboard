@@ -101,14 +101,14 @@ const products = computed(() => [
           <div class="flex items-center space-x-4">
             <LanguageSwitcher />
             <NuxtLink 
-              to="/users/login"
+              :to="$localePath('/users/login')"
               variant="ghost" 
               class="text-gray-700 hover:text-blue-600 px-4 py-2 transition-colors"
             >
               {{ $t('login') }}
             </NuxtLink>
             <NuxtLink 
-              to="/users/register"
+              :to="$localePath('/users/register')"
               class="px-6 py-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-lg transition-all"
             >
               {{ $t('register') }}
@@ -136,7 +136,7 @@ const products = computed(() => [
           <!-- CTA 按钮 -->
           <div class="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16">
             <NuxtLink 
-              to="/users/register"
+              :to="$localePath('/users/register')"
               class="px-8 py-4 text-lg bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-lg transition-all text-center"
             >
               {{ $t('home.getStarted') }}
@@ -156,7 +156,7 @@ const products = computed(() => [
                 <div class="text-center">
                   <div class="text-6xl mb-4">🚀</div>
                   <h3 class="text-2xl font-bold text-gray-800 mb-2">PowerX Dashboard</h3>
-                  <p class="text-gray-600">现代化的管理界面预览</p>
+                  <p class="text-gray-600">{{ $t('intro.hero.dashboardPreview') }}</p>
                 </div>
               </div>
             </div>
@@ -173,10 +173,10 @@ const products = computed(() => [
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-16">
           <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-            为什么选择 PowerX？
+            {{ $t('intro.features.title') }}
           </h2>
           <p class="text-xl text-gray-600 max-w-2xl mx-auto">
-            我们提供最先进的技术和最贴心的服务，让您的业务管理事半功倍
+            {{ $t('intro.features.subtitle') }}
           </p>
         </div>
         
@@ -199,10 +199,10 @@ const products = computed(() => [
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-16">
           <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-            我们的产品
+            {{ $t('intro.products.title') }}
           </h2>
           <p class="text-xl text-gray-600 max-w-2xl mx-auto">
-            全方位的解决方案，满足您不同的业务需求
+            {{ $t('intro.products.subtitle') }}
           </p>
         </div>
         
@@ -243,7 +243,7 @@ const products = computed(() => [
                 variant="outline"
                 class="border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white"
               >
-                了解详情
+                {{ $t('intro.products.learnMore') }}
               </UButton>
             </template>
           </UCard>
@@ -256,29 +256,26 @@ const products = computed(() => [
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-16">
           <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-            关于 PowerX
+            {{ $t('intro.about.title') }}
           </h2>
           <p class="text-xl text-gray-600 max-w-3xl mx-auto">
-            我们致力于为企业提供最先进的管理解决方案，让每一个企业都能享受到数字化转型带来的便利
+            {{ $t('intro.about.subtitle') }}
           </p>
         </div>
         
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           <!-- 左侧内容 -->
           <div>
-            <h3 class="text-2xl font-bold text-gray-900 mb-6">我们的使命</h3>
+            <h3 class="text-2xl font-bold text-gray-900 mb-6">{{ $t('intro.about.mission.title') }}</h3>
             <div class="space-y-4 text-gray-600">
               <p>
-                PowerX 成立于2024年，专注于为中小企业和大型企业提供全方位的数字化管理解决方案。
-                我们相信技术应该让管理变得更简单，而不是更复杂。
+                {{ $t('intro.about.mission.paragraph1') }}
               </p>
               <p>
-                通过不断的技术创新和用户体验优化，我们已经帮助超过1000家企业实现了数字化转型，
-                提升了他们的运营效率和竞争力。
+                {{ $t('intro.about.mission.paragraph2') }}
               </p>
               <p>
-                我们的团队由来自世界各地的优秀工程师、设计师和产品经理组成，
-                共同致力于打造最好用的企业管理平台。
+                {{ $t('intro.about.mission.paragraph3') }}
               </p>
             </div>
             
@@ -286,15 +283,15 @@ const products = computed(() => [
             <div class="grid grid-cols-3 gap-6 mt-8">
               <div class="text-center">
                 <div class="text-3xl font-bold text-blue-600 mb-2">1000+</div>
-                <div class="text-sm text-gray-600">服务企业</div>
+                <div class="text-sm text-gray-600">{{ $t('intro.about.stats.companies') }}</div>
               </div>
               <div class="text-center">
                 <div class="text-3xl font-bold text-blue-600 mb-2">50万+</div>
-                <div class="text-sm text-gray-600">活跃用户</div>
+                <div class="text-sm text-gray-600">{{ $t('intro.about.stats.users') }}</div>
               </div>
               <div class="text-center">
                 <div class="text-3xl font-bold text-blue-600 mb-2">99.9%</div>
-                <div class="text-sm text-gray-600">系统稳定性</div>
+                <div class="text-sm text-gray-600">{{ $t('intro.about.stats.uptime') }}</div>
               </div>
             </div>
           </div>
@@ -304,8 +301,8 @@ const products = computed(() => [
             <div class="bg-gradient-to-br from-blue-100 to-purple-100 rounded-2xl p-8 h-96 flex items-center justify-center">
               <div class="text-center">
                 <div class="text-6xl mb-4">🏢</div>
-                <h4 class="text-xl font-bold text-gray-800 mb-2">企业级解决方案</h4>
-                <p class="text-gray-600">安全、稳定、可扩展</p>
+                <h4 class="text-xl font-bold text-gray-800 mb-2">{{ $t('intro.about.enterprise.title') }}</h4>
+                <p class="text-gray-600">{{ $t('intro.about.enterprise.description') }}</p>
               </div>
             </div>
             <!-- 装饰元素 -->
@@ -316,28 +313,28 @@ const products = computed(() => [
         
         <!-- 团队价值观 -->
         <div class="mt-20">
-          <h3 class="text-2xl font-bold text-gray-900 text-center mb-12">我们的价值观</h3>
+          <h3 class="text-2xl font-bold text-gray-900 text-center mb-12">{{ $t('intro.about.values.title') }}</h3>
           <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div class="text-center">
               <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <span class="text-2xl">💡</span>
               </div>
-              <h4 class="text-lg font-semibold text-gray-900 mb-2">创新驱动</h4>
-              <p class="text-gray-600">持续创新，用技术推动行业进步</p>
+              <h4 class="text-lg font-semibold text-gray-900 mb-2">{{ $t('intro.about.values.innovation.title') }}</h4>
+              <p class="text-gray-600">{{ $t('intro.about.values.innovation.description') }}</p>
             </div>
             <div class="text-center">
               <div class="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <span class="text-2xl">🤝</span>
               </div>
-              <h4 class="text-lg font-semibold text-gray-900 mb-2">用户至上</h4>
-              <p class="text-gray-600">以用户需求为中心，提供最佳体验</p>
+              <h4 class="text-lg font-semibold text-gray-900 mb-2">{{ $t('intro.about.values.userFirst.title') }}</h4>
+              <p class="text-gray-600">{{ $t('intro.about.values.userFirst.description') }}</p>
             </div>
             <div class="text-center">
               <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <span class="text-2xl">🎯</span>
               </div>
-              <h4 class="text-lg font-semibold text-gray-900 mb-2">追求卓越</h4>
-              <p class="text-gray-600">精益求精，打造行业标杆产品</p>
+              <h4 class="text-lg font-semibold text-gray-900 mb-2">{{ $t('intro.about.values.excellence.title') }}</h4>
+              <p class="text-gray-600">{{ $t('intro.about.values.excellence.description') }}</p>
             </div>
           </div>
         </div>
@@ -349,15 +346,15 @@ const products = computed(() => [
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center">
           <h3 class="text-2xl font-bold mb-4">PowerX</h3>
-          <p class="text-gray-400 mb-8">让管理更简单，让业务更高效</p>
+          <p class="text-gray-400 mb-8">{{ $t('home.footer') }}</p>
           <div class="flex justify-center space-x-6">
-            <a href="#" class="text-gray-400 hover:text-white transition-colors">关于我们</a>
-            <a href="#" class="text-gray-400 hover:text-white transition-colors">联系我们</a>
-            <a href="#" class="text-gray-400 hover:text-white transition-colors">隐私政策</a>
-            <a href="#" class="text-gray-400 hover:text-white transition-colors">服务条款</a>
+            <a href="#" class="text-gray-400 hover:text-white transition-colors">{{ $t('intro.footer.aboutUs') }}</a>
+            <a href="#" class="text-gray-400 hover:text-white transition-colors">{{ $t('intro.footer.contactUs') }}</a>
+            <a href="#" class="text-gray-400 hover:text-white transition-colors">{{ $t('privacyPolicy') }}</a>
+            <a href="#" class="text-gray-400 hover:text-white transition-colors">{{ $t('termsOfService') }}</a>
           </div>
           <div class="mt-8 pt-8 border-t border-gray-800">
-            <p class="text-gray-400">&copy; 2024 PowerX. All rights reserved.</p>
+            <p class="text-gray-400">{{ $t('intro.footer.copyright') }}</p>
           </div>
         </div>
       </div>

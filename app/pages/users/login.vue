@@ -3,6 +3,8 @@ definePageMeta({
   layout: false   // 禁用layout
 })
 
+const { t } = useI18n()
+
 // 表单数据
 const form = reactive({
   email: '',
@@ -17,7 +19,7 @@ const error = ref('')
 // 登录处理
 const handleLogin = async () => {
   if (!form.email || !form.password) {
-    error.value = '请填写所有必填字段'
+    error.value = t('required')
     return
   }
   
@@ -31,7 +33,7 @@ const handleLogin = async () => {
     // 登录成功后跳转到仪表板
     await navigateTo('/dashboard')
   } catch (err) {
-    error.value = '登录失败，请检查您的凭据'
+    error.value = t('loginFailed')
   } finally {
     loading.value = false
   }
@@ -47,17 +49,18 @@ const handleForgotPassword = () => {
 <template>
   <div class="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center p-4">
     <div class="max-w-md w-full">
-      <!-- 顶部区域：返回首页 -->
+      <!-- 顶部区域：返回首页和语言切换器 -->
       <div class="mb-6 flex justify-between items-center">
         <NuxtLink 
-          to="/" 
+          :to="$localePath('/')" 
           class="inline-flex items-center text-gray-600 hover:text-blue-600 transition-colors text-sm"
         >
           <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
           </svg>
-          返回首页
+          {{ $t('backToHome') }}
         </NuxtLink>
+        <LanguageSwitcher />
       </div>
 
       <!-- 登录卡片 -->
@@ -68,8 +71,8 @@ const handleForgotPassword = () => {
           <h1 class="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-3">
             PowerX
           </h1>
-          <h2 class="text-xl font-semibold text-gray-900 mb-2">欢迎回来</h2>
-          <p class="text-gray-600 text-sm">请登录您的账户</p>
+          <h2 class="text-xl font-semibold text-gray-900 mb-2">{{ $t('welcomeBack') }}</h2>
+          <p class="text-gray-600 text-sm">{{ $t('loginSubtitle') }}</p>
         </div>
 
         <div class="px-6 pb-6">
@@ -91,14 +94,14 @@ const handleForgotPassword = () => {
             <!-- 邮箱输入 -->
             <div>
               <label for="email" class="block text-sm font-medium text-gray-700 mb-2">
-                邮箱 <span class="text-red-500">*</span>
+                {{ $t('email') }} <span class="text-red-500">*</span>
               </label>
               <input
                 id="email"
                 name="email"
                 v-model="form.email"
                 type="email"
-                placeholder="请输入邮箱"
+                :placeholder="$t('email')"
                 :disabled="loading"
                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100"
               />
@@ -107,14 +110,14 @@ const handleForgotPassword = () => {
             <!-- 密码输入 -->
             <div>
               <label for="password" class="block text-sm font-medium text-gray-700 mb-2">
-                密码 <span class="text-red-500">*</span>
+                {{ $t('password') }} <span class="text-red-500">*</span>
               </label>
               <input
                 id="password"
                 name="password"
                 v-model="form.password"
                 type="password"
-                placeholder="请输入密码"
+                :placeholder="$t('password')"
                 :disabled="loading"
                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100"
               />
@@ -129,7 +132,7 @@ const handleForgotPassword = () => {
                   :disabled="loading"
                   class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                 />
-                <span class="ml-2 text-sm text-gray-600">记住我</span>
+                <span class="ml-2 text-sm text-gray-600">{{ $t('remember') }}</span>
               </label>
               <button 
                 type="button"
@@ -137,7 +140,7 @@ const handleForgotPassword = () => {
                 @click="handleForgotPassword"
                 :disabled="loading"
               >
-                忘记密码？
+                {{ $t('forgot') }}
               </button>
             </div>
 
@@ -147,19 +150,19 @@ const handleForgotPassword = () => {
               :disabled="loading"
               class="w-full py-2 px-4 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-medium rounded-md transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {{ loading ? '登录中...' : '登录' }}
+              {{ loading ? $t('signingIn') : $t('login') }}
             </button>
           </form>
 
           <!-- 注册链接 -->
           <div class="text-center mt-6 pt-4 border-t border-gray-200">
             <p class="text-gray-600 text-sm">
-              还没有账户？
+              {{ $t('noAccount') }}
               <NuxtLink 
-                to="/users/register" 
+                :to="$localePath('/users/register')" 
                 class="text-blue-600 hover:text-blue-700 font-medium"
               >
-                立即注册
+                {{ $t('signUpNow') }}
               </NuxtLink>
             </p>
           </div>

@@ -60,9 +60,12 @@
       "about": "회사소개"
     },
     "hero": {
-      "welcomeTo": "환영합니다"
+      "welcomeTo": "환영합니다",
+      "dashboardPreview": "현대적인 관리 인터페이스 미리보기"
     },
     "features": {
+      "title": "왜 PowerX를 선택해야 할까요?",
+      "subtitle": "최첨단 기술과 세심한 서비스로 비즈니스 관리 효율성을 두 배로 향상",
       "performance": {
         "title": "고성능",
         "description": "최적화된 아키텍처 설계로 시스템의 빠른 응답 보장"
@@ -81,6 +84,9 @@
       }
     },
     "products": {
+      "title": "우리의 제품",
+      "subtitle": "다양한 비즈니스 요구사항을 충족하는 종합 솔루션",
+      "learnMore": "자세히 보기",
       "admin": {
         "description": "포괄적인 백엔드 관리 시스템",
         "features": {
@@ -108,6 +114,45 @@
           "support247": "24시간 지원"
         }
       }
+    },
+    "about": {
+      "title": "PowerX 소개",
+      "subtitle": "우리는 기업에게 가장 앞선 관리 솔루션을 제공하여 모든 기업이 디지털 전환의 편리함을 누릴 수 있도록 노력하고 있습니다",
+      "mission": {
+        "title": "우리의 사명",
+        "paragraph1": "PowerX는 2024년에 설립되어 중소기업부터 대기업까지 포괄적인 디지털 관리 솔루션 제공에 전념하고 있습니다. 우리는 기술이 관리를 더 복잡하게 만드는 것이 아니라 더 간단하게 만들어야 한다고 믿습니다.",
+        "paragraph2": "지속적인 기술 혁신과 사용자 경험 최적화를 통해 1,000개 이상의 기업이 디지털 전환을 달성하고 운영 효율성과 경쟁력을 향상시킬 수 있도록 도왔습니다.",
+        "paragraph3": "우리 팀은 전 세계의 우수한 엔지니어, 디자이너, 제품 관리자들로 구성되어 최고의 기업 관리 플랫폼을 구축하기 위해 함께 노력하고 있습니다."
+      },
+      "stats": {
+        "companies": "서비스 기업",
+        "users": "활성 사용자",
+        "uptime": "시스템 가동률"
+      },
+      "enterprise": {
+        "title": "엔터프라이즈 솔루션",
+        "description": "안전하고 안정적이며 확장 가능"
+      },
+      "values": {
+        "title": "우리의 가치관",
+        "innovation": {
+          "title": "혁신 주도",
+          "description": "지속적인 혁신으로 기술을 통한 업계 발전 추진"
+        },
+        "userFirst": {
+          "title": "사용자 우선",
+          "description": "사용자 요구를 중심으로 최고의 경험 제공"
+        },
+        "excellence": {
+          "title": "우수성 추구",
+          "description": "완벽을 추구하며 업계 표준 제품 창조"
+        }
+      }
+    },
+    "footer": {
+      "aboutUs": "회사소개",
+      "contactUs": "문의하기",
+      "copyright": "© 2024 PowerX. All rights reserved."
     }
   }
 }
