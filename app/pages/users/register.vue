@@ -1,0 +1,286 @@
+<script setup lang="ts">
+definePageMeta({
+  layout: false   // 禁用layout
+})
+
+// 表单数据
+const form = reactive({
+  username: '',
+  email: '',
+  password: '',
+  confirmPassword: '',
+  agree: false
+})
+
+// 表单验证状态
+const loading = ref(false)
+const error = ref('')
+const success = ref(false)
+
+// 密码强度检查
+const passwordStrength = computed(() => {
+  const password = form.password
+  if (!password) return { level: 0, text: '', color: 'gray' }
+  
+  let score = 0
+  if (password.length >= 8) score++
+  if (/[A-Z]/.test(password)) score++
+  if (/[a-z]/.test(password)) score++
+  if (/[0-9]/.test(password)) score++
+  if (/[^A-Za-z0-9]/.test(password)) score++
+  
+  if (score <= 2) return { level: score, text: '弱', color: 'red' }
+  if (score <= 3) return { level: score, text: '中等', color: 'yellow' }
+  return { level: score, text: '强', color: 'green' }
+})
+
+// 表单验证
+const validateForm = () => {
+  if (!form.username.trim()) {
+    error.value = '请输入用户名'
+    return false
+  }
+  if (!form.email.trim()) {
+    error.value = '请输入邮箱地址'
+    return false
+  }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
+    error.value = '请输入有效的邮箱地址'
+    return false
+  }
+  if (!form.password) {
+    error.value = '请输入密码'
+    return false
+  }
+  if (form.password.length < 6) {
+    error.value = '密码长度至少6位'
+    return false
+  }
+  if (form.password !== form.confirmPassword) {
+    error.value = '两次输入的密码不一致'
+    return false
+  }
+  if (!form.agree) {
+    error.value = '请同意服务条款和隐私政策'
+    return false
+  }
+  return true
+}
+
+// 注册处理
+const handleRegister = async () => {
+  if (!validateForm()) return
+  
+  loading.value = true
+  error.value = ''
+  
+  try {
+    // 这里添加实际的注册逻辑
+    await new Promise(resolve => setTimeout(resolve, 1500)) // 模拟API调用
+    
+    success.value = true
+    
+    // 注册成功后延迟跳转到登录页面
+    setTimeout(() => {
+      navigateTo('/users/login')
+    }, 2000)
+  } catch (err) {
+    error.value = '注册失败，请稍后重试'
+  } finally {
+    loading.value = false
+  }
+}
+</script>
+
+<template>
+  <div class="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center p-4">
+    <div class="max-w-md w-full">
+      <!-- 返回首页链接 - 左对齐 -->
+      <div class="mb-6">
+        <NuxtLink 
+          to="/" 
+          class="inline-flex items-center text-gray-600 hover:text-blue-600 transition-colors text-sm"
+        >
+          <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+          </svg>
+          返回首页
+        </NuxtLink>
+      </div>
+
+      <!-- 注册卡片 -->
+      <UCard class="shadow-xl border-0">
+        <template #header>
+          <div class="text-center py-6">
+            <!-- Logo -->
+            <h1 class="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-3">
+              PowerX
+            </h1>
+            <h2 class="text-xl font-semibold text-gray-900 mb-2">创建账户</h2>
+            <p class="text-gray-600 text-sm">加入PowerX，开启高效管理之旅</p>
+          </div>
+        </template>
+
+        <div class="px-6 pb-6">
+          <!-- 成功提示 -->
+          <UAlert 
+            v-if="success" 
+            color="green" 
+            variant="soft" 
+            title="注册成功！"
+            description="正在跳转到登录页面..."
+            class="mb-6"
+          />
+
+          <form v-else @submit.prevent="handleRegister" class="space-y-5">
+            <!-- 错误提示 -->
+            <UAlert 
+              v-if="error" 
+              color="red" 
+              variant="soft" 
+              :title="error"
+              :close-button="{ icon: 'i-heroicons-x-mark-20-solid', color: 'gray', variant: 'link', padded: false }"
+              @close="error = ''"
+              class="mb-1"
+            />
+
+            <!-- 用户名输入 -->
+            <div class="mb-6">
+              <label for="username" class="block text-sm font-medium text-gray-700 mb-3">
+                用户名 <span class="text-red-500">*</span>
+              </label>
+              <UInput
+                id="username"
+                name="username"
+                v-model="form.username"
+                placeholder="请输入用户名"
+                size="lg"
+                :disabled="loading"
+                class="w-full"
+              />
+            </div>
+
+            <!-- 邮箱输入 -->
+            <div class="mb-6">
+              <label for="email" class="block text-sm font-medium text-gray-700 mb-3">
+                邮箱地址 <span class="text-red-500">*</span>
+              </label>
+              <UInput
+                id="email"
+                name="email"
+                v-model="form.email"
+                type="email"
+                placeholder="请输入您的邮箱"
+                size="lg"
+                :disabled="loading"
+                class="w-full"
+              />
+            </div>
+
+            <!-- 密码输入 -->
+            <div class="mb-6">
+              <label for="password" class="block text-sm font-medium text-gray-700 mb-3">
+                密码 <span class="text-red-500">*</span>
+              </label>
+              <UInput
+                id="password"
+                name="password"
+                v-model="form.password"
+                type="password"
+                placeholder="请输入密码（至少6位）"
+                size="lg"
+                :disabled="loading"
+                class="w-full"
+              />
+              <!-- 密码强度指示器 -->
+              <div v-if="form.password" class="mt-3">
+                <div class="flex items-center space-x-2">
+                  <div class="flex-1 bg-gray-200 rounded-full h-2">
+                    <div 
+                      class="h-2 rounded-full transition-all duration-300"
+                      :class="{
+                        'bg-red-500': passwordStrength.color === 'red',
+                        'bg-yellow-500': passwordStrength.color === 'yellow',
+                        'bg-green-500': passwordStrength.color === 'green'
+                      }"
+                      :style="{ width: `${(passwordStrength.level / 5) * 100}%` }"
+                    ></div>
+                  </div>
+                  <span 
+                    class="text-xs font-medium"
+                    :class="{
+                      'text-red-600': passwordStrength.color === 'red',
+                      'text-yellow-600': passwordStrength.color === 'yellow',
+                      'text-green-600': passwordStrength.color === 'green'
+                    }"
+                  >
+                    {{ passwordStrength.text }}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- 确认密码输入 -->
+            <div class="mb-6">
+              <label for="confirmPassword" class="block text-sm font-medium text-gray-700 mb-3">
+                确认密码 <span class="text-red-500">*</span>
+              </label>
+              <UInput
+                id="confirmPassword"
+                name="confirmPassword"
+                v-model="form.confirmPassword"
+                type="password"
+                placeholder="请再次输入密码"
+                size="lg"
+                :disabled="loading"
+                class="w-full"
+              />
+            </div>
+
+            <!-- 同意条款 -->
+            <div class="flex items-start space-x-3 pt-1">
+              <UCheckbox 
+                v-model="form.agree" 
+                :disabled="loading"
+                class="mt-0.5"
+              />
+              <p class="text-sm text-gray-600 leading-relaxed">
+                我已阅读并同意
+                <a href="#" class="text-blue-600 hover:text-blue-700">服务条款</a>
+                和
+                <a href="#" class="text-blue-600 hover:text-blue-700">隐私政策</a>
+              </p>
+            </div>
+
+            <!-- 注册按钮 -->
+            <div class="pt-2">
+              <UButton
+                type="submit"
+                block
+                size="lg"
+                :loading="loading"
+                :disabled="!form.agree"
+                class="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+              >
+                {{ loading ? '注册中...' : '创建账户' }}
+              </UButton>
+            </div>
+          </form>
+
+          <!-- 登录链接 -->
+          <div class="text-center mt-6 pt-4 border-t border-gray-200">
+            <p class="text-gray-600 text-sm">
+              已有账户？
+              <NuxtLink 
+                to="/users/login" 
+                class="text-blue-600 hover:text-blue-700 font-medium"
+              >
+                立即登录
+              </NuxtLink>
+            </p>
+          </div>
+        </div>
+      </UCard>
+    </div>
+  </div>
+</template>
