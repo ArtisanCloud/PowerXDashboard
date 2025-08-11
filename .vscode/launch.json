@@ -10,6 +10,7 @@
         "run",
         "dev",
         "--",
+        "--port=3030",
         "-o"
       ],
       "cwd": "${workspaceFolder}",
