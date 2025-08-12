@@ -1,89 +1,55 @@
 <script setup lang="ts">
-interface MenuItem {
-  id: string
-  title: string
-  icon: string
-  path?: string
-  children?: MenuItem[]
-  badge?: string | number
-}
+import { useMenuService, type MenuItem } from '~/composables/api/services/menuService';
+
+// 确保 UIcon 和 UBadge 组件可用
+// 如果使用 Nuxt UI，这些组件应该已经全局注册
+// 如果没有，可能需要手动导入
 
 const { t } = useI18n()
 const route = useRoute()
+const menuService = useMenuService()
 
-// 菜单数据
-const menuItems = computed<MenuItem[]>(() => [
+// 从 API 获取菜单数据
+const { data: menuResponse, pending: menuLoading, error: menuError, refresh: refreshMenus } = await useAsyncData(
+  'user-menus',
+  () => menuService.getUserMenus(),
   {
-    id: 'dashboard',
-    title: t('menu.dashboard'),
-    icon: 'i-heroicons-home',
-    path: '/dashboard'
-  },
-  {
-    id: 'users',
-    title: t('menu.users'),
-    icon: 'i-heroicons-users',
-    children: [
-      {
-        id: 'user-list',
-        title: t('menu.userList'),
-        icon: 'i-heroicons-list-bullet',
-        path: '/users'
-      },
-      {
-        id: 'user-roles',
-        title: t('menu.userRoles'),
-        icon: 'i-heroicons-shield-check',
-        path: '/users/roles'
-      }
-    ]
-  },
-  {
-    id: 'content',
-    title: t('menu.content'),
-    icon: 'i-heroicons-document-text',
-    children: [
-      {
-        id: 'articles',
-        title: t('menu.articles'),
-        icon: 'i-heroicons-newspaper',
-        path: '/content/articles'
-      },
-      {
-        id: 'categories',
-        title: t('menu.categories'),
-        icon: 'i-heroicons-tag',
-        path: '/content/categories'
-      }
-    ]
-  },
-  {
-    id: 'analytics',
-    title: t('menu.analytics'),
-    icon: 'i-heroicons-chart-bar',
-    path: '/analytics',
-    badge: 'New'
-  },
-  {
-    id: 'settings',
-    title: t('menu.settings'),
-    icon: 'i-heroicons-cog-6-tooth',
-    children: [
-      {
-        id: 'system',
-        title: t('menu.systemSettings'),
-        icon: 'i-heroicons-server',
-        path: '/settings/system'
-      },
-      {
-        id: 'security',
-        title: t('menu.security'),
-        icon: 'i-heroicons-lock-closed',
-        path: '/settings/security'
-      }
-    ]
+    default: () => ({ data: [] }),
+    transform: (response) => response || { data: [] }
   }
-])
+)
+
+// 调试输出
+// console.log('菜单响应数据:', menuResponse.value)
+
+// 处理菜单数据，不使用翻译，直接显示原始标题
+const menuItems = computed<MenuItem[]>(() => {
+  // console.log('计算菜单项，原始数据:', menuResponse.value)
+  
+  if (!menuResponse.value?.data) {
+    console.log('菜单数据为空')
+    return []
+  }
+  
+  const processMenuItems = (items: MenuItem[]): MenuItem[] => {
+    return items
+      .filter(item => item.visible !== false) // 确保即使 visible 未定义也会显示
+      .sort((a, b) => (a.order || 0) - (b.order || 0)) // 防止 order 未定义
+      .map(item => {
+        // console.log('处理菜单项:', item)
+        return {
+          ...item,
+          // 直接使用原始标题，不进行翻译
+          title: item.title || '未命名菜单',
+          children: item.children && item.children.length > 0 ? processMenuItems(item.children) : undefined
+        }
+      })
+  }
+  
+  const result = processMenuItems(menuResponse.value.data)
+  // console.log('处理后的菜单项:', result)
+  return result
+})
 
 // 展开状态管理
 const expandedItems = ref<Set<string>>(new Set())
@@ -135,7 +101,41 @@ onMounted(() => {
 
     <!-- 菜单区域 -->
     <nav class="flex-1 overflow-y-auto py-4">
-      <ul class="space-y-1 px-3">
+      <!-- 加载状态 -->
+      <div v-if="menuLoading" class="px-3">
+        <div class="space-y-2">
+          <div v-for="i in 5" :key="i" class="animate-pulse">
+            <div class="flex items-center space-x-3 px-3 py-2">
+              <div class="w-5 h-5 bg-gray-200 rounded"></div>
+              <div class="h-4 bg-gray-200 rounded flex-1"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 错误状态 -->
+      <div v-else-if="menuError" class="px-3">
+        <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+          <div class="flex items-center space-x-2 text-red-700 mb-2">
+            <UIcon name="i-heroicons-exclamation-triangle" class="w-5 h-5" />
+            <span class="font-medium">菜单加载失败</span>
+          </div>
+          <p class="text-sm text-red-600 mb-3">无法加载菜单数据，请检查网络连接。</p>
+          <UButton @click="() => refreshMenus()" size="xs" color="error" variant="soft">
+            重新加载
+          </UButton>
+        </div>
+      </div>
+      
+      <!-- 菜单列表 -->
+      <ul v-else class="space-y-1 px-3">
+        <!-- 调试信息 -->
+        <li class="bg-yellow-50 p-2 mb-2 rounded text-xs">
+          <div>菜单项数量: {{ menuItems.length }}</div>
+          <div v-if="menuItems.length === 0" class="text-red-500">
+            警告: 没有菜单项可显示
+          </div>
+        </li>
         <li v-for="item in menuItems" :key="item.id">
           <!-- 有子菜单的项目 -->
           <div v-if="item.children">
