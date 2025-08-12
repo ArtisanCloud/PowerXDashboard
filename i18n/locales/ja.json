@@ -1,94 +1,110 @@
 {
   "welcome": "ようこそ",
-  "home": "ホーム",
-  "profile": "プロフィール",
   "login": "ログイン",
   "register": "登録",
-  "logout": "ログアウト",
-  "email": "メールアドレス",
-  "password": "パスワード",
-  "username": "ユーザー名",
-  "confirmPassword": "パスワード確認",
-  "remember": "ログイン状態を保持",
-  "forgot": "パスワードを忘れた？",
-  "submit": "送信",
-  "cancel": "キャンセル",
-  "loading": "読み込み中...",
-  "success": "成功",
-  "error": "エラー",
-  "backToHome": "ホームに戻る",
-  "welcomeBack": "おかえりなさい",
-  "loginSubtitle": "アカウントにサインインして続行",
-  "createAccount": "アカウント作成",
-  "registerSubtitle": "PowerXに参加して効率的な管理を始めましょう",
-  "signingIn": "サインイン中...",
-  "creatingAccount": "アカウント作成中...",
-  "noAccount": "アカウントをお持ちでない方",
-  "hasAccount": "既にアカウントをお持ちの方",
-  "signUpNow": "今すぐ登録",
-  "signInNow": "今すぐサインイン",
-  "agreeTerms": "以下に同意します",
-  "termsOfService": "利用規約",
-  "privacyPolicy": "プライバシーポリシー",
-  "and": "と",
-  "required": "この項目は必須です",
-  "invalidEmail": "有効なメールアドレスを入力してください",
-  "passwordTooShort": "パスワードは6文字以上である必要があります",
-  "passwordMismatch": "パスワードが一致しません",
-  "mustAgreeTerms": "利用規約とプライバシーポリシーに同意してください",
-  "loginFailed": "ログインに失敗しました。認証情報を確認してください",
-  "registerFailed": "登録に失敗しました。後でもう一度お試しください",
-  "registerSuccess": "登録が完了しました！",
-  "redirectingToLogin": "ログインページにリダイレクトしています...",
-  "passwordStrength": {
-    "weak": "弱い",
-    "medium": "普通",
-    "strong": "強い"
+  "common": {
+    "language": "言語",
+    "reload": "再読み込み"
+  },
+  "user": {
+    "admin": "管理者"
+  },
+  "dashboard": {
+    "title": "ダッシュボード",
+    "description": "システム概要と主要指標",
+    "stats": {
+      "totalUsers": "総ユーザー数",
+      "todayVisits": "本日の訪問",
+      "totalRevenue": "総収入",
+      "activeUsers": "アクティブユーザー",
+      "vsLastMonth": "vs 先月"
+    },
+    "charts": {
+      "visitTrend": "訪問傾向",
+      "chartArea": "チャートエリア",
+      "integration": "ここにChart.jsなどのチャートライブラリを統合できます"
+    },
+    "activities": {
+      "title": "最近のアクティビティ",
+      "viewAll": "すべてのアクティビティを表示",
+      "users": {
+        "zhangsan": "張三",
+        "lisi": "李四",
+        "wangwu": "王五"
+      },
+      "actions": {
+        "createArticle": "新しい記事を作成しました",
+        "updateProfile": "ユーザープロフィールを更新しました",
+        "deleteComment": "コメントを削除しました"
+      },
+      "targets": {
+        "vueBestPractices": "「Vue 3 ベストプラクティス」",
+        "onTechShare": "「技術共有」で"
+      },
+      "times": {
+        "minutesAgo": "{minutes}分前"
+      }
+    },
+    "quickActions": {
+      "title": "クイックアクション",
+      "addUser": "ユーザー追加",
+      "createArticle": "記事作成",
+      "viewAnalytics": "分析を表示",
+      "systemSettings": "システム設定"
+    },
+    "common": {
+      "viewDetails": "詳細を表示"
+    }
   },
   "home": {
-    "title": "PowerX 管理システム",
-    "subtitle": "効率的で知的、安全なビジネス管理のための次世代企業管理プラットフォーム",
-    "dashboardDesc": "効率的なビジネス管理とデータ洞察のための包括的なダッシュボード概要",
+    "subtitle": "現代的な企業管理システムで、あなたのビジネスを飛躍させます",
     "learnMore": "詳細を見る",
-    "getStarted": "今すぐ始める",
-    "footer": "管理をより簡単に、ビジネスをより効率的に"
+    "dashboardDesc": "現代的な管理インターフェース",
+    "footer": "全著作権所有"
+  },
+  "menu": {
+    "dashboard": "ダッシュボード",
+    "customers": "顧客管理",
+    "customerList": "顧客リスト",
+    "customerGroups": "顧客グループ",
+    "products": "製品管理",
+    "productList": "製品リスト",
+    "productCategories": "製品カテゴリ",
+    "orders": "注文管理",
+    "settings": "システム設定",
+    "userManagement": "ユーザー管理",
+    "roleManagement": "役割管理",
+    "systemConfig": "システム構成",
+    "loadFailed": "メニュー読み込み失敗",
+    "loadFailedDesc": "メニューデータを読み込めません。ネットワーク接続を確認してください。",
+    "itemCount": "メニュー項目数",
+    "noItemsWarning": "警告：表示するメニュー項目がありません",
+    "badge": {
+      "new": "新着"
+    }
   },
   "intro": {
-    "nav": {
-      "features": "機能",
-      "products": "製品",
-      "about": "会社概要"
-    },
-    "hero": {
-      "welcomeTo": "ようこそ",
-      "dashboardPreview": "モダンな管理インターフェースプレビュー"
-    },
     "features": {
-      "title": "なぜPowerXを選ぶのか？",
-      "subtitle": "最先端の技術と心のこもったサービスで、ビジネス管理を倍効率化",
       "performance": {
         "title": "高性能",
-        "description": "最適化されたアーキテクチャ設計により、システムの高速応答を保証"
+        "description": "Nuxt 4をベースに構築され、究極のパフォーマンス体験を提供"
       },
       "design": {
         "title": "モダンデザイン",
-        "description": "シンプルで美しいインターフェースでユーザー体験を向上"
+        "description": "最新のUIデザインコンセプトを採用し、シンプルで美しいインターフェース"
       },
       "usability": {
         "title": "使いやすさ",
-        "description": "直感的な操作フローで学習コストを削減"
+        "description": "直感的な操作インターフェースで、管理をより簡単に"
       },
       "security": {
         "title": "安全で信頼性",
-        "description": "企業レベルのセキュリティ保護でデータを守る"
+        "description": "エンタープライズレベルのセキュリティ保証、データの安全性を確保"
       }
     },
     "products": {
-      "title": "私たちの製品",
-      "subtitle": "さまざまなビジネスニーズに対応する包括的なソリューション",
-      "learnMore": "詳細を見る",
       "admin": {
-        "description": "包括的なバックエンド管理システム",
+        "description": "企業のデジタル変革を支援する強力なバックエンド管理システム",
         "features": {
           "userManagement": "ユーザー管理",
           "permissionControl": "権限制御",
@@ -97,16 +113,16 @@
         }
       },
       "analytics": {
-        "description": "強力なデータ分析プラットフォーム",
+        "description": "ビジネス成長の機会を発見するインテリジェントデータ分析プラットフォーム",
         "features": {
           "realTimeAnalysis": "リアルタイム分析",
-          "visualReports": "視覚的レポート",
+          "visualReports": "視覚化レポート",
           "predictiveModels": "予測モデル",
           "customDashboard": "カスタムダッシュボード"
         }
       },
       "cloud": {
-        "description": "スケーラブルなクラウドソリューション",
+        "description": "クラウドソリューション、いつでもどこでもデータにアクセス",
         "features": {
           "cloudStorage": "クラウドストレージ",
           "multiDeviceSync": "マルチデバイス同期",
@@ -114,67 +130,6 @@
           "support247": "24時間365日サポート"
         }
       }
-    },
-    "about": {
-      "title": "PowerXについて",
-      "subtitle": "私たちは企業に最先端の管理ソリューションを提供し、すべての企業がデジタル変革の利便性を享受できるよう取り組んでいます",
-      "mission": {
-        "title": "私たちの使命",
-        "paragraph1": "PowerXは2024年に設立され、中小企業から大企業まで包括的なデジタル管理ソリューションの提供に特化しています。私たちは、技術は管理をより複雑にするのではなく、よりシンプルにするべきだと信じています。",
-        "paragraph2": "継続的な技術革新とユーザー体験の最適化により、私たちは1,000社以上の企業のデジタル変革を支援し、運営効率と競争力の向上を実現しました。",
-        "paragraph3": "私たちのチームは世界各地の優秀なエンジニア、デザイナー、プロダクトマネージャーで構成され、最高の企業管理プラットフォームの構築に共同で取り組んでいます。"
-      },
-      "stats": {
-        "companies": "サービス企業数",
-        "users": "アクティブユーザー",
-        "uptime": "システム稼働率"
-      },
-      "enterprise": {
-        "title": "エンタープライズソリューション",
-        "description": "安全・安定・拡張可能"
-      },
-      "values": {
-        "title": "私たちの価値観",
-        "innovation": {
-          "title": "イノベーション主導",
-          "description": "継続的なイノベーションで技術による業界の進歩を推進"
-        },
-        "userFirst": {
-          "title": "ユーザー第一",
-          "description": "ユーザーのニーズを中心に、最高の体験を提供"
-        },
-        "excellence": {
-          "title": "卓越性の追求",
-          "description": "完璧を求め、業界標準となる製品を創造"
-        }
-      }
-    },
-    "footer": {
-      "aboutUs": "会社概要",
-      "contactUs": "お問い合わせ",
-      "copyright": "© 2024 PowerX. All rights reserved."
     }
-  },
-  "menu": {
-    "dashboard": "ダッシュボード",
-    "users": "ユーザー管理",
-    "userList": "ユーザー一覧",
-    "userRoles": "ユーザー権限",
-    "content": "コンテンツ管理",
-    "articles": "記事管理",
-    "categories": "カテゴリ管理",
-    "analytics": "データ分析",
-    "settings": "システム設定",
-    "systemSettings": "システム構成",
-    "security": "セキュリティ設定"
-  },
-  "header": {
-    "dashboard": "ダッシュボード",
-    "profile": "プロフィール",
-    "settings": "設定",
-    "logout": "ログアウト",
-    "searchPlaceholder": "ユーザー、コンテンツを検索...",
-    "searchSuggestions": "検索候補",
-    "create": "新規作成"
   }
 }

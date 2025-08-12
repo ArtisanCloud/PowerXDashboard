@@ -1,94 +1,110 @@
 {
-  "welcome": "Welcome",
-  "home": "Home",
-  "profile": "Profile",
+  "welcome": "Welcome to",
   "login": "Login",
   "register": "Register",
-  "logout": "Logout",
-  "email": "Email Address",
-  "password": "Password",
-  "username": "Username",
-  "confirmPassword": "Confirm Password",
-  "remember": "Remember me",
-  "forgot": "Forgot password?",
-  "submit": "Submit",
-  "cancel": "Cancel",
-  "loading": "Loading...",
-  "success": "Success",
-  "error": "Error",
-  "backToHome": "Back to Home",
-  "welcomeBack": "Welcome Back",
-  "loginSubtitle": "Sign in to your account to continue",
-  "createAccount": "Create Account",
-  "registerSubtitle": "Join PowerX and start your efficient management journey",
-  "signingIn": "Signing in...",
-  "creatingAccount": "Creating account...",
-  "noAccount": "Don't have an account?",
-  "hasAccount": "Already have an account?",
-  "signUpNow": "Sign up now",
-  "signInNow": "Sign in now",
-  "agreeTerms": "I have read and agree to the",
-  "termsOfService": "Terms of Service",
-  "privacyPolicy": "Privacy Policy",
-  "and": "and",
-  "required": "This field is required",
-  "invalidEmail": "Please enter a valid email address",
-  "passwordTooShort": "Password must be at least 6 characters",
-  "passwordMismatch": "Passwords do not match",
-  "mustAgreeTerms": "Please agree to the Terms of Service and Privacy Policy",
-  "loginFailed": "Login failed, please check your credentials",
-  "registerFailed": "Registration failed, please try again later",
-  "registerSuccess": "Registration successful!",
-  "redirectingToLogin": "Redirecting to login page...",
-  "passwordStrength": {
-    "weak": "Weak",
-    "medium": "Medium",
-    "strong": "Strong"
+  "common": {
+    "language": "Language",
+    "reload": "Reload"
+  },
+  "user": {
+    "admin": "Administrator"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "description": "System overview and key metrics",
+    "stats": {
+      "totalUsers": "Total Users",
+      "todayVisits": "Today's Visits",
+      "totalRevenue": "Total Revenue",
+      "activeUsers": "Active Users",
+      "vsLastMonth": "vs Last Month"
+    },
+    "charts": {
+      "visitTrend": "Visit Trend",
+      "chartArea": "Chart Area",
+      "integration": "You can integrate Chart.js or other chart libraries here"
+    },
+    "activities": {
+      "title": "Recent Activities",
+      "viewAll": "View All Activities",
+      "users": {
+        "zhangsan": "Zhang San",
+        "lisi": "Li Si",
+        "wangwu": "Wang Wu"
+      },
+      "actions": {
+        "createArticle": "created a new article",
+        "updateProfile": "updated user profile",
+        "deleteComment": "deleted a comment"
+      },
+      "targets": {
+        "vueBestPractices": "'Vue 3 Best Practices'",
+        "onTechShare": "on 'Tech Share'"
+      },
+      "times": {
+        "minutesAgo": "{minutes} minutes ago"
+      }
+    },
+    "quickActions": {
+      "title": "Quick Actions",
+      "addUser": "Add User",
+      "createArticle": "Create Article",
+      "viewAnalytics": "View Analytics",
+      "systemSettings": "System Settings"
+    },
+    "common": {
+      "viewDetails": "View Details"
+    }
   },
   "home": {
-    "title": "PowerX Management System",
-    "subtitle": "Next-generation enterprise management platform for efficient, intelligent, and secure business management",
-    "dashboardDesc": "Comprehensive dashboard overview for efficient business management and data insights",
+    "subtitle": "Modern enterprise management system to help your business soar",
     "learnMore": "Learn More",
-    "getStarted": "Get Started",
-    "footer": "Making management simpler, making business more efficient"
+    "dashboardDesc": "Modern management interface",
+    "footer": "All rights reserved"
+  },
+  "menu": {
+    "dashboard": "Dashboard",
+    "customers": "Customer Management",
+    "customerList": "Customer List",
+    "customerGroups": "Customer Groups",
+    "products": "Product Management",
+    "productList": "Product List",
+    "productCategories": "Product Categories",
+    "orders": "Order Management",
+    "settings": "System Settings",
+    "userManagement": "User Management",
+    "roleManagement": "Role Management",
+    "systemConfig": "System Configuration",
+    "loadFailed": "Menu Loading Failed",
+    "loadFailedDesc": "Unable to load menu data, please check your network connection.",
+    "itemCount": "Menu Item Count",
+    "noItemsWarning": "Warning: No menu items to display",
+    "badge": {
+      "new": "New"
+    }
   },
   "intro": {
-    "nav": {
-      "features": "Features",
-      "products": "Products",
-      "about": "About"
-    },
-    "hero": {
-      "welcomeTo": "Welcome to",
-      "dashboardPreview": "Modern management interface preview"
-    },
     "features": {
-      "title": "Why Choose PowerX?",
-      "subtitle": "We provide the most advanced technology and thoughtful service to make your business management twice as effective",
       "performance": {
         "title": "High Performance",
-        "description": "Optimized architecture design ensures fast system response"
+        "description": "Built on Nuxt 4, providing ultimate performance experience"
       },
       "design": {
         "title": "Modern Design",
-        "description": "Clean and beautiful interface enhances user experience"
+        "description": "Adopting the latest UI design concepts, clean and beautiful interface"
       },
       "usability": {
         "title": "Easy to Use",
-        "description": "Intuitive workflow reduces learning costs"
+        "description": "Intuitive interface makes management simpler"
       },
       "security": {
         "title": "Secure & Reliable",
-        "description": "Enterprise-grade security protection for your data"
+        "description": "Enterprise-level security guarantee, data safety assured"
       }
     },
     "products": {
-      "title": "Our Products",
-      "subtitle": "Comprehensive solutions to meet your different business needs",
-      "learnMore": "Learn More",
       "admin": {
-        "description": "Comprehensive backend management system",
+        "description": "Powerful backend management system for enterprise digital transformation",
         "features": {
           "userManagement": "User Management",
           "permissionControl": "Permission Control",
@@ -97,7 +113,7 @@
         }
       },
       "analytics": {
-        "description": "Powerful data analytics platform",
+        "description": "Intelligent data analysis platform to discover business growth opportunities",
         "features": {
           "realTimeAnalysis": "Real-time Analysis",
           "visualReports": "Visual Reports",
@@ -106,7 +122,7 @@
         }
       },
       "cloud": {
-        "description": "Scalable cloud solutions",
+        "description": "Cloud solution, access your data anytime, anywhere",
         "features": {
           "cloudStorage": "Cloud Storage",
           "multiDeviceSync": "Multi-device Sync",
@@ -114,67 +130,6 @@
           "support247": "24/7 Support"
         }
       }
-    },
-    "about": {
-      "title": "About PowerX",
-      "subtitle": "We are committed to providing enterprises with the most advanced management solutions, allowing every enterprise to enjoy the convenience brought by digital transformation",
-      "mission": {
-        "title": "Our Mission",
-        "paragraph1": "PowerX was founded in 2024, focusing on providing comprehensive digital management solutions for small and medium enterprises and large enterprises. We believe that technology should make management simpler, not more complex.",
-        "paragraph2": "Through continuous technological innovation and user experience optimization, we have helped more than 1,000 enterprises achieve digital transformation and improve their operational efficiency and competitiveness.",
-        "paragraph3": "Our team consists of excellent engineers, designers and product managers from all over the world, working together to create the best enterprise management platform."
-      },
-      "stats": {
-        "companies": "Companies Served",
-        "users": "Active Users",
-        "uptime": "System Uptime"
-      },
-      "enterprise": {
-        "title": "Enterprise Solutions",
-        "description": "Secure, Stable, Scalable"
-      },
-      "values": {
-        "title": "Our Values",
-        "innovation": {
-          "title": "Innovation Driven",
-          "description": "Continuous innovation, using technology to drive industry progress"
-        },
-        "userFirst": {
-          "title": "User First",
-          "description": "User-centered, providing the best experience"
-        },
-        "excellence": {
-          "title": "Pursuit of Excellence",
-          "description": "Striving for perfection, creating industry benchmark products"
-        }
-      }
-    },
-    "footer": {
-      "aboutUs": "About Us",
-      "contactUs": "Contact Us",
-      "copyright": "© 2024 PowerX. All rights reserved."
     }
-  },
-  "menu": {
-    "dashboard": "Dashboard",
-    "users": "User Management",
-    "userList": "User List",
-    "userRoles": "User Roles",
-    "content": "Content Management",
-    "articles": "Articles",
-    "categories": "Categories",
-    "analytics": "Analytics",
-    "settings": "Settings",
-    "systemSettings": "System Settings",
-    "security": "Security"
-  },
-  "header": {
-    "dashboard": "Dashboard",
-    "profile": "Profile",
-    "settings": "Settings",
-    "logout": "Logout",
-    "searchPlaceholder": "Search users, content...",
-    "searchSuggestions": "Search Suggestions",
-    "create": "Create"
   }
 }

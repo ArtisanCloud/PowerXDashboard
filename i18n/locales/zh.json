@@ -1,94 +1,110 @@
 {
-  "welcome": "欢迎",
-  "home": "首页",
-  "profile": "个人资料",
+  "welcome": "欢迎使用",
   "login": "登录",
   "register": "注册",
-  "logout": "退出登录",
-  "email": "邮箱地址",
-  "password": "密码",
-  "username": "用户名",
-  "confirmPassword": "确认密码",
-  "remember": "记住我",
-  "forgot": "忘记密码？",
-  "submit": "提交",
-  "cancel": "取消",
-  "loading": "加载中...",
-  "success": "成功",
-  "error": "错误",
-  "backToHome": "返回首页",
-  "welcomeBack": "欢迎回来",
-  "loginSubtitle": "登录您的账户继续使用",
-  "createAccount": "创建账户",
-  "registerSubtitle": "加入PowerX，开启高效管理之旅",
-  "signingIn": "登录中...",
-  "creatingAccount": "注册中...",
-  "noAccount": "还没有账户？",
-  "hasAccount": "已有账户？",
-  "signUpNow": "立即注册",
-  "signInNow": "立即登录",
-  "agreeTerms": "我已阅读并同意",
-  "termsOfService": "服务条款",
-  "privacyPolicy": "隐私政策",
-  "and": "和",
-  "required": "此字段为必填项",
-  "invalidEmail": "请输入有效的邮箱地址",
-  "passwordTooShort": "密码长度至少6位",
-  "passwordMismatch": "两次输入的密码不一致",
-  "mustAgreeTerms": "请同意服务条款和隐私政策",
-  "loginFailed": "登录失败，请检查用户名和密码",
-  "registerFailed": "注册失败，请稍后重试",
-  "registerSuccess": "注册成功！",
-  "redirectingToLogin": "正在跳转到登录页面...",
-  "passwordStrength": {
-    "weak": "弱",
-    "medium": "中等",
-    "strong": "强"
+  "common": {
+    "language": "语言",
+    "reload": "重新加载"
+  },
+  "user": {
+    "admin": "管理员"
+  },
+  "dashboard": {
+    "title": "仪表板",
+    "description": "系统概览和关键指标",
+    "stats": {
+      "totalUsers": "总用户数",
+      "todayVisits": "今日访问",
+      "totalRevenue": "总收入",
+      "activeUsers": "活跃用户",
+      "vsLastMonth": "vs 上月"
+    },
+    "charts": {
+      "visitTrend": "访问趋势",
+      "chartArea": "图表区域",
+      "integration": "这里可以集成 Chart.js 或其他图表库"
+    },
+    "activities": {
+      "title": "最近活动",
+      "viewAll": "查看所有活动",
+      "users": {
+        "zhangsan": "张三",
+        "lisi": "李四",
+        "wangwu": "王五"
+      },
+      "actions": {
+        "createArticle": "创建了新文章",
+        "updateProfile": "更新了用户资料",
+        "deleteComment": "删除了评论"
+      },
+      "targets": {
+        "vueBestPractices": "《Vue 3 最佳实践》",
+        "onTechShare": "在《技术分享》下"
+      },
+      "times": {
+        "minutesAgo": "{minutes}分钟前"
+      }
+    },
+    "quickActions": {
+      "title": "快速操作",
+      "addUser": "添加用户",
+      "createArticle": "创建文章",
+      "viewAnalytics": "查看分析",
+      "systemSettings": "系统设置"
+    },
+    "common": {
+      "viewDetails": "查看详情"
+    }
   },
   "home": {
-    "title": "PowerX 管理系统",
-    "subtitle": "新一代企业级管理平台，让您的业务管理更加高效、智能、安全",
-    "dashboardDesc": "全面的仪表板概览，助力高效业务管理和数据洞察",
+    "subtitle": "现代化的企业级管理系统，助力您的业务腾飞",
     "learnMore": "了解更多",
-    "getStarted": "立即开始",
-    "footer": "让管理更简单，让业务更高效"
+    "dashboardDesc": "现代化的管理界面",
+    "footer": "保留所有权利"
+  },
+  "menu": {
+    "dashboard": "仪表盘",
+    "customers": "客户管理",
+    "customerList": "客户列表",
+    "customerGroups": "客户分组",
+    "products": "产品管理",
+    "productList": "产品列表",
+    "productCategories": "产品分类",
+    "orders": "订单管理",
+    "settings": "系统设置",
+    "userManagement": "用户管理",
+    "roleManagement": "角色管理",
+    "systemConfig": "系统配置",
+    "loadFailed": "菜单加载失败",
+    "loadFailedDesc": "无法加载菜单数据，请检查网络连接。",
+    "itemCount": "菜单项数量",
+    "noItemsWarning": "警告: 没有菜单项可显示",
+    "badge": {
+      "new": "新"
+    }
   },
   "intro": {
-    "nav": {
-      "features": "特性",
-      "products": "产品",
-      "about": "关于"
-    },
-    "hero": {
-      "welcomeTo": "欢迎来到",
-      "dashboardPreview": "现代化的管理界面预览"
-    },
     "features": {
-      "title": "为什么选择 PowerX？",
-      "subtitle": "我们提供最先进的技术和最贴心的服务，让您的业务管理事半功倍",
       "performance": {
         "title": "高性能",
-        "description": "优化的架构设计，确保系统快速响应"
+        "description": "基于 Nuxt 4 构建，提供极致的性能体验"
       },
       "design": {
         "title": "现代设计",
-        "description": "简洁美观的界面，提升用户体验"
+        "description": "采用最新的 UI 设计理念，界面简洁美观"
       },
       "usability": {
-        "title": "易用性",
-        "description": "直观的操作流程，降低学习成本"
+        "title": "易于使用",
+        "description": "直观的操作界面，让管理变得更加简单"
       },
       "security": {
         "title": "安全可靠",
-        "description": "企业级安全保障，保护您的数据"
+        "description": "企业级安全保障，数据安全有保证"
       }
     },
     "products": {
-      "title": "我们的产品",
-      "subtitle": "全方位的解决方案，满足您不同的业务需求",
-      "learnMore": "了解详情",
       "admin": {
-        "description": "全面的后台管理系统",
+        "description": "强大的后台管理系统，助力企业数字化转型",
         "features": {
           "userManagement": "用户管理",
           "permissionControl": "权限控制",
@@ -97,7 +113,7 @@
         }
       },
       "analytics": {
-        "description": "强大的数据分析平台",
+        "description": "智能数据分析平台，洞察业务增长机会",
         "features": {
           "realTimeAnalysis": "实时分析",
           "visualReports": "可视化报表",
@@ -106,75 +122,14 @@
         }
       },
       "cloud": {
-        "description": "可扩展的云端解决方案",
+        "description": "云端解决方案，随时随地访问您的数据",
         "features": {
           "cloudStorage": "云端存储",
-          "multiDeviceSync": "多设备同步",
+          "multiDeviceSync": "多端同步",
           "elasticScaling": "弹性扩展",
-          "support247": "7x24小时支持"
+          "support247": "7x24支持"
         }
       }
-    },
-    "about": {
-      "title": "关于 PowerX",
-      "subtitle": "我们致力于为企业提供最先进的管理解决方案，让每一个企业都能享受到数字化转型带来的便利",
-      "mission": {
-        "title": "我们的使命",
-        "paragraph1": "PowerX 成立于2024年，专注于为中小企业和大型企业提供全方位的数字化管理解决方案。我们相信技术应该让管理变得更简单，而不是更复杂。",
-        "paragraph2": "通过不断的技术创新和用户体验优化，我们已经帮助超过1000家企业实现了数字化转型，提升了他们的运营效率和竞争力。",
-        "paragraph3": "我们的团队由来自世界各地的优秀工程师、设计师和产品经理组成，共同致力于打造最好用的企业管理平台。"
-      },
-      "stats": {
-        "companies": "服务企业",
-        "users": "活跃用户",
-        "uptime": "系统稳定性"
-      },
-      "enterprise": {
-        "title": "企业级解决方案",
-        "description": "安全、稳定、可扩展"
-      },
-      "values": {
-        "title": "我们的价值观",
-        "innovation": {
-          "title": "创新驱动",
-          "description": "持续创新，用技术推动行业进步"
-        },
-        "userFirst": {
-          "title": "用户至上",
-          "description": "以用户需求为中心，提供最佳体验"
-        },
-        "excellence": {
-          "title": "追求卓越",
-          "description": "精益求精，打造行业标杆产品"
-        }
-      }
-    },
-    "footer": {
-      "aboutUs": "关于我们",
-      "contactUs": "联系我们",
-      "copyright": "© 2024 PowerX. All rights reserved."
     }
-  },
-  "menu": {
-    "dashboard": "仪表板",
-    "users": "用户管理",
-    "userList": "用户列表",
-    "userRoles": "用户角色",
-    "content": "内容管理",
-    "articles": "文章管理",
-    "categories": "分类管理",
-    "analytics": "数据分析",
-    "settings": "系统设置",
-    "systemSettings": "系统配置",
-    "security": "安全设置"
-  },
-  "header": {
-    "dashboard": "仪表板",
-    "profile": "个人资料",
-    "settings": "设置",
-    "logout": "退出登录",
-    "searchPlaceholder": "搜索用户、内容...",
-    "searchSuggestions": "搜索建议",
-    "create": "新建"
   }
 }

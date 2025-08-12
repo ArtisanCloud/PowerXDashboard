@@ -5,6 +5,7 @@ import { useMenuService, type MenuItem } from '~/composables/api/services/menuSe
 // 如果使用 Nuxt UI，这些组件应该已经全局注册
 // 如果没有，可能需要手动导入
 
+// 使用 i18n 进行菜单标题翻译
 const { t } = useI18n()
 const route = useRoute()
 const menuService = useMenuService()
@@ -22,9 +23,9 @@ const { data: menuResponse, pending: menuLoading, error: menuError, refresh: ref
 // 调试输出
 // console.log('菜单响应数据:', menuResponse.value)
 
-// 处理菜单数据，不使用翻译，直接显示原始标题
+// 处理菜单数据，使用 i18n 翻译菜单标题
 const menuItems = computed<MenuItem[]>(() => {
-  // console.log('计算菜单项，原始数据:', menuResponse.value)
+  console.log('计算菜单项，原始数据:', menuResponse.value)
   
   if (!menuResponse.value?.data) {
     console.log('菜单数据为空')
@@ -36,18 +37,30 @@ const menuItems = computed<MenuItem[]>(() => {
       .filter(item => item.visible !== false) // 确保即使 visible 未定义也会显示
       .sort((a, b) => (a.order || 0) - (b.order || 0)) // 防止 order 未定义
       .map(item => {
-        // console.log('处理菜单项:', item)
-        return {
+        console.log('处理菜单项:', item)
+        // 处理菜单项，翻译标题和 badge
+        const processedItem = {
           ...item,
-          // 直接使用原始标题，不进行翻译
-          title: item.title || '未命名菜单',
+          // 使用 i18n 翻译菜单标题
+          title: item.title ? t(item.title) : '未命名菜单',
+          // 如果 badge 是翻译键（以 menu. 开头），则翻译它
+          badge: item.badge && typeof item.badge === 'string' && item.badge.startsWith('menu.') 
+            ? t(item.badge) 
+            : item.badge,
           children: item.children && item.children.length > 0 ? processMenuItems(item.children) : undefined
+        };
+        
+        console.log('处理后的菜单项:', item.title, '→', processedItem.title);
+        if (item.badge) {
+          console.log('处理后的 badge:', item.badge, '→', processedItem.badge);
         }
+        
+        return processedItem;
       })
   }
   
   const result = processMenuItems(menuResponse.value.data)
-  // console.log('处理后的菜单项:', result)
+  console.log('处理后的菜单项:', result)
   return result
 })
 
@@ -118,11 +131,11 @@ onMounted(() => {
         <div class="bg-red-50 border border-red-200 rounded-lg p-4">
           <div class="flex items-center space-x-2 text-red-700 mb-2">
             <UIcon name="i-heroicons-exclamation-triangle" class="w-5 h-5" />
-            <span class="font-medium">菜单加载失败</span>
+            <span class="font-medium">{{ $t('menu.loadFailed') }}</span>
           </div>
-          <p class="text-sm text-red-600 mb-3">无法加载菜单数据，请检查网络连接。</p>
+          <p class="text-sm text-red-600 mb-3">{{ $t('menu.loadFailedDesc') }}</p>
           <UButton @click="() => refreshMenus()" size="xs" color="error" variant="soft">
-            重新加载
+            {{ $t('common.reload') }}
           </UButton>
         </div>
       </div>
@@ -130,10 +143,10 @@ onMounted(() => {
       <!-- 菜单列表 -->
       <ul v-else class="space-y-1 px-3">
         <!-- 调试信息 -->
-        <li class="bg-yellow-50 p-2 mb-2 rounded text-xs">
-          <div>菜单项数量: {{ menuItems.length }}</div>
-          <div v-if="menuItems.length === 0" class="text-red-500">
-            警告: 没有菜单项可显示
+        <li class="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-700 p-2 mb-2 rounded text-xs">
+          <div class="text-yellow-800 dark:text-yellow-200">{{ $t('menu.itemCount') }}: {{ menuItems.length }}</div>
+          <div v-if="menuItems.length === 0" class="text-red-600 dark:text-red-400">
+            {{ $t('menu.noItemsWarning') }}
           </div>
         </li>
         <li v-for="item in menuItems" :key="item.id">
@@ -219,7 +232,7 @@ onMounted(() => {
           <UIcon name="i-heroicons-user" class="w-5 h-5 text-gray-600" />
         </div>
         <div class="flex-1 min-w-0">
-          <p class="text-sm font-medium text-gray-900 truncate">管理员</p>
+          <p class="text-sm font-medium text-gray-900 truncate">{{ $t('user.admin') }}</p>
           <p class="text-xs text-gray-500 truncate">admin@powerx.com</p>
         </div>
       </div>

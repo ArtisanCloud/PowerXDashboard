@@ -1,94 +1,110 @@
 {
   "welcome": "환영합니다",
-  "home": "홈",
-  "profile": "프로필",
   "login": "로그인",
   "register": "회원가입",
-  "logout": "로그아웃",
-  "email": "이메일 주소",
-  "password": "비밀번호",
-  "username": "사용자명",
-  "confirmPassword": "비밀번호 확인",
-  "remember": "로그인 상태 유지",
-  "forgot": "비밀번호를 잊으셨나요?",
-  "submit": "제출",
-  "cancel": "취소",
-  "loading": "로딩 중...",
-  "success": "성공",
-  "error": "오류",
-  "backToHome": "홈으로 돌아가기",
-  "welcomeBack": "다시 오신 것을 환영합니다",
-  "loginSubtitle": "계속하려면 계정에 로그인하세요",
-  "createAccount": "계정 만들기",
-  "registerSubtitle": "PowerX에 가입하여 효율적인 관리를 시작하세요",
-  "signingIn": "로그인 중...",
-  "creatingAccount": "계정 생성 중...",
-  "noAccount": "계정이 없으신가요?",
-  "hasAccount": "이미 계정이 있으신가요?",
-  "signUpNow": "지금 가입하기",
-  "signInNow": "지금 로그인하기",
-  "agreeTerms": "다음에 동의합니다",
-  "termsOfService": "서비스 약관",
-  "privacyPolicy": "개인정보 처리방침",
-  "and": "및",
-  "required": "이 필드는 필수입니다",
-  "invalidEmail": "유효한 이메일 주소를 입력하세요",
-  "passwordTooShort": "비밀번호는 최소 6자 이상이어야 합니다",
-  "passwordMismatch": "비밀번호가 일치하지 않습니다",
-  "mustAgreeTerms": "서비스 약관 및 개인정보 처리방침에 동의해주세요",
-  "loginFailed": "로그인에 실패했습니다. 자격 증명을 확인하세요",
-  "registerFailed": "회원가입에 실패했습니다. 나중에 다시 시도하세요",
-  "registerSuccess": "회원가입이 완료되었습니다!",
-  "redirectingToLogin": "로그인 페이지로 이동 중...",
-  "passwordStrength": {
-    "weak": "약함",
-    "medium": "보통",
-    "strong": "강함"
+  "common": {
+    "language": "언어",
+    "reload": "새로고침"
+  },
+  "user": {
+    "admin": "관리자"
+  },
+  "dashboard": {
+    "title": "대시보드",
+    "description": "시스템 개요 및 주요 지표",
+    "stats": {
+      "totalUsers": "총 사용자 수",
+      "todayVisits": "오늘 방문",
+      "totalRevenue": "총 수익",
+      "activeUsers": "활성 사용자",
+      "vsLastMonth": "vs 지난달"
+    },
+    "charts": {
+      "visitTrend": "방문 추세",
+      "chartArea": "차트 영역",
+      "integration": "여기에 Chart.js 또는 다른 차트 라이브러리를 통합할 수 있습니다"
+    },
+    "activities": {
+      "title": "최근 활동",
+      "viewAll": "모든 활동 보기",
+      "users": {
+        "zhangsan": "장산",
+        "lisi": "리쓰",
+        "wangwu": "왕우"
+      },
+      "actions": {
+        "createArticle": "새 글을 작성했습니다",
+        "updateProfile": "사용자 프로필을 업데이트했습니다",
+        "deleteComment": "댓글을 삭제했습니다"
+      },
+      "targets": {
+        "vueBestPractices": "'Vue 3 모범 사례'",
+        "onTechShare": "'기술 공유'에서"
+      },
+      "times": {
+        "minutesAgo": "{minutes}분 전"
+      }
+    },
+    "quickActions": {
+      "title": "빠른 작업",
+      "addUser": "사용자 추가",
+      "createArticle": "글 작성",
+      "viewAnalytics": "분석 보기",
+      "systemSettings": "시스템 설정"
+    },
+    "common": {
+      "viewDetails": "세부 정보 보기"
+    }
   },
   "home": {
-    "title": "PowerX 관리 시스템",
-    "subtitle": "효율적이고 지능적이며 안전한 비즈니스 관리를 위한 차세대 기업 관리 플랫폼",
-    "dashboardDesc": "효율적인 비즈니스 관리와 데이터 인사이트를 위한 종합 대시보드 개요",
+    "subtitle": "현대적인 기업 관리 시스템으로 비즈니스의 성장을 도와드립니다",
     "learnMore": "자세히 보기",
-    "getStarted": "시작하기",
-    "footer": "관리를 더 간단하게, 비즈니스를 더 효율적으로"
+    "dashboardDesc": "현대적인 관리 인터페이스",
+    "footer": "모든 권리 보유"
+  },
+  "menu": {
+    "dashboard": "대시보드",
+    "customers": "고객 관리",
+    "customerList": "고객 목록",
+    "customerGroups": "고객 그룹",
+    "products": "제품 관리",
+    "productList": "제품 목록",
+    "productCategories": "제품 카테고리",
+    "orders": "주문 관리",
+    "settings": "시스템 설정",
+    "userManagement": "사용자 관리",
+    "roleManagement": "역할 관리",
+    "systemConfig": "시스템 구성",
+    "loadFailed": "메뉴 로딩 실패",
+    "loadFailedDesc": "메뉴 데이터를 로드할 수 없습니다. 네트워크 연결을 확인하세요.",
+    "itemCount": "메뉴 항목 수",
+    "noItemsWarning": "경고: 표시할 메뉴 항목이 없습니다",
+    "badge": {
+      "new": "신규"
+    }
   },
   "intro": {
-    "nav": {
-      "features": "기능",
-      "products": "제품",
-      "about": "회사소개"
-    },
-    "hero": {
-      "welcomeTo": "환영합니다",
-      "dashboardPreview": "현대적인 관리 인터페이스 미리보기"
-    },
     "features": {
-      "title": "왜 PowerX를 선택해야 할까요?",
-      "subtitle": "최첨단 기술과 세심한 서비스로 비즈니스 관리 효율성을 두 배로 향상",
       "performance": {
         "title": "고성능",
-        "description": "최적화된 아키텍처 설계로 시스템의 빠른 응답 보장"
+        "description": "Nuxt 4 기반으로 구축되어 최고의 성능 경험을 제공합니다"
       },
       "design": {
         "title": "모던 디자인",
-        "description": "깔끔하고 아름다운 인터페이스로 사용자 경험 향상"
+        "description": "최신 UI 디자인 개념을 채택하여 깔끔하고 아름다운 인터페이스"
       },
       "usability": {
-        "title": "사용 편의성",
-        "description": "직관적인 작업 흐름으로 학습 비용 절감"
+        "title": "사용하기 쉬움",
+        "description": "직관적인 조작 인터페이스로 관리를 더욱 간단하게"
       },
       "security": {
-        "title": "안전하고 신뢰할 수 있는",
-        "description": "기업급 보안 보호로 데이터를 안전하게 보호"
+        "title": "안전하고 신뢰할 수 있음",
+        "description": "기업급 보안 보장, 데이터 안전성 확보"
       }
     },
     "products": {
-      "title": "우리의 제품",
-      "subtitle": "다양한 비즈니스 요구사항을 충족하는 종합 솔루션",
-      "learnMore": "자세히 보기",
       "admin": {
-        "description": "포괄적인 백엔드 관리 시스템",
+        "description": "기업의 디지털 전환을 지원하는 강력한 백엔드 관리 시스템",
         "features": {
           "userManagement": "사용자 관리",
           "permissionControl": "권한 제어",
@@ -97,84 +113,23 @@
         }
       },
       "analytics": {
-        "description": "강력한 데이터 분석 플랫폼",
+        "description": "비즈니스 성장 기회를 발견하는 지능형 데이터 분석 플랫폼",
         "features": {
           "realTimeAnalysis": "실시간 분석",
-          "visualReports": "시각적 보고서",
+          "visualReports": "시각화 보고서",
           "predictiveModels": "예측 모델",
           "customDashboard": "사용자 정의 대시보드"
         }
       },
       "cloud": {
-        "description": "확장 가능한 클라우드 솔루션",
+        "description": "클라우드 솔루션, 언제 어디서나 데이터에 액세스",
         "features": {
           "cloudStorage": "클라우드 스토리지",
-          "multiDeviceSync": "다중 기기 동기화",
+          "multiDeviceSync": "멀티 디바이스 동기화",
           "elasticScaling": "탄력적 확장",
           "support247": "24시간 지원"
         }
       }
-    },
-    "about": {
-      "title": "PowerX 소개",
-      "subtitle": "우리는 기업에게 가장 앞선 관리 솔루션을 제공하여 모든 기업이 디지털 전환의 편리함을 누릴 수 있도록 노력하고 있습니다",
-      "mission": {
-        "title": "우리의 사명",
-        "paragraph1": "PowerX는 2024년에 설립되어 중소기업부터 대기업까지 포괄적인 디지털 관리 솔루션 제공에 전념하고 있습니다. 우리는 기술이 관리를 더 복잡하게 만드는 것이 아니라 더 간단하게 만들어야 한다고 믿습니다.",
-        "paragraph2": "지속적인 기술 혁신과 사용자 경험 최적화를 통해 1,000개 이상의 기업이 디지털 전환을 달성하고 운영 효율성과 경쟁력을 향상시킬 수 있도록 도왔습니다.",
-        "paragraph3": "우리 팀은 전 세계의 우수한 엔지니어, 디자이너, 제품 관리자들로 구성되어 최고의 기업 관리 플랫폼을 구축하기 위해 함께 노력하고 있습니다."
-      },
-      "stats": {
-        "companies": "서비스 기업",
-        "users": "활성 사용자",
-        "uptime": "시스템 가동률"
-      },
-      "enterprise": {
-        "title": "엔터프라이즈 솔루션",
-        "description": "안전하고 안정적이며 확장 가능"
-      },
-      "values": {
-        "title": "우리의 가치관",
-        "innovation": {
-          "title": "혁신 주도",
-          "description": "지속적인 혁신으로 기술을 통한 업계 발전 추진"
-        },
-        "userFirst": {
-          "title": "사용자 우선",
-          "description": "사용자 요구를 중심으로 최고의 경험 제공"
-        },
-        "excellence": {
-          "title": "우수성 추구",
-          "description": "완벽을 추구하며 업계 표준 제품 창조"
-        }
-      }
-    },
-    "footer": {
-      "aboutUs": "회사소개",
-      "contactUs": "문의하기",
-      "copyright": "© 2024 PowerX. All rights reserved."
     }
-  },
-  "menu": {
-    "dashboard": "대시보드",
-    "users": "사용자 관리",
-    "userList": "사용자 목록",
-    "userRoles": "사용자 권한",
-    "content": "콘텐츠 관리",
-    "articles": "게시글 관리",
-    "categories": "카테고리 관리",
-    "analytics": "데이터 분석",
-    "settings": "시스템 설정",
-    "systemSettings": "시스템 구성",
-    "security": "보안 설정"
-  },
-  "header": {
-    "dashboard": "대시보드",
-    "profile": "프로필",
-    "settings": "설정",
-    "logout": "로그아웃",
-    "searchPlaceholder": "사용자, 콘텐츠 검색...",
-    "searchSuggestions": "검색 제안",
-    "create": "새로 만들기"
   }
 }

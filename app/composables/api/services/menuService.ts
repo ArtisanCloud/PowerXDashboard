@@ -51,11 +51,11 @@ export const useMenuService = () => {
      * 获取用户菜单（根据权限过滤）
      */
     getUserMenus: () => {
-      // 模拟菜单数据，用于前端开发测试
+      // 模拟菜单数据，使用翻译键而不是直接的中文文本
       const mockMenuData: MenuItem[] = [
         {
           id: 'dashboard',
-          title: '仪表盘',
+          title: 'menu.dashboard',
           icon: 'i-heroicons-home',
           path: '/dashboard',
           order: 1,
@@ -63,14 +63,14 @@ export const useMenuService = () => {
         },
         {
           id: 'customers',
-          title: '客户管理',
+          title: 'menu.customers',
           icon: 'i-heroicons-users',
           order: 2,
           visible: true,
           children: [
             {
               id: 'customer-list',
-              title: '客户列表',
+              title: 'menu.customerList',
               icon: 'i-heroicons-list-bullet',
               path: '/customers',
               order: 1,
@@ -79,7 +79,7 @@ export const useMenuService = () => {
             },
             {
               id: 'customer-groups',
-              title: '客户分组',
+              title: 'menu.customerGroups',
               icon: 'i-heroicons-user-group',
               path: '/customer-groups',
               order: 2,
@@ -90,14 +90,14 @@ export const useMenuService = () => {
         },
         {
           id: 'products',
-          title: '产品管理',
+          title: 'menu.products',
           icon: 'i-heroicons-cube',
           order: 3,
           visible: true,
           children: [
             {
               id: 'product-list',
-              title: '产品列表',
+              title: 'menu.productList',
               icon: 'i-heroicons-squares-2x2',
               path: '/products',
               order: 1,
@@ -106,7 +106,7 @@ export const useMenuService = () => {
             },
             {
               id: 'product-categories',
-              title: '产品分类',
+              title: 'menu.productCategories',
               icon: 'i-heroicons-tag',
               path: '/product-categories',
               order: 2,
@@ -117,23 +117,23 @@ export const useMenuService = () => {
         },
         {
           id: 'orders',
-          title: '订单管理',
+          title: 'menu.orders',
           icon: 'i-heroicons-shopping-cart',
           path: '/orders',
           order: 4,
           visible: true,
-          badge: '新'
+          badge: 'menu.badge.new'
         },
         {
           id: 'settings',
-          title: '系统设置',
+          title: 'menu.settings',
           icon: 'i-heroicons-cog-6-tooth',
           order: 5,
           visible: true,
           children: [
             {
               id: 'user-management',
-              title: '用户管理',
+              title: 'menu.userManagement',
               icon: 'i-heroicons-user',
               path: '/settings/users',
               order: 1,
@@ -142,7 +142,7 @@ export const useMenuService = () => {
             },
             {
               id: 'role-management',
-              title: '角色管理',
+              title: 'menu.roleManagement',
               icon: 'i-heroicons-shield-check',
               path: '/settings/roles',
               order: 2,
@@ -151,7 +151,7 @@ export const useMenuService = () => {
             },
             {
               id: 'system-config',
-              title: '系统配置',
+              title: 'menu.systemConfig',
               icon: 'i-heroicons-wrench-screwdriver',
               path: '/settings/config',
               order: 3,
