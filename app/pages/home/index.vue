@@ -74,7 +74,7 @@ onMounted(() => {
               :to="$localePath('/dashboard')"
               class="px-8 py-4 text-lg bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-lg transition-all text-center"
             >
-              马上开始
+              {{ $t('home.getStarted') }}
             </NuxtLink>
             <NuxtLink 
               :to="$localePath('/home/intro')"
