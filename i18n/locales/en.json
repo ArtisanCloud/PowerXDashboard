@@ -59,6 +59,7 @@
   "home": {
     "subtitle": "Modern enterprise management system to help your business soar",
     "learnMore": "Learn More",
+    "getStarted": "Get Started",
     "dashboardDesc": "Modern management interface",
     "footer": "All rights reserved"
   },
@@ -83,8 +84,26 @@
       "new": "New"
     }
   },
+  "header": {
+    "profile": "Profile",
+    "settings": "Settings",
+    "logout": "Logout",
+    "searchPlaceholder": "Search users, content...",
+    "searchSuggestions": "Search Suggestions"
+  },
   "intro": {
+    "nav": {
+      "features": "Features",
+      "products": "Products",
+      "about": "About"
+    },
+    "hero": {
+      "welcomeTo": "Welcome to",
+      "dashboardPreview": "Modern management interface"
+    },
     "features": {
+      "title": "Core Features",
+      "subtitle": "We provide comprehensive enterprise solutions to help your business grow",
       "performance": {
         "title": "High Performance",
         "description": "Built on Nuxt 4, providing ultimate performance experience"
@@ -103,6 +122,9 @@
       }
     },
     "products": {
+      "title": "Product Suite",
+      "subtitle": "Complete enterprise product ecosystem to meet different business needs",
+      "learnMore": "Learn More",
       "admin": {
         "description": "Powerful backend management system for enterprise digital transformation",
         "features": {
@@ -130,6 +152,47 @@
           "support247": "24/7 Support"
         }
       }
+    },
+    "about": {
+      "title": "About Us",
+      "subtitle": "We are committed to providing the best digital solutions for enterprises",
+      "mission": {
+        "title": "Our Mission",
+        "paragraph1": "PowerX is dedicated to providing the most advanced digital management solutions for enterprises. We believe in the power of technology to transform how businesses operate, improve efficiency, and create value.",
+        "paragraph2": "Through continuous innovation and optimization, we provide stable, secure, and user-friendly product experiences for our customers. Our team consists of experienced engineers and designers focused on creating world-class enterprise software.",
+        "paragraph3": "We always adhere to a customer-centric philosophy, listening to customer needs, continuously improving our products, and working hard for our customers' success."
+      },
+      "stats": {
+        "companies": "Enterprise Clients",
+        "users": "Active Users",
+        "uptime": "System Availability"
+      },
+      "enterprise": {
+        "title": "Enterprise Solutions",
+        "description": "Professional solutions tailored for large enterprises"
+      },
+      "values": {
+        "title": "Our Values",
+        "innovation": {
+          "title": "Continuous Innovation",
+          "description": "Constantly exploring new technologies to provide cutting-edge solutions"
+        },
+        "userFirst": {
+          "title": "User First",
+          "description": "Always user-oriented, providing the best product experience"
+        },
+        "excellence": {
+          "title": "Pursuit of Excellence",
+          "description": "Never compromise on product quality and service level, pursuing perfection"
+        }
+      }
+    },
+    "footer": {
+      "aboutUs": "About Us",
+      "contactUs": "Contact Us",
+      "copyright": "© 2024 PowerX. All rights reserved."
     }
-  }
+  },
+  "privacyPolicy": "Privacy Policy",
+  "termsOfService": "Terms of Service"
 }

@@ -59,6 +59,7 @@
   "home": {
     "subtitle": "现代化的企业级管理系统，助力您的业务腾飞",
     "learnMore": "了解更多",
+    "getStarted": "开始",
     "dashboardDesc": "现代化的管理界面",
     "footer": "保留所有权利"
   },
@@ -83,8 +84,26 @@
       "new": "新"
     }
   },
+  "header": {
+    "profile": "个人资料",
+    "settings": "设置",
+    "logout": "退出登录",
+    "searchPlaceholder": "搜索用户、内容...",
+    "searchSuggestions": "搜索建议"
+  },
   "intro": {
+    "nav": {
+      "features": "特性",
+      "products": "产品",
+      "about": "关于"
+    },
+    "hero": {
+      "welcomeTo": "欢迎使用",
+      "dashboardPreview": "现代化的管理界面"
+    },
     "features": {
+      "title": "核心特性",
+      "subtitle": "我们提供全面的企业级解决方案，助力您的业务发展",
       "performance": {
         "title": "高性能",
         "description": "基于 Nuxt 4 构建，提供极致的性能体验"
@@ -103,6 +122,9 @@
       }
     },
     "products": {
+      "title": "产品套件",
+      "subtitle": "完整的企业级产品生态，满足不同业务需求",
+      "learnMore": "了解更多",
       "admin": {
         "description": "强大的后台管理系统，助力企业数字化转型",
         "features": {
@@ -130,6 +152,47 @@
           "support247": "7x24支持"
         }
       }
+    },
+    "about": {
+      "title": "关于我们",
+      "subtitle": "我们致力于为企业提供最优质的数字化解决方案",
+      "mission": {
+        "title": "我们的使命",
+        "paragraph1": "PowerX 致力于为企业提供最先进的数字化管理解决方案。我们相信技术的力量能够改变企业的运营方式，提升效率，创造价值。",
+        "paragraph2": "通过不断的创新和优化，我们为客户提供稳定、安全、易用的产品体验。我们的团队由经验丰富的工程师和设计师组成，专注于打造世界级的企业级软件。",
+        "paragraph3": "我们始终坚持以客户为中心的理念，倾听客户需求，持续改进产品，为客户的成功而努力。"
+      },
+      "stats": {
+        "companies": "企业客户",
+        "users": "活跃用户",
+        "uptime": "系统可用性"
+      },
+      "enterprise": {
+        "title": "企业级解决方案",
+        "description": "为大型企业量身定制的专业解决方案"
+      },
+      "values": {
+        "title": "我们的价值观",
+        "innovation": {
+          "title": "持续创新",
+          "description": "不断探索新技术，为客户提供最前沿的解决方案"
+        },
+        "userFirst": {
+          "title": "用户至上",
+          "description": "始终以用户需求为导向，提供最佳的产品体验"
+        },
+        "excellence": {
+          "title": "追求卓越",
+          "description": "在产品质量和服务水平上永不妥协，追求完美"
+        }
+      }
+    },
+    "footer": {
+      "aboutUs": "关于我们",
+      "contactUs": "联系我们",
+      "copyright": "© 2024 PowerX. 保留所有权利。"
     }
-  }
+  },
+  "privacyPolicy": "隐私政策",
+  "termsOfService": "服务条款"
 }

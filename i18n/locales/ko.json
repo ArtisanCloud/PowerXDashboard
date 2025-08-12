@@ -59,6 +59,7 @@
   "home": {
     "subtitle": "현대적인 기업 관리 시스템으로 비즈니스의 성장을 도와드립니다",
     "learnMore": "자세히 보기",
+    "getStarted": "시작하기",
     "dashboardDesc": "현대적인 관리 인터페이스",
     "footer": "모든 권리 보유"
   },
@@ -83,8 +84,26 @@
       "new": "신규"
     }
   },
+  "header": {
+    "profile": "프로필",
+    "settings": "설정",
+    "logout": "로그아웃",
+    "searchPlaceholder": "사용자, 콘텐츠 검색...",
+    "searchSuggestions": "검색 제안"
+  },
   "intro": {
+    "nav": {
+      "features": "기능",
+      "products": "제품",
+      "about": "회사 소개"
+    },
+    "hero": {
+      "welcomeTo": "환영합니다",
+      "dashboardPreview": "현대적인 관리 인터페이스"
+    },
     "features": {
+      "title": "핵심 기능",
+      "subtitle": "비즈니스 성장을 지원하는 포괄적인 기업 솔루션을 제공합니다",
       "performance": {
         "title": "고성능",
         "description": "Nuxt 4 기반으로 구축되어 최고의 성능 경험을 제공합니다"
@@ -103,6 +122,9 @@
       }
     },
     "products": {
+      "title": "제품 스위트",
+      "subtitle": "다양한 비즈니스 요구사항을 충족하는 완전한 기업 제품 생태계",
+      "learnMore": "자세히 보기",
       "admin": {
         "description": "기업의 디지털 전환을 지원하는 강력한 백엔드 관리 시스템",
         "features": {
@@ -130,6 +152,47 @@
           "support247": "24시간 지원"
         }
       }
+    },
+    "about": {
+      "title": "회사 소개",
+      "subtitle": "기업에 최고의 디지털 솔루션을 제공하기 위해 최선을 다하고 있습니다",
+      "mission": {
+        "title": "우리의 사명",
+        "paragraph1": "PowerX는 기업에 가장 진보된 디지털 관리 솔루션을 제공하는 데 전념하고 있습니다. 기술의 힘이 비즈니스 운영 방식을 변화시키고, 효율성을 향상시키며, 가치를 창출할 수 있다고 믿습니다.",
+        "paragraph2": "지속적인 혁신과 최적화를 통해 고객에게 안정적이고 안전하며 사용하기 쉬운 제품 경험을 제공합니다. 우리 팀은 경험이 풍부한 엔지니어와 디자이너로 구성되어 세계적 수준의 기업용 소프트웨어 제작에 집중하고 있습니다.",
+        "paragraph3": "우리는 항상 고객 중심의 철학을 고수하며, 고객의 요구에 귀를 기울이고, 제품을 지속적으로 개선하며, 고객의 성공을 위해 노력합니다."
+      },
+      "stats": {
+        "companies": "기업 고객",
+        "users": "활성 사용자",
+        "uptime": "시스템 가용성"
+      },
+      "enterprise": {
+        "title": "기업 솔루션",
+        "description": "대기업을 위해 맞춤 제작된 전문 솔루션"
+      },
+      "values": {
+        "title": "우리의 가치관",
+        "innovation": {
+          "title": "지속적 혁신",
+          "description": "새로운 기술을 끊임없이 탐구하여 최첨단 솔루션을 제공"
+        },
+        "userFirst": {
+          "title": "사용자 우선",
+          "description": "항상 사용자 지향적이며 최고의 제품 경험을 제공"
+        },
+        "excellence": {
+          "title": "우수성 추구",
+          "description": "제품 품질과 서비스 수준에서 결코 타협하지 않고 완벽을 추구"
+        }
+      }
+    },
+    "footer": {
+      "aboutUs": "회사 소개",
+      "contactUs": "문의하기",
+      "copyright": "© 2024 PowerX. 모든 권리 보유."
     }
-  }
+  },
+  "privacyPolicy": "개인정보 보호정책",
+  "termsOfService": "서비스 약관"
 }
