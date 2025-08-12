@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import ThemeSwitcher from '../ThemeSwitcher.vue'
 const { t } = useI18n()
 
 // 用户信息
@@ -96,7 +97,8 @@ const markAsRead = (id: number) => {
 // 退出登录
 const handleLogout = async () => {
   // 这里添加退出登录逻辑
-  await navigateTo($localePath('/users/login'))
+  const localePath = useLocalePath()
+  await navigateTo(localePath('/users/login'))
 }
 
 // 搜索功能
@@ -183,11 +185,8 @@ const handleSearch = () => {
         </UButton>
       </UDropdownMenu>
 
-      <!-- 快速操作 -->
-      <UButton variant="ghost" size="sm" :to="$localePath('/content/articles/create')">
-        <UIcon name="i-heroicons-plus" class="w-5 h-5" />
-        <span class="hidden sm:inline ml-2">{{ t('header.create') }}</span>
-      </UButton>
+      <!-- 主题切换 -->
+      <ThemeSwitcher />
 
       <!-- 用户菜单 -->
       <UDropdownMenu :items="userMenuItems">

@@ -5,6 +5,23 @@ definePageMeta({
 
 const { t } = useI18n()
 
+// 使用全局主题状态
+const theme = useState('theme', () => 'auto')
+
+// 在客户端初始化主题
+onMounted(() => {
+  if (process.client) {
+    // 监听主题变化事件
+    window.addEventListener('theme-changed', (e: any) => {
+      theme.value = e.detail
+    })
+    
+    // 初始化主题
+    const savedTheme = localStorage.getItem('theme') || 'auto'
+    theme.value = savedTheme
+  }
+})
+
 // 表单数据
 const form = reactive({
   email: '',
