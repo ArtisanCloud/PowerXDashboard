@@ -154,5 +154,27 @@
       "contactUs": "Contact Us",
       "copyright": "© 2024 PowerX. All rights reserved."
     }
+  },
+  "menu": {
+    "dashboard": "Dashboard",
+    "users": "User Management",
+    "userList": "User List",
+    "userRoles": "User Roles",
+    "content": "Content Management",
+    "articles": "Articles",
+    "categories": "Categories",
+    "analytics": "Analytics",
+    "settings": "Settings",
+    "systemSettings": "System Settings",
+    "security": "Security"
+  },
+  "header": {
+    "dashboard": "Dashboard",
+    "profile": "Profile",
+    "settings": "Settings",
+    "logout": "Logout",
+    "searchPlaceholder": "Search users, content...",
+    "searchSuggestions": "Search Suggestions",
+    "create": "Create"
   }
 }

@@ -154,5 +154,27 @@
       "contactUs": "联系我们",
       "copyright": "© 2024 PowerX. All rights reserved."
     }
+  },
+  "menu": {
+    "dashboard": "仪表板",
+    "users": "用户管理",
+    "userList": "用户列表",
+    "userRoles": "用户角色",
+    "content": "内容管理",
+    "articles": "文章管理",
+    "categories": "分类管理",
+    "analytics": "数据分析",
+    "settings": "系统设置",
+    "systemSettings": "系统配置",
+    "security": "安全设置"
+  },
+  "header": {
+    "dashboard": "仪表板",
+    "profile": "个人资料",
+    "settings": "设置",
+    "logout": "退出登录",
+    "searchPlaceholder": "搜索用户、内容...",
+    "searchSuggestions": "搜索建议",
+    "create": "新建"
   }
 }

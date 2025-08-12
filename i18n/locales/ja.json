@@ -154,5 +154,27 @@
       "contactUs": "お問い合わせ",
       "copyright": "© 2024 PowerX. All rights reserved."
     }
+  },
+  "menu": {
+    "dashboard": "ダッシュボード",
+    "users": "ユーザー管理",
+    "userList": "ユーザー一覧",
+    "userRoles": "ユーザー権限",
+    "content": "コンテンツ管理",
+    "articles": "記事管理",
+    "categories": "カテゴリ管理",
+    "analytics": "データ分析",
+    "settings": "システム設定",
+    "systemSettings": "システム構成",
+    "security": "セキュリティ設定"
+  },
+  "header": {
+    "dashboard": "ダッシュボード",
+    "profile": "プロフィール",
+    "settings": "設定",
+    "logout": "ログアウト",
+    "searchPlaceholder": "ユーザー、コンテンツを検索...",
+    "searchSuggestions": "検索候補",
+    "create": "新規作成"
   }
 }

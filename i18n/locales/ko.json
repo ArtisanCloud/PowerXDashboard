@@ -154,5 +154,27 @@
       "contactUs": "문의하기",
       "copyright": "© 2024 PowerX. All rights reserved."
     }
+  },
+  "menu": {
+    "dashboard": "대시보드",
+    "users": "사용자 관리",
+    "userList": "사용자 목록",
+    "userRoles": "사용자 권한",
+    "content": "콘텐츠 관리",
+    "articles": "게시글 관리",
+    "categories": "카테고리 관리",
+    "analytics": "데이터 분석",
+    "settings": "시스템 설정",
+    "systemSettings": "시스템 구성",
+    "security": "보안 설정"
+  },
+  "header": {
+    "dashboard": "대시보드",
+    "profile": "프로필",
+    "settings": "설정",
+    "logout": "로그아웃",
+    "searchPlaceholder": "사용자, 콘텐츠 검색...",
+    "searchSuggestions": "검색 제안",
+    "create": "새로 만들기"
   }
 }

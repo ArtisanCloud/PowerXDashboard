@@ -9,6 +9,7 @@ export default defineNuxtConfig({
   compatibilityDate: '2024-11-01',
   ui: { fonts: false },
 
+  components: [{ path: '~/components', pathPrefix: false }],
 
   // i18n 配置
   i18n: {
