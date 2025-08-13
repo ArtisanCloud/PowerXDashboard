@@ -64,6 +64,7 @@
     "footer": "全著作権所有"
   },
   "menu": {
+    "agent": "AI チャット",
     "dashboard": "ダッシュボード",
     "customers": "顧客管理",
     "customerList": "顧客リスト",
@@ -194,5 +195,122 @@
     }
   },
   "privacyPolicy": "プライバシーポリシー",
-  "termsOfService": "利用規約"
+  "termsOfService": "利用規約",
+  "error": {
+    "tip": "このページで問題が発生しました",
+    "goBack": "戻る",
+    "goHome": "ホームに戻る"
+  },
+  "agent": {
+    "selector": {
+      "title": "AI エージェント",
+      "create": "作成",
+      "searchPlaceholder": "エージェントを検索...",
+      "noResults": "一致するエージェントが見つかりません",
+      "noAgents": "エージェントがありません。作成をクリックして最初のエージェントを追加してください",
+      "active": "アクティブ",
+      "inactive": "非アクティブ",
+      "current": "現在",
+      "available": "利用可能",
+      "capabilities": "の機能",
+      "edit": "編集",
+      "delete": "削除",
+      "totalCount": "合計 {count} エージェント"
+    },
+    "message": {
+      "justNow": "たった今",
+      "minutesAgo": "{minutes}分前",
+      "hoursAgo": "{hours}時間前",
+      "you": "あなた",
+      "assistant": "アシスタント",
+      "system": "システム",
+      "typing": "入力中...",
+      "thinking": "考え中...",
+      "metadata": "メタデータ",
+      "sendFailed": "送信失敗",
+      "retry": "再試行",
+      "copy": "コピー",
+      "delete": "削除"
+    },
+    "chat": {
+      "defaultAgent": "デフォルトアシスタント",
+      "disconnected": "未接続",
+      "connected": "接続済み",
+      "responding": "応答中",
+      "typing": "入力中",
+      "clear": "クリア",
+      "welcomeTitle": "会話を開始",
+      "welcomeMessage": "エージェントを選択してインテリジェントな会話を開始し、AI アシスタントの強力な機能を体験してください。",
+      "agentTyping": "エージェントが入力中...",
+      "inputPlaceholder": "メッセージを入力...",
+      "disconnectedPlaceholder": "接続が切断されました。メッセージを送信できません",
+      "enterToSend": "Enter で送信",
+      "shiftEnterNewLine": "Shift+Enter で改行",
+      "model": "モデル",
+      "temperature": "温度"
+    },
+    "config": {
+      "editTitle": "エージェントを編集",
+      "createTitle": "エージェントを作成",
+      "basicInfo": "基本情報",
+      "name": "名前",
+      "namePlaceholder": "エージェント名を入力",
+      "description": "説明",
+      "descriptionPlaceholder": "エージェントの機能と特徴を説明",
+      "avatar": "アバター",
+      "avatarPlaceholder": "アバター画像のURLを入力",
+      "status": "ステータス",
+      "active": "アクティブ",
+      "inactive": "非アクティブ",
+      "modelConfig": "モデル設定",
+      "model": "モデル",
+      "selectModel": "モデルを選択",
+      "temperature": "温度",
+      "conservative": "保守的",
+      "creative": "創造的",
+      "maxTokens": "最大トークン数",
+      "maxTokensPlaceholder": "最大トークン数を入力",
+      "systemPrompt": "システムプロンプト",
+      "systemPromptPlaceholder": "エージェントの動作と役割を定義するシステムプロンプトを入力",
+      "usePreset": "プリセットを使用",
+      "capability": "機能",
+      "advancedSettings": "詳細設定",
+      "contextWindow": "コンテキストウィンドウ",
+      "contextWindowPlaceholder": "コンテキストウィンドウサイズを入力",
+      "responseFormat": "応答形式",
+      "selectFormat": "形式を選択",
+      "streaming": "ストリーミング",
+      "streamingEnabled": "有効",
+      "streamingDisabled": "無効",
+      "reset": "リセット",
+      "cancel": "キャンセル",
+      "save": "保存",
+      "capabilities": {
+        "textGeneration": "テキスト生成",
+        "codeGeneration": "コード生成",
+        "imageAnalysis": "画像分析",
+        "webSearch": "ウェブ検索",
+        "fileProcessing": "ファイル処理",
+        "dataAnalysis": "データ分析",
+        "translation": "翻訳",
+        "summarization": "要約"
+      },
+      "presets": {
+        "assistant": "汎用アシスタント",
+        "assistantPrompt": "あなたは有用で無害で正直なAIアシスタントです。ユーザーの質問に親切で専門的な方法で答えてください。",
+        "coder": "プログラミングアシスタント",
+        "coderPrompt": "あなたは複数のプログラミング言語と技術に精通した専門的なプログラミングアシスタントです。明確で実行可能なコードソリューションを提供してください。",
+        "translator": "翻訳アシスタント",
+        "translatorPrompt": "あなたは複数の言語を正確に翻訳できる専門的な翻訳アシスタントです。原文の語調と意味を保持してください。",
+        "analyst": "データアナリスト",
+        "analystPrompt": "あなたはデータから洞察を抽出することに長けたデータ分析の専門家です。詳細な分析と推奨事項を提供してください。"
+      },
+      "formats": {
+        "text": "プレーンテキスト",
+        "markdown": "Markdown",
+        "json": "JSON"
+      }
+    },
+    "confirmDelete": "このエージェントを削除してもよろしいですか？この操作は元に戻せません。"
+  }
 }

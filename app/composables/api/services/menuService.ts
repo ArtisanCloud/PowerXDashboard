@@ -54,11 +54,19 @@ export const useMenuService = () => {
       // 模拟菜单数据，使用翻译键而不是直接的中文文本
       const mockMenuData: MenuItem[] = [
         {
+          id: 'agent',
+          title: 'menu.agent',
+          icon: 'i-heroicons-chat-bubble-left-right',
+          path: '/agent',
+          order: 1,
+          visible: true
+        },
+        {
           id: 'dashboard',
           title: 'menu.dashboard',
           icon: 'i-heroicons-home',
           path: '/dashboard',
-          order: 1,
+          order: 2,
           visible: true
         },
         {
@@ -92,7 +100,7 @@ export const useMenuService = () => {
           id: 'products',
           title: 'menu.products',
           icon: 'i-heroicons-cube',
-          order: 3,
+          order: 4,
           visible: true,
           children: [
             {
@@ -120,7 +128,7 @@ export const useMenuService = () => {
           title: 'menu.orders',
           icon: 'i-heroicons-shopping-cart',
           path: '/orders',
-          order: 4,
+          order: 5,
           visible: true,
           badge: 'menu.badge.new'
         },
@@ -128,7 +136,7 @@ export const useMenuService = () => {
           id: 'settings',
           title: 'menu.settings',
           icon: 'i-heroicons-cog-6-tooth',
-          order: 5,
+          order: 6,
           visible: true,
           children: [
             {

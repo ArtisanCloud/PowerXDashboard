@@ -198,7 +198,7 @@ const recentActivities = ref([
         <UButton
           variant="outline"
           class="h-20 flex flex-col items-center justify-center space-y-2"
-          :to="$localePath('/users')"
+          :to="$localePath('/settings/users')"
         >
           <UIcon name="i-heroicons-user-plus" class="w-6 h-6" />
           <span class="text-sm">{{

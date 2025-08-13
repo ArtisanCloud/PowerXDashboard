@@ -7,11 +7,20 @@ export default defineEventHandler(async (event) => {
   // 模拟菜单数据（这些数据通常来自数据库）
   const menuData: MenuItem[] = [
     {
+      id: 'agent',
+      title: 'menu.agent',
+      icon: 'i-heroicons-chat-bubble-left-right',
+      path: '/agent',
+      order: 1,
+      visible: true,
+      permissions: ['agent.view']
+    },
+    {
       id: 'dashboard',
       title: 'menu.dashboard',
       icon: 'i-heroicons-home',
       path: '/dashboard',
-      order: 1,
+      order: 2,
       visible: true,
       permissions: ['dashboard.view']
     },
@@ -19,7 +28,7 @@ export default defineEventHandler(async (event) => {
       id: 'users',
       title: 'menu.users',
       icon: 'i-heroicons-users',
-      order: 2,
+      order: 3,
       visible: true,
       permissions: ['users.view'],
       children: [
@@ -49,7 +58,7 @@ export default defineEventHandler(async (event) => {
       id: 'content',
       title: 'menu.content',
       icon: 'i-heroicons-document-text',
-      order: 3,
+      order: 4,
       visible: true,
       permissions: ['content.view'],
       children: [
@@ -81,7 +90,7 @@ export default defineEventHandler(async (event) => {
       icon: 'i-heroicons-chart-bar',
       path: '/analytics',
       badge: 'New',
-      order: 4,
+      order: 5,
       visible: true,
       permissions: ['analytics.view']
     },
@@ -89,7 +98,7 @@ export default defineEventHandler(async (event) => {
       id: 'settings',
       title: 'menu.settings',
       icon: 'i-heroicons-cog-6-tooth',
-      order: 5,
+      order: 6,
       visible: true,
       permissions: ['settings.view'],
       children: [

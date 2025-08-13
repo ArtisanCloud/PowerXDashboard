@@ -45,9 +45,17 @@ const handleGoHome = () => {
       {{ errorTitle }}
     </h1>
 
-    <p class="text-gray-500 dark:text-gray-400 mb-8">
+    <p class="text-gray-500 dark:text-gray-400 mb-4">
       {{ t('error.tip', '请尝试返回或回到首页。') }}
     </p>
+
+    <!-- 显示详细错误信息 -->
+    <div v-if="props.error" class="mb-8 max-w-2xl mx-auto">
+      <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 text-left overflow-auto max-h-60">
+        <p class="font-medium text-red-700 dark:text-red-400 mb-2">错误详情：</p>
+        <pre class="text-sm text-red-600 dark:text-red-300 whitespace-pre-wrap break-words">{{ JSON.stringify(props.error, null, 2) }}</pre>
+      </div>
+    </div>
 
     <div class="flex justify-center space-x-4">
       <button

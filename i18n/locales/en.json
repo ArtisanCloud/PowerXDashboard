@@ -64,6 +64,7 @@
     "footer": "All rights reserved"
   },
   "menu": {
+    "agent": "AI Chat",
     "dashboard": "Dashboard",
     "customers": "Customer Management",
     "customerList": "Customer List",
@@ -194,5 +195,122 @@
     }
   },
   "privacyPolicy": "Privacy Policy",
-  "termsOfService": "Terms of Service"
+  "termsOfService": "Terms of Service",
+  "error": {
+    "tip": "Something went wrong with this page",
+    "goBack": "Go Back",
+    "goHome": "Go Home"
+  },
+  "agent": {
+    "selector": {
+      "title": "AI Agents",
+      "create": "Create",
+      "searchPlaceholder": "Search agents...",
+      "noResults": "No matching agents found",
+      "noAgents": "No agents yet, click create to add your first one",
+      "active": "Active",
+      "inactive": "Inactive",
+      "current": "Current",
+      "available": "Available",
+      "capabilities": "capabilities",
+      "edit": "Edit",
+      "delete": "Delete",
+      "totalCount": "{count} agents total"
+    },
+    "message": {
+      "justNow": "Just now",
+      "minutesAgo": "{minutes} minutes ago",
+      "hoursAgo": "{hours} hours ago",
+      "you": "You",
+      "assistant": "Assistant",
+      "system": "System",
+      "typing": "Typing...",
+      "thinking": "Thinking...",
+      "metadata": "Metadata",
+      "sendFailed": "Send failed",
+      "retry": "Retry",
+      "copy": "Copy",
+      "delete": "Delete"
+    },
+    "chat": {
+      "defaultAgent": "Default Assistant",
+      "disconnected": "Disconnected",
+      "connected": "Connected",
+      "responding": "Responding",
+      "typing": "Typing",
+      "clear": "Clear",
+      "welcomeTitle": "Start Conversation",
+      "welcomeMessage": "Select an agent to start an intelligent conversation and experience the power of AI assistance.",
+      "agentTyping": "Agent is typing...",
+      "inputPlaceholder": "Type a message...",
+      "disconnectedPlaceholder": "Connection lost, cannot send messages",
+      "enterToSend": "Enter to send",
+      "shiftEnterNewLine": "Shift+Enter for new line",
+      "model": "Model",
+      "temperature": "Temperature"
+    },
+    "config": {
+      "editTitle": "Edit Agent",
+      "createTitle": "Create Agent",
+      "basicInfo": "Basic Information",
+      "name": "Name",
+      "namePlaceholder": "Enter agent name",
+      "description": "Description",
+      "descriptionPlaceholder": "Describe the agent's functionality and characteristics",
+      "avatar": "Avatar",
+      "avatarPlaceholder": "Enter avatar image URL",
+      "status": "Status",
+      "active": "Active",
+      "inactive": "Inactive",
+      "modelConfig": "Model Configuration",
+      "model": "Model",
+      "selectModel": "Select model",
+      "temperature": "Temperature",
+      "conservative": "Conservative",
+      "creative": "Creative",
+      "maxTokens": "Max Tokens",
+      "maxTokensPlaceholder": "Enter maximum tokens",
+      "systemPrompt": "System Prompt",
+      "systemPromptPlaceholder": "Enter system prompt to define agent behavior and role",
+      "usePreset": "Use Preset",
+      "capability": "Capability",
+      "advancedSettings": "Advanced Settings",
+      "contextWindow": "Context Window",
+      "contextWindowPlaceholder": "Enter context window size",
+      "responseFormat": "Response Format",
+      "selectFormat": "Select format",
+      "streaming": "Streaming",
+      "streamingEnabled": "Enabled",
+      "streamingDisabled": "Disabled",
+      "reset": "Reset",
+      "cancel": "Cancel",
+      "save": "Save",
+      "capabilities": {
+        "textGeneration": "Text Generation",
+        "codeGeneration": "Code Generation",
+        "imageAnalysis": "Image Analysis",
+        "webSearch": "Web Search",
+        "fileProcessing": "File Processing",
+        "dataAnalysis": "Data Analysis",
+        "translation": "Translation",
+        "summarization": "Summarization"
+      },
+      "presets": {
+        "assistant": "General Assistant",
+        "assistantPrompt": "You are a helpful, harmless, and honest AI assistant. Please answer user questions in a friendly and professional manner.",
+        "coder": "Programming Assistant",
+        "coderPrompt": "You are a professional programming assistant skilled in multiple programming languages and technologies. Please provide clear, executable code solutions.",
+        "translator": "Translation Assistant",
+        "translatorPrompt": "You are a professional translation assistant capable of accurately translating multiple languages. Please maintain the tone and meaning of the original text.",
+        "analyst": "Data Analyst",
+        "analystPrompt": "You are a data analysis expert skilled at extracting insights from data. Please provide detailed analysis and recommendations."
+      },
+      "formats": {
+        "text": "Plain Text",
+        "markdown": "Markdown",
+        "json": "JSON"
+      }
+    },
+    "confirmDelete": "Are you sure you want to delete this agent? This action cannot be undone."
+  }
 }

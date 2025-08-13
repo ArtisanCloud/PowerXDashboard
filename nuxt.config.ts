@@ -2,6 +2,16 @@ import tailwindcss from '@tailwindcss/vite'
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
+  ssr: false,
+  runtimeConfig: {
+    // 仅服务端可见
+    upstream: process.env.UPSTREAM || 'http://127.0.0.1:8077',    // 你的后端基础域名
+    wsUpstream: process.env.WS_UPSTREAM || 'ws://127.0.0.1:3001', // 你的 WS 服务
+    public: {
+      apiBase: '/api/v1', // 前端仍然请求 /api/v1/**，由我们在 server 里转发
+      wsUrl: '/ws'        // 如果要同域 WS，可再配反代；暂时可用你现有的 ws://localhost:3001/ws
+    }
+  },
   srcDir: 'app',
   devtools: { enabled: true },
   modules: ['@nuxt/ui', '@nuxt/icon', '@nuxtjs/i18n'],

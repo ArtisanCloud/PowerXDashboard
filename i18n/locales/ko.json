@@ -64,6 +64,7 @@
     "footer": "모든 권리 보유"
   },
   "menu": {
+    "agent": "AI 채팅",
     "dashboard": "대시보드",
     "customers": "고객 관리",
     "customerList": "고객 목록",
@@ -194,5 +195,122 @@
     }
   },
   "privacyPolicy": "개인정보 보호정책",
-  "termsOfService": "서비스 약관"
+  "termsOfService": "서비스 약관",
+  "agent": {
+    "selector": {
+      "title": "AI 에이전트",
+      "create": "생성",
+      "searchPlaceholder": "에이전트 검색...",
+      "noResults": "일치하는 에이전트를 찾을 수 없습니다",
+      "noAgents": "에이전트가 없습니다. 생성을 클릭하여 첫 번째 에이전트를 추가하세요",
+      "active": "활성",
+      "inactive": "비활성",
+      "current": "현재",
+      "available": "사용 가능",
+      "capabilities": "개 기능",
+      "edit": "편집",
+      "delete": "삭제",
+      "totalCount": "총 {count}개 에이전트"
+    },
+    "message": {
+      "justNow": "방금 전",
+      "minutesAgo": "{minutes}분 전",
+      "hoursAgo": "{hours}시간 전",
+      "you": "당신",
+      "assistant": "어시스턴트",
+      "system": "시스템",
+      "typing": "입력 중...",
+      "thinking": "생각 중...",
+      "metadata": "메타데이터",
+      "sendFailed": "전송 실패",
+      "retry": "재시도",
+      "copy": "복사",
+      "delete": "삭제"
+    },
+    "chat": {
+      "defaultAgent": "기본 어시스턴트",
+      "disconnected": "연결 끊김",
+      "connected": "연결됨",
+      "responding": "응답 중",
+      "typing": "입력 중",
+      "clear": "지우기",
+      "welcomeTitle": "대화 시작",
+      "welcomeMessage": "에이전트를 선택하여 지능적인 대화를 시작하고 AI 어시스턴트의 강력한 기능을 경험하세요.",
+      "agentTyping": "에이전트가 입력 중...",
+      "inputPlaceholder": "메시지 입력...",
+      "disconnectedPlaceholder": "연결이 끊어져 메시지를 보낼 수 없습니다",
+      "enterToSend": "Enter로 전송",
+      "shiftEnterNewLine": "Shift+Enter로 줄바꿈",
+      "model": "모델",
+      "temperature": "온도"
+    },
+    "config": {
+      "editTitle": "에이전트 편집",
+      "createTitle": "에이전트 생성",
+      "basicInfo": "기본 정보",
+      "name": "이름",
+      "namePlaceholder": "에이전트 이름 입력",
+      "description": "설명",
+      "descriptionPlaceholder": "에이전트의 기능과 특징을 설명하세요",
+      "avatar": "아바타",
+      "avatarPlaceholder": "아바타 이미지 URL 입력",
+      "status": "상태",
+      "active": "활성",
+      "inactive": "비활성",
+      "modelConfig": "모델 설정",
+      "model": "모델",
+      "selectModel": "모델 선택",
+      "temperature": "온도",
+      "conservative": "보수적",
+      "creative": "창의적",
+      "maxTokens": "최대 토큰 수",
+      "maxTokensPlaceholder": "최대 토큰 수 입력",
+      "systemPrompt": "시스템 프롬프트",
+      "systemPromptPlaceholder": "에이전트의 동작과 역할을 정의하는 시스템 프롬프트 입력",
+      "usePreset": "프리셋 사용",
+      "capability": "기능",
+      "advancedSettings": "고급 설정",
+      "contextWindow": "컨텍스트 윈도우",
+      "contextWindowPlaceholder": "컨텍스트 윈도우 크기 입력",
+      "responseFormat": "응답 형식",
+      "selectFormat": "형식 선택",
+      "streaming": "스트리밍",
+      "streamingEnabled": "활성화됨",
+      "streamingDisabled": "비활성화됨",
+      "reset": "재설정",
+      "cancel": "취소",
+      "save": "저장",
+      "capabilities": {
+        "textGeneration": "텍스트 생성",
+        "codeGeneration": "코드 생성",
+        "imageAnalysis": "이미지 분석",
+        "webSearch": "웹 검색",
+        "fileProcessing": "파일 처리",
+        "dataAnalysis": "데이터 분석",
+        "translation": "번역",
+        "summarization": "요약"
+      },
+      "presets": {
+        "assistant": "범용 어시스턴트",
+        "assistantPrompt": "당신은 유용하고 무해하며 정직한 AI 어시스턴트입니다. 사용자의 질문에 친근하고 전문적인 방식으로 답변해 주세요.",
+        "coder": "프로그래밍 어시스턴트",
+        "coderPrompt": "당신은 여러 프로그래밍 언어와 기술에 능숙한 전문 프로그래밍 어시스턴트입니다. 명확하고 실행 가능한 코드 솔루션을 제공해 주세요.",
+        "translator": "번역 어시스턴트",
+        "translatorPrompt": "당신은 여러 언어를 정확하게 번역할 수 있는 전문 번역 어시스턴트입니다. 원문의 어조와 의미를 유지해 주세요.",
+        "analyst": "데이터 분석가",
+        "analystPrompt": "당신은 데이터에서 통찰력을 추출하는 데 능숙한 데이터 분석 전문가입니다. 상세한 분석과 권장사항을 제공해 주세요."
+      },
+      "formats": {
+        "text": "일반 텍스트",
+        "markdown": "Markdown",
+        "json": "JSON"
+      }
+    },
+    "confirmDelete": "이 에이전트를 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다."
+  },
+  "error": {
+    "tip": "이 페이지에서 문제가 발생했습니다",
+    "goBack": "뒤로 가기",
+    "goHome": "홈으로 가기"
+  }
 }

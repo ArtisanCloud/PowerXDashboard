@@ -25,7 +25,7 @@ const {
 
 // 处理菜单数据，使用 i18n 翻译菜单标题
 const menuItems = computed<MenuItem[]>(() => {
-  console.log("计算菜单项，原始数据:", menuResponse.value);
+  // console.log("计算菜单项，原始数据:", menuResponse.value);
 
   if (!menuResponse.value?.data) {
     console.log("菜单数据为空");
@@ -37,7 +37,7 @@ const menuItems = computed<MenuItem[]>(() => {
       .filter((item) => item.visible !== false) // 确保即使 visible 未定义也会显示
       .sort((a, b) => (a.order || 0) - (b.order || 0)) // 防止 order 未定义
       .map((item) => {
-        console.log("处理菜单项:", item);
+        // console.log("处理菜单项:", item);
         // 处理菜单项，翻译标题和 badge
         const processedItem = {
           ...item,
@@ -56,7 +56,7 @@ const menuItems = computed<MenuItem[]>(() => {
               : undefined,
         };
 
-        console.log("处理后的菜单项:", item.title, "→", processedItem.title);
+        // console.log("处理后的菜单项:", item.title, "→", processedItem.title);
         if (item.badge) {
           console.log("处理后的 badge:", item.badge, "→", processedItem.badge);
         }
@@ -66,7 +66,7 @@ const menuItems = computed<MenuItem[]>(() => {
   };
 
   const result = processMenuItems(menuResponse.value.data);
-  console.log("处理后的菜单项:", result);
+  // console.log("处理后的菜单项:", result);
   return result;
 });
 

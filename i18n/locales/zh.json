@@ -64,6 +64,7 @@
     "footer": "保留所有权利"
   },
   "menu": {
+    "agent": "AI 对话",
     "dashboard": "仪表盘",
     "customers": "客户管理",
     "customerList": "客户列表",
@@ -194,5 +195,122 @@
     }
   },
   "privacyPolicy": "隐私政策",
-  "termsOfService": "服务条款"
+  "termsOfService": "服务条款",
+  "error": {
+    "tip": "页面出现了一些问题",
+    "goBack": "返回上一页",
+    "goHome": "回到首页"
+  },
+  "agent": {
+    "selector": {
+      "title": "Agent 助手",
+      "create": "新建",
+      "searchPlaceholder": "搜索 Agent...",
+      "noResults": "没有找到匹配的 Agent",
+      "noAgents": "暂无 Agent，点击新建创建第一个",
+      "active": "活跃",
+      "inactive": "未激活",
+      "current": "当前",
+      "available": "可用",
+      "capabilities": "项能力",
+      "edit": "编辑",
+      "delete": "删除",
+      "totalCount": "共 {count} 个 Agent"
+    },
+    "message": {
+      "justNow": "刚刚",
+      "minutesAgo": "{minutes} 分钟前",
+      "hoursAgo": "{hours} 小时前",
+      "you": "你",
+      "assistant": "助手",
+      "system": "系统",
+      "typing": "正在输入...",
+      "thinking": "正在思考...",
+      "metadata": "元数据",
+      "sendFailed": "发送失败",
+      "retry": "重试",
+      "copy": "复制",
+      "delete": "删除"
+    },
+    "chat": {
+      "defaultAgent": "默认助手",
+      "disconnected": "未连接",
+      "connected": "已连接",
+      "responding": "回复中",
+      "typing": "正在输入",
+      "clear": "清空",
+      "welcomeTitle": "开始对话",
+      "welcomeMessage": "选择一个 Agent 开始智能对话，体验 AI 助手的强大功能。",
+      "agentTyping": "助手正在输入...",
+      "inputPlaceholder": "输入消息...",
+      "disconnectedPlaceholder": "连接断开，无法发送消息",
+      "enterToSend": "Enter 发送",
+      "shiftEnterNewLine": "Shift+Enter 换行",
+      "model": "模型",
+      "temperature": "温度"
+    },
+    "config": {
+      "editTitle": "编辑 Agent",
+      "createTitle": "创建 Agent",
+      "basicInfo": "基本信息",
+      "name": "名称",
+      "namePlaceholder": "输入 Agent 名称",
+      "description": "描述",
+      "descriptionPlaceholder": "描述这个 Agent 的功能和特点",
+      "avatar": "头像",
+      "avatarPlaceholder": "输入头像图片 URL",
+      "status": "状态",
+      "active": "激活",
+      "inactive": "未激活",
+      "modelConfig": "模型配置",
+      "model": "模型",
+      "selectModel": "选择模型",
+      "temperature": "温度",
+      "conservative": "保守",
+      "creative": "创意",
+      "maxTokens": "最大令牌数",
+      "maxTokensPlaceholder": "输入最大令牌数",
+      "systemPrompt": "系统提示词",
+      "systemPromptPlaceholder": "输入系统提示词，定义 Agent 的行为和角色",
+      "usePreset": "使用预设",
+      "capability": "能力",
+      "advancedSettings": "高级设置",
+      "contextWindow": "上下文窗口",
+      "contextWindowPlaceholder": "输入上下文窗口大小",
+      "responseFormat": "响应格式",
+      "selectFormat": "选择格式",
+      "streaming": "流式响应",
+      "streamingEnabled": "已启用",
+      "streamingDisabled": "已禁用",
+      "reset": "重置",
+      "cancel": "取消",
+      "save": "保存",
+      "capabilities": {
+        "textGeneration": "文本生成",
+        "codeGeneration": "代码生成",
+        "imageAnalysis": "图像分析",
+        "webSearch": "网络搜索",
+        "fileProcessing": "文件处理",
+        "dataAnalysis": "数据分析",
+        "translation": "翻译",
+        "summarization": "摘要"
+      },
+      "presets": {
+        "assistant": "通用助手",
+        "assistantPrompt": "你是一个有用、无害、诚实的AI助手。请以友好、专业的方式回答用户的问题。",
+        "coder": "编程助手",
+        "coderPrompt": "你是一个专业的编程助手，擅长多种编程语言和技术。请提供清晰、可执行的代码解决方案。",
+        "translator": "翻译助手",
+        "translatorPrompt": "你是一个专业的翻译助手，能够准确翻译多种语言。请保持原文的语调和含义。",
+        "analyst": "分析师",
+        "analystPrompt": "你是一个数据分析专家，擅长从数据中提取洞察。请提供详细的分析和建议。"
+      },
+      "formats": {
+        "text": "纯文本",
+        "markdown": "Markdown",
+        "json": "JSON"
+      }
+    },
+    "confirmDelete": "确定要删除这个 Agent 吗？此操作不可撤销。"
+  }
 }
