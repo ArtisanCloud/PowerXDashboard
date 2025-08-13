@@ -62,11 +62,19 @@ export const useMenuService = () => {
           visible: true
         },
         {
+          id: 'workflow',
+          title: 'menu.workflow',
+          icon: 'i-heroicons-squares-2x2',
+          path: '/workflow',
+          order: 2,
+          visible: true
+        },
+        {
           id: 'dashboard',
           title: 'menu.dashboard',
           icon: 'i-heroicons-home',
           path: '/dashboard',
-          order: 2,
+          order: 3,
           visible: true
         },
         {

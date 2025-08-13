@@ -231,7 +231,7 @@ const selectedAgent = computed(() => {
       :description="alertDesc || 'SSE/WebSocket 连接建立失败，请稍后再试。'"
       :color="'error'"
       :variant="'solid'"
-      :icon="'i-heroicons-wifi-slash-20-solid'"
+      :icon="'i-heroicons-signal-slash-20-solid'"
       close
       @update:open="(val) => { hide()}"
       class="fixed bottom-4 right-4 max-w-sm"

@@ -65,6 +65,7 @@
   },
   "menu": {
     "agent": "AI 对话",
+    "workflow": "工作流",
     "dashboard": "仪表盘",
     "customers": "客户管理",
     "customerList": "客户列表",
@@ -313,5 +314,64 @@
       }
     },
     "confirmDelete": "确定要删除这个 Agent 吗？此操作不可撤销。"
+  },
+  "workflow": {
+    "title": "工作流编辑器",
+    "newWorkflow": "新建工作流",
+    "openWorkflow": "打开工作流",
+    "saveWorkflow": "保存工作流",
+    "runWorkflow": "运行工作流",
+    "undo": "撤销",
+    "redo": "重做",
+    "fitView": "适应视图",
+    "empty": {
+      "title": "开始创建工作流",
+      "description": "创建新工作流或打开现有工作流"
+    },
+    "palette": {
+      "title": "节点清单",
+      "searchPlaceholder": "搜索节点..."
+    },
+    "properties": {
+      "title": "节点属性"
+    },
+    "dialog": {
+      "newWorkflow": {
+        "title": "新建工作流",
+        "name": "工作流名称",
+        "namePlaceholder": "输入工作流名称",
+        "description": "描述",
+        "descriptionPlaceholder": "输入工作流描述（可选）",
+        "cancel": "取消",
+        "create": "创建"
+      },
+      "openWorkflow": {
+        "title": "打开工作流",
+        "noWorkflows": "没有可用的工作流",
+        "columns": {
+          "name": "名称",
+          "description": "描述",
+          "updatedAt": "更新时间",
+          "actions": "操作"
+        },
+        "open": "打开",
+        "cancel": "取消"
+      }
+    },
+    "nodes": {
+      "llm": "大模型",
+      "http": "HTTP 请求",
+      "selector": "条件判断",
+      "properties": "个属性"
+    },
+    "messages": {
+      "loadKindsFailed": "加载节点类型失败",
+      "loadPaletteFailed": "加载节点模板失败",
+      "loadWorkflowFailed": "加载工作流失败",
+      "saveWorkflowFailed": "保存工作流失败",
+      "templateNotFound": "未找到模板",
+      "unknownKind": "未知节点类型",
+      "jsonParseError": "无法解析JSON"
+    }
   }
 }
