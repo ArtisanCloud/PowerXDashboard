@@ -239,6 +239,7 @@
       "responding": "回复中",
       "typing": "正在输入",
       "clear": "清空",
+      "realtimeFailed": "实时连接失败",
       "welcomeTitle": "开始对话",
       "welcomeMessage": "选择一个 Agent 开始智能对话，体验 AI 助手的强大功能。",
       "agentTyping": "助手正在输入...",

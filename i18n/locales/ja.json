@@ -239,6 +239,7 @@
       "responding": "応答中",
       "typing": "入力中",
       "clear": "クリア",
+      "realtimeFailed": "リアルタイム接続に失敗しました",
       "welcomeTitle": "会話を開始",
       "welcomeMessage": "エージェントを選択してインテリジェントな会話を開始し、AI アシスタントの強力な機能を体験してください。",
       "agentTyping": "エージェントが入力中...",

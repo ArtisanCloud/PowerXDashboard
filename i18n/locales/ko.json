@@ -234,6 +234,7 @@
       "responding": "응답 중",
       "typing": "입력 중",
       "clear": "지우기",
+      "realtimeFailed": "실시간 연결 실패",
       "welcomeTitle": "대화 시작",
       "welcomeMessage": "에이전트를 선택하여 지능적인 대화를 시작하고 AI 어시스턴트의 강력한 기능을 경험하세요.",
       "agentTyping": "에이전트가 입력 중...",

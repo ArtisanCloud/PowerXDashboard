@@ -19,6 +19,9 @@ const connectionType = ref<'sse' | 'websocket'>('sse')
 const showConfigPanel = ref(false)
 const editingAgent = ref<AgentConfig | null>(null)
 
+// 一次性提醒（UAlert）
+const { visible: alertVisible, title: alertTitle, description: alertDesc, notifyOnce, hide, reset } = useOneShotAlert()
+
 // Agent 管理
 const agentManager = useAgentManager()
 const { agents, loading: agentsLoading, error: agentsError } = agentManager
@@ -36,11 +39,23 @@ const chatConnection = useAgentChat({
     console.log('收到消息:', message)
   },
   onError: (error) => {
-    console.error('聊天错误:', error)
-    // 这里可以显示错误提示
+    // 降噪：不再用 console.error 刷屏
+    // console.debug('聊天错误:', error)
+
+    // 只提醒一次（SSE/WS 任一失败都会走这里）
+    notifyOnce(
+      t('agent.chat.realtimeFailed') || '实时连接失败',
+      // 兼容你当前的浏览器报错：MIME 不是 text/event-stream
+      // 这里给出更友好的描述
+      (typeof error === 'string' ? error : (error?.message || 'SSE/WebSocket 连接建立失败，稍后将自动重试'))
+    )
   },
   onConnectionChange: (connected) => {
     console.log('连接状态变化:', connected)
+    // 一旦恢复连接，自动关闭提醒（但不重置“只提醒一次”的标记）
+    if (connected && alertVisible.value) {
+      hide()
+    }
   }
 })
 
@@ -63,10 +78,7 @@ const {
 
 // 初始化
 onMounted(async () => {
-  // 获取 Agent 列表
   await agentManager.fetchAgents(API_URL)
-  
-  // 连接聊天
   connect()
 })
 
@@ -77,11 +89,9 @@ onUnmounted(() => {
 
 const agentsList = computed(() => Array.isArray(agents.value) ? agents.value : [])
 
-
 // 处理 Agent 选择
 const handleAgentSelect = async (agentId: string) => {
   if (agentId === currentAgentId.value) return
-  
   currentAgentId.value = agentId
   await switchAgent(agentId)
 }
@@ -90,6 +100,8 @@ const handleAgentSelect = async (agentId: string) => {
 const handleConnectionSwitch = (type: 'sse' | 'websocket') => {
   connectionType.value = type
   switchConnection(type)
+  // 切换连接方式时，重置一次性提醒标记，让用户在新方式失败时仍能看到一次提示
+  reset()
 }
 
 // 处理发送消息
@@ -105,6 +117,11 @@ const handleRetryMessage = async () => {
 // 处理清空消息
 const handleClearMessages = () => {
   clearMessages()
+}
+
+const handleCloseConfig = () => {
+  showConfigPanel.value = false
+  editingAgent.value = null
 }
 
 // 创建新 Agent
@@ -127,8 +144,6 @@ const handleDeleteAgent = async (agentId: string) => {
   if (confirm(t('agent.confirmDelete'))) {
     try {
       await agentManager.deleteAgent(API_URL, agentId)
-      
-      // 如果删除的是当前 Agent，切换到第一个可用的 Agent
       if (agentId === currentAgentId.value && agents.value.length > 0) {
         const firstAgent = agents.value[0]
         await handleAgentSelect(firstAgent.id)
@@ -143,10 +158,8 @@ const handleDeleteAgent = async (agentId: string) => {
 const handleSaveAgent = async (config: Partial<AgentConfig>) => {
   try {
     if (editingAgent.value) {
-      // 更新现有 Agent
       await agentManager.updateAgent(API_URL, editingAgent.value.id, config)
     } else {
-      // 创建新 Agent
       const newAgent = await agentManager.createAgent(API_URL, {
         ...config,
         id: `agent_${Date.now()}`,
@@ -155,22 +168,13 @@ const handleSaveAgent = async (config: Partial<AgentConfig>) => {
         temperature: config.temperature || 0.7,
         maxTokens: config.maxTokens || 2000
       })
-      
-      // 自动切换到新创建的 Agent
       await handleAgentSelect(newAgent.id)
     }
-    
     showConfigPanel.value = false
     editingAgent.value = null
   } catch (error) {
     console.error('保存 Agent 失败:', error)
   }
-}
-
-// 关闭配置面板
-const handleCloseConfig = () => {
-  showConfigPanel.value = false
-  editingAgent.value = null
 }
 
 // 计算当前 Agent
@@ -196,18 +200,20 @@ const selectedAgent = computed(() => {
 
     <!-- 中间聊天界面 -->
     <div class="flex-1 flex flex-col min-w-0">
-      <ChatInterface
-        :messages="Array.isArray(messages) ? messages : []"
-        :is-connected="!!isConnected"
-        :is-streaming="!!isStreaming"
-        :is-typing="!!isTyping"
-        :current-agent="selectedAgent || null"
-        :connection-type="connectionType"
-        @send-message="handleSendMessage"
-        @retry-message="handleRetryMessage"
-        @clear-messages="handleClearMessages"
-        @switch-connection="handleConnectionSwitch"
-      />
+      <ClientOnly>
+        <ChatInterface
+          :messages="Array.isArray(messages) ? messages : []"
+          :is-connected="!!isConnected"
+          :is-streaming="!!isStreaming"
+          :is-typing="!!isTyping"
+          :current-agent="selectedAgent || null"
+          :connection-type="connectionType"
+          @send-message="handleSendMessage"
+          @retry-message="handleRetryMessage"
+          @clear-messages="handleClearMessages"
+          @switch-connection="handleConnectionSwitch"
+        />
+      </ClientOnly>
     </div>
 
     <!-- 配置面板 -->
@@ -218,8 +224,18 @@ const selectedAgent = computed(() => {
       @save="handleSaveAgent"
     />
 
-    <!-- 错误提示 -->
-    <UAlert />
+    <!-- 错误提示（只显示一次） -->
+    <UAlert
+      v-if="alertVisible" 
+      :title="alertTitle || '实时连接失败'"
+      :description="alertDesc || 'SSE/WebSocket 连接建立失败，请稍后再试。'"
+      :color="'error'"
+      :variant="'solid'"
+      :icon="'i-heroicons-wifi-slash-20-solid'"
+      close
+      @update:open="(val) => { hide()}"
+      class="fixed bottom-4 right-4 max-w-sm"
+    />
   </div>
 </template>
 

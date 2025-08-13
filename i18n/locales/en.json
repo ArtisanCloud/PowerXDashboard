@@ -239,6 +239,7 @@
       "responding": "Responding",
       "typing": "Typing",
       "clear": "Clear",
+      "realtimeFailed": "Realtime Connection Failed",
       "welcomeTitle": "Start Conversation",
       "welcomeMessage": "Select an agent to start an intelligent conversation and experience the power of AI assistance.",
       "agentTyping": "Agent is typing...",

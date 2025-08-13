@@ -67,14 +67,14 @@ const closeMobileSidebar = () => {
           <!-- 页面标题区域 -->
           <div v-if="$route.meta.title" class="mb-6">
             <div class="flex items-center justify-between">
-              <div>
+              <!-- <div>
                 <h1 class="text-2xl font-bold text-gray-900">
                   {{ $route.meta.title }}
                 </h1>
                 <p v-if="$route.meta.description" class="mt-1 text-sm text-gray-600">
                   {{ $route.meta.description }}
                 </p>
-              </div>
+              </div> -->
               
               <!-- 页面操作按钮区域 -->
               <div v-if="$route.meta.actions" class="flex items-center space-x-3">
