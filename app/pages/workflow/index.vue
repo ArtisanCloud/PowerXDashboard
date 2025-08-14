@@ -128,14 +128,21 @@ const newWorkflow = reactive({
   name: '',
   description: ''
 });
-const workflowList = ref([]);
+interface WorkflowItem {
+  id: string;
+  name: string;
+  description?: string;
+  updatedAt: string;
+}
+
+const workflowList = ref<WorkflowItem[]>([]);
 
 // 工作流列表列定义
 const workflowColumns = [
-  { key: 'name', label: '名称' } as const,
-  { key: 'description', label: '描述' } as const,
-  { key: 'updatedAt', label: '更新时间' } as const,
-  { key: 'actions', label: '操作' } as const
+  { key: 'name', label: '名称' },
+  { key: 'description', label: '描述' },
+  { key: 'updatedAt', label: '更新时间' },
+  { key: 'actions', label: '操作' }
 ];
 
 // 创建新工作流
@@ -149,12 +156,14 @@ async function confirmCreateWorkflow() {
   
   const workflow = await createWf(newWorkflow.name, newWorkflow.description);
   if (workflow) {
-    workflowLoaded.value = true;
     showNewWorkflowModal.value = false;
     
     // 重置表单
     newWorkflow.name = '';
     newWorkflow.description = '';
+    
+    // 跳转到工作区页面
+    await navigateTo(`/workflow/workspace?id=${workflow.id}`);
   }
 }
 
@@ -171,9 +180,8 @@ async function openWorkflow() {
 
 // 加载选中的工作流
 async function loadSelectedWorkflow(id: string) {
-  await loadWorkflow(id);
-  workflowLoaded.value = true;
-  showOpenWorkflowModal.value = false;
+  // 跳转到工作区页面
+  await navigateTo(`/workflow/workspace?id=${id}`);
 }
 
 // 组件挂载

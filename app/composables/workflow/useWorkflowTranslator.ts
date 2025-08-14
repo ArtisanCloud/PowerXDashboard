@@ -81,7 +81,7 @@ export function useWorkflowTranslator() {
       sourceHandle: edge.sourceHandle || '',
       target: edge.target,
       targetHandle: edge.targetHandle || '',
-      label: edge.label,
+      label: typeof edge.label === 'string' ? edge.label : undefined,
       type: edge.type,
     }));
 

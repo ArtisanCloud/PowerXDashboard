@@ -75,11 +75,17 @@ export function useWorkflowManager() {
     const paletteItem = palette.value.find(p => p.id === paletteId);
     if (!paletteItem) {
       error.value = `未找到模板: ${paletteId}`;
-      return;
+      return null;
     }
     
-    const node = makeNodeFromPalette(paletteItem, kinds.value, position);
-    return node;
+    try {
+      const node = makeNodeFromPalette(paletteItem, kinds.value, position);
+      return node;
+    } catch (err) {
+      error.value = `创建节点失败: ${err}`;
+      console.error(err);
+      return null;
+    }
   }
 
   // 保存当前工作流
