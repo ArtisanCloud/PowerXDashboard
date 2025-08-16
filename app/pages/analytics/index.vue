@@ -42,11 +42,12 @@
             <p class="text-sm font-medium text-gray-600 dark:text-gray-400">{{ metric.title }}</p>
             <p class="text-2xl font-bold text-gray-900 dark:text-white mt-1">{{ metric.value }}</p>
             <div class="flex items-center mt-2">
-              <UIcon 
-                :name="metric.trend === 'up' ? 'i-lucide-arrow-trending-up' : 'i-lucide-arrow-trending-down'"
-                :class="metric.trend === 'up' ? 'text-green-500' : 'text-red-500'"
-                class="w-4 h-4"
-              />
+                            <span class="metric.trend === 'up' ? 'text-green-500' : 'text-red-500' inline-block">
+                <UIcon 
+                                :name="metric.trend === 'up' ? 'i-lucide-arrow-trending-up' : 'i-lucide-arrow-trending-down'"
+                                class="w-4 h-4"
+                               />
+              </span>
               <span 
                 :class="metric.trend === 'up' ? 'text-green-600' : 'text-red-600'"
                 class="text-sm font-medium ml-1"
@@ -57,7 +58,9 @@
             </div>
           </div>
           <div class="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-            <UIcon :name="metric.icon" class="w-6 h-6 text-blue-600" />
+                        <span class="w-6 h-6 text-blue-600 inline-block">
+              <UIcon :name="metric.icon" />
+            </span>
           </div>
         </div>
       </UCard>
@@ -73,7 +76,9 @@
         
         <div class="h-64 bg-gray-50 dark:bg-gray-800 rounded-lg flex items-center justify-center">
           <div class="text-center">
-            <UIcon name="i-lucide-chart-bar" class="w-12 h-12 text-gray-400 mx-auto mb-2" />
+                        <span class="w-12 h-12 text-gray-400 mx-auto mb-2 inline-block">
+              <UIcon name="i-lucide-chart-bar" />
+            </span>
             <p class="text-gray-500">访问趋势图表</p>
             <p class="text-sm text-gray-400">集成图表库后显示</p>
           </div>
@@ -135,7 +140,9 @@
         <div class="space-y-4">
           <div v-for="device in deviceStats" :key="device.type" class="flex items-center justify-between">
             <div class="flex items-center gap-3">
-              <UIcon :name="device.icon" class="w-5 h-5 text-gray-600" />
+                            <span class="w-5 h-5 text-gray-600 inline-block">
+                <UIcon :name="device.icon" />
+              </span>
               <span class="font-medium">{{ device.type }}</span>
             </div>
             <div class="text-right">

@@ -15,7 +15,9 @@
       >
         <div class="flex items-center gap-4">
           <div class="p-3 rounded-lg" :class="setting.iconBg">
-            <UIcon :name="setting.icon" :class="setting.iconColor" class="w-6 h-6" />
+                        <span class="setting.iconColor inline-block">
+              <UIcon :name="setting.icon" class="w-6 h-6"  />
+            </span>
           </div>
           <div>
             <h3 class="font-semibold text-gray-900 dark:text-white">{{ setting.title }}</h3>

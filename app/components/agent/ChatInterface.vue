@@ -204,7 +204,9 @@ const formatFileSize = (bytes: number) => {
       <div v-if="messages.length === 0" class="flex items-center justify-center h-full">
         <div class="text-center">
           <div class="w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
-            <UIcon name="i-heroicons-chat-bubble-left-right" class="w-8 h-8 text-gray-400" />
+                        <span class="w-8 h-8 text-gray-400 inline-block">
+              <UIcon name="i-heroicons-chat-bubble-left-right" />
+            </span>
           </div>
           <h3 class="text-lg font-medium text-gray-900 mb-2">
             {{ t('agent.chat.welcomeTitle') }}
@@ -263,7 +265,9 @@ const formatFileSize = (bytes: number) => {
             :key="index"
             class="flex items-center space-x-2 bg-gray-100 rounded-lg px-3 py-2"
           >
-            <UIcon name="i-heroicons-document" class="w-4 h-4 text-gray-500" />
+                        <span class="w-4 h-4 text-gray-500 inline-block">
+              <UIcon name="i-heroicons-document" />
+            </span>
             <span class="text-sm text-gray-700">{{ file.name }}</span>
             <span class="text-xs text-gray-500">({{ formatFileSize(file.size) }})</span>
             <UButton

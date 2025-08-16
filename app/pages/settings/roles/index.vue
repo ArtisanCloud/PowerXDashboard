@@ -17,7 +17,9 @@ const { t } = useI18n()
     
     <div class="bg-white rounded-lg shadow p-6">
       <div class="text-center py-12">
-        <UIcon name="i-heroicons-shield-check" class="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                <span class="w-16 h-16 text-gray-400 mx-auto mb-4 inline-block">
+          <UIcon name="i-heroicons-shield-check" />
+        </span>
         <h3 class="text-lg font-medium text-gray-900 mb-2">角色管理</h3>
         <p class="text-gray-500">角色管理功能正在开发中...</p>
       </div>

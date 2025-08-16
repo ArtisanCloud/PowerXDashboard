@@ -130,14 +130,16 @@ const handleSearch = () => {
               :to="$localePath('/dashboard')"
               class="text-gray-500 hover:text-gray-700"
             >
-              <UIcon name="i-heroicons-home" class="w-4 h-4" />
+                            <span class="w-4 h-4 inline-block">
+                <UIcon name="i-heroicons-home" />
+              </span>
             </NuxtLink>
           </li>
           <li class="flex items-center">
-            <UIcon
-              name="i-heroicons-chevron-right"
-              class="w-4 h-4 text-gray-400 mx-2"
-            />
+                        <span class="w-4 h-4 text-gray-400 mx-2 inline-block">
+              <UIcon
+                            name="i-heroicons-chevron-right" />
+            </span>
             <span class="text-sm font-medium text-gray-900">{{
               $route.meta.title || t("dashboard.title")
             }}</span>
@@ -194,7 +196,9 @@ const handleSearch = () => {
       <!-- 通知 -->
       <UDropdownMenu :items="notificationItems">
         <UButton variant="ghost" size="sm" class="relative">
-          <UIcon name="i-heroicons-bell" class="w-5 h-5" />
+                    <span class="w-5 h-5 inline-block">
+            <UIcon name="i-heroicons-bell" />
+          </span>
           <UBadge
             v-if="unreadCount > 0"
             :label="unreadCount.toString()"
@@ -214,16 +218,18 @@ const handleSearch = () => {
           <div
             class="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center"
           >
-            <UIcon name="i-heroicons-user" class="w-5 h-5 text-gray-600" />
+                        <span class="w-5 h-5 text-gray-600 inline-block">
+              <UIcon name="i-heroicons-user" />
+            </span>
           </div>
           <div class="hidden md:block text-left">
             <div class="text-sm font-medium text-gray-900">{{ user.name }}</div>
             <div class="text-xs text-gray-500">{{ user.email }}</div>
           </div>
-          <UIcon
-            name="i-heroicons-chevron-down"
-            class="w-4 h-4 text-gray-400"
-          />
+                    <span class="w-4 h-4 text-gray-400 inline-block">
+            <UIcon
+                        name="i-heroicons-chevron-down" />
+          </span>
         </UButton>
       </UDropdownMenu>
     </div>

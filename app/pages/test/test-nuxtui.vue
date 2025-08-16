@@ -108,27 +108,39 @@
         
         <div class="grid grid-cols-6 gap-4">
           <div class="text-center">
-            <UIcon name="i-heroicons-home" class="w-8 h-8 mx-auto mb-2" />
+                        <span class="w-8 h-8 mx-auto mb-2 inline-block">
+              <UIcon name="i-heroicons-home" />
+            </span>
             <p class="text-sm">首页</p>
           </div>
           <div class="text-center">
-            <UIcon name="i-heroicons-user" class="w-8 h-8 mx-auto mb-2" />
+                        <span class="w-8 h-8 mx-auto mb-2 inline-block">
+              <UIcon name="i-heroicons-user" />
+            </span>
             <p class="text-sm">用户</p>
           </div>
           <div class="text-center">
-            <UIcon name="i-heroicons-cog-6-tooth" class="w-8 h-8 mx-auto mb-2" />
+                        <span class="w-8 h-8 mx-auto mb-2 inline-block">
+              <UIcon name="i-heroicons-cog-6-tooth" />
+            </span>
             <p class="text-sm">设置</p>
           </div>
           <div class="text-center">
-            <UIcon name="i-heroicons-heart" class="w-8 h-8 mx-auto mb-2 text-red-500" />
+                        <span class="w-8 h-8 mx-auto mb-2 text-red-500 inline-block">
+              <UIcon name="i-heroicons-heart" />
+            </span>
             <p class="text-sm">喜欢</p>
           </div>
           <div class="text-center">
-            <UIcon name="i-heroicons-star" class="w-8 h-8 mx-auto mb-2 text-yellow-500" />
+                        <span class="w-8 h-8 mx-auto mb-2 text-yellow-500 inline-block">
+              <UIcon name="i-heroicons-star" />
+            </span>
             <p class="text-sm">收藏</p>
           </div>
           <div class="text-center">
-            <UIcon name="i-heroicons-bell" class="w-8 h-8 mx-auto mb-2 text-blue-500" />
+                        <span class="w-8 h-8 mx-auto mb-2 text-blue-500 inline-block">
+              <UIcon name="i-heroicons-bell" />
+            </span>
             <p class="text-sm">通知</p>
           </div>
         </div>

@@ -143,7 +143,9 @@ onMounted(() => {
       <div v-else-if="menuError" class="px-3">
         <div class="bg-red-50 border border-red-200 rounded-lg p-4">
           <div class="flex items-center space-x-2 text-red-700 mb-2">
-            <UIcon name="i-heroicons-exclamation-triangle" class="w-5 h-5" />
+                        <span class="w-5 h-5 inline-block">
+              <UIcon name="i-heroicons-exclamation-triangle" />
+            </span>
             <span class="font-medium">{{ $t("menu.loadFailed") }}</span>
           </div>
           <p class="text-sm text-red-600 mb-3">
@@ -189,18 +191,20 @@ onMounted(() => {
               "
             >
               <div class="flex items-center space-x-3">
-                <UIcon :name="item.icon" class="w-5 h-5" />
+                                <span class="w-5 h-5 inline-block">
+                  <UIcon :name="item.icon" />
+                </span>
                 <span>{{ item.title }}</span>
               </div>
               <div class="flex items-center space-x-2">
                 <UBadge v-if="item.badge" size="xs" color="primary">{{
                   item.badge
                 }}</UBadge>
-                <UIcon
-                  name="i-heroicons-chevron-right"
-                  class="w-4 h-4 transition-transform"
-                  :class="{ 'rotate-90': expandedItems.has(item.id) }"
-                />
+                                <span class="w-4 h-4 transition-transform inline-block">
+                  <UIcon
+                                    name="i-heroicons-chevron-right" :class="{ 'rotate-90': expandedItems.has(item.id) }"
+                                   />
+                </span>
               </div>
             </button>
 
@@ -228,7 +232,9 @@ onMounted(() => {
                         : 'text-slate-600 dark:text-slate-300 hover:bg-slate-900/5 dark:hover:bg-white/5 hover:text-slate-900 dark:hover:text-white'
                     "
                   >
-                    <UIcon :name="child.icon" class="w-4 h-4" />
+                                        <span class="w-4 h-4 inline-block">
+                      <UIcon :name="child.icon" />
+                    </span>
                     <span>{{ child.title }}</span>
                   </NuxtLink>
                 </li>
@@ -248,7 +254,9 @@ onMounted(() => {
             "
           >
             <div class="flex items-center space-x-3">
-              <UIcon :name="item.icon" class="w-5 h-5" />
+                            <span class="w-5 h-5 inline-block">
+                <UIcon :name="item.icon" />
+              </span>
               <span>{{ item.title }}</span>
             </div>
             <UBadge v-if="item.badge" size="xs" color="primary">{{
@@ -265,7 +273,9 @@ onMounted(() => {
         <div
           class="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center"
         >
-          <UIcon name="i-heroicons-user" class="w-5 h-5 text-gray-600" />
+                    <span class="w-5 h-5 text-gray-600 inline-block">
+            <UIcon name="i-heroicons-user" />
+          </span>
         </div>
         <div class="flex-1 min-w-0">
           <p class="text-sm font-medium text-gray-900 truncate">

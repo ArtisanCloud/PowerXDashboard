@@ -10,7 +10,9 @@
       <UCard>
         <template #header>
           <div class="flex items-center gap-3">
-            <UIcon name="i-lucide-document-text" class="w-6 h-6 text-blue-500" />
+                        <span class="w-6 h-6 text-blue-500 inline-block">
+              <UIcon name="i-lucide-document-text" />
+            </span>
             <h3 class="text-lg font-semibold">文章管理</h3>
           </div>
         </template>
@@ -42,7 +44,9 @@
       <UCard>
         <template #header>
           <div class="flex items-center gap-3">
-            <UIcon name="i-lucide-photo" class="w-6 h-6 text-purple-500" />
+                        <span class="w-6 h-6 text-purple-500 inline-block">
+              <UIcon name="i-lucide-photo" />
+            </span>
             <h3 class="text-lg font-semibold">媒体库</h3>
           </div>
         </template>
@@ -65,7 +69,9 @@
       <UCard>
         <template #header>
           <div class="flex items-center gap-3">
-            <UIcon name="i-lucide-tag" class="w-6 h-6 text-orange-500" />
+                        <span class="w-6 h-6 text-orange-500 inline-block">
+              <UIcon name="i-lucide-tag" />
+            </span>
             <h3 class="text-lg font-semibold">分类管理</h3>
           </div>
         </template>

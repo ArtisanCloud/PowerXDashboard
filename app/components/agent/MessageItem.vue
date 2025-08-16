@@ -149,7 +149,9 @@ const escapeHtml = (text: string) => {
         v-else
         class="w-8 h-8 rounded-full bg-gray-400 flex items-center justify-center text-white text-sm font-medium"
       >
-        <UIcon name="i-heroicons-cog-6-tooth" class="w-4 h-4" />
+                <span class="w-4 h-4 inline-block">
+          <UIcon name="i-heroicons-cog-6-tooth" />
+        </span>
       </div>
     </div>
 
@@ -167,12 +169,12 @@ const escapeHtml = (text: string) => {
         </span>
         
         <!-- 状态图标 -->
-        <UIcon
-          v-if="getStatusIcon()"
-          :name="getStatusIcon()!"
-          class="w-3 h-3"
-          :class="getStatusColor()"
-        />
+                <span class="w-3 h-3 inline-block">
+          <UIcon
+                    v-if="getStatusIcon()"
+                    :name="getStatusIcon()!" :class="getStatusColor()"
+                   />
+        </span>
         
         <!-- 流式输入指示器 -->
         <div v-if="isStreaming && message.role === 'assistant'" class="flex items-center space-x-1">
@@ -211,7 +213,9 @@ const escapeHtml = (text: string) => {
       <!-- 错误状态 -->
       <div v-if="message.status === 'error'" class="mt-2 p-2 bg-red-50 border border-red-200 rounded-md">
         <div class="flex items-center space-x-2">
-          <UIcon name="i-heroicons-exclamation-triangle" class="w-4 h-4 text-red-500" />
+                    <span class="w-4 h-4 text-red-500 inline-block">
+            <UIcon name="i-heroicons-exclamation-triangle" />
+          </span>
           <span class="text-sm text-red-700">{{ t('agent.message.sendFailed') }}</span>
           <UButton
             size="xs"
