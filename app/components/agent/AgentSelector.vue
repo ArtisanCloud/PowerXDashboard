@@ -101,9 +101,7 @@ const getModelIcon = (model: string) => {
 
       <div v-else-if="filteredAgents.length === 0" class="p-4 text-center">
         <div class="text-gray-400 mb-2">
-                    <span class="w-12 h-12 mx-auto inline-block">
-            <UIcon name="i-heroicons-face-frown" />
-          </span>
+                    <UIcon class="w-12 h-12 mx-auto inline-block" name="i-heroicons-face-frown"  />
         </div>
         <p class="text-sm text-gray-500">
           {{ searchQuery ? t('agent.selector.noResults') : t('agent.selector.noAgents') }}
@@ -157,8 +155,8 @@ const getModelIcon = (model: string) => {
                   <div class="flex items-center mt-2 space-x-2">
                     <div class="flex items-center text-xs text-gray-400">
                                             <span class="w-3 h-3 mr-1 inline-block">
-                        <UIcon :name="getModelIcon(agent.model)" />
-                      </span>
+                                              <UIcon class="w-3 h-3 mr-1 inline-block" :name="getModelIcon(agent.model)"  />
+                                            </span>
                       {{ agent.model }}
                     </div>
                     <div class="text-xs text-gray-300">•</div>

@@ -98,9 +98,7 @@ const recentActivities = ref([
             </div>
           </div>
           <div class="p-3 bg-blue-50 rounded-lg">
-                        <span class="w-6 h-6 text-blue-600 inline-block">
-              <UIcon :name="stat.icon" />
-            </span>
+                        <UIcon class="w-6 h-6 text-blue-600 inline-block" :name="stat.icon"  />
           </div>
         </div>
       </UCard>
@@ -127,9 +125,9 @@ const recentActivities = ref([
           >
             <div class="text-center">
                             <span class="w-12 h-12 text-gray-400 mx-auto mb-2 inline-block">
-                <UIcon
-                                name="i-heroicons-chart-bar" />
-              </span>
+                              <UIcon class="w-12 h-12 text-gray-400 mx-auto mb-2 inline-block"
+                              name="i-heroicons-chart-bar"  />
+                            </span>
               <p class="text-gray-500">
                 {{ $t("dashboard.charts.chartArea") }}
               </p>
@@ -203,8 +201,8 @@ const recentActivities = ref([
           :to="$localePath('/settings/users')"
         >
                     <span class="w-6 h-6 inline-block">
-            <UIcon name="i-heroicons-user-plus" />
-          </span>
+                      <UIcon class="w-6 h-6 inline-block" name="i-heroicons-user-plus"  />
+                    </span>
           <span class="text-sm">{{
             $t("dashboard.quickActions.addUser")
           }}</span>
@@ -216,7 +214,7 @@ const recentActivities = ref([
           :to="$localePath('/content/articles/create')"
         >
           <span class="w-6 h-6 inline-block">
-            <UIcon name="i-heroicons-document-plus" />
+            <UIcon class="w-6 h-6 inline-block" name="i-heroicons-document-plus"  />
           </span>
           <span class="text-sm">{{
             $t("dashboard.quickActions.createArticle")
@@ -229,8 +227,8 @@ const recentActivities = ref([
           :to="$localePath('/analytics')"
         >
                     <span class="w-6 h-6 inline-block">
-            <UIcon name="i-heroicons-chart-bar" />
-          </span>
+                      <UIcon class="w-6 h-6 inline-block" name="i-heroicons-chart-bar"  />
+                    </span>
           <span class="text-sm">{{
             $t("dashboard.quickActions.viewAnalytics")
           }}</span>
@@ -242,8 +240,8 @@ const recentActivities = ref([
           :to="$localePath('/settings')"
         >
                     <span class="w-6 h-6 inline-block">
-            <UIcon name="i-heroicons-cog-6-tooth" />
-          </span>
+                      <UIcon class="w-6 h-6 inline-block" name="i-heroicons-cog-6-tooth"  />
+                    </span>
           <span class="text-sm">{{
             $t("dashboard.quickActions.systemSettings")
           }}</span>

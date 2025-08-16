@@ -115,12 +115,10 @@ const items = computed<DropdownMenuItem[][]>(() => [
   <UDropdownMenu :items="items">
     <UButton variant="ghost" size="sm" class="flex items-center gap-2">
             <span class="w-5 h-5 inline-block">
-        <UIcon :name="currentThemeIcon" />
-      </span>
+              <UIcon class="w-5 h-5 inline-block" :name="currentThemeIcon"  />
+            </span>
       <span class="hidden sm:inline ml-1">主题</span>
-            <span class="w-4 h-4 inline-block">
-        <UIcon name="i-heroicons-chevron-down-20-solid" />
-      </span>
+            <UIcon class="w-4 h-4 inline-block" name="i-heroicons-chevron-down-20-solid"  />
     </UButton>
   </UDropdownMenu>
 </template>

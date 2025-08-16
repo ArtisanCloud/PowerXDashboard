@@ -42,9 +42,7 @@ const items = computed<DropdownMenuItem[][]>(() => [
     <UButton variant="ghost" class="flex items-center gap-2">
       <span class="text-lg">{{ current.flag }}</span>
       <span class="hidden sm:inline">{{ current.name }}</span>
-            <span class="w-4 h-4 inline-block">
-        <UIcon name="i-heroicons-chevron-down-20-solid" />
-      </span>
+            <UIcon class="w-4 h-4 inline-block" name="i-heroicons-chevron-down-20-solid"  />
     </UButton>
   </UDropdownMenu>
 </template>

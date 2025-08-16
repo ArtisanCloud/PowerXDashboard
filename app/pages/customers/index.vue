@@ -17,9 +17,7 @@ const { t } = useI18n()
     
     <div class="bg-white rounded-lg shadow p-6">
       <div class="text-center py-12">
-                <span class="w-16 h-16 text-gray-400 mx-auto mb-4 inline-block">
-          <UIcon name="i-heroicons-users" />
-        </span>
+                <UIcon class="w-16 h-16 text-gray-400 mx-auto mb-4 inline-block" name="i-heroicons-users"  />
         <h3 class="text-lg font-medium text-gray-900 mb-2">客户列表</h3>
         <p class="text-gray-500">客户管理功能正在开发中...</p>
       </div>

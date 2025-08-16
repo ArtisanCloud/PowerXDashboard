@@ -130,16 +130,12 @@ const handleSearch = () => {
               :to="$localePath('/dashboard')"
               class="text-gray-500 hover:text-gray-700"
             >
-                            <span class="w-4 h-4 inline-block">
-                <UIcon name="i-heroicons-home" />
-              </span>
+             <UIcon class="w-4 h-4 inline-block" name="i-heroicons-home"  />
             </NuxtLink>
           </li>
           <li class="flex items-center">
-                        <span class="w-4 h-4 text-gray-400 mx-2 inline-block">
-              <UIcon
-                            name="i-heroicons-chevron-right" />
-            </span>
+                        <UIcon class="w-4 h-4 text-gray-400 mx-2 inline-block"
+                          name="i-heroicons-chevron-right"  />
             <span class="text-sm font-medium text-gray-900">{{
               $route.meta.title || t("dashboard.title")
             }}</span>
@@ -197,8 +193,8 @@ const handleSearch = () => {
       <UDropdownMenu :items="notificationItems">
         <UButton variant="ghost" size="sm" class="relative">
                     <span class="w-5 h-5 inline-block">
-            <UIcon name="i-heroicons-bell" />
-          </span>
+                      <UIcon class="w-5 h-5 inline-block" name="i-heroicons-bell"  />
+                    </span>
           <UBadge
             v-if="unreadCount > 0"
             :label="unreadCount.toString()"
@@ -219,17 +215,17 @@ const handleSearch = () => {
             class="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center"
           >
                         <span class="w-5 h-5 text-gray-600 inline-block">
-              <UIcon name="i-heroicons-user" />
-            </span>
+                          <UIcon class="w-5 h-5 text-gray-600 inline-block" name="i-heroicons-user"  />
+                        </span>
           </div>
           <div class="hidden md:block text-left">
             <div class="text-sm font-medium text-gray-900">{{ user.name }}</div>
             <div class="text-xs text-gray-500">{{ user.email }}</div>
           </div>
                     <span class="w-4 h-4 text-gray-400 inline-block">
-            <UIcon
-                        name="i-heroicons-chevron-down" />
-          </span>
+                      <UIcon class="w-4 h-4 text-gray-400 inline-block"
+                      name="i-heroicons-chevron-down"  />
+                    </span>
         </UButton>
       </UDropdownMenu>
     </div>

@@ -108,39 +108,27 @@
         
         <div class="grid grid-cols-6 gap-4">
           <div class="text-center">
-                        <span class="w-8 h-8 mx-auto mb-2 inline-block">
-              <UIcon name="i-heroicons-home" />
-            </span>
+                        <UIcon class="w-8 h-8 mx-auto mb-2 inline-block" name="i-heroicons-home"  />
             <p class="text-sm">首页</p>
           </div>
           <div class="text-center">
-                        <span class="w-8 h-8 mx-auto mb-2 inline-block">
-              <UIcon name="i-heroicons-user" />
-            </span>
+                        <UIcon class="w-8 h-8 mx-auto mb-2 inline-block" name="i-heroicons-user"  />
             <p class="text-sm">用户</p>
           </div>
           <div class="text-center">
-                        <span class="w-8 h-8 mx-auto mb-2 inline-block">
-              <UIcon name="i-heroicons-cog-6-tooth" />
-            </span>
+                        <UIcon class="w-8 h-8 mx-auto mb-2 inline-block" name="i-heroicons-cog-6-tooth"  />
             <p class="text-sm">设置</p>
           </div>
           <div class="text-center">
-                        <span class="w-8 h-8 mx-auto mb-2 text-red-500 inline-block">
-              <UIcon name="i-heroicons-heart" />
-            </span>
+                        <UIcon class="w-8 h-8 mx-auto mb-2 text-red-500 inline-block" name="i-heroicons-heart"  />
             <p class="text-sm">喜欢</p>
           </div>
           <div class="text-center">
-                        <span class="w-8 h-8 mx-auto mb-2 text-yellow-500 inline-block">
-              <UIcon name="i-heroicons-star" />
-            </span>
+                        <UIcon class="w-8 h-8 mx-auto mb-2 text-yellow-500 inline-block" name="i-heroicons-star"  />
             <p class="text-sm">收藏</p>
           </div>
           <div class="text-center">
-                        <span class="w-8 h-8 mx-auto mb-2 text-blue-500 inline-block">
-              <UIcon name="i-heroicons-bell" />
-            </span>
+                        <UIcon class="w-8 h-8 mx-auto mb-2 text-blue-500 inline-block" name="i-heroicons-bell"  />
             <p class="text-sm">通知</p>
           </div>
         </div>

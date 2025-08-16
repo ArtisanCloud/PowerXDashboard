@@ -17,9 +17,8 @@ const { t } = useI18n()
     
     <div class="bg-white rounded-lg shadow p-6">
       <div class="text-center py-12">
-                <span class="w-16 h-16 text-gray-400 mx-auto mb-4 inline-block">
-          <UIcon name="i-heroicons-shopping-cart" />
-        </span>
+                  <UIcon class="w-16 h-16 text-gray-400 mx-auto mb-4 inline-block" name="i-heroicons-shopping-cart"  />
+
         <h3 class="text-lg font-medium text-gray-900 mb-2">订单列表</h3>
         <p class="text-gray-500">订单管理功能正在开发中...</p>
         <UBadge color="primary" class="mt-2">新功能</UBadge>
