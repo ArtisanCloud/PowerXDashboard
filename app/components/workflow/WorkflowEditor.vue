@@ -1,22 +1,57 @@
 <template>
-  <div class="workflow-editor" :class="{ 'dark': isDark }">
+  <div class="workflow-editor" :class="{ dark: isDark }">
     <!-- 工具栏 -->
     <div class="workflow-toolbar">
-      <UButton icon="i-heroicons-arrow-uturn-left" color="neutral" variant="ghost" @click="undo" :disabled="!canUndo">
+      <UButton
+        icon="i-heroicons-arrow-uturn-left"
+        color="neutral"
+        variant="ghost"
+        size="sm"
+        class="gap-2 whitespace-nowrap"
+        @click="undo"
+        :disabled="!canUndo"
+      >
         撤销
       </UButton>
-      <UButton icon="i-heroicons-arrow-uturn-right" color="neutral" variant="ghost" @click="redo" :disabled="!canRedo">
+      <UButton
+        icon="i-heroicons-arrow-uturn-right"
+        color="neutral"
+        variant="ghost"
+        size="sm"
+        class="gap-2 whitespace-nowrap"
+        @click="redo"
+        :disabled="!canRedo"
+      >
         重做
       </UButton>
       <USeparator vertical />
-      <UButton icon="i-heroicons-plus" color="primary" @click="handleFitView">
+      <UButton
+        icon="i-heroicons-plus"
+        color="primary"
+        size="sm"
+        class="gap-2 whitespace-nowrap"
+        @click="handleFitView"
+      >
         适应视图
       </UButton>
-      <UButton icon="i-heroicons-document-plus" color="primary" variant="ghost" @click="handleSaveWorkflow">
+      <UButton
+        icon="i-heroicons-document-plus"
+        color="primary"
+        variant="ghost"
+        size="sm"
+        class="gap-2 whitespace-nowrap"
+        @click="handleSaveWorkflow"
+      >
         保存
       </UButton>
       <div class="flex-grow"></div>
-      <UButton icon="i-heroicons-play" color="success" @click="runWorkflow">
+      <UButton
+        icon="i-heroicons-play"
+        color="success"
+        size="sm"
+        class="gap-2 whitespace-nowrap"
+        @click="runWorkflow"
+      >
         运行
       </UButton>
     </div>
@@ -27,16 +62,16 @@
       <div class="workflow-palette">
         <h3 class="palette-title">节点清单</h3>
         <div class="palette-search">
-          <UInput 
-            v-model="paletteSearch" 
-            icon="i-heroicons-magnifying-glass" 
+          <UInput
+            v-model="paletteSearch"
+            icon="i-heroicons-magnifying-glass"
             placeholder="搜索节点..."
             :color="isDark ? 'gray' : 'white'"
           />
         </div>
         <div class="palette-items">
-          <div 
-            v-for="item in filteredPalette" 
+          <div
+            v-for="item in filteredPalette"
             :key="item.id"
             class="palette-item"
             draggable="true"
@@ -70,10 +105,13 @@
           @node-click="onNodeClick"
         >
           <template #node-generic="nodeProps">
-            <GenericNode v-bind="nodeProps" @update:props="updateNodeProps(nodeProps.id, $event)" />
+            <GenericNode
+              v-bind="nodeProps"
+              @update:props="updateNodeProps(nodeProps.id, $event)"
+            />
           </template>
-          
-          <Background pattern-color="#aaa" gap="8" />
+
+          <Background pattern-color="#aaa" :gap="8" />
           <MiniMap />
           <Controls />
         </VueFlow>
@@ -85,13 +123,18 @@
         <div class="properties-content">
           <div class="properties-header">
             <h4>{{ selectedNode.data.label }}</h4>
-            <div class="properties-kind">{{ getKindLabel(selectedNode.data.kind) }}</div>
+            <div class="properties-kind">
+              {{ getKindLabel(selectedNode.data.kind) }}
+            </div>
           </div>
-          
+
           <USeparator />
-          
+
           <div class="properties-form">
-            <template v-for="(value, key) in selectedNode.data.props" :key="key">
+            <template
+              v-for="(value, key) in selectedNode.data.props"
+              :key="key"
+            >
               <div class="properties-field">
                 <UForm :label="key">
                   <!-- 根据属性类型渲染不同的输入控件 -->
@@ -99,29 +142,35 @@
                     <USwitch v-model="selectedNode.data.props[key]" />
                   </template>
                   <template v-else-if="typeof value === 'number'">
-                    <UInput 
-                      v-model.number="selectedNode.data.props[key]" 
-                      type="number" 
-                      :step="getNumberStep(key, selectedNode.data.schema)" 
+                    <UInput
+                      v-model.number="selectedNode.data.props[key]"
+                      type="number"
+                      :step="getNumberStep(key, selectedNode.data.schema)"
                     />
                   </template>
-                  <template v-else-if="isEnumField(key, selectedNode.data.schema)">
-                    <USelect 
-                      v-model="selectedNode.data.props[key]" 
-                      :options="getEnumOptions(key, selectedNode.data.schema)" 
+                  <template
+                    v-else-if="isEnumField(key, selectedNode.data.schema)"
+                  >
+                    <USelect
+                      v-model="selectedNode.data.props[key]"
+                      :options="getEnumOptions(key, selectedNode.data.schema)"
                     />
                   </template>
-                  <template v-else-if="typeof value === 'string' && value.length > 50">
-                    <UTextarea 
-                      v-model="selectedNode.data.props[key]" 
-                      :rows="5" 
+                  <template
+                    v-else-if="typeof value === 'string' && value.length > 50"
+                  >
+                    <UTextarea
+                      v-model="selectedNode.data.props[key]"
+                      :rows="5"
                     />
                   </template>
-                  <template v-else-if="typeof value === 'object' && value !== null">
-                    <UTextarea 
-                      v-model="objectProps[key]" 
-                      :rows="5" 
-                      @blur="updateObjectProp(key)" 
+                  <template
+                    v-else-if="typeof value === 'object' && value !== null"
+                  >
+                    <UTextarea
+                      v-model="objectProps[key]"
+                      :rows="5"
+                      @blur="updateObjectProp(key)"
                     />
                   </template>
                   <template v-else>
@@ -138,68 +187,69 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, onMounted, reactive } from 'vue';
-import { VueFlow, useVueFlow } from '@vue-flow/core'
-import { Background } from '@vue-flow/background'
-import { Controls } from '@vue-flow/controls'
-import { MiniMap } from '@vue-flow/minimap'
-import type { Node, Edge, Connection } from '@vue-flow/core'
-import type { KindSpec, PaletteItem } from '~/types/workflow'
+import { ref, computed, watch, onMounted, reactive } from "vue";
+import { VueFlow, useVueFlow } from "@vue-flow/core";
+import { Background } from "@vue-flow/background";
+import { Controls } from "@vue-flow/controls";
+import { MiniMap } from "@vue-flow/minimap";
+import type { Node, Edge, Connection } from "@vue-flow/core";
+import type { KindSpec, PaletteItem } from "~/types/workflow";
 
-import '@vue-flow/core/dist/style.css'
-import '@vue-flow/core/dist/theme-default.css'
-import '@vue-flow/controls/dist/style.css'
-import '@vue-flow/minimap/dist/style.css'
+import "@vue-flow/core/dist/style.css";
+import "@vue-flow/core/dist/theme-default.css";
+import "@vue-flow/controls/dist/style.css";
+import "@vue-flow/minimap/dist/style.css";
 
-import '@vue-flow/core/dist/style.css';
-import '@vue-flow/core/dist/theme-default.css';
-import '@vue-flow/controls/dist/style.css';
-import '@vue-flow/minimap/dist/style.css';
-import { useWorkflowManager } from '~/composables/workflow/useWorkflowManager';
-import GenericNode from './nodes/GenericNode.vue';
+import "@vue-flow/core/dist/style.css";
+import "@vue-flow/core/dist/theme-default.css";
+import "@vue-flow/controls/dist/style.css";
+import "@vue-flow/minimap/dist/style.css";
+import { useWorkflowManager } from "~/composables/workflow/useWorkflowManager";
+import GenericNode from "./nodes/GenericNode.vue";
 
 // 主题支持
-const colorMode = useColorMode()
-const isDark = computed(() => colorMode.value === 'dark')
+const colorMode = useColorMode();
+const isDark = computed(() => colorMode.value === "dark");
 
 // 工作流管理器
-const { 
-  kinds, 
-  palette, 
-  currentWorkflow, 
-  loadKinds, 
-  loadPalette, 
-  addNodeFromPalette, 
-  saveWorkflow 
+const {
+  kinds,
+  palette,
+  currentWorkflow,
+  loadKinds,
+  loadPalette,
+  addNodeFromPalette,
+  saveWorkflow,
 } = useWorkflowManager();
 
 // Vue Flow 实例
-const { 
-  findNode, 
-  getNodes, 
-  getEdges, 
-  addEdges, 
-  setViewport, 
+const {
+  findNode,
+  getNodes,
+  getEdges,
+  addEdges,
+  setViewport,
   fitView,
   project,
-  addNodes
+  addNodes,
 } = useVueFlow();
 
 // 状态
 const nodes = ref<Node[]>([]);
 const edges = ref<Edge[]>([]);
-const paletteSearch = ref('');
+const paletteSearch = ref("");
 const selectedNode = ref<Node | null>(null);
 const objectProps = reactive<Record<string, string>>({});
 
 // 过滤后的节点清单
 const filteredPalette = computed(() => {
   if (!paletteSearch.value) return palette.value;
-  
+
   const search = paletteSearch.value.toLowerCase();
-  return palette.value.filter(item => 
-    item.label.toLowerCase().includes(search) || 
-    item.kind.toLowerCase().includes(search)
+  return palette.value.filter(
+    (item) =>
+      item.label.toLowerCase().includes(search) ||
+      item.kind.toLowerCase().includes(search)
   );
 });
 
@@ -211,24 +261,24 @@ function getKindLabel(kind: string) {
 // 拖拽开始
 function onDragStart(event: DragEvent, paletteId: string) {
   if (event.dataTransfer) {
-    event.dataTransfer.setData('application/vueflow', paletteId);
-    event.dataTransfer.effectAllowed = 'move';
+    event.dataTransfer.setData("application/vueflow", paletteId);
+    event.dataTransfer.effectAllowed = "move";
   }
 }
 
 // 拖拽放置
 function onDrop(event: DragEvent) {
   if (!event.dataTransfer) return;
-  
-  const paletteId = event.dataTransfer.getData('application/vueflow');
+
+  const paletteId = event.dataTransfer.getData("application/vueflow");
   if (!paletteId) return;
-  
+
   // 获取放置位置
   const position = project({
     x: event.clientX,
     y: event.clientY,
   });
-  
+
   // 添加节点
   const newNode = addNodeFromPalette(paletteId, position);
   if (newNode) {
@@ -252,12 +302,12 @@ const canRedo = ref(false);
 
 function undo() {
   // 简单的撤销实现
-  console.log('撤销操作');
+  console.log("撤销操作");
 }
 
 function redo() {
   // 简单的重做实现
-  console.log('重做操作');
+  console.log("重做操作");
 }
 
 // 允许拖拽
@@ -265,15 +315,15 @@ function onDragOver(event: DragEvent) {
   if (event.preventDefault) {
     event.preventDefault();
   }
-  
+
   if (event.dataTransfer) {
-    event.dataTransfer.dropEffect = 'move';
+    event.dataTransfer.dropEffect = "move";
   }
 }
 
 // 连接节点
 function handleConnect(params: Connection) {
-  console.log('连接节点:', params);
+  console.log("连接节点:", params);
   addEdges([params]);
 }
 
@@ -291,11 +341,11 @@ function onReady() {
 function onNodeClick(event: { node: Node }) {
   const node = event.node;
   selectedNode.value = node;
-  
+
   // 初始化对象属性编辑器
   if (node.data.props) {
     for (const [key, value] of Object.entries(node.data.props)) {
-      if (typeof value === 'object' && value !== null) {
+      if (typeof value === "object" && value !== null) {
         objectProps[key] = JSON.stringify(value, null, 2);
       }
     }
@@ -313,13 +363,17 @@ function updateNodeProps(nodeId: string, newProps: Record<string, any>) {
 // 更新对象属性
 function updateObjectProp(key: string) {
   if (!selectedNode.value) return;
-  
+
   try {
     selectedNode.value.data.props[key] = JSON.parse(objectProps[key]);
   } catch (err) {
     console.error(`无法解析JSON: ${objectProps[key]}`, err);
     // 恢复原始值
-    objectProps[key] = JSON.stringify(selectedNode.value.data.props[key], null, 2);
+    objectProps[key] = JSON.stringify(
+      selectedNode.value.data.props[key],
+      null,
+      2
+    );
   }
 }
 
@@ -334,17 +388,17 @@ function getEnumOptions(key: string, schema: any) {
   if (!schema?.properties?.[key]?.enum) return [];
   return schema.properties[key].enum.map((value: any) => ({
     label: value,
-    value
+    value,
   }));
 }
 
 // 获取数字输入步长
 function getNumberStep(key: string, schema: any) {
   if (!schema?.properties?.[key]) return 1;
-  
+
   const prop = schema.properties[key];
-  if (prop.type !== 'number') return 1;
-  
+  if (prop.type !== "number") return 1;
+
   // 如果有最小和最大值，计算合适的步长
   if (prop.minimum !== undefined && prop.maximum !== undefined) {
     const range = prop.maximum - prop.minimum;
@@ -353,14 +407,14 @@ function getNumberStep(key: string, schema: any) {
     if (range <= 100) return 1;
     return Math.pow(10, Math.floor(Math.log10(range)) - 2);
   }
-  
+
   return 1;
 }
 
 // 运行工作流
 function runWorkflow() {
   // 这里应该调用API运行工作流
-  console.log('运行工作流', currentWorkflow.value?.id);
+  console.log("运行工作流", currentWorkflow.value?.id);
 }
 
 // 注意：在当前版本的 Vue Flow 中，我们通过点击事件来处理节点选择
@@ -388,7 +442,7 @@ onMounted(async () => {
   align-items: center;
   padding: 8px 16px;
   border-bottom: 1px solid var(--border-color);
-  gap: 8px;
+  gap: 12px;
   background-color: var(--bg-secondary);
 }
 

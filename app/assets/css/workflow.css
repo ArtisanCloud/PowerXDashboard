@@ -74,3 +74,55 @@
 .vue-flow-wrapper .vue-flow__controls button:hover {
   background: #f5f5f5;
 }
+
+/* =========================
+   Workflow 面板（节点清单）
+   ========================= */
+
+.workflow-palette .palette-items {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.5rem; /* 8px */
+}
+
+.workflow-palette .palette-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;               /* 8px */
+  padding: 0.5rem 0.75rem;   /* 8px 12px */
+  border: 1px solid #e5e7eb; /* gray-200 */
+  border-radius: 0.5rem;     /* rounded-lg */
+  background-color: #ffffff; /* white */
+  transition: background-color 150ms ease, border-color 150ms ease, box-shadow 150ms ease;
+}
+
+.workflow-palette .palette-item:hover {
+  border-color: #cbd5e1;     /* slate-300 */
+  background-color: #f8fafc; /* slate-50 */
+}
+
+.workflow-palette .palette-item-icon {
+  width: 1.75rem;  /* w-7 */
+  height: 1.75rem; /* h-7 */
+  border-radius: 0.375rem; /* rounded-md */
+  display: grid;
+  place-items: center;
+  color: #334155;           /* slate-700 */
+  background-color: #f1f5f9;/* slate-100 */
+}
+
+/* 暗色模式支持 */
+.dark .workflow-palette .palette-item {
+  border-color: #334155;     /* slate-700 */
+  background-color: #0f172a; /* slate-900 */
+}
+
+.dark .workflow-palette .palette-item:hover {
+  border-color: #475569;     /* slate-600 */
+  background-color: #111827; /* gray-900 */
+}
+
+.dark .workflow-palette .palette-item-icon {
+  color: #cbd5e1;            /* slate-300 */
+  background-color: #1f2937; /* gray-800 */
+}
