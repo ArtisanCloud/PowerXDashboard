@@ -2,18 +2,40 @@
   <div 
     :class="[
       'wf-node', 
-      `wf-node-${nodeData.ui.shape}`, 
-      `wf-node-${nodeData.ui.colorToken || 'default'}`
+      `wf-node-${nodeData.ui?.shape || 'card'}`, 
+      `wf-node-${nodeData.ui?.colorToken || 'default'}`
     ]"
     :style="nodeStyle"
   >
+    <!-- 输入端口 -->
+    <template v-for="port in (nodeData.ports?.inputs || [])" :key="`in-${port.name}`">
+      <Handle
+        :id="port.name"
+        type="target"
+        :position="getHandlePosition('in', port.name)"
+        :style="getHandleStyle('in', port.name)"
+        class="wf-node-handle wf-node-handle-in"
+      />
+    </template>
+
+    <!-- 输出端口 -->
+    <template v-for="port in (nodeData.ports?.outputs || [])" :key="`out-${port.name}`">
+      <Handle
+        :id="port.name"
+        type="source"
+        :position="getHandlePosition('out', port.name)"
+        :style="getHandleStyle('out', port.name)"
+        class="wf-node-handle wf-node-handle-out"
+      />
+    </template>
+
     <!-- 节点头部 -->
     <div class="wf-node-header">
-      <div class="wf-node-icon" v-if="nodeData.ui.icon">
+      <div class="wf-node-icon" v-if="nodeData.ui?.icon">
         <Icon :name="nodeData.ui.icon" />
       </div>
       <div class="wf-node-title">{{ nodeData.label }}</div>
-      <div class="wf-node-badges" v-if="nodeData.ui.badges && nodeData.ui.badges.length">
+      <div class="wf-node-badges" v-if="nodeData.ui?.badges && nodeData.ui.badges.length">
         <span 
           v-for="badge in nodeData.ui.badges" 
           :key="badge" 
@@ -28,47 +50,26 @@
     <div class="wf-node-content">
       <!-- 如果有自定义组件，则使用自定义组件 -->
       <component 
-        v-if="nodeData.ui.component && registeredComponents[nodeData.ui.component]" 
+        v-if="nodeData.ui?.component && registeredComponents[nodeData.ui.component]" 
         :is="registeredComponents[nodeData.ui.component]"
         :node-data="nodeData"
         @update:props="updateProps"
       />
       <!-- 否则使用默认预览模板 -->
-      <div v-else-if="nodeData.ui.previewTpl" class="wf-node-preview">
+      <div v-else-if="nodeData.ui?.previewTpl" class="wf-node-preview">
         {{ renderPreviewTemplate(nodeData.ui.previewTpl, nodeData.props) }}
       </div>
       <!-- 最简单的情况，显示属性数量 -->
       <div v-else class="wf-node-props-count">
-        {{ Object.keys(nodeData.props).length }} 个属性
+        {{ Object.keys(nodeData.props || {}).length }} 个属性
       </div>
     </div>
-
-    <!-- 输入端口 -->
-    <template v-for="port in nodeData.ports.inputs" :key="`in-${port.name}`">
-      <div 
-        :class="['wf-node-port', 'wf-node-port-in']"
-        :style="getPortPosition('in', port.name)"
-      >
-        <div class="wf-node-port-handle" :data-handle-id="port.name" />
-        <div class="wf-node-port-label">{{ port.label || port.name }}</div>
-      </div>
-    </template>
-
-    <!-- 输出端口 -->
-    <template v-for="port in nodeData.ports.outputs" :key="`out-${port.name}`">
-      <div 
-        :class="['wf-node-port', 'wf-node-port-out']"
-        :style="getPortPosition('out', port.name)"
-      >
-        <div class="wf-node-port-label">{{ port.label || port.name }}</div>
-        <div class="wf-node-port-handle" :data-handle-id="port.name" />
-      </div>
-    </template>
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed, inject } from 'vue';
+import { Handle, Position } from '@vue-flow/core';
 import type { NodeData } from '~/types/workflow';
 
 const props = defineProps<{
@@ -78,28 +79,29 @@ const props = defineProps<{
 }>();
 
 // 注册的自定义组件
-const registeredComponents = inject('workflowComponents', {});
+const registeredComponents = inject('workflowComponents', {} as Record<string, any>);
 
 // 节点数据
 const nodeData = computed(() => props.data);
 
 // 节点样式
 const nodeStyle = computed(() => {
-  const { size } = nodeData.value.ui;
+  const size = nodeData.value.ui?.size;
   return {
     width: size?.w ? `${size.w}px` : 'auto',
+    minWidth: '150px',
     minHeight: size?.h ? `${size.h}px` : 'auto',
   };
 });
 
-// 获取端口位置
-function getPortPosition(type: 'in' | 'out', portName: string) {
-  const handles = nodeData.value.ui.handles || {};
+// 获取 Handle 位置
+function getHandlePosition(type: 'in' | 'out', portName: string): Position {
+  const handles = nodeData.value.ui?.handles || {};
   
   // 默认位置映射
   const defaultPositions = {
-    in: 'left',
-    out: 'right'
+    in: Position.Left,
+    out: Position.Right
   };
   
   // 查找端口在哪个位置
@@ -107,14 +109,50 @@ function getPortPosition(type: 'in' | 'out', portName: string) {
   
   for (const [pos, ports] of Object.entries(handles)) {
     if (Array.isArray(ports) && ports.includes(portName)) {
-      position = pos;
+      switch (pos) {
+        case 'top':
+          position = Position.Top;
+          break;
+        case 'right':
+          position = Position.Right;
+          break;
+        case 'bottom':
+          position = Position.Bottom;
+          break;
+        case 'left':
+          position = Position.Left;
+          break;
+      }
       break;
     }
   }
   
-  return {
-    '--port-position': position,
+  return position;
+}
+
+// 获取 Handle 样式
+function getHandleStyle(type: 'in' | 'out', portName: string) {
+  const position = getHandlePosition(type, portName);
+  
+  // 根据位置调整样式
+  const baseStyle = {
+    width: '10px',
+    height: '10px',
+    background: '#555',
+    border: '2px solid #fff',
   };
+  
+  switch (position) {
+    case Position.Top:
+      return { ...baseStyle, top: '-6px', left: '50%', transform: 'translateX(-50%)' };
+    case Position.Right:
+      return { ...baseStyle, right: '-6px', top: '50%', transform: 'translateY(-50%)' };
+    case Position.Bottom:
+      return { ...baseStyle, bottom: '-6px', left: '50%', transform: 'translateX(-50%)' };
+    case Position.Left:
+    default:
+      return { ...baseStyle, left: '-6px', top: '50%', transform: 'translateY(-50%)' };
+  }
 }
 
 // 渲染预览模板
@@ -257,42 +295,23 @@ const emit = defineEmits(['update:props']);
   font-style: italic;
 }
 
-/* 端口样式 */
-.wf-node-port {
+/* Handle 样式 */
+.wf-node-handle {
   position: absolute;
-  display: flex;
-  align-items: center;
-  font-size: 10px;
-}
-
-.wf-node-port-in {
-  left: 0;
-  transform: translateX(-50%);
-}
-
-.wf-node-port-out {
-  right: 0;
-  transform: translateX(50%);
-}
-
-.wf-node-port-handle {
-  width: 10px;
-  height: 10px;
-  background-color: #9ca3af;
   border-radius: 50%;
   cursor: crosshair;
+  z-index: 10;
 }
 
-.wf-node-port-in .wf-node-port-handle {
-  margin-right: 4px;
+.wf-node-handle:hover {
+  background: #3b82f6 !important;
 }
 
-.wf-node-port-out .wf-node-port-handle {
-  margin-left: 4px;
+.wf-node-handle-in {
+  background: #10b981;
 }
 
-.wf-node-port-label {
-  white-space: nowrap;
-  color: #6b7280;
+.wf-node-handle-out {
+  background: #f59e0b;
 }
 </style>

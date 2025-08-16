@@ -277,9 +277,9 @@ function handleConnect(connection: Connection) {
   const edge: Edge = {
     id: `e-${connection.source}-${connection.sourceHandle || 'default'}-${connection.target}-${connection.targetHandle || 'default'}`,
     source: connection.source || '',
-    sourceHandle: connection.sourceHandle || 'default',
+    sourceHandle: connection.sourceHandle,
     target: connection.target || '',
-    targetHandle: connection.targetHandle || 'default',
+    targetHandle: connection.targetHandle,
     type: 'smoothstep',
     animated: true,
   };

@@ -11,7 +11,3 @@ import { Background } from '@vue-flow/background'
     </div>
   </div>
 </template>
-
-<style scoped>
-@import './style.css'
-</style>

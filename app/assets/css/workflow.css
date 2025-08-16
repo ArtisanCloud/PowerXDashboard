@@ -1,0 +1,76 @@
+/* Workflow 组件专用样式 - 用于解决与主题CSS的冲突 */
+
+/* 重置Vue Flow组件的样式，避免被主题CSS覆盖 */
+.vue-flow-wrapper {
+  /* 创建一个独立的样式作用域 */
+  isolation: isolate;
+}
+
+.vue-flow-wrapper .vue-flow,
+.vue-flow-wrapper .vue-flow *,
+.vue-flow-wrapper .vue-flow__node,
+.vue-flow-wrapper .vue-flow__edge,
+.vue-flow-wrapper .vue-flow__handle,
+.vue-flow-wrapper .vue-flow__background,
+.vue-flow-wrapper .vue-flow__controls,
+.vue-flow-wrapper .vue-flow__minimap {
+  /* 重置主题CSS的强制样式 */
+  background-color: revert !important;
+  color: revert !important;
+  border-color: revert !important;
+  transition: revert !important;
+}
+
+/* 确保Vue Flow容器有正确的尺寸 */
+.vue-flow-wrapper .vue-flow {
+  width: 100%;
+  height: 100%;
+  background-color: #f8f9fa;
+}
+
+/* 确保默认节点样式不被覆盖 */
+.vue-flow-wrapper .vue-flow__node-default {
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 3px;
+  color: #222;
+  font-size: 12px;
+  padding: 10px;
+  text-align: center;
+  width: 150px;
+}
+
+/* 确保连接点样式正确 */
+.vue-flow-wrapper .vue-flow__handle {
+  background: #555;
+  border: 2px solid white;
+  border-radius: 50%;
+  height: 8px;
+  width: 8px;
+}
+
+/* 确保边线样式正确 */
+.vue-flow-wrapper .vue-flow__edge-default {
+  stroke: #b1b1b7;
+  stroke-width: 1;
+}
+
+/* 确保控制按钮样式正确 */
+.vue-flow-wrapper .vue-flow__controls {
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.vue-flow-wrapper .vue-flow__controls button {
+  background: white;
+  border: none;
+  color: #555;
+  cursor: pointer;
+  padding: 5px;
+}
+
+.vue-flow-wrapper .vue-flow__controls button:hover {
+  background: #f5f5f5;
+}

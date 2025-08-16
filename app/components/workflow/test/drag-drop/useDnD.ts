@@ -1,38 +1,38 @@
 import { useVueFlow } from '@vue-flow/core'
-import {  watch, onUnmounted, type Ref } from 'vue'
+import { ref, watch } from 'vue'
 
 let id = 0
 
 /**
- * 生成唯一ID
- * @returns {string} - 唯一ID
+ * @returns {string} - A unique id.
  */
-function getId(): string {
+function getId() {
   return `dndnode_${id++}`
 }
 
 /**
- * 拖放状态接口
+ * In a real world scenario you'd want to avoid creating refs in a global scope like this as they might not be cleaned up properly.
+ * @type {{draggedType: Ref<string|null>, isDragOver: Ref<boolean>, isDragging: Ref<boolean>}}
  */
-interface DragDropState {
-  draggedType: Ref<string | null>
-  isDragOver: Ref<boolean>
-  isDragging: Ref<boolean>
+const state = {
+  /**
+   * The type of the node being dragged.
+   */
+  draggedType: ref(null),
+  isDragOver: ref(false),
+  isDragging: ref(false),
 }
 
 export default function useDragAndDrop() {
-  // 每个组件实例都有自己的状态，避免全局状态冲突
-  const draggedType = ref<string | null>(null)
-  const isDragOver = ref(false)
-  const isDragging = ref(false)
+  const { draggedType, isDragOver, isDragging } = state
 
   const { addNodes, screenToFlowCoordinate, onNodesInitialized, updateNode } = useVueFlow()
 
-  const unwatchDragging = watch(isDragging, (dragging) => {
+  watch(isDragging, (dragging) => {
     document.body.style.userSelect = dragging ? 'none' : ''
   })
 
-  function onDragStart(event: DragEvent, type: string) {
+  function onDragStart(event, type) {
     if (event.dataTransfer) {
       event.dataTransfer.setData('application/vueflow', type)
       event.dataTransfer.effectAllowed = 'move'
@@ -45,10 +45,11 @@ export default function useDragAndDrop() {
   }
 
   /**
-   * 处理拖拽悬停事件
+   * Handles the drag over event.
+   *
    * @param {DragEvent} event
    */
-  function onDragOver(event: DragEvent) {
+  function onDragOver(event) {
     event.preventDefault()
 
     if (draggedType.value) {
@@ -72,57 +73,40 @@ export default function useDragAndDrop() {
   }
 
   /**
-   * 处理拖放事件
+   * Handles the drop event.
+   *
    * @param {DragEvent} event
    */
-  function onDrop(event: DragEvent) {
-    event.preventDefault()
-    
-    if (!draggedType.value) {
-      return
-    }
-
+  function onDrop(event) {
     const position = screenToFlowCoordinate({
       x: event.clientX,
       y: event.clientY,
     })
 
     const nodeId = getId()
-    const nodeType = draggedType.value // 确保类型不为null
 
     const newNode = {
       id: nodeId,
-      type: nodeType,
+      type: draggedType.value,
       position,
-      data: { label: `${nodeType} ${nodeId}` },
+      data: { label: nodeId },
     }
 
     /**
-     * 拖放后对齐节点位置，使其以鼠标为中心
+     * Align node position after drop, so it's centered to the mouse
+     *
+     * We can hook into events even in a callback, and we can remove the event listener after it's been called.
      */
     const { off } = onNodesInitialized(() => {
       updateNode(nodeId, (node) => ({
-        position: { 
-          x: node.position.x - (node.dimensions?.width || 0) / 2, 
-          y: node.position.y - (node.dimensions?.height || 0) / 2 
-        },
+        position: { x: node.position.x - node.dimensions.width / 2, y: node.position.y - node.dimensions.height / 2 },
       }))
 
       off()
     })
 
     addNodes(newNode)
-    
-    // 清理拖拽状态
-    onDragEnd()
   }
-
-  // 组件卸载时清理事件监听器和状态
-  onUnmounted(() => {
-    unwatchDragging()
-    document.removeEventListener('drop', onDragEnd)
-    document.body.style.userSelect = ''
-  })
 
   return {
     draggedType,
