@@ -1,15 +1,15 @@
 <template>
   <div class="workflow-workspace h-full">
-    <WorkflowEditor />
+    <TestWorkflowEditor />
   </div>
 </template>
 
 <script setup lang="ts">
-import WorkflowEditor from '~/components/workflow/WorkflowEditor.vue'
+import TestWorkflowEditor from '~/components/workflow/test/SimpleWorkflowTest.vue'
 
 // 使用工作流布局
 definePageMeta({
-  layout: 'workflow'
+  layout: false
 })
 
 // 设置页面标题
@@ -20,6 +20,8 @@ useHead({
 
 <style scoped>
 .workflow-workspace {
+  width:800px;
+  height: 800px;
   background: #1a1a1a;
 }
 </style>
