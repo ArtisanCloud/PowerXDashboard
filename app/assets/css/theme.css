@@ -54,10 +54,11 @@ aside, .sidebar, [class*="sidebar"] {
   border-color: var(--border-color) !important;
 }
 
-/* 卡片和容器 */
-.bg-white, [class*="bg-white"],
-.u-card, .card, [class*="card"],
-.u-container, .container, [class*="container"] {
+/* 卡片和容器 - 排除Vue Flow组件 */
+.bg-white:not(.vue-flow *):not(.vue-flow__node):not(.vue-flow__edge), 
+[class*="bg-white"]:not(.vue-flow *):not(.vue-flow__node):not(.vue-flow__edge),
+.u-card:not(.vue-flow *), .card:not(.vue-flow *), [class*="card"]:not(.vue-flow *),
+.u-container:not(.vue-flow *), .container:not(.vue-flow *), [class*="container"]:not(.vue-flow *) {
   background-color: var(--card-bg) !important;
 }
 
