@@ -83,7 +83,9 @@
     "noItemsWarning": "경고: 표시할 메뉴 항목이 없습니다",
     "badge": {
       "new": "신규"
-    }
+    },
+    "aiSettings": "모델 설정",
+    "workflow": "워크플로우"
   },
   "header": {
     "profile": "프로필",

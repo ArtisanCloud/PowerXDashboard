@@ -83,7 +83,9 @@
     "noItemsWarning": "Warning: No menu items to display",
     "badge": {
       "new": "New"
-    }
+    },
+    "aiSettings": "Model Settings",
+    "workflow": "Workflow"
   },
   "header": {
     "profile": "Profile",

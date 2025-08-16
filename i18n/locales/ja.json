@@ -83,7 +83,9 @@
     "noItemsWarning": "警告：表示するメニュー項目がありません",
     "badge": {
       "new": "新着"
-    }
+    },
+    "aiSettings": "モデル設定",
+    "workflow": "ワークフロー"
   },
   "header": {
     "profile": "プロフィール",

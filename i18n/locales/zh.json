@@ -84,7 +84,8 @@
     "noItemsWarning": "警告: 没有菜单项可显示",
     "badge": {
       "new": "新"
-    }
+    },
+    "aiSettings": "模型设置"
   },
   "header": {
     "profile": "个人资料",
