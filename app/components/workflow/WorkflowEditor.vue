@@ -69,7 +69,7 @@
           @pane-ready="onReady"
           @node-click="onNodeClick"
         >
-          <template #node-wf-generic="nodeProps">
+          <template #node-generic="nodeProps">
             <GenericNode v-bind="nodeProps" @update:props="updateNodeProps(nodeProps.id, $event)" />
           </template>
           
@@ -178,7 +178,6 @@ const {
   findNode, 
   getNodes, 
   getEdges, 
-  onConnect, 
   addEdges, 
   setViewport, 
   fitView,
@@ -273,18 +272,9 @@ function onDragOver(event: DragEvent) {
 }
 
 // 连接节点
-function handleConnect(connection: Connection) {
-  const edge: Edge = {
-    id: `e-${connection.source}-${connection.sourceHandle || 'default'}-${connection.target}-${connection.targetHandle || 'default'}`,
-    source: connection.source || '',
-    sourceHandle: connection.sourceHandle,
-    target: connection.target || '',
-    targetHandle: connection.targetHandle,
-    type: 'smoothstep',
-    animated: true,
-  };
-  
-  addEdges([edge]);
+function handleConnect(params: Connection) {
+  console.log('连接节点:', params);
+  addEdges([params]);
 }
 
 // 节点拖拽结束
@@ -298,7 +288,7 @@ function onReady() {
 }
 
 // 点击节点
-function onNodeClick(event: any) {
+function onNodeClick(event: { node: Node }) {
   const node = event.node;
   selectedNode.value = node;
   
