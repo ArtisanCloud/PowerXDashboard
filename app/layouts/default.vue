@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
 import { useWindowSize } from '../composables/useWindowSize'
+import Sidebar from '../components/layout/Sidebar.vue'
+import Header from '../components/layout/Header.vue'
 
 // 侧边栏折叠状态
 const sidebarCollapsed = ref(false)

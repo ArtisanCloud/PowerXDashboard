@@ -2,6 +2,7 @@
 import type { DeepReadonly } from 'vue'
 import type { ChatMessage } from '~/types/agent'
 import type { AgentConfig } from '~/composables/useAgentManager'
+import MessageItem from '~/components/agent/MessageItem.vue'
 
 // 如果你没全局声明过，就保留这行；若已有同名类型，删掉这行
 type ConnectionType = 'sse' | 'websocket'

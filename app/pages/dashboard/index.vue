@@ -215,7 +215,7 @@ const recentActivities = ref([
           class="h-20 flex flex-col items-center justify-center space-y-2"
           :to="$localePath('/content/articles/create')"
         >
-                    <span class="w-6 h-6 inline-block">
+          <span class="w-6 h-6 inline-block">
             <UIcon name="i-heroicons-document-plus" />
           </span>
           <span class="text-sm">{{

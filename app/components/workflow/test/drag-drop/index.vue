@@ -2,7 +2,7 @@
 import { ref } from 'vue'
 import { VueFlow, useVueFlow } from '@vue-flow/core'
 import DropzoneBackground from './DropzoneBackground.vue'
-import Sidebar from './WSidebar.vue'
+import WSidebar from './WSidebar.vue'
 import useDragAndDrop from './useDnD'
 
 const { onConnect, addEdges } = useVueFlow()
@@ -27,7 +27,7 @@ onConnect(addEdges)
       </DropzoneBackground>
     </VueFlow>
 
-    <Sidebar />
+    <WSidebar />
   </div>
 </template>
 

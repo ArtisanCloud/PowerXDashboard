@@ -8,7 +8,7 @@
       <UButton icon="i-heroicons-arrow-uturn-right" color="neutral" variant="ghost" @click="redo" :disabled="!canRedo">
         重做
       </UButton>
-      <UDivider vertical />
+      <USeparator vertical />
       <UButton icon="i-heroicons-plus" color="primary" @click="handleFitView">
         适应视图
       </UButton>
@@ -88,7 +88,7 @@
             <div class="properties-kind">{{ getKindLabel(selectedNode.data.kind) }}</div>
           </div>
           
-          <UDivider />
+          <USeparator />
           
           <div class="properties-form">
             <template v-for="(value, key) in selectedNode.data.props" :key="key">
@@ -96,7 +96,7 @@
                 <UForm :label="key">
                   <!-- 根据属性类型渲染不同的输入控件 -->
                   <template v-if="typeof value === 'boolean'">
-                    <UToggle v-model="selectedNode.data.props[key]" />
+                    <USwitch v-model="selectedNode.data.props[key]" />
                   </template>
                   <template v-else-if="typeof value === 'number'">
                     <UInput 

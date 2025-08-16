@@ -18,8 +18,12 @@ export default defineNuxtConfig({
   css: ['~/assets/css/main.css', '@/assets/scss/main.scss'],
   compatibilityDate: '2024-11-01',
   ui: { fonts: false },
+  icon: {
+    // 即使是 SPA 也强制走本地 server 端点（/_icon）
+    provider: 'server'
+    // 如需自定义缓存或前缀，再加 server 相关配置
+  },
 
-  components: [{ path: '~/components', pathPrefix: false }],
 
   // i18n 配置
   i18n: {

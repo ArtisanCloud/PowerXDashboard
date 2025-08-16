@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import type { AgentConfig } from '~/composables/useAgentManager'
+import ChatInterface from '@/components/agent/ChatInterface.vue'
+import ConfigPanel from '@/components/agent/ConfigPanel.vue'
 
 definePageMeta({
   title: 'Agent 对话',

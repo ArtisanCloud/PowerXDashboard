@@ -202,8 +202,8 @@ onMounted(() => {
                 }}</UBadge>
                                 <span class="w-4 h-4 transition-transform inline-block">
                   <UIcon
-                                    name="i-heroicons-chevron-right" :class="{ 'rotate-90': expandedItems.has(item.id) }"
-                                   />
+                      name="i-heroicons-chevron-right" :class="{ 'rotate-90': expandedItems.has(item.id) }"
+                      />
                 </span>
               </div>
             </button>

@@ -77,7 +77,7 @@
                 <label class="font-medium">用户注册</label>
                 <p class="text-sm text-gray-600 dark:text-gray-400">允许新用户注册账号</p>
               </div>
-              <UToggle v-model="settings.allowRegistration" />
+              <USwitch v-model="settings.allowRegistration" />
             </div>
 
             <div class="flex items-center justify-between">
@@ -85,7 +85,7 @@
                 <label class="font-medium">评论功能</label>
                 <p class="text-sm text-gray-600 dark:text-gray-400">启用文章评论功能</p>
               </div>
-              <UToggle v-model="settings.enableComments" />
+              <USwitch v-model="settings.enableComments" />
             </div>
 
             <div class="flex items-center justify-between">
@@ -93,7 +93,7 @@
                 <label class="font-medium">邮件通知</label>
                 <p class="text-sm text-gray-600 dark:text-gray-400">发送系统邮件通知</p>
               </div>
-              <UToggle v-model="settings.emailNotifications" />
+              <USwitch v-model="settings.emailNotifications" />
             </div>
 
             <div class="flex items-center justify-between">
@@ -101,7 +101,7 @@
                 <label class="font-medium">维护模式</label>
                 <p class="text-sm text-gray-600 dark:text-gray-400">启用网站维护模式</p>
               </div>
-              <UToggle v-model="settings.maintenanceMode" />
+              <USwitch v-model="settings.maintenanceMode" />
             </div>
           </div>
         </div>
@@ -115,7 +115,7 @@
                 <label class="font-medium">强制 HTTPS</label>
                 <p class="text-sm text-gray-600 dark:text-gray-400">强制使用 HTTPS 连接</p>
               </div>
-              <UToggle v-model="settings.forceHttps" />
+              <USwitch v-model="settings.forceHttps" />
             </div>
 
             <div class="flex items-center justify-between">
@@ -123,7 +123,7 @@
                 <label class="font-medium">两步验证</label>
                 <p class="text-sm text-gray-600 dark:text-gray-400">启用两步验证功能</p>
               </div>
-              <UToggle v-model="settings.twoFactorAuth" />
+              <USwitch v-model="settings.twoFactorAuth" />
             </div>
 
             <div class="flex items-center justify-between">
