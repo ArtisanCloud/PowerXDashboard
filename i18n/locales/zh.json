@@ -85,7 +85,8 @@
     "badge": {
       "new": "新"
     },
-    "aiSettings": "模型设置"
+    "aiSettings": "模型设置",
+    "pluginMarketplace": "插件市场"
   },
   "header": {
     "profile": "个人资料",

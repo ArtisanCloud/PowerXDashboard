@@ -85,7 +85,8 @@
       "new": "신규"
     },
     "aiSettings": "모델 설정",
-    "workflow": "워크플로우"
+    "workflow": "워크플로우",
+    "pluginMarketplace": "플러그인 마켓"
   },
   "header": {
     "profile": "프로필",

@@ -85,7 +85,8 @@
       "new": "New"
     },
     "aiSettings": "Model Settings",
-    "workflow": "Workflow"
+    "workflow": "Workflow",
+    "pluginMarketplace": "Plugin Marketplace"
   },
   "header": {
     "profile": "Profile",

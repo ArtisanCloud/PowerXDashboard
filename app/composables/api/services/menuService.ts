@@ -70,6 +70,14 @@ export const useMenuService = () => {
           visible: true,
         },
         {
+          id: "plugins",
+          title: "menu.pluginMarketplace",
+          icon: "i-heroicons-puzzle-piece",
+          path: "/plugins",
+          order: 4,
+          visible: true,
+        },
+        {
           id: "dashboard",
           title: "menu.dashboard",
           icon: "i-heroicons-home",
