@@ -89,7 +89,7 @@
       </div>
 
       <!-- 中间画布区域 -->
-      <div class="workflow-canvas">
+      <div class="workflow-canvas vue-flow-wrapper">
         <VueFlow
           v-model:nodes="nodes"
           v-model:edges="edges"

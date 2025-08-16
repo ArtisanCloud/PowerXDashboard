@@ -1,4 +1,4 @@
 @import "tailwindcss";
 @import "@nuxt/ui";
-
-@import "./workflow.css"
+@import "./theme.css";
+@import "./workflow.css";
