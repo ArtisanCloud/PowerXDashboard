@@ -30,7 +30,7 @@
                 >
                 <USelect
                   v-model="state.scope"
-                  :options="scopes"
+                  :items="scopes"
                   icon="i-heroicons-cog-6-tooth"
                 />
               </div>
@@ -52,7 +52,7 @@
                 >
                 <USelect
                   v-model="state.env"
-                  :options="envOptions"
+                  :items="envOptions"
                   icon="i-heroicons-circle-stack"
                 />
               </div>

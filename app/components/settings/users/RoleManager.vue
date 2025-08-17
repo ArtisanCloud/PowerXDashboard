@@ -555,8 +555,8 @@ const permissions = ref<Permission[]>([
 
 // 搜索和筛选
 const searchQuery = ref("");
-const statusFilter = ref("");
-const levelFilter = ref("");
+const statusFilter = ref<string | null>(null);
+const levelFilter = ref<string | null>(null);
 
 // 表单状态
 const showForm = ref(false);
@@ -1098,8 +1098,8 @@ const getRolePermissionDetails = (role: Role) => {
           <UFormField label="状态" class="mb-0">
             <USelect
               v-model="statusFilter"
-              :options="[
-                { label: '全部状态', value: '' },
+              :items="[
+                { label: '全部状态', value: null },
                 { label: '启用', value: 'active' },
                 { label: '禁用', value: 'inactive' },
               ]"
@@ -1115,8 +1115,8 @@ const getRolePermissionDetails = (role: Role) => {
           <UFormField label="权限层级" class="mb-0">
             <USelect
               v-model="levelFilter"
-              :options="[
-                { label: '全部层级', value: '' },
+              :items="[
+                { label: '全部层级', value: null },
                 { label: '1 - 最高级', value: '1' },
                 { label: '2 - 高级', value: '2' },
                 { label: '3 - 中级', value: '3' },
@@ -1231,7 +1231,8 @@ const getRolePermissionDetails = (role: Role) => {
                 <UFormField label="权限层级">
                   <USelect
                     v-model="roleForm.level"
-                    :options="[
+                    :items="[
+                      { label: '无', value: 0 },
                       { label: '1 - 最高级（系统管理员）', value: 1 },
                       { label: '2 - 高级（部门管理员）', value: 2 },
                       { label: '3 - 中级（业务管理员）', value: 3 },

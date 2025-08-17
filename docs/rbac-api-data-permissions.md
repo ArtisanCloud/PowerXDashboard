@@ -17,9 +17,9 @@ type Permission = {
   code: string;
   module: string;
   description: string;
-  type: 'menu' | 'action' | 'data' | 'api'; // 新增 api 类型
+  type: "menu" | "action" | "data" | "api"; // 新增 api 类型
   apiEndpoint?: string; // API端点
-  httpMethod?: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
+  httpMethod?: "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
   parentId?: number;
   children?: Permission[];
 };
@@ -58,13 +58,13 @@ type Permission = {
 export default defineNuxtRouteMiddleware(async (to, from) => {
   const { $api } = useNuxtApp();
   const user = await getCurrentUser();
-  
+
   // 检查API权限
   const requiredPermission = getRequiredPermission(to.path, to.method);
   if (requiredPermission && !hasPermission(user, requiredPermission)) {
     throw createError({
       statusCode: 403,
-      statusMessage: 'Insufficient permissions'
+      statusMessage: "Insufficient permissions",
     });
   }
 });
@@ -72,12 +72,13 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
 // 权限检查函数
 function hasPermission(user: User, permission: string): boolean {
   // 检查用户角色是否包含所需权限
-  return user.roles.some(role => 
-    role.permissions.includes('*') || 
-    role.permissions.includes(permission) ||
-    role.permissions.some(p => 
-      p.endsWith(':*') && permission.startsWith(p.replace(':*', ':'))
-    )
+  return user.roles.some(
+    (role) =>
+      role.permissions.includes("*") ||
+      role.permissions.includes(permission) ||
+      role.permissions.some(
+        (p) => p.endsWith(":*") && permission.startsWith(p.replace(":*", ":"))
+      )
   );
 }
 ```
@@ -88,7 +89,7 @@ function hasPermission(user: User, permission: string): boolean {
 
 ```typescript
 type DataPermission = {
-  type: 'own' | 'department' | 'company' | 'all'; // 数据范围
+  type: "own" | "department" | "company" | "all"; // 数据范围
   conditions?: Record<string, any>; // 额外条件
 };
 
@@ -115,7 +116,7 @@ type Role = {
     },
     "order": {
       type: "department", // 只能看本部门的订单
-      conditions: { 
+      conditions: {
         created_at: { gte: "2024-01-01" } // 只能看2024年后的订单
       }
     },
@@ -133,43 +134,43 @@ type Role = {
 export class DataService {
   async getFilteredData(resource: string, user: User, baseQuery: any = {}) {
     const dataPermission = this.getUserDataPermission(user, resource);
-    
+
     // 根据数据权限类型添加过滤条件
     const filteredQuery = this.applyDataPermissionFilter(
-      baseQuery, 
-      dataPermission, 
+      baseQuery,
+      dataPermission,
       user
     );
-    
+
     return await this.query(resource, filteredQuery);
   }
-  
+
   private applyDataPermissionFilter(
-    query: any, 
-    permission: DataPermission, 
+    query: any,
+    permission: DataPermission,
     user: User
   ) {
     switch (permission.type) {
-      case 'own':
+      case "own":
         return { ...query, user_id: user.id };
-      
-      case 'department':
-        return { 
-          ...query, 
+
+      case "department":
+        return {
+          ...query,
           department_id: user.department_id,
-          ...permission.conditions 
+          ...permission.conditions,
         };
-      
-      case 'company':
-        return { 
-          ...query, 
+
+      case "company":
+        return {
+          ...query,
           company_id: user.company_id,
-          ...permission.conditions 
+          ...permission.conditions,
         };
-      
-      case 'all':
+
+      case "all":
         return { ...query, ...permission.conditions };
-      
+
       default:
         return { ...query, id: -1 }; // 无权限时返回空结果
     }
@@ -192,8 +193,8 @@ export default defineNuxtPlugin(() => {
       },
       canAccess: (resource: string, action: string) => {
         return $can(`${resource}:${action}`);
-      }
-    }
+      },
+    },
   };
 });
 ```
@@ -204,17 +205,10 @@ export default defineNuxtPlugin(() => {
 <template>
   <div>
     <!-- 基于权限显示按钮 -->
-    <UButton 
-      v-if="$can('user:create')" 
-      @click="createUser"
-    >
-      创建用户
-    </UButton>
-    
+    <UButton v-if="$can('user:create')" @click="createUser"> 创建用户 </UButton>
+
     <!-- 基于数据权限显示内容 -->
-    <div v-if="canViewUserData">
-      用户敏感信息
-    </div>
+    <div v-if="canViewUserData">用户敏感信息</div>
   </div>
 </template>
 
@@ -224,7 +218,7 @@ const user = getCurrentUser();
 
 // 检查数据权限
 const canViewUserData = computed(() => {
-  return $can('user:data') && hasDataAccess('user', user.id);
+  return $can("user:data") && hasDataAccess("user", user.id);
 });
 </script>
 ```
@@ -236,20 +230,23 @@ const canViewUserData = computed(() => {
 ```typescript
 // server/middleware/rbac.ts
 export default defineEventHandler(async (event) => {
-  if (event.node.req.url?.startsWith('/api/')) {
+  if (event.node.req.url?.startsWith("/api/")) {
     const user = await getUserFromToken(event);
-    const permission = getRequiredPermission(event.node.req.url, event.node.req.method);
-    
+    const permission = getRequiredPermission(
+      event.node.req.url,
+      event.node.req.method
+    );
+
     if (permission && !hasPermission(user, permission)) {
       throw createError({
         statusCode: 403,
-        statusMessage: 'Access denied'
+        statusMessage: "Access denied",
       });
     }
-    
+
     // 将用户信息和权限信息添加到上下文
     event.context.user = user;
-    event.context.permissions = user.roles.flatMap(r => r.permissions);
+    event.context.permissions = user.roles.flatMap((r) => r.permissions);
   }
 });
 ```
@@ -261,13 +258,13 @@ export default defineEventHandler(async (event) => {
 export default defineEventHandler(async (event) => {
   const user = event.context.user;
   const dataService = new DataService();
-  
+
   // 根据用户的数据权限过滤查询结果
-  const users = await dataService.getFilteredData('user', user, {
+  const users = await dataService.getFilteredData("user", user, {
     // 基础查询条件
-    status: 'active'
+    status: "active",
   });
-  
+
   return users;
 });
 ```
@@ -305,7 +302,7 @@ export default defineEventHandler(async (event) => {
       <label class="text-sm font-medium">{{ resource }}数据范围</label>
       <USelect
         v-model="roleForm.dataPermissions[resource].type"
-        :options="[
+        :items="[
           { label: '仅自己', value: 'own' },
           { label: '本部门', value: 'department' },
           { label: '本公司', value: 'company' },
@@ -337,15 +334,18 @@ function getCachedPermissions(userId: number) {
   if (permissionCache.has(cacheKey)) {
     return permissionCache.get(cacheKey);
   }
-  
+
   const permissions = getUserPermissions(userId);
   permissionCache.set(cacheKey, permissions);
-  
+
   // 设置缓存过期时间
-  setTimeout(() => {
-    permissionCache.delete(cacheKey);
-  }, 5 * 60 * 1000); // 5分钟过期
-  
+  setTimeout(
+    () => {
+      permissionCache.delete(cacheKey);
+    },
+    5 * 60 * 1000
+  ); // 5分钟过期
+
   return permissions;
 }
 ```

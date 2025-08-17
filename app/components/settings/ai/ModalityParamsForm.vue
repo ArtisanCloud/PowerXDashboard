@@ -53,7 +53,7 @@
           >
           <USelect
             v-model="image.size"
-            :options="imageSizeOptions"
+            :items="imageSizeOptions"
             icon="i-heroicons-photo"
           />
         </div>
@@ -63,7 +63,7 @@
           >
           <USelect
             v-model="image.quality"
-            :options="imageQualityOptions"
+            :items="imageQualityOptions"
             icon="i-heroicons-sparkles"
           />
         </div>
@@ -73,7 +73,7 @@
           >
           <USelect
             v-model="image.format"
-            :options="imageFormatOptions"
+            :items="imageFormatOptions"
             icon="i-heroicons-arrow-down-tray"
           />
         </div>
@@ -109,7 +109,7 @@
           >
           <USelect
             v-model="embedding.truncate"
-            :options="truncateOptions"
+            :items="truncateOptions"
             icon="i-heroicons-scissors"
           />
         </div>
@@ -135,7 +135,7 @@
           >
           <USelect
             v-model="video.resolution"
-            :options="videoResolutionOptions"
+            :items="videoResolutionOptions"
             icon="i-heroicons-video-camera"
           />
         </div>

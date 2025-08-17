@@ -333,14 +333,14 @@ const testConnection = async (type: string) => {
               <UFormGroup label="时区" name="timezone">
                 <USelect
                   v-model="basicForm.timezone"
-                  :options="timezoneOptions"
+                  :items="timezoneOptions"
                 />
               </UFormGroup>
 
               <UFormGroup label="默认语言" name="language">
                 <USelect
                   v-model="basicForm.language"
-                  :options="languageOptions"
+                  :items="languageOptions"
                 />
               </UFormGroup>
 
@@ -568,7 +568,7 @@ const testConnection = async (type: string) => {
                 <UFormGroup label="服务商" name="smsProvider">
                   <USelect
                     v-model="notificationForm.smsProvider"
-                    :options="[
+                    :items="[
                       { label: '阿里云', value: 'aliyun' },
                       { label: '腾讯云', value: 'tencent' },
                       { label: '华为云', value: 'huawei' },
@@ -645,7 +645,7 @@ const testConnection = async (type: string) => {
                 <UFormGroup label="存储驱动" name="storageDriver">
                   <USelect
                     v-model="storageForm.storageDriver"
-                    :options="storageDriverOptions"
+                    :items="storageDriverOptions"
                   />
                 </UFormGroup>
               </div>
@@ -707,7 +707,7 @@ const testConnection = async (type: string) => {
                 <UFormGroup label="缓存驱动" name="cacheDriver">
                   <USelect
                     v-model="storageForm.cacheDriver"
-                    :options="cacheDriverOptions"
+                    :items="cacheDriverOptions"
                   />
                 </UFormGroup>
 
@@ -862,7 +862,7 @@ const testConnection = async (type: string) => {
                   <UFormGroup label="地图服务" name="mapProvider">
                     <USelect
                       v-model="integrationForm.mapProvider"
-                      :options="[
+                      :items="[
                         { label: '百度地图', value: 'baidu' },
                         { label: '高德地图', value: 'amap' },
                         { label: '腾讯地图', value: 'tencent' },
@@ -942,7 +942,7 @@ const testConnection = async (type: string) => {
                 <UFormGroup label="日志级别" name="logLevel">
                   <USelect
                     v-model="advancedForm.logLevel"
-                    :options="logLevelOptions"
+                    :items="logLevelOptions"
                   />
                 </UFormGroup>
 
@@ -994,7 +994,7 @@ const testConnection = async (type: string) => {
                 >
                   <USelect
                     v-model="advancedForm.backupFrequency"
-                    :options="backupFrequencyOptions"
+                    :items="backupFrequencyOptions"
                   />
                 </UFormGroup>
               </div>

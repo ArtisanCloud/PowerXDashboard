@@ -425,7 +425,7 @@ const getBackupTypeColor = (type) => {
                 <UFormField label="备份类型">
                   <USelect
                     v-model="backupConfig.backupType"
-                    :options="backupTypeOptions"
+                    :items="backupTypeOptions"
                   />
                 </UFormField>
 
@@ -467,7 +467,7 @@ const getBackupTypeColor = (type) => {
               <UFormField label="压缩级别">
                 <USelect
                   v-model="backupConfig.compressionLevel"
-                  :options="compressionOptions"
+                  :items="compressionOptions"
                 />
               </UFormField>
 

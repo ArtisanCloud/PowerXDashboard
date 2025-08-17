@@ -105,22 +105,28 @@ const users = ref<User[]>([
   },
 ]);
 
-const departments = ref<string[]>([
-  "技术部",
-  "市场部",
-  "销售部",
-  "人力资源部",
-  "财务部",
+const departments = ref([
+  { label: $t("organization.user.filter.allDepartments"), value: null },
+  { label: "技术部", value: "技术部" },
+  { label: "市场部", value: "市场部" },
+  { label: "销售部", value: "销售部" },
+  { label: "人力资源部", value: "人力资源部" },
+  { label: "财务部", value: "财务部" },
 ]);
 
-const roles = ref<RoleType[]>(["管理员", "编辑", "用户"]);
+const roles = ref([
+  { label: $t("organization.user.filter.allRoles"), value: null },
+  { label: "管理员", value: "管理员" },
+  { label: "编辑", value: "编辑" },
+  { label: "用户", value: "用户" },
+]);
 
 /** ========= 搜索与筛选 ========= */
 const searchQuery = ref("");
 const filters = reactive({
-  department: "",
-  role: "",
-  status: "",
+  department: null as string | null,
+  role: null as string | null,
+  status: null as string | null, // ⬅️ 改为 null，表示“未选择”
 });
 
 /** ========= 导入 / 导出 ========= */
@@ -631,7 +637,7 @@ onMounted(() => {
           >
             <USelect
               v-model="filters.department"
-              :options="departments"
+              :items="departments"
               :placeholder="$t('organization.user.filter.allDepartments')"
               class="w-full sm:w-40"
             />
@@ -643,7 +649,7 @@ onMounted(() => {
           <UFormField :label="$t('organization.user.form.role')" class="mb-0">
             <USelect
               v-model="filters.role"
-              :options="roles"
+              :items="roles"
               :placeholder="$t('organization.user.filter.allRoles')"
               class="w-full sm:w-40"
             />
@@ -655,8 +661,11 @@ onMounted(() => {
           <UFormField :label="$t('organization.user.form.status')" class="mb-0">
             <USelect
               v-model="filters.status"
-              :options="[
-                { label: $t('organization.user.filter.allStatus'), value: '' },
+              :items="[
+                {
+                  label: $t('organization.user.filter.allStatus'),
+                  value: 0,
+                },
                 {
                   label: $t('organization.user.filter.active'),
                   value: 'active',
@@ -666,8 +675,8 @@ onMounted(() => {
                   value: 'inactive',
                 },
               ]"
-              option-attribute="value"
               :placeholder="$t('organization.user.filter.allStatus')"
+              clearable
               class="w-full sm:w-40"
             />
           </UFormField>
@@ -774,7 +783,7 @@ onMounted(() => {
               <UFormField :label="$t('organization.user.form.department')">
                 <USelect
                   v-model="userForm.department"
-                  :options="departments"
+                  :items="departments"
                   :placeholder="$t('organization.user.form.selectDepartment')"
                 />
               </UFormField>
@@ -782,7 +791,7 @@ onMounted(() => {
               <UFormField :label="$t('organization.user.form.role')">
                 <USelect
                   v-model="userForm.role"
-                  :options="roles"
+                  :items="roles"
                   :placeholder="$t('organization.user.form.selectRole')"
                 />
               </UFormField>

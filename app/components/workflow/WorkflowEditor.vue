@@ -153,7 +153,7 @@
                   >
                     <USelect
                       v-model="selectedNode.data.props[key]"
-                      :options="getEnumOptions(key, selectedNode.data.schema)"
+                      :items="getEnumOptions(key, selectedNode.data.schema)"
                     />
                   </template>
                   <template

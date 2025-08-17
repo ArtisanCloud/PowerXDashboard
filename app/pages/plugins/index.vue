@@ -28,12 +28,12 @@
         />
         <USelect
           v-model="category"
-          :options="categoryOptions"
+          :items="categoryOptions"
           icon="i-heroicons-squares-2x2"
         />
         <USelect
           v-model="sort"
-          :options="sortOptions"
+          :items="sortOptions"
           icon="i-heroicons-adjustments-vertical"
         />
       </div>

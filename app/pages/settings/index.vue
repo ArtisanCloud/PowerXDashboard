@@ -80,7 +80,7 @@
               </div>
               <USelect
                 v-model="settings.defaultLanguage"
-                :options="languageOptions"
+                :items="languageOptions"
                 class="w-64"
               />
             </div>

@@ -49,7 +49,7 @@
       <div class="flex-1" />
       <USelect
         v-model="env"
-        :options="envOptions"
+        :items="envOptions"
         class="w-36"
         icon="i-heroicons-circle-stack"
       />

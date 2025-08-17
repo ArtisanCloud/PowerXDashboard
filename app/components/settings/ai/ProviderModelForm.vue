@@ -8,7 +8,7 @@
         >
         <USelect
           v-model="state.provider"
-          :options="providerOptions"
+          :items="providerOptions"
           icon="i-heroicons-building-library"
           @change="emit('providerChanged', state.provider)"
         />
@@ -19,7 +19,7 @@
         >
         <USelect
           v-model="state.model"
-          :options="modelOptions"
+          :items="modelOptions"
           icon="i-heroicons-cpu-chip"
         />
       </div>

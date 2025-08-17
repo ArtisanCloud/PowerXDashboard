@@ -41,13 +41,13 @@
 
                 <div class="space-y-4">
                   <UFormField label="状态" name="status">
-                    <USelect v-model="state.status" :options="statusOptions" />
+                    <USelect v-model="state.status" :items="statusOptions" />
                   </UFormField>
 
                   <UFormField label="分类" name="category">
                     <USelect
                       v-model="state.category"
-                      :options="categoryOptions"
+                      :items="categoryOptions"
                     />
                   </UFormField>
 
