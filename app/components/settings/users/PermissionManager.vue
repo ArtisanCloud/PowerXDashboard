@@ -543,15 +543,15 @@ const getPermissionTypeColor = (type: string) => {
   return colors[type] || "neutral";
 };
 
-// 获取权限名称的文字颜色类
+// 获取权限名称的文字颜色类 - 更舒适的颜色搭配
 const getPermissionTextColor = (type: string) => {
   const colors: Record<string, string> = {
-    menu: "text-primary-700",
-    action: "text-green-700",
-    data: "text-red-700",
-    api: "text-amber-700",
+    menu: "text-blue-600", // 柔和的蓝色 - 菜单权限
+    action: "text-emerald-600", // 翠绿色 - 操作权限
+    data: "text-rose-600", // 玫瑰红 - 数据权限
+    api: "text-violet-600", // 紫罗兰色 - API权限
   };
-  return colors[type] || "text-gray-700";
+  return colors[type] || "text-slate-600";
 };
 
 const getHttpMethodColor = (method?: string) => {
