@@ -119,7 +119,7 @@ const handleSearch = () => {
 
 <template>
   <header
-    class="bg-white border-b border-gray-200 h-16 flex items-center justify-between px-6"
+    class="bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm border-b border-gray-200/60 dark:border-gray-700/60 shadow-sm h-16 flex items-center justify-between px-6 sticky top-0 z-40"
   >
     <!-- 左侧：面包屑导航 -->
     <div class="flex items-center space-x-4">
@@ -163,7 +163,7 @@ const handleSearch = () => {
         <!-- 搜索建议下拉框 -->
         <div
           v-if="isSearchFocused && searchQuery"
-          class="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50"
+          class="absolute top-full left-0 right-0 mt-1 bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm border border-gray-200/60 dark:border-gray-700/60 rounded-lg shadow-xl z-50"
         >
           <div class="p-2">
             <div class="text-xs text-gray-500 mb-2">

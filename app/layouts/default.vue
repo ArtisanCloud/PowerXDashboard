@@ -38,11 +38,13 @@ const closeMobileSidebar = () => {
 </script>
 
 <template>
-  <div class="h-screen bg-gray-50 flex overflow-hidden">
+  <div
+    class="h-screen bg-gradient-to-br from-gray-50 via-gray-50 to-gray-100 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800 flex overflow-hidden"
+  >
     <!-- 移动端遮罩层 -->
     <div
       v-if="showMobileOverlay"
-      class="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
+      class="fixed inset-0 bg-black/60 dark:bg-black/80 backdrop-blur-sm z-40 md:hidden"
       @click="closeMobileSidebar"
     />
 
@@ -94,7 +96,9 @@ const closeMobileSidebar = () => {
           </div>
 
           <!-- 主要内容插槽 -->
-          <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+          <div
+            class="bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm rounded-xl shadow-lg border border-gray-200/60 dark:border-gray-700/60 overflow-hidden"
+          >
             <slot />
           </div>
         </div>

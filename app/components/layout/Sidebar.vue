@@ -105,9 +105,13 @@ onMounted(() => {
 </script>
 
 <template>
-  <aside class="w-64 bg-white border-r border-gray-200 flex flex-col h-screen">
+  <aside
+    class="w-64 bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm border-r border-gray-200/60 dark:border-gray-700/60 shadow-lg flex flex-col h-screen relative z-30"
+  >
     <!-- Logo 区域 -->
-    <div class="flex items-center justify-center h-16 border-b border-gray-200">
+    <div
+      class="flex items-center justify-center h-16 border-b border-gray-200/60 dark:border-gray-700/60 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/30 dark:to-purple-900/30"
+    >
       <NuxtLink
         :to="$localePath('/dashboard')"
         class="flex items-center space-x-2"
@@ -272,7 +276,7 @@ onMounted(() => {
 
     <!-- 底部用户信息 -->
     <div
-      class="mt-auto border-t border-gray-200 px-4 py-4 h-[73px] flex items-center"
+      class="mt-auto border-t border-gray-200/60 dark:border-gray-700/60 bg-gradient-to-r from-gray-50 to-blue-50 dark:from-gray-800/50 dark:to-blue-900/30 px-4 py-4 h-[73px] flex items-center"
     >
       <div class="flex items-center space-x-3">
         <div
