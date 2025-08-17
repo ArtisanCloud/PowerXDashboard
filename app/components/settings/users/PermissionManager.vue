@@ -657,6 +657,44 @@ const roleColumns = computed(() => {
     },
   ];
 });
+
+// ====== 表单内（新增/编辑角色弹窗）用到的权限选择辅助 ======
+const formModulePermissionIds = (module: string) =>
+  permissions.value.filter((p) => p.module === module).map((p) => p.id);
+
+const hasFormPermission = (permissionId: number) => {
+  return roleForm.permissions.includes(permissionId);
+};
+
+const toggleFormPermission = (permissionId: number) => {
+  const i = roleForm.permissions.indexOf(permissionId);
+  if (i === -1) roleForm.permissions.push(permissionId);
+  else roleForm.permissions.splice(i, 1);
+};
+
+const toggleFormModulePermissions = (module: string, checked: boolean) => {
+  const ids = formModulePermissionIds(module);
+  if (checked) {
+    ids.forEach((id) => {
+      if (!roleForm.permissions.includes(id)) roleForm.permissions.push(id);
+    });
+  } else {
+    roleForm.permissions = roleForm.permissions.filter(
+      (id) => !ids.includes(id)
+    );
+  }
+};
+
+const isFormModuleFullySelected = (module: string) => {
+  const ids = formModulePermissionIds(module);
+  return ids.length > 0 && ids.every((id) => roleForm.permissions.includes(id));
+};
+
+const isFormModulePartiallySelected = (module: string) => {
+  const ids = formModulePermissionIds(module);
+  const picked = ids.filter((id) => roleForm.permissions.includes(id)).length;
+  return picked > 0 && picked < ids.length;
+};
 </script>
 
 <template>
@@ -874,9 +912,18 @@ const roleColumns = computed(() => {
     </div>
 
     <!-- 角色表单对话框 -->
-    <UModal v-model:open="showRoleForm" :ui="{ content: 'sm:max-w-lg' }">
+    <UModal
+      v-model:open="showRoleForm"
+      :ui="{ content: 'w-full max-w-5xl' }"
+      :title="
+        isEditing
+          ? $t('organization.permission.edit')
+          : $t('organization.permission.add')
+      "
+      :description="$t('organization.permission.configDesc')"
+    >
       <template #content>
-        <div class="p-6">
+        <div class="py-12 px-24">
           <h3 class="text-lg font-medium text-gray-900 mb-4">
             {{
               isEditing

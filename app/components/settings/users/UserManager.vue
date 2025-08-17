@@ -37,7 +37,7 @@ interface User {
   username: string;
   email: string;
   department: string;
-  role: RoleType | string;
+  role: RoleType | string | null;
   status: StatusType | string;
   avatar: string;
 }
@@ -106,16 +106,15 @@ const users = ref<User[]>([
 ]);
 
 const departments = ref([
-  { label: $t("organization.user.filter.allDepartments"), value: null },
+  { label: t("organization.user.form.selectDepartment"), value: null },
   { label: "技术部", value: "技术部" },
   { label: "市场部", value: "市场部" },
   { label: "销售部", value: "销售部" },
   { label: "人力资源部", value: "人力资源部" },
-  { label: "财务部", value: "财务部" },
 ]);
 
 const roles = ref([
-  { label: $t("organization.user.filter.allRoles"), value: null },
+  { label: t("organization.user.form.selectRole"), value: null },
   { label: "管理员", value: "管理员" },
   { label: "编辑", value: "编辑" },
   { label: "用户", value: "用户" },
@@ -335,8 +334,8 @@ const userForm = reactive({
   name: "",
   username: "",
   email: "",
-  department: "",
-  role: "" as RoleType | "",
+  department: null as string | null,
+  role: null as RoleType | null,
   password: "",
   confirmPassword: "",
   status: "active" as StatusType,
@@ -346,8 +345,8 @@ function resetForm() {
   userForm.name = "";
   userForm.username = "";
   userForm.email = "";
-  userForm.department = "";
-  userForm.role = "" as any;
+  userForm.department = null;
+  userForm.role = null as any;
   userForm.password = "";
   userForm.confirmPassword = "";
   userForm.status = "active";
@@ -453,9 +452,9 @@ const filteredUsers = computed<User[]>(() => {
 });
 
 function resetFilters() {
-  filters.department = "";
-  filters.role = "";
-  filters.status = "";
+  filters.department = null;
+  filters.role = null;
+  filters.status = null;
   searchQuery.value = "";
 }
 
@@ -629,38 +628,35 @@ onMounted(() => {
           />
         </div>
 
-        <!-- 部门筛选 -->
-        <div class="w-full sm:w-auto">
-          <UFormField
-            :label="$t('organization.user.form.department')"
-            class="mb-0"
-          >
+        <UFormField :label="$t('organization.user.form.department')">
+          <div class="w-full sm:min-w-[12rem]">
             <USelect
-              v-model="filters.department"
+              v-model="userForm.department!"
               :items="departments"
-              :placeholder="$t('organization.user.filter.allDepartments')"
-              class="w-full sm:w-40"
+              :placeholder="t('organization.user.form.selectDepartment')"
+              class="w-full"
+              option-attribute="label"
             />
-          </UFormField>
-        </div>
+          </div>
+        </UFormField>
 
-        <!-- 角色筛选 -->
-        <div class="w-full sm:w-auto">
-          <UFormField :label="$t('organization.user.form.role')" class="mb-0">
+        <UFormField :label="$t('organization.user.form.role')">
+          <div class="w-full sm:min-w-[12rem]">
             <USelect
-              v-model="filters.role"
+              v-model="userForm.role"
               :items="roles"
-              :placeholder="$t('organization.user.filter.allRoles')"
-              class="w-full sm:w-40"
+              :placeholder="t('organization.user.form.selectRole')"
+              class="w-full"
+              option-attribute="label"
             />
-          </UFormField>
-        </div>
+          </div>
+        </UFormField>
 
         <!-- 状态筛选 -->
         <div class="w-full sm:w-auto">
           <UFormField :label="$t('organization.user.form.status')" class="mb-0">
             <USelect
-              v-model="filters.status"
+              v-model="filters.status!"
               :items="[
                 {
                   label: $t('organization.user.filter.allStatus'),
@@ -736,9 +732,17 @@ onMounted(() => {
     </div>
 
     <!-- 用户表单对话框 -->
-    <UModal v-model:open="showForm">
+    <UModal
+      v-model:open="showForm"
+      :ui="{
+        width: 'w-full max-w-6xl', // 改这里就能控制宽度
+        content: 'sm:max-w-6xl w-full', // 确保内部 DialogContent 撑开
+      }"
+      :title="isEditing ? '编辑用户' : '添加用户'"
+      :description="isEditing ? '修改用户信息' : '创建新用户'"
+    >
       <template #content>
-        <div class="p-6">
+        <div class="py-12 px-32">
           <h3 class="text-lg font-medium text-gray-900 mb-4">
             {{
               isEditing
@@ -785,6 +789,7 @@ onMounted(() => {
                   v-model="userForm.department"
                   :items="departments"
                   :placeholder="$t('organization.user.form.selectDepartment')"
+                  class="w-48"
                 />
               </UFormField>
 
@@ -793,6 +798,7 @@ onMounted(() => {
                   v-model="userForm.role"
                   :items="roles"
                   :placeholder="$t('organization.user.form.selectRole')"
+                  class="w-48"
                 />
               </UFormField>
 

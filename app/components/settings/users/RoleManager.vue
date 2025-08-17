@@ -1194,9 +1194,19 @@ const getRolePermissionDetails = (role: Role) => {
     </div>
 
     <!-- 角色表单对话框 -->
-    <UModal v-model:open="showForm">
+    <UModal
+      v-model:open="showForm"
+      :ui="{
+        width: 'w-full max-w-6xl', // 改这里就能控制宽度
+        content: 'sm:max-w-6xl w-full', // 确保内部 DialogContent 撑开
+      }"
+      :title="isEditing ? '编辑角色' : '添加角色'"
+      :description="
+        isEditing ? '修改角色信息和权限配置' : '创建新角色并配置权限'
+      "
+    >
       <template #content>
-        <div class="p-6 max-w-4xl">
+        <div class="px-32 py-6">
           <h3 class="text-lg font-medium text-gray-900 mb-4">
             {{ isEditing ? "编辑角色" : "新建角色" }}
           </h3>
@@ -1224,7 +1234,7 @@ const getRolePermissionDetails = (role: Role) => {
                   <UTextarea
                     v-model="roleForm.description"
                     placeholder="输入角色描述"
-                    rows="3"
+                    :rows="3"
                   />
                 </UFormField>
 

@@ -308,56 +308,56 @@ const testConnection = async (type: string) => {
 
           <UForm :state="basicForm" class="space-y-6">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <UFormGroup label="站点名称" name="siteName">
+              <UFormField label="站点名称" name="siteName">
                 <UInput
                   v-model="basicForm.siteName"
                   placeholder="请输入站点名称"
                 />
-              </UFormGroup>
+              </UFormField>
 
-              <UFormGroup label="管理员邮箱" name="adminEmail">
+              <UFormField label="管理员邮箱" name="adminEmail">
                 <UInput
                   v-model="basicForm.adminEmail"
                   type="email"
                   placeholder="请输入管理员邮箱"
                 />
-              </UFormGroup>
+              </UFormField>
 
-              <UFormGroup label="站点URL" name="siteUrl">
+              <UFormField label="站点URL" name="siteUrl">
                 <UInput
                   v-model="basicForm.siteUrl"
                   placeholder="请输入站点URL"
                 />
-              </UFormGroup>
+              </UFormField>
 
-              <UFormGroup label="时区" name="timezone">
+              <UFormField label="时区" name="timezone">
                 <USelect
                   v-model="basicForm.timezone"
                   :items="timezoneOptions"
                 />
-              </UFormGroup>
+              </UFormField>
 
-              <UFormGroup label="默认语言" name="language">
+              <UFormField label="默认语言" name="language">
                 <USelect
                   v-model="basicForm.language"
                   :items="languageOptions"
                 />
-              </UFormGroup>
+              </UFormField>
 
-              <UFormGroup label="日期格式" name="dateFormat">
+              <UFormField label="日期格式" name="dateFormat">
                 <UInput
                   v-model="basicForm.dateFormat"
                   placeholder="YYYY-MM-DD"
                 />
-              </UFormGroup>
+              </UFormField>
             </div>
 
-            <UFormGroup label="站点描述" name="siteDescription">
+            <UFormField label="站点描述" name="siteDescription">
               <UTextarea
                 v-model="basicForm.siteDescription"
                 placeholder="请输入站点描述"
               />
-            </UFormGroup>
+            </UFormField>
           </UForm>
         </UCard>
 
@@ -379,14 +379,14 @@ const testConnection = async (type: string) => {
             <div class="space-y-4">
               <h4 class="font-medium text-gray-900">密码策略</h4>
               <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <UFormGroup label="最小长度" name="passwordMinLength">
+                <UFormField label="最小长度" name="passwordMinLength">
                   <UInput
                     v-model="securityForm.passwordMinLength"
                     type="number"
                     min="6"
                     max="32"
                   />
-                </UFormGroup>
+                </UFormField>
 
                 <div class="space-y-3">
                   <UCheckbox
@@ -409,21 +409,21 @@ const testConnection = async (type: string) => {
               </div>
             </div>
 
-            <UDivider />
+            <USeparator />
 
             <div class="space-y-4">
               <h4 class="font-medium text-gray-900">登录安全</h4>
               <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <UFormGroup label="最大登录尝试次数" name="loginMaxAttempts">
+                <UFormField label="最大登录尝试次数" name="loginMaxAttempts">
                   <UInput
                     v-model="securityForm.loginMaxAttempts"
                     type="number"
                     min="3"
                     max="10"
                   />
-                </UFormGroup>
+                </UFormField>
 
-                <UFormGroup
+                <UFormField
                   label="锁定时长（分钟）"
                   name="loginLockoutDuration"
                 >
@@ -433,16 +433,16 @@ const testConnection = async (type: string) => {
                     min="5"
                     max="1440"
                   />
-                </UFormGroup>
+                </UFormField>
 
-                <UFormGroup label="会话超时（分钟）" name="sessionTimeout">
+                <UFormField label="会话超时（分钟）" name="sessionTimeout">
                   <UInput
                     v-model="securityForm.sessionTimeout"
                     type="number"
                     min="30"
                     max="1440"
                   />
-                </UFormGroup>
+                </UFormField>
 
                 <div class="space-y-3">
                   <UCheckbox
@@ -495,54 +495,54 @@ const testConnection = async (type: string) => {
                 v-if="notificationForm.emailEnabled"
                 class="grid grid-cols-1 md:grid-cols-2 gap-6"
               >
-                <UFormGroup label="SMTP服务器" name="emailHost">
+                <UFormField label="SMTP服务器" name="emailHost">
                   <UInput
                     v-model="notificationForm.emailHost"
                     placeholder="smtp.example.com"
                   />
-                </UFormGroup>
+                </UFormField>
 
-                <UFormGroup label="端口" name="emailPort">
+                <UFormField label="端口" name="emailPort">
                   <UInput
                     v-model="notificationForm.emailPort"
                     type="number"
                     placeholder="587"
                   />
-                </UFormGroup>
+                </UFormField>
 
-                <UFormGroup label="用户名" name="emailUsername">
+                <UFormField label="用户名" name="emailUsername">
                   <UInput
                     v-model="notificationForm.emailUsername"
                     placeholder="请输入用户名"
                   />
-                </UFormGroup>
+                </UFormField>
 
-                <UFormGroup label="密码" name="emailPassword">
+                <UFormField label="密码" name="emailPassword">
                   <UInput
                     v-model="notificationForm.emailPassword"
                     type="password"
                     placeholder="请输入密码"
                   />
-                </UFormGroup>
+                </UFormField>
 
-                <UFormGroup label="发件人名称" name="emailFromName">
+                <UFormField label="发件人名称" name="emailFromName">
                   <UInput
                     v-model="notificationForm.emailFromName"
                     placeholder="PowerX Admin"
                   />
-                </UFormGroup>
+                </UFormField>
 
-                <UFormGroup label="发件人邮箱" name="emailFromAddress">
+                <UFormField label="发件人邮箱" name="emailFromAddress">
                   <UInput
                     v-model="notificationForm.emailFromAddress"
                     type="email"
                     placeholder="noreply@example.com"
                   />
-                </UFormGroup>
+                </UFormField>
               </div>
             </div>
 
-            <UDivider />
+            <USeparator />
 
             <!-- 短信设置 -->
             <div class="space-y-4">
@@ -565,7 +565,7 @@ const testConnection = async (type: string) => {
                 v-if="notificationForm.smsEnabled"
                 class="grid grid-cols-1 md:grid-cols-2 gap-6"
               >
-                <UFormGroup label="服务商" name="smsProvider">
+                <UFormField label="服务商" name="smsProvider">
                   <USelect
                     v-model="notificationForm.smsProvider"
                     :items="[
@@ -574,28 +574,28 @@ const testConnection = async (type: string) => {
                       { label: '华为云', value: 'huawei' },
                     ]"
                   />
-                </UFormGroup>
+                </UFormField>
 
                 <div></div>
 
-                <UFormGroup label="Access Key" name="smsAccessKey">
+                <UFormField label="Access Key" name="smsAccessKey">
                   <UInput
                     v-model="notificationForm.smsAccessKey"
                     placeholder="请输入Access Key"
                   />
-                </UFormGroup>
+                </UFormField>
 
-                <UFormGroup label="Secret Key" name="smsSecretKey">
+                <UFormField label="Secret Key" name="smsSecretKey">
                   <UInput
                     v-model="notificationForm.smsSecretKey"
                     type="password"
                     placeholder="请输入Secret Key"
                   />
-                </UFormGroup>
+                </UFormField>
               </div>
             </div>
 
-            <UDivider />
+            <USeparator />
 
             <!-- 系统通知 -->
             <div class="space-y-4">
@@ -633,24 +633,24 @@ const testConnection = async (type: string) => {
             <div class="space-y-4">
               <h4 class="font-medium text-gray-900">文件上传</h4>
               <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <UFormGroup label="最大文件大小（MB）" name="uploadMaxSize">
+                <UFormField label="最大文件大小（MB）" name="uploadMaxSize">
                   <UInput
                     v-model="storageForm.uploadMaxSize"
                     type="number"
                     min="1"
                     max="1024"
                   />
-                </UFormGroup>
+                </UFormField>
 
-                <UFormGroup label="存储驱动" name="storageDriver">
+                <UFormField label="存储驱动" name="storageDriver">
                   <USelect
                     v-model="storageForm.storageDriver"
                     :items="storageDriverOptions"
                   />
-                </UFormGroup>
+                </UFormField>
               </div>
 
-              <UFormGroup label="允许的文件类型" name="uploadAllowedTypes">
+              <UFormField label="允许的文件类型" name="uploadAllowedTypes">
                 <UInput
                   :model-value="storageForm.uploadAllowedTypes.join(', ')"
                   @update:model-value="
@@ -660,60 +660,60 @@ const testConnection = async (type: string) => {
                   "
                   placeholder="jpg, png, pdf, doc"
                 />
-              </UFormGroup>
+              </UFormField>
 
               <!-- 云存储配置 -->
               <div
                 v-if="storageForm.storageDriver !== 'local'"
                 class="grid grid-cols-1 md:grid-cols-2 gap-6"
               >
-                <UFormGroup label="存储端点" name="storageEndpoint">
+                <UFormField label="存储端点" name="storageEndpoint">
                   <UInput
                     v-model="storageForm.storageEndpoint"
                     placeholder="请输入存储端点"
                   />
-                </UFormGroup>
+                </UFormField>
 
-                <UFormGroup label="存储桶名称" name="storageBucket">
+                <UFormField label="存储桶名称" name="storageBucket">
                   <UInput
                     v-model="storageForm.storageBucket"
                     placeholder="请输入存储桶名称"
                   />
-                </UFormGroup>
+                </UFormField>
 
-                <UFormGroup label="Access Key" name="storageAccessKey">
+                <UFormField label="Access Key" name="storageAccessKey">
                   <UInput
                     v-model="storageForm.storageAccessKey"
                     placeholder="请输入Access Key"
                   />
-                </UFormGroup>
+                </UFormField>
 
-                <UFormGroup label="Secret Key" name="storageSecretKey">
+                <UFormField label="Secret Key" name="storageSecretKey">
                   <UInput
                     v-model="storageForm.storageSecretKey"
                     type="password"
                     placeholder="请输入Secret Key"
                   />
-                </UFormGroup>
+                </UFormField>
               </div>
             </div>
 
-            <UDivider />
+            <USeparator />
 
             <!-- 缓存设置 -->
             <div class="space-y-4">
               <h4 class="font-medium text-gray-900">缓存设置</h4>
               <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <UFormGroup label="缓存驱动" name="cacheDriver">
+                <UFormField label="缓存驱动" name="cacheDriver">
                   <USelect
                     v-model="storageForm.cacheDriver"
                     :items="cacheDriverOptions"
                   />
-                </UFormGroup>
+                </UFormField>
 
                 <div></div>
 
-                <UFormGroup
+                <UFormField
                   v-if="storageForm.cacheDriver === 'redis'"
                   label="Redis主机"
                   name="cacheHost"
@@ -722,9 +722,9 @@ const testConnection = async (type: string) => {
                     v-model="storageForm.cacheHost"
                     placeholder="localhost"
                   />
-                </UFormGroup>
+                </UFormField>
 
-                <UFormGroup
+                <UFormField
                   v-if="storageForm.cacheDriver === 'redis'"
                   label="Redis端口"
                   name="cachePort"
@@ -734,9 +734,9 @@ const testConnection = async (type: string) => {
                     type="number"
                     placeholder="6379"
                   />
-                </UFormGroup>
+                </UFormField>
 
-                <UFormGroup
+                <UFormField
                   v-if="storageForm.cacheDriver === 'redis'"
                   label="Redis密码"
                   name="cachePassword"
@@ -746,7 +746,7 @@ const testConnection = async (type: string) => {
                     type="password"
                     placeholder="请输入密码（可选）"
                   />
-                </UFormGroup>
+                </UFormField>
               </div>
             </div>
           </UForm>
@@ -778,24 +778,24 @@ const testConnection = async (type: string) => {
                 v-if="integrationForm.wechatEnabled"
                 class="grid grid-cols-1 md:grid-cols-2 gap-6"
               >
-                <UFormGroup label="App ID" name="wechatAppId">
+                <UFormField label="App ID" name="wechatAppId">
                   <UInput
                     v-model="integrationForm.wechatAppId"
                     placeholder="请输入微信App ID"
                   />
-                </UFormGroup>
+                </UFormField>
 
-                <UFormGroup label="App Secret" name="wechatAppSecret">
+                <UFormField label="App Secret" name="wechatAppSecret">
                   <UInput
                     v-model="integrationForm.wechatAppSecret"
                     type="password"
                     placeholder="请输入微信App Secret"
                   />
-                </UFormGroup>
+                </UFormField>
               </div>
             </div>
 
-            <UDivider />
+            <USeparator />
 
             <!-- 支付宝集成 -->
             <div class="space-y-4">
@@ -808,32 +808,32 @@ const testConnection = async (type: string) => {
                 v-if="integrationForm.alipayEnabled"
                 class="grid grid-cols-1 md:grid-cols-2 gap-6"
               >
-                <UFormGroup label="App ID" name="alipayAppId">
+                <UFormField label="App ID" name="alipayAppId">
                   <UInput
                     v-model="integrationForm.alipayAppId"
                     placeholder="请输入支付宝App ID"
                   />
-                </UFormGroup>
+                </UFormField>
 
                 <div></div>
 
-                <UFormGroup label="应用私钥" name="alipayPrivateKey">
+                <UFormField label="应用私钥" name="alipayPrivateKey">
                   <UTextarea
                     v-model="integrationForm.alipayPrivateKey"
                     placeholder="请输入应用私钥"
                   />
-                </UFormGroup>
+                </UFormField>
 
-                <UFormGroup label="支付宝公钥" name="alipayPublicKey">
+                <UFormField label="支付宝公钥" name="alipayPublicKey">
                   <UTextarea
                     v-model="integrationForm.alipayPublicKey"
                     placeholder="请输入支付宝公钥"
                   />
-                </UFormGroup>
+                </UFormField>
               </div>
             </div>
 
-            <UDivider />
+            <USeparator />
 
             <!-- 其他集成 -->
             <div class="space-y-4">
@@ -846,7 +846,7 @@ const testConnection = async (type: string) => {
                     <UCheckbox v-model="integrationForm.analyticsEnabled" />
                   </div>
 
-                  <UFormGroup
+                  <UFormField
                     v-if="integrationForm.analyticsEnabled"
                     label="跟踪ID"
                     name="analyticsTrackingId"
@@ -855,11 +855,11 @@ const testConnection = async (type: string) => {
                       v-model="integrationForm.analyticsTrackingId"
                       placeholder="GA-XXXXXXXXX-X"
                     />
-                  </UFormGroup>
+                  </UFormField>
                 </div>
 
                 <div class="space-y-4">
-                  <UFormGroup label="地图服务" name="mapProvider">
+                  <UFormField label="地图服务" name="mapProvider">
                     <USelect
                       v-model="integrationForm.mapProvider"
                       :items="[
@@ -868,14 +868,14 @@ const testConnection = async (type: string) => {
                         { label: '腾讯地图', value: 'tencent' },
                       ]"
                     />
-                  </UFormGroup>
+                  </UFormField>
 
-                  <UFormGroup label="API密钥" name="mapApiKey">
+                  <UFormField label="API密钥" name="mapApiKey">
                     <UInput
                       v-model="integrationForm.mapApiKey"
                       placeholder="请输入地图API密钥"
                     />
-                  </UFormGroup>
+                  </UFormField>
                 </div>
               </div>
             </div>
@@ -920,7 +920,7 @@ const testConnection = async (type: string) => {
                   />
                 </div>
 
-                <UFormGroup
+                <UFormField
                   v-if="advancedForm.maintenanceMode"
                   label="维护提示信息"
                   name="maintenanceMessage"
@@ -929,35 +929,35 @@ const testConnection = async (type: string) => {
                     v-model="advancedForm.maintenanceMessage"
                     placeholder="系统维护中，请稍后访问"
                   />
-                </UFormGroup>
+                </UFormField>
               </div>
             </div>
 
-            <UDivider />
+            <USeparator />
 
             <!-- 日志设置 -->
             <div class="space-y-4">
               <h4 class="font-medium text-gray-900">日志设置</h4>
               <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <UFormGroup label="日志级别" name="logLevel">
+                <UFormField label="日志级别" name="logLevel">
                   <USelect
                     v-model="advancedForm.logLevel"
                     :items="logLevelOptions"
                   />
-                </UFormGroup>
+                </UFormField>
 
-                <UFormGroup label="日志保留天数" name="logMaxFiles">
+                <UFormField label="日志保留天数" name="logMaxFiles">
                   <UInput
                     v-model="advancedForm.logMaxFiles"
                     type="number"
                     min="1"
                     max="365"
                   />
-                </UFormGroup>
+                </UFormField>
               </div>
             </div>
 
-            <UDivider />
+            <USeparator />
 
             <!-- 性能监控 -->
             <div class="space-y-4">
@@ -976,7 +976,7 @@ const testConnection = async (type: string) => {
               </div>
             </div>
 
-            <UDivider />
+            <USeparator />
 
             <!-- 备份设置 -->
             <div class="space-y-4">
@@ -987,7 +987,7 @@ const testConnection = async (type: string) => {
                   <span class="font-medium">启用自动备份</span>
                 </div>
 
-                <UFormGroup
+                <UFormField
                   v-if="advancedForm.backupEnabled"
                   label="备份频率"
                   name="backupFrequency"
@@ -996,7 +996,7 @@ const testConnection = async (type: string) => {
                     v-model="advancedForm.backupFrequency"
                     :items="backupFrequencyOptions"
                   />
-                </UFormGroup>
+                </UFormField>
               </div>
             </div>
           </UForm>
