@@ -1,54 +1,59 @@
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
-import { useWindowSize } from '../composables/useWindowSize'
-import Sidebar from '../components/layout/Sidebar.vue'
-import Header from '../components/layout/Header.vue'
+import { ref, computed, watch } from "vue";
+import { useWindowSize } from "../composables/useWindowSize";
+import Sidebar from "../components/layout/Sidebar.vue";
+import Header from "../components/layout/Header.vue";
+import FooterBar from "../components/layout/FooterBar.vue";
 
 // 侧边栏折叠状态
-const sidebarCollapsed = ref(false)
+const sidebarCollapsed = ref(false);
 
 // 切换侧边栏状态
 const toggleSidebar = () => {
-  sidebarCollapsed.value = !sidebarCollapsed.value
-}
+  sidebarCollapsed.value = !sidebarCollapsed.value;
+};
 
 // 响应式处理
-const { width } = useWindowSize()
-const isMobile = computed(() => width.value < 768)
+const { width } = useWindowSize();
+const isMobile = computed(() => width.value < 768);
 
 // 移动端自动折叠侧边栏
 watch(isMobile, (mobile) => {
   if (mobile) {
-    sidebarCollapsed.value = true
+    sidebarCollapsed.value = true;
   }
-})
+});
 
 // 移动端遮罩层
-const showMobileOverlay = computed(() => isMobile.value && !sidebarCollapsed.value)
+const showMobileOverlay = computed(
+  () => isMobile.value && !sidebarCollapsed.value
+);
 
 // 点击遮罩层关闭侧边栏
 const closeMobileSidebar = () => {
   if (isMobile.value) {
-    sidebarCollapsed.value = true
+    sidebarCollapsed.value = true;
   }
-}
+};
 </script>
 
 <template>
   <div class="min-h-screen bg-gray-50 flex">
     <!-- 移动端遮罩层 -->
-    <div 
+    <div
       v-if="showMobileOverlay"
       class="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
       @click="closeMobileSidebar"
     />
 
     <!-- 侧边栏 -->
-    <div 
+    <div
       class="fixed md:relative z-50 h-full transition-transform duration-300 ease-in-out"
       :class="[
-        sidebarCollapsed ? '-translate-x-full md:translate-x-0' : 'translate-x-0',
-        sidebarCollapsed ? 'md:w-16' : 'md:w-64'
+        sidebarCollapsed
+          ? '-translate-x-full md:translate-x-0'
+          : 'translate-x-0',
+        sidebarCollapsed ? 'md:w-16' : 'md:w-64',
       ]"
     >
       <div class="h-full">
@@ -77,9 +82,12 @@ const closeMobileSidebar = () => {
                   {{ $route.meta.description }}
                 </p>
               </div> -->
-              
+
               <!-- 页面操作按钮区域 -->
-              <div v-if="$route.meta.actions" class="flex items-center space-x-3">
+              <div
+                v-if="$route.meta.actions"
+                class="flex items-center space-x-3"
+              >
                 <slot name="page-actions" />
               </div>
             </div>
@@ -93,18 +101,7 @@ const closeMobileSidebar = () => {
       </main>
 
       <!-- 页脚 -->
-      <footer class="bg-white border-t border-gray-200 px-6 py-4">
-        <div class="flex items-center justify-between text-sm text-gray-600">
-          <div>
-            © 2024 PowerX. {{ $t('home.footer') }}
-          </div>
-          <div class="flex items-center space-x-4">
-            <a href="#" class="hover:text-gray-900">{{ $t('intro.footer.aboutUs') }}</a>
-            <a href="#" class="hover:text-gray-900">{{ $t('intro.footer.contactUs') }}</a>
-            <a href="#" class="hover:text-gray-900">{{ $t('privacyPolicy') }}</a>
-          </div>
-        </div>
-      </footer>
+      <FooterBar />
     </div>
   </div>
 </template>

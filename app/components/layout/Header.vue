@@ -130,12 +130,14 @@ const handleSearch = () => {
               :to="$localePath('/dashboard')"
               class="text-gray-500 hover:text-gray-700"
             >
-             <UIcon class="w-4 h-4 inline-block" name="i-heroicons-home"  />
+              <UIcon class="w-4 h-4 inline-block" name="i-heroicons-home" />
             </NuxtLink>
           </li>
           <li class="flex items-center">
-                        <UIcon class="w-4 h-4 text-gray-400 mx-2 inline-block"
-                          name="i-heroicons-chevron-right"  />
+            <UIcon
+              class="w-4 h-4 text-gray-400 mx-2 inline-block"
+              name="i-heroicons-chevron-right"
+            />
             <span class="text-sm font-medium text-gray-900">{{
               $route.meta.title || t("dashboard.title")
             }}</span>
@@ -186,15 +188,12 @@ const handleSearch = () => {
 
     <!-- 右侧：操作按钮 -->
     <div class="flex items-center space-x-4">
-      <!-- 语言切换器 -->
-      <LanguageSwitcher />
-
       <!-- 通知 -->
       <UDropdownMenu :items="notificationItems">
         <UButton variant="ghost" size="sm" class="relative">
-                    <span class="w-5 h-5 inline-block">
-                      <UIcon class="w-5 h-5 inline-block" name="i-heroicons-bell"  />
-                    </span>
+          <span class="w-5 h-5 inline-block">
+            <UIcon class="w-5 h-5 inline-block" name="i-heroicons-bell" />
+          </span>
           <UBadge
             v-if="unreadCount > 0"
             :label="unreadCount.toString()"
@@ -205,27 +204,29 @@ const handleSearch = () => {
         </UButton>
       </UDropdownMenu>
 
-      <!-- 主题切换 -->
-      <ThemeSwitcher />
-
       <!-- 用户菜单 -->
       <UDropdownMenu :items="userMenuItems">
         <UButton variant="ghost" class="flex items-center space-x-2">
           <div
             class="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center"
           >
-                        <span class="w-5 h-5 text-gray-600 inline-block">
-                          <UIcon class="w-5 h-5 text-gray-600 inline-block" name="i-heroicons-user"  />
-                        </span>
+            <span class="w-5 h-5 text-gray-600 inline-block">
+              <UIcon
+                class="w-5 h-5 text-gray-600 inline-block"
+                name="i-heroicons-user"
+              />
+            </span>
           </div>
           <div class="hidden md:block text-left">
             <div class="text-sm font-medium text-gray-900">{{ user.name }}</div>
             <div class="text-xs text-gray-500">{{ user.email }}</div>
           </div>
-                    <span class="w-4 h-4 text-gray-400 inline-block">
-                      <UIcon class="w-4 h-4 text-gray-400 inline-block"
-                      name="i-heroicons-chevron-down"  />
-                    </span>
+          <span class="w-4 h-4 text-gray-400 inline-block">
+            <UIcon
+              class="w-4 h-4 text-gray-400 inline-block"
+              name="i-heroicons-chevron-down"
+            />
+          </span>
         </UButton>
       </UDropdownMenu>
     </div>
