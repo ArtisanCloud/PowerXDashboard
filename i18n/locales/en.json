@@ -65,6 +65,7 @@
   },
   "menu": {
     "agent": "AI Chat",
+    "workflow": "Workflow",
     "dashboard": "Dashboard",
     "customers": "Customer Management",
     "customerList": "Customer List",
@@ -203,6 +204,157 @@
     "tip": "Something went wrong with this page",
     "goBack": "Go Back",
     "goHome": "Go Home"
+  },
+  "organization": {
+    "title": "Organization Structure",
+    "tabs": {
+      "departments": "Departments",
+      "users": "Users",
+      "permissions": "Permissions"
+    },
+    "description": "Manage system users, departments and permissions",
+    "department": {
+      "title": "Department Management",
+      "description": "Manage company department structure",
+      "add": "Add Department",
+      "edit": "Edit Department",
+      "delete": "Delete Department",
+      "confirmDelete": "Are you sure you want to delete this department?",
+      "form": {
+        "name": "Department Name",
+        "code": "Department Code",
+        "leader": "Leader",
+        "description": "Description",
+        "namePlaceholder": "Enter department name",
+        "codePlaceholder": "Enter department code",
+        "leaderPlaceholder": "Enter leader name",
+        "descriptionPlaceholder": "Enter department description"
+      },
+      "table": {
+        "name": "Department Name",
+        "code": "Department Code",
+        "leader": "Leader",
+        "memberCount": "Member Count",
+        "description": "Description",
+        "actions": "Actions"
+      },
+      "empty": {
+        "title": "No Departments",
+        "noResults": "No matching departments found, try another search term",
+        "create": "Click 'Add Department' button to create your first department"
+      },
+      "search": "Search department name, code or leader..."
+    },
+    "user": {
+      "title": "User Management",
+      "description": "Manage system user accounts and permissions",
+      "add": "Add User",
+      "edit": "Edit User",
+      "delete": "Delete User",
+      "disable": "Disable",
+      "enable": "Enable",
+      "confirmDelete": "Are you sure you want to delete this user?",
+      "importExport": "Import/Export",
+      "import": {
+        "title": "Import User Data",
+        "button": "Import User Data",
+        "success": "Successfully imported {count} users",
+        "error": "Import failed: {message}",
+        "invalidFormat": "Invalid user data format",
+        "missingFields": "Imported data is missing required fields (name, username, or email)"
+      },
+      "export": {
+        "csv": "Export User Data (CSV)",
+        "json": "Export User Data (JSON)"
+      },
+      "form": {
+        "name": "Name",
+        "username": "Username",
+        "email": "Email",
+        "department": "Department",
+        "role": "Role",
+        "password": "Password",
+        "newPassword": "New Password (leave empty to keep unchanged)",
+        "confirmPassword": "Confirm Password",
+        "confirmNewPassword": "Confirm New Password",
+        "status": "Status",
+        "active": "Active",
+        "inactive": "Inactive",
+        "namePlaceholder": "Enter name",
+        "usernamePlaceholder": "Enter username",
+        "emailPlaceholder": "Enter email address",
+        "passwordPlaceholder": "Enter password",
+        "selectDepartment": "Select department",
+        "selectRole": "Select role"
+      },
+      "table": {
+        "avatar": "",
+        "name": "Name",
+        "username": "Username",
+        "email": "Email",
+        "department": "Department",
+        "role": "Role",
+        "status": "Status",
+        "actions": "Actions"
+      },
+      "filter": {
+        "allDepartments": "All Departments",
+        "allRoles": "All Roles",
+        "allStatus": "All Status",
+        "active": "Active",
+        "inactive": "Inactive",
+        "reset": "Reset"
+      },
+      "empty": {
+        "title": "No Users",
+        "noResults": "No matching users found, try adjusting your filters",
+        "create": "Click 'Add User' button to create your first user"
+      },
+      "search": "Search username, email...",
+      "validation": {
+        "requiredFields": "Please fill in required fields",
+        "passwordMismatch": "Passwords do not match"
+      }
+    },
+    "permission": {
+      "title": "Permission Management",
+      "description": "Manage system roles and permissions",
+      "roleList": "Role List",
+      "roleConfig": "Permission Configuration",
+      "configDesc": "Configure the features and operations this role can access",
+      "add": "Add Role",
+      "edit": "Edit Role",
+      "delete": "Delete Role",
+      "systemRole": "System",
+      "userCount": "users",
+      "confirmDelete": "Are you sure you want to delete this role?",
+      "systemRoleError": "System roles cannot be deleted",
+      "form": {
+        "name": "Role Name",
+        "code": "Role Code",
+        "description": "Description",
+        "permissions": "Permissions",
+        "namePlaceholder": "Enter role name",
+        "codePlaceholder": "Enter role code",
+        "descriptionPlaceholder": "Enter role description"
+      },
+      "empty": {
+        "title": "No Roles",
+        "noResults": "No matching roles found, try another search term",
+        "create": "Click 'Add Role' button to create your first role"
+      },
+      "search": "Search roles..."
+    },
+    "common": {
+      "save": "Save",
+      "cancel": "Cancel",
+      "edit": "Edit",
+      "delete": "Delete",
+      "actions": "Actions",
+      "search": "Search",
+      "filter": "Filter",
+      "reset": "Reset"
+    }
   },
   "agent": {
     "selector": {

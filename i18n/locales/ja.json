@@ -204,6 +204,157 @@
     "goBack": "戻る",
     "goHome": "ホームに戻る"
   },
+  "organization": {
+    "title": "組織構造",
+    "tabs": {
+      "departments": "部門管理",
+      "users": "ユーザー管理",
+      "permissions": "権限管理"
+    },
+    "description": "システムユーザー、部門、権限を管理",
+    "department": {
+      "title": "部門管理",
+      "description": "会社の部門構造を管理",
+      "add": "部門追加",
+      "edit": "部門編集",
+      "delete": "部門削除",
+      "confirmDelete": "この部門を削除してもよろしいですか？",
+      "form": {
+        "name": "部門名",
+        "code": "部門コード",
+        "leader": "責任者",
+        "description": "説明",
+        "namePlaceholder": "部門名を入力",
+        "codePlaceholder": "部門コードを入力",
+        "leaderPlaceholder": "責任者名を入力",
+        "descriptionPlaceholder": "部門の説明を入力"
+      },
+      "table": {
+        "name": "部門名",
+        "code": "部門コード",
+        "leader": "責任者",
+        "memberCount": "メンバー数",
+        "description": "説明",
+        "actions": "操作"
+      },
+      "empty": {
+        "title": "部門データがありません",
+        "noResults": "一致する部門が見つかりません。別の検索語を試してください",
+        "create": "「部門追加」ボタンをクリックして最初の部門を作成"
+      },
+      "search": "部門名、コード、責任者を検索..."
+    },
+    "user": {
+      "title": "ユーザー管理",
+      "description": "システムユーザーアカウントと権限を管理",
+      "add": "ユーザー追加",
+      "edit": "ユーザー編集",
+      "delete": "ユーザー削除",
+      "disable": "無効化",
+      "enable": "有効化",
+      "confirmDelete": "このユーザーを削除してもよろしいですか？",
+      "importExport": "インポート/エクスポート",
+      "import": {
+        "title": "ユーザーデータのインポート",
+        "button": "ユーザーデータをインポート",
+        "success": "{count}人のユーザーをインポートしました",
+        "error": "インポート失敗：{message}",
+        "invalidFormat": "無効なユーザーデータ形式",
+        "missingFields": "インポートされたデータに必須フィールド（名前、ユーザー名、またはメール）がありません"
+      },
+      "export": {
+        "csv": "ユーザーデータをエクスポート (CSV)",
+        "json": "ユーザーデータをエクスポート (JSON)"
+      },
+      "form": {
+        "name": "名前",
+        "username": "ユーザー名",
+        "email": "メール",
+        "department": "部門",
+        "role": "役割",
+        "password": "パスワード",
+        "newPassword": "新しいパスワード（変更しない場合は空白）",
+        "confirmPassword": "パスワード確認",
+        "confirmNewPassword": "新しいパスワード確認",
+        "status": "ステータス",
+        "active": "有効",
+        "inactive": "無効",
+        "namePlaceholder": "名前を入力",
+        "usernamePlaceholder": "ユーザー名を入力",
+        "emailPlaceholder": "メールアドレスを入力",
+        "passwordPlaceholder": "パスワードを入力",
+        "selectDepartment": "部門を選択",
+        "selectRole": "役割を選択"
+      },
+      "table": {
+        "avatar": "",
+        "name": "名前",
+        "username": "ユーザー名",
+        "email": "メール",
+        "department": "部門",
+        "role": "役割",
+        "status": "ステータス",
+        "actions": "操作"
+      },
+      "filter": {
+        "allDepartments": "すべての部門",
+        "allRoles": "すべての役割",
+        "allStatus": "すべてのステータス",
+        "active": "有効",
+        "inactive": "無効",
+        "reset": "リセット"
+      },
+      "empty": {
+        "title": "ユーザーデータがありません",
+        "noResults": "一致するユーザーが見つかりません。フィルターを調整してください",
+        "create": "「ユーザー追加」ボタンをクリックして最初のユーザーを作成"
+      },
+      "search": "ユーザー名、メールを検索...",
+      "validation": {
+        "requiredFields": "必須フィールドを入力してください",
+        "passwordMismatch": "パスワードが一致しません"
+      }
+    },
+    "permission": {
+      "title": "権限管理",
+      "description": "システムの役割と権限を管理",
+      "roleList": "役割リスト",
+      "roleConfig": "権限設定",
+      "configDesc": "この役割がアクセスできる機能と操作を設定",
+      "add": "役割追加",
+      "edit": "役割編集",
+      "delete": "役割削除",
+      "systemRole": "システム",
+      "userCount": "ユーザー",
+      "confirmDelete": "この役割を削除してもよろしいですか？",
+      "systemRoleError": "システム役割は削除できません",
+      "form": {
+        "name": "役割名",
+        "code": "役割コード",
+        "description": "説明",
+        "permissions": "権限",
+        "namePlaceholder": "役割名を入力",
+        "codePlaceholder": "役割コードを入力",
+        "descriptionPlaceholder": "役割の説明を入力"
+      },
+      "empty": {
+        "title": "役割データがありません",
+        "noResults": "一致する役割が見つかりません。別の検索語を試してください",
+        "create": "「役割追加」ボタンをクリックして最初の役割を作成"
+      },
+      "search": "役割を検索..."
+    },
+    "common": {
+      "save": "保存",
+      "cancel": "キャンセル",
+      "edit": "編集",
+      "delete": "削除",
+      "actions": "操作",
+      "search": "検索",
+      "filter": "フィルター",
+      "reset": "リセット"
+    }
+  },
   "agent": {
     "selector": {
       "title": "AI エージェント",
