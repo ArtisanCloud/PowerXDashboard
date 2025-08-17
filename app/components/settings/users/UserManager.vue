@@ -663,125 +663,136 @@ onMounted(() => {
     </div>
 
     <!-- 用户表单对话框 -->
-    <UModal v-model="showForm" :ui="{ width: 'sm:max-w-lg' }">
-      <div class="p-6">
-        <h3 class="text-lg font-medium text-gray-900 mb-4">
-          {{
-            isEditing
-              ? $t("organization.user.edit")
-              : $t("organization.user.add")
-          }}
-        </h3>
+    <UModal v-model:open="showForm" :ui="{ width: 'sm:max-w-lg' }">
+      <template #content>
+        <div class="p-6">
+          <h3 class="text-lg font-medium text-gray-900 mb-4">
+            {{
+              isEditing
+                ? $t("organization.user.edit")
+                : $t("organization.user.add")
+            }}
+          </h3>
 
-        <form @submit.prevent="saveUser">
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <UFormField :label="$t('organization.user.form.name')" required>
-              <UInput
-                v-model="userForm.name"
-                :placeholder="$t('organization.user.form.namePlaceholder')"
-              />
-            </UFormField>
+          <form @submit.prevent="saveUser">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <UFormField :label="$t('organization.user.form.name')" required>
+                <UInput
+                  v-model="userForm.name"
+                  :placeholder="$t('organization.user.form.namePlaceholder')"
+                />
+              </UFormField>
 
-            <UFormField :label="$t('organization.user.form.username')" required>
-              <UInput
-                v-model="userForm.username"
-                :placeholder="$t('organization.user.form.usernamePlaceholder')"
-              />
-            </UFormField>
+              <UFormField
+                :label="$t('organization.user.form.username')"
+                required
+              >
+                <UInput
+                  v-model="userForm.username"
+                  :placeholder="
+                    $t('organization.user.form.usernamePlaceholder')
+                  "
+                />
+              </UFormField>
 
-            <UFormField
-              :label="$t('organization.user.form.email')"
-              required
-              class="md:col-span-2"
-            >
-              <UInput
-                v-model="userForm.email"
-                type="email"
-                :placeholder="$t('organization.user.form.emailPlaceholder')"
-              />
-            </UFormField>
+              <UFormField
+                :label="$t('organization.user.form.email')"
+                required
+                class="md:col-span-2"
+              >
+                <UInput
+                  v-model="userForm.email"
+                  type="email"
+                  :placeholder="$t('organization.user.form.emailPlaceholder')"
+                />
+              </UFormField>
 
-            <UFormField :label="$t('organization.user.form.department')">
-              <USelect
-                v-model="userForm.department"
-                :options="departments"
-                :placeholder="$t('organization.user.form.selectDepartment')"
-              />
-            </UFormField>
+              <UFormField :label="$t('organization.user.form.department')">
+                <USelect
+                  v-model="userForm.department"
+                  :options="departments"
+                  :placeholder="$t('organization.user.form.selectDepartment')"
+                />
+              </UFormField>
 
-            <UFormField :label="$t('organization.user.form.role')">
-              <USelect
-                v-model="userForm.role"
-                :options="roles"
-                :placeholder="$t('organization.user.form.selectRole')"
-              />
-            </UFormField>
+              <UFormField :label="$t('organization.user.form.role')">
+                <USelect
+                  v-model="userForm.role"
+                  :options="roles"
+                  :placeholder="$t('organization.user.form.selectRole')"
+                />
+              </UFormField>
 
-            <UFormField
-              :label="
-                isEditing
-                  ? $t('organization.user.form.newPassword')
-                  : $t('organization.user.form.password')
-              "
-              :required="!isEditing"
-            >
-              <UInput
-                v-model="userForm.password"
-                type="password"
-                :placeholder="$t('organization.user.form.passwordPlaceholder')"
-              />
-            </UFormField>
+              <UFormField
+                :label="
+                  isEditing
+                    ? $t('organization.user.form.newPassword')
+                    : $t('organization.user.form.password')
+                "
+                :required="!isEditing"
+              >
+                <UInput
+                  v-model="userForm.password"
+                  type="password"
+                  :placeholder="
+                    $t('organization.user.form.passwordPlaceholder')
+                  "
+                />
+              </UFormField>
 
-            <UFormField
-              :label="
-                isEditing
-                  ? $t('organization.user.form.confirmNewPassword')
-                  : $t('organization.user.form.confirmPassword')
-              "
-              :required="!isEditing"
-            >
-              <UInput
-                v-model="userForm.confirmPassword"
-                type="password"
-                :placeholder="$t('organization.user.form.passwordPlaceholder')"
-              />
-            </UFormField>
+              <UFormField
+                :label="
+                  isEditing
+                    ? $t('organization.user.form.confirmNewPassword')
+                    : $t('organization.user.form.confirmPassword')
+                "
+                :required="!isEditing"
+              >
+                <UInput
+                  v-model="userForm.confirmPassword"
+                  type="password"
+                  :placeholder="
+                    $t('organization.user.form.passwordPlaceholder')
+                  "
+                />
+              </UFormField>
 
-            <UFormField
-              :label="$t('organization.user.form.status')"
-              class="md:col-span-2"
-            >
-              <URadioGroup
-                v-model="userForm.status"
-                :items="[
-                  {
-                    value: 'active',
-                    label: $t('organization.user.form.active'),
-                  },
-                  {
-                    value: 'inactive',
-                    label: $t('organization.user.form.inactive'),
-                  },
-                ]"
-                class="flex space-x-4"
-              />
-            </UFormField>
-          </div>
+              <UFormField
+                :label="$t('organization.user.form.status')"
+                class="md:col-span-2"
+              >
+                <URadioGroup
+                  v-model="userForm.status"
+                  :items="[
+                    {
+                      value: 'active',
+                      label: $t('organization.user.form.active'),
+                    },
+                    {
+                      value: 'inactive',
+                      label: $t('organization.user.form.inactive'),
+                    },
+                  ]"
+                  class="flex space-x-4"
+                />
+              </UFormField>
+            </div>
 
-          <div class="mt-6 flex justify-end space-x-3">
-            <UButton
-              color="neutral"
-              variant="outline"
-              @click="showForm = false"
-            >
-              {{ $t("organization.common.cancel") }}
-            </UButton>
-            <UButton type="submit" color="primary">
-              {{ $t("organization.common.save") }}
-            </UButton>
-          </div>
-        </form>
-      </div>
+            <div class="mt-6 flex justify-end space-x-3">
+              <UButton
+                color="neutral"
+                variant="outline"
+                @click="showForm = false"
+              >
+                {{ $t("organization.common.cancel") }}
+              </UButton>
+              <UButton type="submit" color="primary">
+                {{ $t("organization.common.save") }}
+              </UButton>
+            </div>
+          </form>
+        </div></template
+      >
     </UModal>
   </div>
 </template>

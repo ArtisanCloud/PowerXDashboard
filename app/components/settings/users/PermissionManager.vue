@@ -605,138 +605,153 @@ const isModulePartiallySelected = (module) => {
     </div>
 
     <!-- 角色表单对话框 -->
-    <UModal v-model="showRoleForm" :ui="{ width: 'sm:max-w-lg' }">
-      <div class="p-6">
-        <h3 class="text-lg font-medium text-gray-900 mb-4">
-          {{
-            isEditing
-              ? $t("organization.permission.edit")
-              : $t("organization.permission.add")
-          }}
-        </h3>
+    <UModal v-model:open="showRoleForm" :ui="{ width: 'sm:max-w-lg' }">
+      <template #content>
+        <div class="p-6">
+          <h3 class="text-lg font-medium text-gray-900 mb-4">
+            {{
+              isEditing
+                ? $t("organization.permission.edit")
+                : $t("organization.permission.add")
+            }}
+          </h3>
 
-        <form @submit.prevent="saveRole">
-          <div class="space-y-4">
-            <UFormField
-              :label="$t('organization.permission.form.name')"
-              required
-            >
-              <UInput
-                v-model="roleForm.name"
-                :placeholder="
-                  $t('organization.permission.form.namePlaceholder')
-                "
-              />
-            </UFormField>
+          <form @submit.prevent="saveRole">
+            <div class="space-y-4">
+              <UFormField
+                :label="$t('organization.permission.form.name')"
+                required
+              >
+                <UInput
+                  v-model="roleForm.name"
+                  :placeholder="
+                    $t('organization.permission.form.namePlaceholder')
+                  "
+                />
+              </UFormField>
 
-            <UFormField
-              :label="$t('organization.permission.form.code')"
-              required
-            >
-              <UInput
-                v-model="roleForm.code"
-                :placeholder="
-                  $t('organization.permission.form.codePlaceholder')
-                "
-              />
-            </UFormField>
+              <UFormField
+                :label="$t('organization.permission.form.code')"
+                required
+              >
+                <UInput
+                  v-model="roleForm.code"
+                  :placeholder="
+                    $t('organization.permission.form.codePlaceholder')
+                  "
+                />
+              </UFormField>
 
-            <UFormField :label="$t('organization.permission.form.description')">
-              <UTextarea
-                v-model="roleForm.description"
-                :placeholder="
-                  $t('organization.permission.form.descriptionPlaceholder')
-                "
-              />
-            </UFormField>
+              <UFormField
+                :label="$t('organization.permission.form.description')"
+              >
+                <UTextarea
+                  v-model="roleForm.description"
+                  :placeholder="
+                    $t('organization.permission.form.descriptionPlaceholder')
+                  "
+                />
+              </UFormField>
 
-            <UFormField :label="$t('organization.permission.form.permissions')">
-              <div class="border rounded-md p-4 max-h-[300px] overflow-y-auto">
+              <UFormField
+                :label="$t('organization.permission.form.permissions')"
+              >
                 <div
-                  v-for="(perms, module) in permissionGroups"
-                  :key="module"
-                  class="mb-4"
+                  class="border rounded-md p-4 max-h-[300px] overflow-y-auto"
                 >
-                  <div class="flex items-center mb-2">
-                    <UCheckbox
-                      :model-value="
-                        perms.every((p) => roleForm.permissions.includes(p.id))
-                      "
-                      :indeterminate="
-                        perms.some((p) =>
-                          roleForm.permissions.includes(p.id)
-                        ) &&
-                        !perms.every((p) => roleForm.permissions.includes(p.id))
-                      "
-                      @update:model-value="
-                        (checked) => {
-                          if (checked) {
-                            perms.forEach((p) => {
-                              if (!roleForm.permissions.includes(p.id)) {
-                                roleForm.permissions.push(p.id);
-                              }
-                            });
-                          } else {
-                            roleForm.permissions = roleForm.permissions.filter(
-                              (id) => !perms.map((p) => p.id).includes(id)
-                            );
-                          }
-                        }
-                      "
-                    />
-                    <h4 class="ml-2 font-medium text-gray-900">{{ module }}</h4>
-                  </div>
-
-                  <div class="ml-6 grid grid-cols-1 md:grid-cols-2 gap-2">
-                    <div
-                      v-for="perm in perms"
-                      :key="perm.id"
-                      class="flex items-start"
-                    >
+                  <div
+                    v-for="(perms, module) in permissionGroups"
+                    :key="module"
+                    class="mb-4"
+                  >
+                    <div class="flex items-center mb-2">
                       <UCheckbox
-                        :model-value="roleForm.permissions.includes(perm.id)"
+                        :model-value="
+                          perms.every((p) =>
+                            roleForm.permissions.includes(p.id)
+                          )
+                        "
+                        :indeterminate="
+                          perms.some((p) =>
+                            roleForm.permissions.includes(p.id)
+                          ) &&
+                          !perms.every((p) =>
+                            roleForm.permissions.includes(p.id)
+                          )
+                        "
                         @update:model-value="
                           (checked) => {
                             if (checked) {
-                              roleForm.permissions.push(perm.id);
+                              perms.forEach((p) => {
+                                if (!roleForm.permissions.includes(p.id)) {
+                                  roleForm.permissions.push(p.id);
+                                }
+                              });
                             } else {
                               roleForm.permissions =
                                 roleForm.permissions.filter(
-                                  (id) => id !== perm.id
+                                  (id) => !perms.map((p) => p.id).includes(id)
                                 );
                             }
                           }
                         "
                       />
-                      <div class="ml-2">
-                        <div class="text-sm font-medium text-gray-700">
-                          {{ perm.name }}
-                        </div>
-                        <div class="text-xs text-gray-500">
-                          {{ perm.description }}
+                      <h4 class="ml-2 font-medium text-gray-900">
+                        {{ module }}
+                      </h4>
+                    </div>
+
+                    <div class="ml-6 grid grid-cols-1 md:grid-cols-2 gap-2">
+                      <div
+                        v-for="perm in perms"
+                        :key="perm.id"
+                        class="flex items-start"
+                      >
+                        <UCheckbox
+                          :model-value="roleForm.permissions.includes(perm.id)"
+                          @update:model-value="
+                            (checked) => {
+                              if (checked) {
+                                roleForm.permissions.push(perm.id);
+                              } else {
+                                roleForm.permissions =
+                                  roleForm.permissions.filter(
+                                    (id) => id !== perm.id
+                                  );
+                              }
+                            }
+                          "
+                        />
+                        <div class="ml-2">
+                          <div class="text-sm font-medium text-gray-700">
+                            {{ perm.name }}
+                          </div>
+                          <div class="text-xs text-gray-500">
+                            {{ perm.description }}
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            </UFormField>
-          </div>
+              </UFormField>
+            </div>
 
-          <div class="mt-6 flex justify-end space-x-3">
-            <UButton
-              color="neutral"
-              variant="outline"
-              @click="showRoleForm = false"
-            >
-              {{ $t("organization.common.cancel") }}
-            </UButton>
-            <UButton type="submit" color="primary">{{
-              $t("organization.common.save")
-            }}</UButton>
-          </div>
-        </form>
-      </div>
+            <div class="mt-6 flex justify-end space-x-3">
+              <UButton
+                color="neutral"
+                variant="outline"
+                @click="showRoleForm = false"
+              >
+                {{ $t("organization.common.cancel") }}
+              </UButton>
+              <UButton type="submit" color="primary">{{
+                $t("organization.common.save")
+              }}</UButton>
+            </div>
+          </form>
+        </div>
+      </template>
     </UModal>
   </div>
 </template>

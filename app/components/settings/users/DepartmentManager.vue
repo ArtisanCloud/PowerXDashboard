@@ -2,7 +2,14 @@
 import { ref, reactive, computed } from "vue";
 import { useI18n } from "#imports"; // Nuxt i18n composable（或 'vue-i18n' 视你的项目配置）
 
-const { t } = useI18n();
+const { t, locale } = useI18n();
+
+// 调试信息
+console.log("DepartmentManager - Current locale:", locale.value);
+console.log(
+  "DepartmentManager - Sample translation:",
+  t("organization.department.title")
+);
 
 // ✅ 用 computed + t 保证 label 始终是字符串，且随语言切换更新
 const columns = computed(() => [
@@ -85,7 +92,7 @@ const departments = ref([
 // 搜索关键词
 const searchQuery = ref("");
 
-// 表单状态
+// 表单状态 - 确保初始值为 false
 const showForm = ref(false);
 const isEditing = ref(false);
 const editingId = ref<number | null>(null);
@@ -108,6 +115,7 @@ const resetForm = () => {
 
 const openAddForm = () => {
   resetForm();
+  // console.log("打开添加部门表单");
   showForm.value = true;
 };
 
@@ -170,153 +178,159 @@ const filteredDepartments = computed(() => {
 
 <template>
   <div>
-    <!-- 头部 -->
-    <div class="flex justify-between items-center mb-6">
-      <div>
-        <h2 class="text-xl font-semibold text-gray-800">
-          {{ $t("organization.department.title") }}
-        </h2>
-        <p class="text-sm text-gray-500 mt-1">
-          {{ $t("organization.department.description") }}
-        </p>
-      </div>
-      <UButton color="primary" icon="i-heroicons-plus" @click="openAddForm">
-        {{ $t("organization.department.add") }}
-      </UButton>
-    </div>
-
-    <!-- 搜索 -->
-    <div class="mb-6">
-      <UInput
-        v-model="searchQuery"
-        icon="i-heroicons-magnifying-glass"
-        :placeholder="$t('organization.department.search')"
-        class="w-full md:w-80"
-      />
-    </div>
-
-    <!-- 表格 -->
-    <!-- ✅ columns 是 computed，模板中会自动解包，不需要 .value -->
-    <UTable :columns="columns" :rows="filteredDepartments">
-      <!-- 操作列 -->
-      <template #actions-data="{ row }">
-        <div class="flex space-x-2">
-          <UButton
-            color="neutral"
-            variant="ghost"
-            icon="i-heroicons-pencil-square"
-            size="xs"
-            @click="openEditForm(row)"
-          >
-            {{ $t("organization.common.edit") }}
-          </UButton>
-          <UButton
-            color="error"
-            variant="ghost"
-            icon="i-heroicons-trash"
-            size="xs"
-            @click="deleteDepartment(row.id)"
-          >
-            {{ $t("organization.common.delete") }}
-          </UButton>
+    <section>
+      <!-- 头部 -->
+      <div class="flex justify-between items-center mb-6">
+        <div>
+          <h2 class="text-xl font-semibold text-gray-800">
+            {{ $t("organization.department.title") }}
+          </h2>
+          <p class="text-sm text-gray-500 mt-1">
+            {{ $t("organization.department.description") }}
+          </p>
         </div>
-      </template>
-    </UTable>
+        <UButton color="primary" icon="i-heroicons-plus" @click="openAddForm">
+          {{ $t("organization.department.add") }}
+        </UButton>
+      </div>
 
-    <!-- 空状态 -->
-    <div
-      v-if="filteredDepartments.length === 0"
-      class="text-center py-12 bg-gray-50 rounded-lg mt-4"
-    >
-      <UIcon
-        name="i-heroicons-building-office"
-        class="w-12 h-12 text-gray-400 mx-auto mb-4"
-      />
-      <h3 class="text-lg font-medium text-gray-900 mb-2">
-        {{ $t("organization.department.empty.title") }}
-      </h3>
-      <p class="text-gray-500 mb-4">
-        {{
-          searchQuery
-            ? $t("organization.department.empty.noResults")
-            : $t("organization.department.empty.create")
-        }}
-      </p>
-      <UButton v-if="!searchQuery" color="primary" @click="openAddForm">
-        {{ $t("organization.department.add") }}
-      </UButton>
-    </div>
+      <!-- 搜索 -->
+      <div class="mb-6">
+        <UInput
+          v-model="searchQuery"
+          icon="i-heroicons-magnifying-glass"
+          :placeholder="$t('organization.department.search')"
+          class="w-full md:w-80"
+        />
+      </div>
 
-    <!-- 弹窗表单 -->
-    <UModal v-model="showForm" :ui="{ width: 'sm:max-w-md' }">
-      <div class="p-6">
-        <h3 class="text-lg font-medium text-gray-900 mb-4">
-          {{
-            isEditing
-              ? $t("organization.department.edit")
-              : $t("organization.department.add")
-          }}
-        </h3>
-
-        <form @submit.prevent="saveDepartment">
-          <div class="space-y-4">
-            <UFormField
-              :label="$t('organization.department.form.name')"
-              required
-            >
-              <UInput
-                v-model="departmentForm.name"
-                :placeholder="
-                  $t('organization.department.form.namePlaceholder')
-                "
-              />
-            </UFormField>
-
-            <UFormField
-              :label="$t('organization.department.form.code')"
-              required
-            >
-              <UInput
-                v-model="departmentForm.code"
-                :placeholder="
-                  $t('organization.department.form.codePlaceholder')
-                "
-              />
-            </UFormField>
-
-            <UFormField :label="$t('organization.department.form.leader')">
-              <UInput
-                v-model="departmentForm.leader"
-                :placeholder="
-                  $t('organization.department.form.leaderPlaceholder')
-                "
-              />
-            </UFormField>
-
-            <UFormField :label="$t('organization.department.form.description')">
-              <UTextarea
-                v-model="departmentForm.description"
-                :placeholder="
-                  $t('organization.department.form.descriptionPlaceholder')
-                "
-              />
-            </UFormField>
-          </div>
-
-          <div class="mt-6 flex justify-end space-x-3">
+      <!-- 表格 -->
+      <UTable :columns="columns" :rows="filteredDepartments">
+        <template #actions-data="{ row }">
+          <div class="flex space-x-2">
             <UButton
               color="neutral"
-              variant="outline"
-              @click="showForm = false"
+              variant="ghost"
+              icon="i-heroicons-pencil-square"
+              size="xs"
+              @click="openEditForm(row)"
             >
-              {{ $t("organization.common.cancel") }}
+              {{ $t("organization.common.edit") }}
             </UButton>
-            <UButton type="submit" color="primary">
-              {{ $t("organization.common.save") }}
+            <UButton
+              color="error"
+              variant="ghost"
+              icon="i-heroicons-trash"
+              size="xs"
+              @click="deleteDepartment(row.id)"
+            >
+              {{ $t("organization.common.delete") }}
             </UButton>
           </div>
-        </form>
+        </template>
+      </UTable>
+
+      <!-- 空状态（这里只管显示提示，别把 Modal 放进来） -->
+      <div
+        v-if="filteredDepartments.length === 0"
+        class="text-center py-12 bg-gray-50 rounded-lg mt-4"
+      >
+        <UIcon
+          name="i-heroicons-building-office"
+          class="w-12 h-12 text-gray-400 mx-auto mb-4"
+        />
+        <h3 class="text-lg font-medium text-gray-900 mb-2">
+          {{ $t("organization.department.empty.title") }}
+        </h3>
+        <p class="text-gray-500 mb-4">
+          {{
+            searchQuery
+              ? $t("organization.department.empty.noResults")
+              : $t("organization.department.empty.create")
+          }}
+        </p>
+        <UButton v-if="!searchQuery" color="primary" @click="openAddForm">
+          {{ $t("organization.department.add") }}
+        </UButton>
       </div>
+    </section>
+
+    <!-- ✅ Modal 常驻 DOM，受控模式 + 正确使用 #content -->
+    <UModal v-model:open="showForm" :ui="{ content: 'sm:max-w-md' }">
+      <template #content>
+        <UCard>
+          <template #header>
+            <h3 class="text-lg font-medium text-gray-900">
+              {{
+                isEditing
+                  ? $t("organization.department.edit")
+                  : $t("organization.department.add")
+              }}
+            </h3>
+          </template>
+
+          <form @submit.prevent="saveDepartment">
+            <div class="space-y-4">
+              <UFormField
+                :label="$t('organization.department.form.name')"
+                required
+              >
+                <UInput
+                  v-model="departmentForm.name"
+                  :placeholder="
+                    $t('organization.department.form.namePlaceholder')
+                  "
+                />
+              </UFormField>
+
+              <UFormField
+                :label="$t('organization.department.form.code')"
+                required
+              >
+                <UInput
+                  v-model="departmentForm.code"
+                  :placeholder="
+                    $t('organization.department.form.codePlaceholder')
+                  "
+                />
+              </UFormField>
+
+              <UFormField :label="$t('organization.department.form.leader')">
+                <UInput
+                  v-model="departmentForm.leader"
+                  :placeholder="
+                    $t('organization.department.form.leaderPlaceholder')
+                  "
+                />
+              </UFormField>
+
+              <UFormField
+                :label="$t('organization.department.form.description')"
+              >
+                <UTextarea
+                  v-model="departmentForm.description"
+                  :placeholder="
+                    $t('organization.department.form.descriptionPlaceholder')
+                  "
+                />
+              </UFormField>
+            </div>
+
+            <div class="mt-6 flex justify-end space-x-3">
+              <UButton
+                color="neutral"
+                variant="outline"
+                @click="showForm = false"
+              >
+                {{ $t("organization.common.cancel") }}
+              </UButton>
+              <UButton type="submit" color="primary">
+                {{ $t("organization.common.save") }}
+              </UButton>
+            </div>
+          </form>
+        </UCard>
+      </template>
     </UModal>
   </div>
 </template>
