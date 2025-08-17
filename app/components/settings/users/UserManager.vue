@@ -125,8 +125,24 @@ const searchQuery = ref("");
 const filters = reactive({
   department: null as string | null,
   role: null as string | null,
-  status: null as string | null, // ⬅️ 改为 null，表示“未选择”
+  status: null as string | null, // ⬅️ 改为 null，表示"未选择"
 });
+
+/** ========= 分页状态 ========= */
+const pagination = reactive({
+  page: 1,
+  pageSize: 10,
+  total: 0,
+  totalPages: 0,
+});
+
+// 分页大小选项
+const pageSizeOptions = [
+  { label: "10", value: 10 },
+  { label: "20", value: 20 },
+  { label: "50", value: 50 },
+  { label: "100", value: 100 },
+];
 
 /** ========= 导入 / 导出 ========= */
 type ExportFormat = "csv" | "json";
@@ -432,10 +448,10 @@ function toggleUserStatus(user: User) {
   }
 }
 
-/** ========= 过滤 ========= */
+/** ========= 过滤和分页 ========= */
 const filteredUsers = computed<User[]>(() => {
   const q = searchQuery.value.trim().toLowerCase();
-  return users.value.filter((u) => {
+  const filtered = users.value.filter((u) => {
     const matchesSearch =
       !q ||
       u.name.toLowerCase().includes(q) ||
@@ -449,14 +465,69 @@ const filteredUsers = computed<User[]>(() => {
 
     return matchesSearch && matchesDepartment && matchesRole && matchesStatus;
   });
+
+  // 更新分页信息
+  pagination.total = filtered.length;
+  pagination.totalPages = Math.ceil(filtered.length / pagination.pageSize);
+
+  return filtered;
 });
+
+// 当前页显示的用户
+const paginatedUsers = computed<User[]>(() => {
+  const start = (pagination.page - 1) * pagination.pageSize;
+  const end = start + pagination.pageSize;
+  return filteredUsers.value.slice(start, end);
+});
+
+// 分页信息
+const paginationInfo = computed(() => {
+  const start = (pagination.page - 1) * pagination.pageSize + 1;
+  const end = Math.min(pagination.page * pagination.pageSize, pagination.total);
+  return {
+    start: pagination.total > 0 ? start : 0,
+    end,
+    total: pagination.total,
+    page: pagination.page,
+    totalPages: pagination.totalPages,
+  };
+});
+
+// 分页控制
+const changePage = (page: number) => {
+  if (page >= 1 && page <= pagination.totalPages) {
+    pagination.page = page;
+  }
+};
+
+const changePageSize = (pageSize: number) => {
+  pagination.pageSize = pageSize;
+  pagination.page = 1; // 重置到第一页
+};
+
+const hasNextPage = computed(() => pagination.page < pagination.totalPages);
+const hasPrevPage = computed(() => pagination.page > 1);
 
 function resetFilters() {
   filters.department = null;
   filters.role = null;
   filters.status = null;
   searchQuery.value = "";
+  pagination.page = 1; // 重置分页
 }
+
+// 监听筛选条件变化，重置到第一页
+watch(
+  [
+    searchQuery,
+    () => filters.department,
+    () => filters.role,
+    () => filters.status,
+  ],
+  () => {
+    pagination.page = 1;
+  }
+);
 
 // ====== ✅ Nuxt UI 3.3+：TanStack 列定义 ======
 const UButton = resolveComponent("UButton");
@@ -692,8 +763,81 @@ onMounted(() => {
       </div>
     </div>
 
+    <!-- 数据统计和分页大小选择 -->
+    <div class="mb-4 bg-white p-4 rounded-lg shadow-sm">
+      <div class="flex justify-between items-center">
+        <div class="text-sm text-gray-600">
+          显示第 {{ paginationInfo.start }} - {{ paginationInfo.end }} 条， 共
+          {{ paginationInfo.total }} 条记录
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="text-sm text-gray-600">每页显示：</span>
+          <USelect
+            :model-value="pagination.pageSize"
+            :options="pageSizeOptions"
+            @update:model-value="changePageSize"
+            class="w-20"
+          />
+        </div>
+      </div>
+    </div>
+
     <!-- ✅ Nuxt UI 3.3+ 用 :data 和 TanStack columns -->
-    <UTable :data="filteredUsers" :columns="columns" />
+    <div class="bg-white rounded-lg shadow-sm">
+      <UTable :data="paginatedUsers" :columns="columns" />
+
+      <!-- 分页控件 -->
+      <div
+        v-if="pagination.totalPages > 1"
+        class="px-6 py-4 border-t border-gray-200"
+      >
+        <div class="flex justify-between items-center">
+          <div class="text-sm text-gray-600">
+            第 {{ pagination.page }} 页，共 {{ pagination.totalPages }} 页
+          </div>
+          <div class="flex gap-2">
+            <UButton
+              :disabled="!hasPrevPage"
+              variant="outline"
+              size="sm"
+              icon="i-heroicons-chevron-left"
+              @click="changePage(pagination.page - 1)"
+            >
+              上一页
+            </UButton>
+
+            <!-- 页码按钮 -->
+            <template
+              v-for="page in Math.min(5, pagination.totalPages)"
+              :key="page"
+            >
+              <UButton
+                v-if="
+                  Math.abs(page - pagination.page) <= 2 ||
+                  page === 1 ||
+                  page === pagination.totalPages
+                "
+                :variant="page === pagination.page ? 'solid' : 'outline'"
+                size="sm"
+                @click="changePage(page)"
+              >
+                {{ page }}
+              </UButton>
+            </template>
+
+            <UButton
+              :disabled="!hasNextPage"
+              variant="outline"
+              size="sm"
+              icon="i-heroicons-chevron-right"
+              @click="changePage(pagination.page + 1)"
+            >
+              下一页
+            </UButton>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <!-- 空状态 -->
     <div

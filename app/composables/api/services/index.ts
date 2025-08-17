@@ -16,6 +16,9 @@ export type {
   ChangePasswordParams,
   ResetPasswordParams,
   ResetPasswordConfirmParams,
+  UserFilters,
+  RoleFilters,
+  DepartmentFilters,
 } from "./authService";
 
 // 仪表板服务

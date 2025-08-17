@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, reactive, computed, h, resolveComponent } from "vue";
+import { ref, reactive, computed, h, resolveComponent, watch } from "vue";
 import { useI18n } from "#imports";
 
 const { t, locale } = useI18n();
@@ -58,6 +58,22 @@ const departments = ref<Department[]>([
 
 const searchQuery = ref("");
 
+/** ========= 分页状态 ========= */
+const pagination = reactive({
+  page: 1,
+  pageSize: 10,
+  total: 0,
+  totalPages: 0,
+});
+
+// 分页大小选项
+const pageSizeOptions = [
+  { label: "10", value: 10 },
+  { label: "20", value: 20 },
+  { label: "50", value: 50 },
+  { label: "100", value: 100 },
+];
+
 // 表单与弹窗
 const showForm = ref(false);
 const isEditing = ref(false);
@@ -100,16 +116,22 @@ const saveDepartment = () => {
     if (index !== -1) {
       departments.value[index] = {
         ...departments.value[index],
-        ...departmentForm,
+        name: departmentForm.name,
+        code: departmentForm.code,
+        leader: departmentForm.leader,
+        description: departmentForm.description,
       };
     }
   } else {
     const newId = Math.max(0, ...departments.value.map((d) => d.id)) + 1;
     departments.value.push({
       id: newId,
+      name: departmentForm.name,
+      code: departmentForm.code,
+      leader: departmentForm.leader,
+      description: departmentForm.description,
       memberCount: 0,
-      ...departmentForm,
-    } as Department);
+    });
   }
   showForm.value = false;
   resetForm();
@@ -121,16 +143,64 @@ const deleteDepartment = (id: number) => {
   }
 };
 
+/** ========= 过滤和分页 ========= */
 const filteredDepartments = computed(() => {
   const q = searchQuery.value.trim().toLowerCase();
-  if (!q) return departments.value;
-  return departments.value.filter(
-    (dept) =>
-      (dept.name ?? "").toLowerCase().includes(q) ||
-      (dept.code ?? "").toLowerCase().includes(q) ||
-      (dept.leader ?? "").toLowerCase().includes(q) ||
-      (dept.description ?? "").toLowerCase().includes(q)
-  );
+  const filtered = q
+    ? departments.value.filter(
+        (dept) =>
+          (dept.name ?? "").toLowerCase().includes(q) ||
+          (dept.code ?? "").toLowerCase().includes(q) ||
+          (dept.leader ?? "").toLowerCase().includes(q) ||
+          (dept.description ?? "").toLowerCase().includes(q)
+      )
+    : departments.value;
+
+  // 更新分页信息
+  pagination.total = filtered.length;
+  pagination.totalPages = Math.ceil(filtered.length / pagination.pageSize);
+
+  return filtered;
+});
+
+// 当前页显示的部门
+const paginatedDepartments = computed(() => {
+  const start = (pagination.page - 1) * pagination.pageSize;
+  const end = start + pagination.pageSize;
+  return filteredDepartments.value.slice(start, end);
+});
+
+// 分页信息
+const paginationInfo = computed(() => {
+  const start = (pagination.page - 1) * pagination.pageSize + 1;
+  const end = Math.min(pagination.page * pagination.pageSize, pagination.total);
+  return {
+    start: pagination.total > 0 ? start : 0,
+    end,
+    total: pagination.total,
+    page: pagination.page,
+    totalPages: pagination.totalPages,
+  };
+});
+
+// 分页控制
+const changePage = (page: number) => {
+  if (page >= 1 && page <= pagination.totalPages) {
+    pagination.page = page;
+  }
+};
+
+const changePageSize = (pageSize: number) => {
+  pagination.pageSize = pageSize;
+  pagination.page = 1; // 重置到第一页
+};
+
+const hasNextPage = computed(() => pagination.page < pagination.totalPages);
+const hasPrevPage = computed(() => pagination.page > 1);
+
+// 监听搜索条件变化，重置到第一页
+watch(searchQuery, () => {
+  pagination.page = 1;
 });
 
 // ====== ✅ Nuxt UI 3.3+：TanStack 列定义 ======
@@ -166,7 +236,7 @@ const columns = computed(() => {
     },
     {
       id: "actions",
-      header: t("organization.department.table.actions").toString(), // 这里是字符串，但我们仍提供 id 以防后续自定义成 VNode
+      header: t("organization.department.table.actions").toString(),
       cell: ({ row }: any) => {
         const d: Department = row.original;
         return h("div", { class: "flex gap-2" }, [
@@ -200,6 +270,21 @@ const columns = computed(() => {
 
 <template>
   <div>
+    <!-- 部门管理头部 -->
+    <div class="flex justify-between items-center mb-6">
+      <div>
+        <h2 class="text-xl font-semibold text-gray-800">
+          {{ $t("organization.department.title") }}
+        </h2>
+        <p class="text-sm text-gray-500 mt-1">
+          {{ $t("organization.department.description") }}
+        </p>
+      </div>
+      <UButton color="primary" icon="i-heroicons-plus" @click="openAddForm">
+        {{ $t("organization.department.add") }}
+      </UButton>
+    </div>
+
     <!-- 搜索 -->
     <UInput
       v-model="searchQuery"
@@ -208,8 +293,81 @@ const columns = computed(() => {
       class="w-full md:w-80 mb-6"
     />
 
+    <!-- 数据统计和分页大小选择 -->
+    <div class="mb-4 bg-white p-4 rounded-lg shadow-sm">
+      <div class="flex justify-between items-center">
+        <div class="text-sm text-gray-600">
+          显示第 {{ paginationInfo.start }} - {{ paginationInfo.end }} 条， 共
+          {{ paginationInfo.total }} 条记录
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="text-sm text-gray-600">每页显示：</span>
+          <USelect
+            :model-value="pagination.pageSize"
+            :options="pageSizeOptions"
+            @update:model-value="changePageSize"
+            class="w-20"
+          />
+        </div>
+      </div>
+    </div>
+
     <!-- ✅ Nuxt UI 3.3+ 用 :data 和 TanStack columns -->
-    <UTable :data="filteredDepartments" :columns="columns" />
+    <div class="bg-white rounded-lg shadow-sm">
+      <UTable :data="paginatedDepartments" :columns="columns" />
+
+      <!-- 分页控件 -->
+      <div
+        v-if="pagination.totalPages > 1"
+        class="px-6 py-4 border-t border-gray-200"
+      >
+        <div class="flex justify-between items-center">
+          <div class="text-sm text-gray-600">
+            第 {{ pagination.page }} 页，共 {{ pagination.totalPages }} 页
+          </div>
+          <div class="flex gap-2">
+            <UButton
+              :disabled="!hasPrevPage"
+              variant="outline"
+              size="sm"
+              icon="i-heroicons-chevron-left"
+              @click="changePage(pagination.page - 1)"
+            >
+              上一页
+            </UButton>
+
+            <!-- 页码按钮 -->
+            <template
+              v-for="page in Math.min(5, pagination.totalPages)"
+              :key="page"
+            >
+              <UButton
+                v-if="
+                  Math.abs(page - pagination.page) <= 2 ||
+                  page === 1 ||
+                  page === pagination.totalPages
+                "
+                :variant="page === pagination.page ? 'solid' : 'outline'"
+                size="sm"
+                @click="changePage(page)"
+              >
+                {{ page }}
+              </UButton>
+            </template>
+
+            <UButton
+              :disabled="!hasNextPage"
+              variant="outline"
+              size="sm"
+              icon="i-heroicons-chevron-right"
+              @click="changePage(pagination.page + 1)"
+            >
+              下一页
+            </UButton>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <!-- 空状态 -->
     <div
@@ -238,7 +396,6 @@ const columns = computed(() => {
     <!-- 表单 -->
     <UModal v-model:open="showForm" :ui="{ content: 'sm:max-w-md' }">
       <template #content>
-        <!-- 保持你原来的表单结构 -->
         <UCard>
           <template #header>
             <h3 class="text-lg font-medium text-gray-900">
