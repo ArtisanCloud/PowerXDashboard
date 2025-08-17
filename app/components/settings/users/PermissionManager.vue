@@ -19,6 +19,10 @@ type Permission = {
   code: string;
   module: string;
   description: string;
+  type: "menu" | "action" | "data" | "api";
+  apiEndpoint?: string;
+  httpMethod?: "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
+  dataScope?: "own" | "department" | "company" | "all";
 };
 
 // 模拟角色数据
@@ -74,6 +78,7 @@ const permissions = ref<Permission[]>([
     code: "user:view",
     module: "用户管理",
     description: "查看用户列表和详情",
+    type: "menu",
   },
   {
     id: 2,
@@ -81,6 +86,7 @@ const permissions = ref<Permission[]>([
     code: "user:create",
     module: "用户管理",
     description: "创建新用户",
+    type: "action",
   },
   {
     id: 3,
@@ -88,6 +94,7 @@ const permissions = ref<Permission[]>([
     code: "user:edit",
     module: "用户管理",
     description: "编辑现有用户信息",
+    type: "action",
   },
   {
     id: 4,
@@ -95,6 +102,38 @@ const permissions = ref<Permission[]>([
     code: "user:delete",
     module: "用户管理",
     description: "删除用户",
+    type: "action",
+  },
+  // 用户API权限
+  {
+    id: 101,
+    name: "用户列表API",
+    code: "api:user:list",
+    module: "用户管理",
+    description: "获取用户列表的API访问权限",
+    type: "api",
+    apiEndpoint: "/api/users",
+    httpMethod: "GET",
+  },
+  {
+    id: 102,
+    name: "创建用户API",
+    code: "api:user:create",
+    module: "用户管理",
+    description: "创建用户的API访问权限",
+    type: "api",
+    apiEndpoint: "/api/users",
+    httpMethod: "POST",
+  },
+  // 用户数据权限
+  {
+    id: 201,
+    name: "用户敏感数据",
+    code: "data:user:sensitive",
+    module: "用户管理",
+    description: "访问用户敏感信息（如手机号、邮箱）",
+    type: "data",
+    dataScope: "department",
   },
 
   // 部门管理权限
@@ -104,6 +143,7 @@ const permissions = ref<Permission[]>([
     code: "department:view",
     module: "部门管理",
     description: "查看部门列表和详情",
+    type: "menu",
   },
   {
     id: 6,
@@ -111,6 +151,7 @@ const permissions = ref<Permission[]>([
     code: "department:create",
     module: "部门管理",
     description: "创建新部门",
+    type: "action",
   },
   {
     id: 7,
@@ -118,6 +159,7 @@ const permissions = ref<Permission[]>([
     code: "department:edit",
     module: "部门管理",
     description: "编辑现有部门信息",
+    type: "action",
   },
   {
     id: 8,
@@ -125,6 +167,7 @@ const permissions = ref<Permission[]>([
     code: "department:delete",
     module: "部门管理",
     description: "删除部门",
+    type: "action",
   },
 
   // 角色权限管理
@@ -134,6 +177,7 @@ const permissions = ref<Permission[]>([
     code: "role:view",
     module: "权限管理",
     description: "查看角色列表和详情",
+    type: "menu",
   },
   {
     id: 10,
@@ -141,6 +185,7 @@ const permissions = ref<Permission[]>([
     code: "role:create",
     module: "权限管理",
     description: "创建新角色",
+    type: "action",
   },
   {
     id: 11,
@@ -148,6 +193,7 @@ const permissions = ref<Permission[]>([
     code: "role:edit",
     module: "权限管理",
     description: "编辑现有角色信息",
+    type: "action",
   },
   {
     id: 12,
@@ -155,6 +201,7 @@ const permissions = ref<Permission[]>([
     code: "role:delete",
     module: "权限管理",
     description: "删除角色",
+    type: "action",
   },
 
   // 系统设置权限
@@ -164,6 +211,7 @@ const permissions = ref<Permission[]>([
     code: "setting:view",
     module: "系统设置",
     description: "查看系统设置",
+    type: "menu",
   },
   {
     id: 14,
@@ -171,6 +219,7 @@ const permissions = ref<Permission[]>([
     code: "setting:edit",
     module: "系统设置",
     description: "修改系统设置",
+    type: "action",
   },
 
   // 内容管理权限
@@ -180,6 +229,7 @@ const permissions = ref<Permission[]>([
     code: "content:view",
     module: "内容管理",
     description: "查看内容列表和详情",
+    type: "menu",
   },
   {
     id: 16,
@@ -187,6 +237,7 @@ const permissions = ref<Permission[]>([
     code: "content:create",
     module: "内容管理",
     description: "创建新内容",
+    type: "action",
   },
   {
     id: 17,
@@ -194,6 +245,7 @@ const permissions = ref<Permission[]>([
     code: "content:edit",
     module: "内容管理",
     description: "编辑现有内容",
+    type: "action",
   },
   {
     id: 18,
@@ -201,6 +253,7 @@ const permissions = ref<Permission[]>([
     code: "content:delete",
     module: "内容管理",
     description: "删除内容",
+    type: "action",
   },
 
   // 产品管理权限
@@ -210,6 +263,7 @@ const permissions = ref<Permission[]>([
     code: "product:view",
     module: "产品管理",
     description: "查看产品列表和详情",
+    type: "menu",
   },
   {
     id: 20,
@@ -217,6 +271,7 @@ const permissions = ref<Permission[]>([
     code: "product:create",
     module: "产品管理",
     description: "创建新产品",
+    type: "action",
   },
   {
     id: 21,
@@ -224,6 +279,7 @@ const permissions = ref<Permission[]>([
     code: "product:edit",
     module: "产品管理",
     description: "编辑现有产品信息",
+    type: "action",
   },
   {
     id: 22,
@@ -231,6 +287,7 @@ const permissions = ref<Permission[]>([
     code: "product:delete",
     module: "产品管理",
     description: "删除产品",
+    type: "action",
   },
 ]);
 
@@ -238,12 +295,12 @@ const permissions = ref<Permission[]>([
 const rolePermissions = ref<Record<number, number[]>>({
   1: [
     1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21,
-    22,
-  ], // 超级管理员拥有所有权限
-  2: [1, 2, 3, 5, 6, 7, 9, 10, 11, 13, 15, 16, 17, 19, 20, 21], // 管理员
-  3: [1, 5, 9, 13, 15, 16, 17, 19], // 编辑
-  4: [1, 5, 9, 15, 19], // 用户
-  5: [1, 5, 15, 16, 17, 19, 20, 21], // 市场专员
+    22, 101, 102, 201,
+  ],
+  2: [1, 2, 3, 5, 6, 7, 9, 10, 11, 13, 15, 16, 17, 19, 20, 21, 101],
+  3: [1, 5, 9, 13, 15, 16, 17, 19],
+  4: [1, 5, 9, 15, 19],
+  5: [1, 5, 15, 16, 17, 19, 20, 21],
 });
 
 // 当前选中的角色
@@ -264,15 +321,23 @@ const roleForm = reactive({
   permissions: [] as number[],
 });
 
-// 权限分组
+// 权限分组 - 按模块和类型分组
 const permissionGroups = computed(() => {
-  const groups: Record<string, Permission[]> = {};
+  const groups: Record<string, Record<string, Permission[]>> = {};
+
   permissions.value.forEach((permission) => {
-    if (!groups[permission.module]) {
-      groups[permission.module] = [];
+    const module = permission.module;
+    const type = permission.type;
+
+    if (!groups[module]) {
+      groups[module] = {};
     }
-    groups[permission.module].push(permission);
+    if (!groups[module][type]) {
+      groups[module][type] = [];
+    }
+    groups[module][type].push(permission);
   });
+
   return groups;
 });
 
@@ -452,6 +517,81 @@ const isModulePartiallySelected = (module: string) => {
   ).length;
 
   return selectedCount > 0 && selectedCount < modulePermissionIds.length;
+};
+
+// 权限类型相关辅助函数
+const getPermissionTypeLabel = (type: string) => {
+  const labels: Record<string, string> = {
+    menu: "菜单",
+    action: "操作",
+    data: "数据",
+    api: "API",
+  };
+  return labels[type] || type;
+};
+
+const getPermissionTypeColor = (type: string) => {
+  const colors: Record<
+    string,
+    "primary" | "success" | "error" | "warning" | "neutral"
+  > = {
+    menu: "primary",
+    action: "success",
+    data: "error",
+    api: "warning",
+  };
+  return colors[type] || "neutral";
+};
+
+// 获取权限名称的文字颜色类
+const getPermissionTextColor = (type: string) => {
+  const colors: Record<string, string> = {
+    menu: "text-primary-700",
+    action: "text-green-700",
+    data: "text-red-700",
+    api: "text-amber-700",
+  };
+  return colors[type] || "text-gray-700";
+};
+
+const getHttpMethodColor = (method?: string) => {
+  const colors: Record<
+    string,
+    "primary" | "success" | "error" | "warning" | "neutral"
+  > = {
+    GET: "success",
+    POST: "primary",
+    PUT: "warning",
+    DELETE: "error",
+    PATCH: "warning",
+  };
+  return colors[method || ""] || "neutral";
+};
+
+const getDataScopeLabel = (scope?: string) => {
+  const labels: Record<string, string> = {
+    own: "仅自己",
+    department: "本部门",
+    company: "本公司",
+    all: "全部",
+  };
+  return labels[scope || ""] || scope || "";
+};
+
+// 权限类型排序
+const getTypeOrder = (type: string) => {
+  const order: Record<string, number> = {
+    menu: 1,
+    action: 2,
+    api: 3,
+    data: 4,
+  };
+  return order[type] || 999;
+};
+
+// 获取排序后的权限类型
+const getSortedTypes = (types: string[]) => {
+  return types.sort((a, b) => getTypeOrder(a) - getTypeOrder(b));
 };
 
 // ====== ✅ Nuxt UI 3.3+：TanStack 列定义 ======
@@ -652,35 +792,77 @@ const roleColumns = computed(() => {
 
           <div class="p-4 max-h-[600px] overflow-y-auto">
             <div
-              v-for="(perms, module) in permissionGroups"
+              v-for="(typeGroups, module) in permissionGroups"
               :key="module"
-              class="mb-6"
+              class="mb-6 border-t border-gray-200 pt-4 first:border-t-0 first:pt-0"
             >
-              <div class="flex items-center mb-2">
+              <div class="flex items-center mb-3">
                 <UCheckbox
                   :model-value="isModuleFullySelected(module)"
                   :indeterminate="isModulePartiallySelected(module)"
                   @update:model-value="toggleModulePermissions(module, $event)"
                 />
-                <h4 class="ml-2 font-medium text-gray-900">{{ module }}</h4>
+                <h4 class="ml-2 font-bold text-gray-900 text-lg">
+                  {{ module }}
+                </h4>
               </div>
 
-              <div class="ml-6 grid grid-cols-1 md:grid-cols-2 gap-2">
+              <div class="ml-6 space-y-4">
                 <div
-                  v-for="perm in perms"
-                  :key="perm.id"
-                  class="flex items-start"
+                  v-for="type in getSortedTypes(Object.keys(typeGroups))"
+                  :key="type"
+                  class="space-y-2"
                 >
-                  <UCheckbox
-                    :model-value="hasPermission(perm.id)"
-                    @update:model-value="togglePermission(perm.id)"
-                  />
-                  <div class="ml-2">
-                    <div class="text-sm font-medium text-gray-700">
-                      {{ perm.name }}
-                    </div>
-                    <div class="text-xs text-gray-500">
-                      {{ perm.description }}
+                  <h5
+                    class="text-sm font-medium text-gray-600 border-b border-gray-100 pb-1"
+                  >
+                    {{ getPermissionTypeLabel(type) }}权限
+                  </h5>
+
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-2 ml-4">
+                    <div
+                      v-for="perm in typeGroups[type]"
+                      :key="perm.id"
+                      class="flex items-start"
+                    >
+                      <UCheckbox
+                        :model-value="hasPermission(perm.id)"
+                        @update:model-value="togglePermission(perm.id)"
+                      />
+                      <div class="ml-2 flex-1">
+                        <div class="flex items-center gap-2">
+                          <span
+                            class="text-sm font-medium"
+                            :class="getPermissionTextColor(perm.type)"
+                          >
+                            {{ perm.name }}
+                          </span>
+                        </div>
+                        <div class="text-xs text-gray-500">
+                          {{ perm.description }}
+                        </div>
+                        <!-- API权限显示端点信息 -->
+                        <div
+                          v-if="perm.type === 'api'"
+                          class="text-xs text-blue-600 mt-1"
+                        >
+                          <UBadge
+                            size="xs"
+                            :color="getHttpMethodColor(perm.httpMethod)"
+                            class="mr-1"
+                          >
+                            {{ perm.httpMethod }}
+                          </UBadge>
+                          <code class="text-xs">{{ perm.apiEndpoint }}</code>
+                        </div>
+                        <!-- 数据权限显示范围信息 -->
+                        <div
+                          v-if="perm.type === 'data'"
+                          class="text-xs text-green-600 mt-1"
+                        >
+                          数据范围: {{ getDataScopeLabel(perm.dataScope) }}
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -747,84 +929,89 @@ const roleColumns = computed(() => {
                   class="border rounded-md p-4 max-h-[300px] overflow-y-auto"
                 >
                   <div
-                    v-for="(perms, module) in permissionGroups"
+                    v-for="(typeGroups, module) in permissionGroups"
                     :key="module"
-                    class="mb-4"
+                    class="mb-4 border-t border-gray-200 pt-4 first:border-t-0 first:pt-0"
                   >
                     <div class="flex items-center mb-2">
                       <UCheckbox
-                        :model-value="
-                          perms.every((p) =>
-                            roleForm.permissions.includes(p.id)
-                          )
-                        "
-                        :indeterminate="
-                          perms.some((p) =>
-                            roleForm.permissions.includes(p.id)
-                          ) &&
-                          !perms.every((p) =>
-                            roleForm.permissions.includes(p.id)
-                          )
-                        "
+                        :model-value="isFormModuleFullySelected(module)"
+                        :indeterminate="isFormModulePartiallySelected(module)"
                         @update:model-value="
-                          (checked) => {
-                            if (checked) {
-                              perms.forEach((p) => {
-                                if (!roleForm.permissions.includes(p.id)) {
-                                  roleForm.permissions.push(p.id);
-                                }
-                              });
-                            } else {
-                              roleForm.permissions =
-                                roleForm.permissions.filter(
-                                  (id) => !perms.map((p) => p.id).includes(id)
-                                );
-                            }
-                          }
+                          toggleFormModulePermissions(module, $event as boolean)
                         "
                       />
-                      <h4 class="ml-2 font-medium text-gray-900">
+                      <h4 class="ml-2 font-semibold text-gray-900">
                         {{ module }}
                       </h4>
                     </div>
 
-                    <div class="ml-6 grid grid-cols-1 md:grid-cols-2 gap-2">
+                    <div class="ml-6 space-y-3">
                       <div
-                        v-for="perm in perms"
-                        :key="perm.id"
-                        class="flex items-start"
+                        v-for="type in Object.keys(typeGroups).sort(
+                          (a, b) => getTypeOrder(a) - getTypeOrder(b)
+                        )"
+                        :key="type"
+                        class="space-y-2"
                       >
-                        <UCheckbox
-                          :model-value="roleForm.permissions.includes(perm.id)"
-                          @update:model-value="
-                            (checked) => {
-                              if (checked) {
-                                roleForm.permissions.push(perm.id);
-                              } else {
-                                roleForm.permissions =
-                                  roleForm.permissions.filter(
-                                    (id) => id !== perm.id
-                                  );
-                              }
-                            }
-                          "
-                        />
-                        <div class="ml-2">
-                          <div class="text-sm font-medium text-gray-700">
-                            {{ perm.name }}
-                          </div>
-                          <div class="text-xs text-gray-500">
-                            {{ perm.description }}
+                        <h5 class="text-xs font-medium text-gray-600">
+                          {{ getPermissionTypeLabel(type) }}
+                        </h5>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                          <div
+                            v-for="perm in typeGroups[type]"
+                            :key="perm.id"
+                            class="flex items-start"
+                          >
+                            <UCheckbox
+                              :model-value="hasFormPermission(perm.id)"
+                              @update:model-value="
+                                toggleFormPermission(perm.id)
+                              "
+                            />
+                            <div class="ml-2 flex-1">
+                              <div class="flex items-center gap-2">
+                                <span
+                                  class="text-sm font-medium"
+                                  :class="getPermissionTextColor(perm.type)"
+                                >
+                                  {{ perm.name }}
+                                </span>
+                                <UBadge
+                                  v-if="perm.type === 'api'"
+                                  size="xs"
+                                  :color="getHttpMethodColor(perm.httpMethod)"
+                                >
+                                  {{ perm.httpMethod }}
+                                </UBadge>
+                              </div>
+                              <div class="text-xs text-gray-500">
+                                {{ perm.description }}
+                                <template
+                                  v-if="perm.type === 'api' && perm.apiEndpoint"
+                                >
+                                  · <code>{{ perm.apiEndpoint }}</code>
+                                </template>
+                                <template
+                                  v-if="perm.type === 'data' && perm.dataScope"
+                                >
+                                  · {{ getDataScopeLabel(perm.dataScope) }}
+                                </template>
+                              </div>
+                            </div>
                           </div>
                         </div>
                       </div>
+                      <!-- /type -->
                     </div>
                   </div>
+                  <!-- /module -->
                 </div>
               </UFormField>
             </div>
 
-            <div class="mt-6 flex justify-end space-x-3">
+            <div class="mt-6 flex justify-end gap-3">
               <UButton
                 color="neutral"
                 variant="outline"
@@ -832,13 +1019,14 @@ const roleColumns = computed(() => {
               >
                 {{ $t("organization.common.cancel") }}
               </UButton>
-              <UButton type="submit" color="primary">{{
-                $t("organization.common.save")
-              }}</UButton>
+              <UButton type="submit" color="primary">
+                {{ $t("organization.common.save") }}
+              </UButton>
             </div>
           </form>
         </div>
       </template>
     </UModal>
   </div>
+  <!-- 最外层 <div> -->
 </template>
