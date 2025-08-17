@@ -18,7 +18,9 @@
             plugin.version
           }}</UBadge>
         </div>
-        <p class="text-sm text-[var(--text-secondary)] line-clamp-2 mt-1">
+        <p
+          class="text-sm text-[var(--text-secondary)] line-clamp-2 mt-1 h-10 flex items-start"
+        >
           {{ plugin.description }}
         </p>
         <div

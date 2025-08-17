@@ -1,8 +1,28 @@
 <script setup lang="ts">
-import { ref, reactive, computed } from "vue";
+import { ref, reactive, computed, h, resolveComponent } from "vue";
+import { useI18n } from "#imports";
+
+const { t, locale } = useI18n();
+
+type Role = {
+  id: number;
+  name: string;
+  code: string;
+  description: string;
+  userCount: number;
+  isSystem: boolean;
+};
+
+type Permission = {
+  id: number;
+  name: string;
+  code: string;
+  module: string;
+  description: string;
+};
 
 // 模拟角色数据
-const roles = ref([
+const roles = ref<Role[]>([
   {
     id: 1,
     name: "超级管理员",
@@ -46,7 +66,7 @@ const roles = ref([
 ]);
 
 // 模拟权限数据
-const permissions = ref([
+const permissions = ref<Permission[]>([
   // 用户管理权限
   {
     id: 1,
@@ -215,7 +235,7 @@ const permissions = ref([
 ]);
 
 // 角色权限映射
-const rolePermissions = ref({
+const rolePermissions = ref<Record<number, number[]>>({
   1: [
     1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21,
     22,
@@ -227,7 +247,7 @@ const rolePermissions = ref({
 });
 
 // 当前选中的角色
-const selectedRole = ref(roles.value[0]);
+const selectedRole = ref<Role>(roles.value[0]);
 
 // 搜索关键词
 const searchQuery = ref("");
@@ -235,18 +255,18 @@ const searchQuery = ref("");
 // 角色表单
 const showRoleForm = ref(false);
 const isEditing = ref(false);
-const editingId = ref(null);
+const editingId = ref<number | null>(null);
 
 const roleForm = reactive({
   name: "",
   code: "",
   description: "",
-  permissions: [],
+  permissions: [] as number[],
 });
 
 // 权限分组
 const permissionGroups = computed(() => {
-  const groups = {};
+  const groups: Record<string, Permission[]> = {};
   permissions.value.forEach((permission) => {
     if (!groups[permission.module]) {
       groups[permission.module] = [];
@@ -273,7 +293,7 @@ const openAddRoleForm = () => {
 };
 
 // 打开编辑表单
-const openEditRoleForm = (role) => {
+const openEditRoleForm = (role: Role) => {
   roleForm.name = role.name;
   roleForm.code = role.code;
   roleForm.description = role.description;
@@ -290,7 +310,7 @@ const saveRole = () => {
     return;
   }
 
-  if (isEditing.value) {
+  if (isEditing.value && editingId.value !== null) {
     // 编辑现有角色
     const index = roles.value.findIndex((r) => r.id === editingId.value);
     if (index !== -1) {
@@ -323,7 +343,7 @@ const saveRole = () => {
 };
 
 // 删除角色
-const deleteRole = (id) => {
+const deleteRole = (id: number) => {
   const role = roles.value.find((r) => r.id === id);
   if (role && role.isSystem) {
     alert("系统角色不能删除");
@@ -351,17 +371,20 @@ const filteredRoles = computed(() => {
 });
 
 // 选择角色
-const selectRole = (role) => {
+const selectRole = (role: Role) => {
   selectedRole.value = role;
 };
 
 // 检查权限是否已分配给当前角色
-const hasPermission = (permissionId) => {
-  return rolePermissions.value[selectedRole.value.id]?.includes(permissionId);
+const hasPermission = (permissionId: number) => {
+  return (
+    rolePermissions.value[selectedRole.value.id]?.includes(permissionId) ||
+    false
+  );
 };
 
 // 切换权限
-const togglePermission = (permissionId) => {
+const togglePermission = (permissionId: number) => {
   const roleId = selectedRole.value.id;
   if (!rolePermissions.value[roleId]) {
     rolePermissions.value[roleId] = [];
@@ -376,7 +399,7 @@ const togglePermission = (permissionId) => {
 };
 
 // 全选/取消全选模块权限
-const toggleModulePermissions = (module, checked) => {
+const toggleModulePermissions = (module: string, checked: boolean) => {
   const modulePermissionIds = permissions.value
     .filter((p) => p.module === module)
     .map((p) => p.id);
@@ -402,7 +425,7 @@ const toggleModulePermissions = (module, checked) => {
 };
 
 // 检查模块是否全选
-const isModuleFullySelected = (module) => {
+const isModuleFullySelected = (module: string) => {
   const modulePermissionIds = permissions.value
     .filter((p) => p.module === module)
     .map((p) => p.id);
@@ -416,7 +439,7 @@ const isModuleFullySelected = (module) => {
 };
 
 // 检查模块是否部分选中
-const isModulePartiallySelected = (module) => {
+const isModulePartiallySelected = (module: string) => {
   const modulePermissionIds = permissions.value
     .filter((p) => p.module === module)
     .map((p) => p.id);
@@ -430,6 +453,70 @@ const isModulePartiallySelected = (module) => {
 
   return selectedCount > 0 && selectedCount < modulePermissionIds.length;
 };
+
+// ====== ✅ Nuxt UI 3.3+：TanStack 列定义 ======
+const UButton = resolveComponent("UButton");
+
+const roleColumns = computed(() => {
+  const _ = locale.value; // 显式依赖，切换语言时重算
+  return [
+    {
+      id: "name",
+      accessorKey: "name",
+      header: "角色名称",
+    },
+    {
+      id: "code",
+      accessorKey: "code",
+      header: "角色代码",
+    },
+    {
+      id: "description",
+      accessorKey: "description",
+      header: "描述",
+    },
+    {
+      id: "userCount",
+      accessorKey: "userCount",
+      header: "用户数量",
+    },
+    {
+      id: "actions",
+      header: "操作",
+      cell: ({ row }: any) => {
+        const role: Role = row.original;
+        return h(
+          "div",
+          { class: "flex gap-2" },
+          [
+            h(
+              UButton,
+              {
+                size: "xs",
+                variant: "ghost",
+                icon: "i-heroicons-pencil-square",
+                onClick: () => openEditRoleForm(role),
+              },
+              { default: () => "编辑" }
+            ),
+            !role.isSystem &&
+              h(
+                UButton,
+                {
+                  size: "xs",
+                  color: "error",
+                  variant: "ghost",
+                  icon: "i-heroicons-trash",
+                  onClick: () => deleteRole(role.id),
+                },
+                { default: () => "删除" }
+              ),
+          ].filter(Boolean)
+        );
+      },
+    },
+  ];
+});
 </script>
 
 <template>
@@ -605,7 +692,7 @@ const isModulePartiallySelected = (module) => {
     </div>
 
     <!-- 角色表单对话框 -->
-    <UModal v-model:open="showRoleForm" :ui="{ width: 'sm:max-w-lg' }">
+    <UModal v-model:open="showRoleForm" :ui="{ content: 'sm:max-w-lg' }">
       <template #content>
         <div class="p-6">
           <h3 class="text-lg font-medium text-gray-900 mb-4">

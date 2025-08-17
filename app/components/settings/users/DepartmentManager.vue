@@ -1,52 +1,19 @@
 <script setup lang="ts">
-import { ref, reactive, computed } from "vue";
-import { useI18n } from "#imports"; // Nuxt i18n composable（或 'vue-i18n' 视你的项目配置）
+import { ref, reactive, computed, h, resolveComponent } from "vue";
+import { useI18n } from "#imports";
 
 const { t, locale } = useI18n();
 
-// 调试信息
-console.log("DepartmentManager - Current locale:", locale.value);
-console.log(
-  "DepartmentManager - Sample translation:",
-  t("organization.department.title")
-);
+type Department = {
+  id: number;
+  name: string;
+  code: string;
+  leader: string;
+  memberCount: number;
+  description: string;
+};
 
-// ✅ 用 computed + t 保证 label 始终是字符串，且随语言切换更新
-const columns = computed(() => [
-  {
-    id: "name",
-    key: "name",
-    label: String(t("organization.department.table.name")),
-  },
-  {
-    id: "code",
-    key: "code",
-    label: String(t("organization.department.table.code")),
-  },
-  {
-    id: "leader",
-    key: "leader",
-    label: String(t("organization.department.table.leader")),
-  },
-  {
-    id: "memberCount",
-    key: "memberCount",
-    label: String(t("organization.department.table.memberCount")),
-  },
-  {
-    id: "description",
-    key: "description",
-    label: String(t("organization.department.table.description")),
-  },
-  {
-    id: "actions",
-    key: "actions",
-    label: String(t("organization.department.table.actions")),
-  },
-]);
-
-// 模拟部门数据
-const departments = ref([
+const departments = ref<Department[]>([
   {
     id: 1,
     name: "技术部",
@@ -89,10 +56,9 @@ const departments = ref([
   },
 ]);
 
-// 搜索关键词
 const searchQuery = ref("");
 
-// 表单状态 - 确保初始值为 false
+// 表单与弹窗
 const showForm = ref(false);
 const isEditing = ref(false);
 const editingId = ref<number | null>(null);
@@ -115,11 +81,10 @@ const resetForm = () => {
 
 const openAddForm = () => {
   resetForm();
-  // console.log("打开添加部门表单");
   showForm.value = true;
 };
 
-const openEditForm = (dept: any) => {
+const openEditForm = (dept: Department) => {
   departmentForm.name = dept.name;
   departmentForm.code = dept.code;
   departmentForm.leader = dept.leader;
@@ -135,22 +100,16 @@ const saveDepartment = () => {
     if (index !== -1) {
       departments.value[index] = {
         ...departments.value[index],
-        name: departmentForm.name,
-        code: departmentForm.code,
-        leader: departmentForm.leader,
-        description: departmentForm.description,
+        ...departmentForm,
       };
     }
   } else {
     const newId = Math.max(0, ...departments.value.map((d) => d.id)) + 1;
     departments.value.push({
       id: newId,
-      name: departmentForm.name,
-      code: departmentForm.code,
-      leader: departmentForm.leader,
-      description: departmentForm.description,
       memberCount: 0,
-    });
+      ...departmentForm,
+    } as Department);
   }
   showForm.value = false;
   resetForm();
@@ -162,102 +121,124 @@ const deleteDepartment = (id: number) => {
   }
 };
 
-// 过滤
 const filteredDepartments = computed(() => {
-  if (!searchQuery.value) return departments.value;
-  const q = searchQuery.value.toLowerCase();
+  const q = searchQuery.value.trim().toLowerCase();
+  if (!q) return departments.value;
   return departments.value.filter(
     (dept) =>
-      dept.name.toLowerCase().includes(q) ||
-      dept.code.toLowerCase().includes(q) ||
-      dept.leader.toLowerCase().includes(q) ||
-      dept.description.toLowerCase().includes(q)
+      (dept.name ?? "").toLowerCase().includes(q) ||
+      (dept.code ?? "").toLowerCase().includes(q) ||
+      (dept.leader ?? "").toLowerCase().includes(q) ||
+      (dept.description ?? "").toLowerCase().includes(q)
   );
+});
+
+// ====== ✅ Nuxt UI 3.3+：TanStack 列定义 ======
+const UButton = resolveComponent("UButton");
+
+const columns = computed(() => {
+  const _ = locale.value; // 显式依赖，切换语言时重算
+  return [
+    {
+      id: "name",
+      accessorKey: "name",
+      header: t("organization.department.table.name").toString(),
+    },
+    {
+      id: "code",
+      accessorKey: "code",
+      header: t("organization.department.table.code").toString(),
+    },
+    {
+      id: "leader",
+      accessorKey: "leader",
+      header: t("organization.department.table.leader").toString(),
+    },
+    {
+      id: "memberCount",
+      accessorKey: "memberCount",
+      header: t("organization.department.table.memberCount").toString(),
+    },
+    {
+      id: "description",
+      accessorKey: "description",
+      header: t("organization.department.table.description").toString(),
+    },
+    {
+      id: "actions",
+      header: t("organization.department.table.actions").toString(), // 这里是字符串，但我们仍提供 id 以防后续自定义成 VNode
+      cell: ({ row }: any) => {
+        const d: Department = row.original;
+        return h("div", { class: "flex gap-2" }, [
+          h(
+            UButton,
+            {
+              size: "xs",
+              variant: "ghost",
+              icon: "i-heroicons-pencil-square",
+              onClick: () => openEditForm(d),
+            },
+            { default: () => t("organization.common.edit").toString() }
+          ),
+          h(
+            UButton,
+            {
+              size: "xs",
+              color: "error",
+              variant: "ghost",
+              icon: "i-heroicons-trash",
+              onClick: () => deleteDepartment(d.id),
+            },
+            { default: () => t("organization.common.delete").toString() }
+          ),
+        ]);
+      },
+    },
+  ];
 });
 </script>
 
 <template>
   <div>
-    <section>
-      <!-- 头部 -->
-      <div class="flex justify-between items-center mb-6">
-        <div>
-          <h2 class="text-xl font-semibold text-gray-800">
-            {{ $t("organization.department.title") }}
-          </h2>
-          <p class="text-sm text-gray-500 mt-1">
-            {{ $t("organization.department.description") }}
-          </p>
-        </div>
-        <UButton color="primary" icon="i-heroicons-plus" @click="openAddForm">
-          {{ $t("organization.department.add") }}
-        </UButton>
-      </div>
+    <!-- 搜索 -->
+    <UInput
+      v-model="searchQuery"
+      icon="i-heroicons-magnifying-glass"
+      :placeholder="$t('organization.department.search')"
+      class="w-full md:w-80 mb-6"
+    />
 
-      <!-- 搜索 -->
-      <div class="mb-6">
-        <UInput
-          v-model="searchQuery"
-          icon="i-heroicons-magnifying-glass"
-          :placeholder="$t('organization.department.search')"
-          class="w-full md:w-80"
-        />
-      </div>
+    <!-- ✅ Nuxt UI 3.3+ 用 :data 和 TanStack columns -->
+    <UTable :data="filteredDepartments" :columns="columns" />
 
-      <!-- 表格 -->
-      <UTable :columns="columns" :rows="filteredDepartments">
-        <template #actions-data="{ row }">
-          <div class="flex space-x-2">
-            <UButton
-              color="neutral"
-              variant="ghost"
-              icon="i-heroicons-pencil-square"
-              size="xs"
-              @click="openEditForm(row)"
-            >
-              {{ $t("organization.common.edit") }}
-            </UButton>
-            <UButton
-              color="error"
-              variant="ghost"
-              icon="i-heroicons-trash"
-              size="xs"
-              @click="deleteDepartment(row.id)"
-            >
-              {{ $t("organization.common.delete") }}
-            </UButton>
-          </div>
-        </template>
-      </UTable>
+    <!-- 空状态 -->
+    <div
+      v-if="filteredDepartments.length === 0"
+      class="text-center py-12 bg-gray-50 rounded-lg mt-4"
+    >
+      <UIcon
+        name="i-heroicons-building-office"
+        class="w-12 h-12 text-gray-400 mx-auto mb-4"
+      />
+      <h3 class="text-lg font-medium text-gray-900 mb-2">
+        {{ $t("organization.department.empty.title") }}
+      </h3>
+      <p class="text-gray-500 mb-4">
+        {{
+          searchQuery
+            ? $t("organization.department.empty.noResults")
+            : $t("organization.department.empty.create")
+        }}
+      </p>
+      <UButton v-if="!searchQuery" color="primary" @click="openAddForm">
+        {{ $t("organization.department.add") }}
+      </UButton>
+    </div>
 
-      <!-- 空状态（这里只管显示提示，别把 Modal 放进来） -->
-      <div
-        v-if="filteredDepartments.length === 0"
-        class="text-center py-12 bg-gray-50 rounded-lg mt-4"
-      >
-        <UIcon
-          name="i-heroicons-building-office"
-          class="w-12 h-12 text-gray-400 mx-auto mb-4"
-        />
-        <h3 class="text-lg font-medium text-gray-900 mb-2">
-          {{ $t("organization.department.empty.title") }}
-        </h3>
-        <p class="text-gray-500 mb-4">
-          {{
-            searchQuery
-              ? $t("organization.department.empty.noResults")
-              : $t("organization.department.empty.create")
-          }}
-        </p>
-        <UButton v-if="!searchQuery" color="primary" @click="openAddForm">
-          {{ $t("organization.department.add") }}
-        </UButton>
-      </div>
-    </section>
-
-    <!-- ✅ Modal 常驻 DOM，受控模式 + 正确使用 #content -->
+    <!-- 表单 -->
     <UModal v-model:open="showForm" :ui="{ content: 'sm:max-w-md' }">
       <template #content>
+        <!-- 保持你原来的表单结构 -->
         <UCard>
           <template #header>
             <h3 class="text-lg font-medium text-gray-900">

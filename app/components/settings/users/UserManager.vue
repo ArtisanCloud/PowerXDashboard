@@ -1,8 +1,31 @@
 <script setup lang="ts">
-import { ref, reactive, computed, onMounted } from "vue";
-import { saveAs } from "file-saver";
-import Papa from "papaparse";
-import { useI18n } from "vue-i18n";
+import { ref, reactive, computed, h, resolveComponent, onMounted } from "vue";
+import { useI18n } from "#imports";
+
+// 类型声明
+declare module "file-saver" {
+  export function saveAs(blob: Blob, filename: string): void;
+}
+
+declare module "papaparse" {
+  export function unparse(data: any[]): string;
+  export function parse<T>(
+    input: string,
+    config: {
+      header: boolean;
+      skipEmptyLines: string;
+      transformHeader: (header: string) => string;
+      complete: (results: { data: T[] }) => void;
+      error: (error: { message: string }) => void;
+    }
+  ): void;
+}
+
+// 动态导入
+const saveAs = (await import("file-saver")).saveAs;
+const Papa = await import("papaparse");
+
+const { t, locale } = useI18n();
 
 /** ========= 类型定义 ========= */
 type StatusType = "active" | "inactive";
@@ -27,9 +50,6 @@ interface ImportUserShape {
   role?: string;
   status?: string;
 }
-
-/** ========= i18n ========= */
-const { t } = useI18n();
 
 /** ========= 数据源 ========= */
 const users = ref<User[]>([
@@ -103,30 +123,6 @@ const filters = reactive({
   status: "",
 });
 
-/** ========= 表格列 ========= */
-const columns = computed(() => [
-  { key: "avatar", id: "avatar", label: " " },
-  { key: "name", id: "name", label: t("organization.user.table.name") },
-  {
-    key: "username",
-    id: "username",
-    label: t("organization.user.table.username"),
-  },
-  { key: "email", id: "email", label: t("organization.user.table.email") },
-  {
-    key: "department",
-    id: "department",
-    label: t("organization.user.table.department"),
-  },
-  { key: "role", id: "role", label: t("organization.user.table.role") },
-  { key: "status", id: "status", label: t("organization.user.table.status") },
-  {
-    key: "actions",
-    id: "actions",
-    label: t("organization.user.table.actions"),
-  },
-]);
-
 /** ========= 导入 / 导出 ========= */
 type ExportFormat = "csv" | "json";
 
@@ -153,6 +149,11 @@ const importExportItems = computed(() => [
 ]);
 
 function exportUsers(format: ExportFormat) {
+  if (!saveAs || !Papa) {
+    alert("导出功能正在加载中，请稍后再试");
+    return;
+  }
+
   const exportData = users.value.map((u) => ({
     name: u.name,
     username: u.username,
@@ -183,6 +184,11 @@ function exportUsers(format: ExportFormat) {
 
 function importUsers() {
   if (typeof window === "undefined") return; // SSR 安全
+  if (!Papa) {
+    alert("导入功能正在加载中，请稍后再试");
+    return;
+  }
+
   const fileInput = document.createElement("input");
   fileInput.type = "file";
   fileInput.accept = ".csv,.json";
@@ -192,7 +198,7 @@ function importUsers() {
     if (!file) return;
 
     const reader = new FileReader();
-    reader.onerror = () => alert(t("organization.user.import.failed"));
+    reader.onerror = () => alert("导入失败");
     reader.onload = (event) => {
       try {
         const text = String(event.target?.result ?? "");
@@ -200,12 +206,12 @@ function importUsers() {
           Papa.parse<ImportUserShape>(text, {
             header: true,
             skipEmptyLines: "greedy",
-            transformHeader: (h) => h.trim(),
-            complete: (results) => {
+            transformHeader: (h: string) => h.trim(),
+            complete: (results: { data: ImportUserShape[] }) => {
               processImportedUsers(results.data);
             },
-            error: (err) => {
-              alert(t("organization.user.import.failed") + ": " + err.message);
+            error: (err: { message: string }) => {
+              alert("导入失败: " + err.message);
             },
           });
         } else if (file.name.toLowerCase().endsWith(".json")) {
@@ -215,7 +221,7 @@ function importUsers() {
           alert(t("organization.user.import.invalidFormat"));
         }
       } catch (error: any) {
-        alert(t("organization.user.import.failed") + ": " + error?.message);
+        alert("导入失败: " + error?.message);
       }
     };
     reader.readAsText(file, "utf-8");
@@ -273,7 +279,7 @@ function processImportedUsers(raw: ImportUserShape[]) {
   // 验证邮箱格式
   const invalidEmail = imported.find((u) => !isValidEmail(u.email));
   if (invalidEmail) {
-    alert(t("organization.user.import.invalidEmail"));
+    alert("邮箱格式无效");
     return;
   }
 
@@ -306,7 +312,7 @@ function processImportedUsers(raw: ImportUserShape[]) {
   }
 
   if (cleaned.length === 0) {
-    alert(t("organization.user.import.noNew"));
+    alert("没有新用户需要导入");
     return;
   }
 
@@ -364,15 +370,15 @@ function openEditForm(user: User) {
 
 function saveUser() {
   if (!userForm.name || !userForm.username || !userForm.email) {
-    alert(t("organization.user.form.required"));
+    alert(t("organization.user.validation.requiredFields"));
     return;
   }
   if (!isValidEmail(userForm.email)) {
-    alert(t("organization.user.form.invalidEmail"));
+    alert("邮箱格式无效");
     return;
   }
   if (!isEditing.value && userForm.password !== userForm.confirmPassword) {
-    alert(t("organization.user.form.passwordMismatch"));
+    alert(t("organization.user.validation.passwordMismatch"));
     return;
   }
 
@@ -408,7 +414,7 @@ function saveUser() {
 }
 
 function deleteUser(id: number) {
-  if (confirm(t("organization.user.deleteConfirm"))) {
+  if (confirm(t("organization.user.confirmDelete"))) {
     users.value = users.value.filter((u) => u.id !== id);
   }
 }
@@ -446,6 +452,130 @@ function resetFilters() {
   filters.status = "";
   searchQuery.value = "";
 }
+
+// ====== ✅ Nuxt UI 3.3+：TanStack 列定义 ======
+const UButton = resolveComponent("UButton");
+const UAvatar = resolveComponent("UAvatar");
+const UBadge = resolveComponent("UBadge");
+
+const columns = computed(() => {
+  const _ = locale.value; // 显式依赖，切换语言时重算
+  return [
+    {
+      id: "avatar",
+      accessorKey: "avatar",
+      header: "",
+      cell: ({ row }: any) => {
+        const user = row.original as User;
+        return h(UAvatar, {
+          src: user.avatar,
+          alt: user.name,
+          size: "sm",
+        });
+      },
+    },
+    {
+      id: "name",
+      accessorKey: "name",
+      header: t("organization.user.table.name").toString(),
+    },
+    {
+      id: "username",
+      accessorKey: "username",
+      header: t("organization.user.table.username").toString(),
+    },
+    {
+      id: "email",
+      accessorKey: "email",
+      header: t("organization.user.table.email").toString(),
+    },
+    {
+      id: "department",
+      accessorKey: "department",
+      header: t("organization.user.table.department").toString(),
+    },
+    {
+      id: "role",
+      accessorKey: "role",
+      header: t("organization.user.table.role").toString(),
+    },
+    {
+      id: "status",
+      accessorKey: "status",
+      header: t("organization.user.table.status").toString(),
+      cell: ({ row }: any) => {
+        const user: User = row.original;
+        return h(
+          UBadge,
+          {
+            color: user.status === "active" ? "success" : "neutral",
+            variant: "subtle",
+            size: "sm",
+          },
+          {
+            default: () =>
+              user.status === "active"
+                ? t("organization.user.form.active")
+                : t("organization.user.form.inactive"),
+          }
+        );
+      },
+    },
+    {
+      id: "actions",
+      header: t("organization.user.table.actions").toString(),
+      cell: ({ row }: any) => {
+        const user = row.original as User;
+        return h(
+          "div",
+          { class: "flex gap-2" },
+          [
+            h(
+              UButton,
+              {
+                size: "xs",
+                variant: "ghost",
+                icon: "i-heroicons-pencil-square",
+                onClick: () => openEditForm(user),
+              },
+              { default: () => t("organization.common.edit") }
+            ),
+            h(
+              UButton,
+              {
+                size: "xs",
+                color: user.status === "active" ? "warning" : "success",
+                variant: "ghost",
+                icon:
+                  user.status === "active"
+                    ? "i-heroicons-lock-closed"
+                    : "i-heroicons-lock-open",
+                onClick: () => toggleUserStatus(user),
+              },
+              {
+                default: () =>
+                  user.status === "active"
+                    ? t("organization.user.disable")
+                    : t("organization.user.enable"),
+              }
+            ),
+            h(
+              UButton,
+              {
+                size: "xs",
+                color: "error",
+                variant: "ghost",
+                icon: "i-heroicons-trash",
+                onClick: () => deleteUser(user.id),
+              },
+              { default: () => t("organization.common.delete") }
+            ),
+          ].filter(Boolean)
+        );
+      },
+    },
+  ];
+});
 
 /** ========= SSR 安全的小处理 ========= */
 onMounted(() => {
@@ -557,113 +687,47 @@ onMounted(() => {
       </div>
     </div>
 
-    <!-- 用户列表 -->
-    <div class="bg-white rounded-lg shadow overflow-hidden">
-      <UTable :columns="columns" :rows="filteredUsers">
-        <!-- 头像列 -->
-        <template #avatar-data="{ row }">
-          <UAvatar :src="row.avatar" :alt="row.name" size="sm" />
-        </template>
+    <!-- ✅ Nuxt UI 3.3+ 用 :data 和 TanStack columns -->
+    <UTable :data="filteredUsers" :columns="columns" />
 
-        <!-- 状态列 -->
-        <template #status-data="{ row }">
-          <UBadge
-            :color="row.status === 'active' ? 'success' : 'neutral'"
-            variant="subtle"
-            size="sm"
-          >
-            {{
-              row.status === "active"
-                ? $t("organization.user.form.active")
-                : $t("organization.user.form.inactive")
-            }}
-          </UBadge>
-        </template>
-
-        <!-- 操作列 -->
-        <template #actions-data="{ row }">
-          <div class="flex space-x-2">
-            <UButton
-              color="neutral"
-              variant="ghost"
-              icon="i-heroicons-pencil-square"
-              size="xs"
-              @click="openEditForm(row)"
-            >
-              {{ $t("organization.common.edit") }}
-            </UButton>
-            <UButton
-              :color="row.status === 'active' ? 'warning' : 'success'"
-              variant="ghost"
-              :icon="
-                row.status === 'active'
-                  ? 'i-heroicons-lock-closed'
-                  : 'i-heroicons-lock-open'
-              "
-              size="xs"
-              @click="toggleUserStatus(row)"
-            >
-              {{
-                row.status === "active"
-                  ? $t("organization.user.disable")
-                  : $t("organization.user.enable")
-              }}
-            </UButton>
-            <UButton
-              color="error"
-              variant="ghost"
-              icon="i-heroicons-trash"
-              size="xs"
-              @click="deleteUser(row.id)"
-            >
-              {{ $t("organization.common.delete") }}
-            </UButton>
-          </div>
-        </template>
-      </UTable>
-
-      <!-- 空状态 -->
-      <div
-        v-if="filteredUsers.length === 0"
-        class="text-center py-12 bg-gray-50"
-      >
-        <UIcon
-          name="i-heroicons-user-slash"
-          class="w-12 h-12 text-gray-400 mx-auto mb-4"
-        />
-        <h3 class="text-lg font-medium text-gray-900 mb-2">
-          {{ $t("organization.user.empty.title") }}
-        </h3>
-        <p class="text-gray-500 mb-4">
-          {{
+    <!-- 空状态 -->
+    <div
+      v-if="filteredUsers.length === 0"
+      class="text-center py-12 bg-gray-50 rounded-lg mt-4"
+    >
+      <UIcon
+        name="i-heroicons-user-slash"
+        class="w-12 h-12 text-gray-400 mx-auto mb-4"
+      />
+      <h3 class="text-lg font-medium text-gray-900 mb-2">
+        {{ $t("organization.user.empty.title") }}
+      </h3>
+      <p class="text-gray-500 mb-4">
+        {{
+          searchQuery || filters.department || filters.role || filters.status
+            ? $t("organization.user.empty.noResults")
+            : $t("organization.user.empty.create")
+        }}
+      </p>
+      <div class="flex justify-center gap-3">
+        <UButton v-if="!searchQuery" color="primary" @click="openAddForm">
+          {{ $t("organization.user.add") }}
+        </UButton>
+        <UButton
+          v-if="
             searchQuery || filters.department || filters.role || filters.status
-              ? $t("organization.user.empty.noResults")
-              : $t("organization.user.empty.create")
-          }}
-        </p>
-        <div class="flex justify-center gap-3">
-          <UButton v-if="!searchQuery" color="primary" @click="openAddForm">
-            {{ $t("organization.user.add") }}
-          </UButton>
-          <UButton
-            v-if="
-              searchQuery ||
-              filters.department ||
-              filters.role ||
-              filters.status
-            "
-            color="neutral"
-            variant="outline"
-            @click="resetFilters"
-          >
-            {{ $t("organization.common.reset") }}
-          </UButton>
-        </div>
+          "
+          color="neutral"
+          variant="outline"
+          @click="resetFilters"
+        >
+          {{ $t("organization.common.reset") }}
+        </UButton>
       </div>
     </div>
 
     <!-- 用户表单对话框 -->
-    <UModal v-model:open="showForm" :ui="{ width: 'sm:max-w-lg' }">
+    <UModal v-model:open="showForm">
       <template #content>
         <div class="p-6">
           <h3 class="text-lg font-medium text-gray-900 mb-4">
@@ -791,8 +855,8 @@ onMounted(() => {
               </UButton>
             </div>
           </form>
-        </div></template
-      >
+        </div>
+      </template>
     </UModal>
   </div>
 </template>
