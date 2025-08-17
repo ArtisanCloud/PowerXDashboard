@@ -38,7 +38,7 @@ const closeMobileSidebar = () => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-gray-50 flex">
+  <div class="h-screen bg-gray-50 flex overflow-hidden">
     <!-- 移动端遮罩层 -->
     <div
       v-if="showMobileOverlay"
@@ -69,7 +69,7 @@ const closeMobileSidebar = () => {
       </div>
 
       <!-- 页面内容 -->
-      <main class="flex-1 overflow-auto">
+      <main class="flex-1 overflow-y-auto">
         <div class="p-6">
           <!-- 页面标题区域 -->
           <div v-if="$route.meta.title" class="mb-6">

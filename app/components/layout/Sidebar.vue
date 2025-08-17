@@ -105,7 +105,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <aside class="w-64 bg-white border-r border-gray-200 flex flex-col h-full">
+  <aside class="w-64 bg-white border-r border-gray-200 flex flex-col h-screen">
     <!-- Logo 区域 -->
     <div class="flex items-center justify-center h-16 border-b border-gray-200">
       <NuxtLink
@@ -143,7 +143,10 @@ onMounted(() => {
       <div v-else-if="menuError" class="px-3">
         <div class="bg-red-50 border border-red-200 rounded-lg p-4">
           <div class="flex items-center space-x-2 text-red-700 mb-2">
-                        <UIcon class="w-5 h-5 inline-block" name="i-heroicons-exclamation-triangle"  />
+            <UIcon
+              class="w-5 h-5 inline-block"
+              name="i-heroicons-exclamation-triangle"
+            />
             <span class="font-medium">{{ $t("menu.loadFailed") }}</span>
           </div>
           <p class="text-sm text-red-600 mb-3">
@@ -189,22 +192,22 @@ onMounted(() => {
               "
             >
               <div class="flex items-center space-x-3">
-                                <span class="w-5 h-5 inline-block">
-                                  <UIcon class="w-5 h-5 inline-block" :name="item.icon"  />
-                                </span>
+                <span class="w-5 h-5 inline-block">
+                  <UIcon class="w-5 h-5 inline-block" :name="item.icon" />
+                </span>
                 <span>{{ item.title }}</span>
               </div>
               <div class="flex items-center space-x-2">
                 <UBadge v-if="item.badge" size="xs" color="primary">{{
                   item.badge
                 }}</UBadge>
-                                <span class="w-4 h-4 transition-transform inline-block">
-                                  <UIcon
-                                  name="i-heroicons-chevron-right" 
-                                  :class="{ 'rotate-90': expandedItems.has(item.id) }"
-                                  class=" w-4 h-4 transition-transform inline-block"
-                                  />
-                                </span>
+                <span class="w-4 h-4 transition-transform inline-block">
+                  <UIcon
+                    name="i-heroicons-chevron-right"
+                    :class="{ 'rotate-90': expandedItems.has(item.id) }"
+                    class="w-4 h-4 transition-transform inline-block"
+                  />
+                </span>
               </div>
             </button>
 
@@ -232,9 +235,9 @@ onMounted(() => {
                         : 'text-slate-600 dark:text-slate-300 hover:bg-slate-900/5 dark:hover:bg-white/5 hover:text-slate-900 dark:hover:text-white'
                     "
                   >
-                                        <span class="w-4 h-4 inline-block">
-                                          <UIcon class="w-4 h-4 inline-block" :name="child.icon"  />
-                                        </span>
+                    <span class="w-4 h-4 inline-block">
+                      <UIcon class="w-4 h-4 inline-block" :name="child.icon" />
+                    </span>
                     <span>{{ child.title }}</span>
                   </NuxtLink>
                 </li>
@@ -254,9 +257,9 @@ onMounted(() => {
             "
           >
             <div class="flex items-center space-x-3">
-                            <span class="w-5 h-5 inline-block">
-                              <UIcon class="w-5 h-5 inline-block" :name="item.icon"  />
-                            </span>
+              <span class="w-5 h-5 inline-block">
+                <UIcon class="w-5 h-5 inline-block" :name="item.icon" />
+              </span>
               <span>{{ item.title }}</span>
             </div>
             <UBadge v-if="item.badge" size="xs" color="primary">{{
@@ -268,14 +271,19 @@ onMounted(() => {
     </nav>
 
     <!-- 底部用户信息 -->
-    <div class="border-t border-gray-200 p-4">
+    <div
+      class="mt-auto border-t border-gray-200 px-4 py-4 h-[73px] flex items-center"
+    >
       <div class="flex items-center space-x-3">
         <div
           class="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center"
         >
-                    <span class="w-5 h-5 text-gray-600 inline-block">
-                      <UIcon class="w-5 h-5 text-gray-600 inline-block" name="i-heroicons-user"  />
-                    </span>
+          <span class="w-5 h-5 text-gray-600 inline-block">
+            <UIcon
+              class="w-5 h-5 text-gray-600 inline-block"
+              name="i-heroicons-user"
+            />
+          </span>
         </div>
         <div class="flex-1 min-w-0">
           <p class="text-sm font-medium text-gray-900 truncate">
