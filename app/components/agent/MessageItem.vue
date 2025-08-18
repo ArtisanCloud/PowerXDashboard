@@ -1,313 +1,564 @@
 <script setup lang="ts">
-import type { ChatMessage } from '~/types/agent'
+import type { ChatMessage } from "~/types/agent";
+import type {
+  EnhancedChatMessage,
+  MessageContent,
+  MESSAGE_TYPES,
+} from "~/types/message";
 
-interface Props {
-  message: ChatMessage
-  isStreaming?: boolean
-  showAvatar?: boolean
-  agentName?: string
-}
+const props = defineProps<{
+  message: ChatMessage | EnhancedChatMessage;
+  isStreaming?: boolean;
+  agentName?: string;
+}>();
 
-interface Emits {
-  (e: 'retry'): void
-  (e: 'copy', content: string): void
-  (e: 'delete'): void
-}
+const emit = defineEmits<{
+  (e: "retry"): void;
+  (e: "copy", content: string): void;
+  (e: "delete"): void;
+}>();
 
-const props = withDefaults(defineProps<Props>(), {
-  isStreaming: false,
-  showAvatar: true
-})
+const { t } = useI18n();
 
-const emit = defineEmits<Emits>()
+// 判断是否为增强消息类型
+const isEnhancedMessage = (msg: any): msg is EnhancedChatMessage => {
+  return Array.isArray(msg.content);
+};
 
-const { t } = useI18n()
+// 获取消息内容
+const getMessageContent = () => {
+  if (isEnhancedMessage(props.message)) {
+    return props.message.content;
+  }
+  // 兼容原有的简单文本消息
+  return [
+    {
+      type: "text",
+      data: { text: props.message.content },
+    },
+  ] as MessageContent[];
+};
+
+// 复制文本到剪贴板
+const copyToClipboard = async (text: string) => {
+  try {
+    await navigator.clipboard.writeText(text);
+    emit("copy", text);
+  } catch (err) {
+    console.error("复制失败:", err);
+  }
+};
+
+// 格式化文件大小
+const formatFileSize = (bytes: number) => {
+  if (bytes === 0) return "0 Bytes";
+  const k = 1024;
+  const sizes = ["Bytes", "KB", "MB", "GB"];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return `${parseFloat((bytes / Math.pow(k, i)).toFixed(2))} ${sizes[i]}`;
+};
 
 // 格式化时间
-const formatTime = (timestamp: number) => {
-  const date = new Date(timestamp)
-  const now = new Date()
-  const diff = now.getTime() - date.getTime()
+const formatTime = (date: Date) => {
+  return new Intl.DateTimeFormat("zh-CN", {
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(date);
+};
+
+// 获取代码语言显示名称
+const getLanguageDisplayName = (lang: string) => {
+  const langMap: Record<string, string> = {
+    javascript: "JavaScript",
+    typescript: "TypeScript",
+    python: "Python",
+    java: "Java",
+    cpp: "C++",
+    csharp: "C#",
+    php: "PHP",
+    go: "Go",
+    rust: "Rust",
+    sql: "SQL",
+    html: "HTML",
+    css: "CSS",
+    json: "JSON",
+    yaml: "YAML",
+    xml: "XML",
+    bash: "Bash",
+    shell: "Shell",
+  };
+  return langMap[lang.toLowerCase()] || lang.toUpperCase();
+};
+
+// 简单的 Markdown 渲染函数
+const renderMarkdown = (markdown: string) => {
+  let html = markdown;
   
-  if (diff < 60000) { // 1分钟内
-    return t('agent.message.justNow')
-  } else if (diff < 3600000) { // 1小时内
-    const minutes = Math.floor(diff / 60000)
-    return t('agent.message.minutesAgo', { minutes })
-  } else if (diff < 86400000) { // 24小时内
-    const hours = Math.floor(diff / 3600000)
-    return t('agent.message.hoursAgo', { hours })
-  } else {
-    return date.toLocaleDateString()
-  }
-}
-
-// 复制内容
-const copyContent = async () => {
-  try {
-    await navigator.clipboard.writeText(props.message.content)
-    // 这里可以添加成功提示
-    emit('copy', props.message.content)
-  } catch (err) {
-    console.error('复制失败:', err)
-  }
-}
-
-// 获取状态图标
-const getStatusIcon = () => {
-  switch (props.message.status) {
-    case 'sending':
-      return 'i-heroicons-clock'
-    case 'sent':
-      return 'i-heroicons-check'
-    case 'error':
-      return 'i-heroicons-exclamation-triangle'
-    default:
-      return null
-  }
-}
-
-// 获取状态颜色
-const getStatusColor = () => {
-  switch (props.message.status) {
-    case 'sending':
-      return 'text-yellow-500'
-    case 'sent':
-      return 'text-green-500'
-    case 'error':
-      return 'text-red-500'
-    default:
-      return 'text-gray-400'
-  }
-}
-
-// 检测是否包含代码块
-const hasCodeBlock = computed(() => {
-  return props.message.content.includes('```')
-})
-
-// 解析消息内容（支持 Markdown）
-const parsedContent = computed(() => {
-  let content = props.message.content
+  // 转义 HTML 特殊字符
+  const escapeHtml = (text: string) => {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  };
   
-  // 简单的 Markdown 解析
-  // 代码块
-  content = content.replace(/```(\w+)?\n([\s\S]*?)```/g, (match: string, lang: string, code: string) => {
-    return `<pre class="code-block" data-lang="${lang || 'text'}"><code>${escapeHtml(code.trim())}</code></pre>`
-  })
-  
-  // 行内代码
-  content = content.replace(/`([^`]+)`/g, '<code class="inline-code">$1</code>')
+  // 标题
+  html = html.replace(/^### (.*$)/gim, '<h3>$1</h3>');
+  html = html.replace(/^## (.*$)/gim, '<h2>$1</h2>');
+  html = html.replace(/^# (.*$)/gim, '<h1>$1</h1>');
   
   // 粗体
-  content = content.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+  html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
   
   // 斜体
-  content = content.replace(/\*(.*?)\*/g, '<em>$1</em>')
+  html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
+  
+  // 行内代码
+  html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
   
   // 链接
-  content = content.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" class="text-blue-600 hover:underline">$1</a>')
+  html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" class="text-blue-600 hover:underline">$1</a>');
+  
+  // 无序列表
+  html = html.replace(/^\- (.*$)/gim, '<li>$1</li>');
+  html = html.replace(/(<li>.*<\/li>)/s, '<ul>$1</ul>');
+  
+  // 有序列表
+  html = html.replace(/^\d+\. (.*$)/gim, '<li>$1</li>');
+  
+  // 引用
+  html = html.replace(/^> (.*$)/gim, '<blockquote>$1</blockquote>');
+  
+  // 表格（简单处理）
+  const tableRegex = /\|(.+)\|\n\|[-\s|]+\|\n((?:\|.+\|\n?)*)/g;
+  html = html.replace(tableRegex, (match, header, rows) => {
+    const headerCells = header.split('|').map((cell: string) => cell.trim()).filter((cell: string) => cell);
+    const headerRow = '<tr>' + headerCells.map((cell: string) => `<th>${cell}</th>`).join('') + '</tr>';
+    
+    const bodyRows = rows.trim().split('\n').map((row: string) => {
+      const cells = row.split('|').map((cell: string) => cell.trim()).filter((cell: string) => cell);
+      return '<tr>' + cells.map((cell: string) => `<td>${cell}</td>`).join('') + '</tr>';
+    }).join('');
+    
+    return `<table class="border-collapse border border-gray-300"><thead>${headerRow}</thead><tbody>${bodyRows}</tbody></table>`;
+  });
   
   // 换行
-  content = content.replace(/\n/g, '<br>')
+  html = html.replace(/\n/g, '<br>');
   
-  return content
-})
-
-// HTML 转义
-const escapeHtml = (text: string) => {
-  const div = document.createElement('div')
-  div.textContent = text
-  return div.innerHTML
-}
+  return html;
+};
 </script>
 
 <template>
-  <div 
-    class="group flex space-x-3 p-4 hover:bg-gray-50 transition-colors"
-    :class="{
-      'bg-blue-50': message.role === 'user',
-      'bg-white': message.role === 'assistant',
-      'bg-yellow-50': message.role === 'system'
-    }"
-  >
-    <!-- 头像 -->
-    <div v-if="showAvatar" class="flex-shrink-0">
-      <div
-        v-if="message.role === 'user'"
-        class="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white text-sm font-medium"
-      >
-        U
-      </div>
-      <div
-        v-else-if="message.role === 'assistant'"
-        class="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white text-sm font-medium"
-      >
-        {{ agentName?.charAt(0).toUpperCase() || 'A' }}
-      </div>
-      <div
-        v-else
-        class="w-8 h-8 rounded-full bg-gray-400 flex items-center justify-center text-white text-sm font-medium"
-      >
-                <UIcon class="w-4 h-4 inline-block" name="i-heroicons-cog-6-tooth"  />
-      </div>
-    </div>
-
-    <!-- 消息内容 -->
-    <div class="flex-1 min-w-0">
-      <!-- 消息头部 -->
-      <div class="flex items-center space-x-2 mb-1">
-        <span class="text-sm font-medium text-gray-900">
-          {{ message.role === 'user' ? t('agent.message.you') : 
-             message.role === 'assistant' ? (agentName || t('agent.message.assistant')) : 
-             t('agent.message.system') }}
-        </span>
-        <span class="text-xs text-gray-500">
-          {{ formatTime(message.timestamp) }}
-        </span>
-        
-        <!-- 状态图标 -->
-                <span class="w-3 h-3 inline-block">
-                  <UIcon
-                  v-if="getStatusIcon()"
-                  :name="getStatusIcon()!"
-                  :class="getStatusColor()"
-                  class=" w-3 h-3 inline-block"
-                  />
-                </span>
-        
-        <!-- 流式输入指示器 -->
-        <div v-if="isStreaming && message.role === 'assistant'" class="flex items-center space-x-1">
-          <div class="flex space-x-1">
-            <div class="w-1 h-1 bg-blue-500 rounded-full animate-bounce" style="animation-delay: 0ms"></div>
-            <div class="w-1 h-1 bg-blue-500 rounded-full animate-bounce" style="animation-delay: 150ms"></div>
-            <div class="w-1 h-1 bg-blue-500 rounded-full animate-bounce" style="animation-delay: 300ms"></div>
-          </div>
-          <span class="text-xs text-blue-500">{{ t('agent.message.typing') }}</span>
+  <div class="p-4 hover:bg-gray-50 transition-colors">
+    <div class="flex space-x-3">
+      <!-- 头像 -->
+      <div class="flex-shrink-0">
+        <div
+          v-if="message.role === 'user'"
+          class="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white font-medium text-sm"
+        >
+          U
+        </div>
+        <div
+          v-else-if="message.role === 'assistant'"
+          class="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-medium text-sm"
+        >
+          {{ agentName?.charAt(0)?.toUpperCase() || "A" }}
+        </div>
+        <div
+          v-else
+          class="w-8 h-8 rounded-full bg-gray-500 flex items-center justify-center text-white font-medium text-sm"
+        >
+          <UIcon name="i-heroicons-cog-6-tooth" class="w-4 h-4" />
         </div>
       </div>
 
       <!-- 消息内容 -->
-      <div class="prose prose-sm max-w-none">
-        <div
-          v-if="message.content"
-          class="text-gray-800 leading-relaxed"
-          v-html="parsedContent"
-        />
-        <div
-          v-else-if="isStreaming"
-          class="text-gray-400 italic"
-        >
-          {{ t('agent.message.thinking') }}
+      <div class="flex-1 min-w-0">
+        <!-- 消息头部 -->
+        <div class="flex items-center space-x-2 mb-2">
+          <span class="font-medium text-gray-900">
+            {{
+              message.role === "user"
+                ? t("agent.chat.you")
+                : message.role === "assistant"
+                  ? agentName || t("agent.chat.assistant")
+                  : t("agent.chat.system")
+            }}
+          </span>
+          <span class="text-xs text-gray-500">
+            {{ formatTime(new Date(message.timestamp)) }}
+          </span>
+          <div v-if="isStreaming" class="flex items-center space-x-1">
+            <div class="w-1 h-1 bg-blue-500 rounded-full animate-pulse"></div>
+            <span class="text-xs text-blue-500">{{
+              t("agent.chat.generating")
+            }}</span>
+          </div>
         </div>
-      </div>
 
-      <!-- 元数据 -->
-      <div v-if="message.metadata" class="mt-2 text-xs text-gray-500">
-        <details class="cursor-pointer">
-          <summary class="hover:text-gray-700">{{ t('agent.message.metadata') }}</summary>
-          <pre class="mt-1 p-2 bg-gray-100 rounded text-xs overflow-x-auto">{{ JSON.stringify(message.metadata, null, 2) }}</pre>
-        </details>
-      </div>
+        <!-- 消息内容渲染 -->
+        <div class="space-y-3">
+          <template
+            v-for="(content, index) in getMessageContent()"
+            :key="index"
+          >
+            <!-- 文本消息 -->
+            <div
+              v-if="content.type === 'text'"
+              class="prose prose-sm max-w-none"
+            >
+              <p class="text-gray-800 whitespace-pre-wrap">
+                {{ content.data.text }}
+              </p>
+            </div>
 
-      <!-- 错误状态 -->
-      <div v-if="message.status === 'error'" class="mt-2 p-2 bg-red-50 border border-red-200 rounded-md">
-        <div class="flex items-center space-x-2">
-                    <span class="w-4 h-4 text-red-500 inline-block">
-                      <UIcon class="w-4 h-4 text-red-500 inline-block" name="i-heroicons-exclamation-triangle"  />
-                    </span>
-          <span class="text-sm text-red-700">{{ t('agent.message.sendFailed') }}</span>
+            <!-- Markdown 消息 -->
+            <div
+              v-else-if="content.type === 'markdown'"
+              class="prose prose-sm max-w-none"
+            >
+              <div class="bg-gray-50 rounded-lg p-4 border">
+                <div class="flex items-center justify-between mb-2">
+                  <span class="text-xs font-medium text-gray-600 uppercase"
+                    >Markdown</span
+                  >
+                  <UButton
+                    size="xs"
+                    variant="ghost"
+                    icon="i-heroicons-clipboard"
+                    @click="copyToClipboard(content.data.markdown)"
+                  />
+                </div>
+                <div class="markdown-content">
+                  <div v-html="renderMarkdown(content.data.markdown)"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 代码消息 -->
+            <div
+              v-else-if="content.type === 'code'"
+              class="bg-gray-900 rounded-lg overflow-hidden"
+            >
+              <div
+                class="flex items-center justify-between px-4 py-2 bg-gray-800 border-b border-gray-700"
+              >
+                <div class="flex items-center space-x-2">
+                  <UIcon
+                    name="i-heroicons-code-bracket"
+                    class="w-4 h-4 text-gray-400"
+                  />
+                  <span class="text-sm font-medium text-gray-300">
+                    {{ getLanguageDisplayName(content.data.language) }}
+                  </span>
+                  <span
+                    v-if="content.data.filename"
+                    class="text-xs text-gray-500"
+                  >
+                    {{ content.data.filename }}
+                  </span>
+                </div>
+                <UButton
+                  size="xs"
+                  variant="ghost"
+                  icon="i-heroicons-clipboard"
+                  class="text-gray-400 hover:text-white"
+                  @click="copyToClipboard(content.data.code)"
+                />
+              </div>
+              <pre
+                class="p-4 text-sm text-gray-100 overflow-x-auto"
+              ><code>{{ content.data.code }}</code></pre>
+            </div>
+
+            <!-- 图片消息 -->
+            <div v-else-if="content.type === 'image'" class="space-y-2">
+              <div
+                class="relative inline-block rounded-lg overflow-hidden border border-gray-200"
+              >
+                <img
+                  :src="content.data.url"
+                  :alt="content.data.alt || '图片'"
+                  :style="{
+                    maxWidth: content.data.width
+                      ? `${content.data.width}px`
+                      : '400px',
+                    maxHeight: content.data.height
+                      ? `${content.data.height}px`
+                      : '300px',
+                  }"
+                  class="object-cover"
+                />
+                <div class="absolute top-2 right-2">
+                  <UButton
+                    size="xs"
+                    variant="solid"
+                    color="neutral"
+                    icon="i-heroicons-arrow-top-right-on-square"
+                    @click="window.open(content.data.url, '_blank')"
+                  />
+                </div>
+              </div>
+              <p v-if="content.data.caption" class="text-sm text-gray-600">
+                {{ content.data.caption }}
+              </p>
+            </div>
+
+            <!-- 视频消息 -->
+            <div v-else-if="content.type === 'video'" class="space-y-2">
+              <div
+                class="relative rounded-lg overflow-hidden border border-gray-200 bg-black"
+              >
+                <video
+                  :src="content.data.url"
+                  :poster="content.data.poster"
+                  controls
+                  class="w-full max-w-md"
+                  style="max-height: 300px"
+                >
+                  您的浏览器不支持视频播放
+                </video>
+              </div>
+              <div
+                class="flex items-center justify-between text-sm text-gray-600"
+              >
+                <span v-if="content.data.caption">{{
+                  content.data.caption
+                }}</span>
+                <span v-if="content.data.duration" class="text-xs">
+                  {{ Math.floor(content.data.duration / 60) }}:{{
+                    String(content.data.duration % 60).padStart(2, "0")
+                  }}
+                </span>
+              </div>
+            </div>
+
+            <!-- 卡片消息 -->
+            <div
+              v-else-if="content.type === 'card'"
+              class="border border-gray-200 rounded-lg overflow-hidden bg-white shadow-sm"
+            >
+              <div v-if="content.data.image" class="aspect-video bg-gray-100">
+                <img
+                  :src="content.data.image"
+                  :alt="content.data.title"
+                  class="w-full h-full object-cover"
+                />
+              </div>
+              <div class="p-4">
+                <h3 class="font-semibold text-gray-900 mb-2">
+                  {{ content.data.title }}
+                </h3>
+                <p
+                  v-if="content.data.description"
+                  class="text-gray-600 text-sm mb-3"
+                >
+                  {{ content.data.description }}
+                </p>
+                <div v-if="content.data.metadata" class="space-y-1 mb-3">
+                  <div
+                    v-for="(value, key) in content.data.metadata"
+                    :key="key"
+                    class="flex justify-between text-xs text-gray-500"
+                  >
+                    <span>{{ key }}:</span>
+                    <span>{{ value }}</span>
+                  </div>
+                </div>
+                <div v-if="content.data.actions" class="flex space-x-2">
+                  <UButton
+                    v-for="action in content.data.actions"
+                    :key="action.label"
+                    :variant="action.variant || 'outline'"
+                    size="sm"
+                    @click="console.log('Action:', action.action)"
+                  >
+                    {{ action.label }}
+                  </UButton>
+                </div>
+              </div>
+            </div>
+
+            <!-- 文件消息 -->
+            <div
+              v-else-if="content.type === 'file'"
+              class="border border-gray-200 rounded-lg p-4 bg-gray-50"
+            >
+              <div class="flex items-center space-x-3">
+                <div class="flex-shrink-0">
+                  <UIcon
+                    name="i-heroicons-document"
+                    class="w-8 h-8 text-gray-500"
+                  />
+                </div>
+                <div class="flex-1 min-w-0">
+                  <p class="font-medium text-gray-900 truncate">
+                    {{ content.data.name }}
+                  </p>
+                  <p class="text-sm text-gray-500">
+                    {{ content.data.type }} •
+                    {{ formatFileSize(content.data.size) }}
+                  </p>
+                </div>
+                <div class="flex-shrink-0">
+                  <UButton
+                    size="sm"
+                    variant="outline"
+                    icon="i-heroicons-arrow-down-tray"
+                    @click="
+                      window.open(
+                        content.data.downloadUrl || content.data.url,
+                        '_blank'
+                      )
+                    "
+                  >
+                    下载
+                  </UButton>
+                </div>
+              </div>
+            </div>
+
+            <!-- 系统消息 -->
+            <div
+              v-else-if="content.type === 'system'"
+              class="rounded-lg p-3"
+              :class="{
+                'bg-blue-50 border border-blue-200':
+                  content.data.level === 'info',
+                'bg-yellow-50 border border-yellow-200':
+                  content.data.level === 'warning',
+                'bg-red-50 border border-red-200':
+                  content.data.level === 'error',
+                'bg-green-50 border border-green-200':
+                  content.data.level === 'success',
+              }"
+            >
+              <div class="flex items-center space-x-2">
+                <UIcon
+                  :name="
+                    {
+                      info: 'i-heroicons-information-circle',
+                      warning: 'i-heroicons-exclamation-triangle',
+                      error: 'i-heroicons-x-circle',
+                      success: 'i-heroicons-check-circle',
+                    }[content.data.level]
+                  "
+                  :class="{
+                    'text-blue-500': content.data.level === 'info',
+                    'text-yellow-500': content.data.level === 'warning',
+                    'text-red-500': content.data.level === 'error',
+                    'text-green-500': content.data.level === 'success',
+                  }"
+                  class="w-5 h-5"
+                />
+                <span
+                  class="text-sm font-medium"
+                  :class="{
+                    'text-blue-800': content.data.level === 'info',
+                    'text-yellow-800': content.data.level === 'warning',
+                    'text-red-800': content.data.level === 'error',
+                    'text-green-800': content.data.level === 'success',
+                  }"
+                >
+                  {{ content.data.message }}
+                </span>
+              </div>
+            </div>
+          </template>
+        </div>
+
+        <!-- 消息操作 -->
+        <div
+          class="flex items-center space-x-2 mt-3 opacity-0 group-hover:opacity-100 transition-opacity"
+        >
           <UButton
+            v-if="message.role === 'assistant'"
             size="xs"
-            variant="outline"
-            color="error"
+            variant="ghost"
+            icon="i-heroicons-arrow-path"
             @click="emit('retry')"
           >
-            {{ t('agent.message.retry') }}
+            重试
+          </UButton>
+          <UButton
+            size="xs"
+            variant="ghost"
+            icon="i-heroicons-clipboard"
+            @click="copyToClipboard(JSON.stringify(message.content))"
+          >
+            复制
+          </UButton>
+          <UButton
+            size="xs"
+            variant="ghost"
+            icon="i-heroicons-trash"
+            @click="emit('delete')"
+          >
+            删除
           </UButton>
         </div>
-      </div>
-
-      <!-- 操作按钮 -->
-      <div class="flex items-center space-x-2 mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
-        <UButton
-          size="xs"
-          variant="ghost"
-          icon="i-heroicons-clipboard-document"
-          @click="copyContent"
-        >
-          {{ t('agent.message.copy') }}
-        </UButton>
-        
-        <UButton
-          v-if="message.role === 'user' && message.status === 'error'"
-          size="xs"
-          variant="ghost"
-          icon="i-heroicons-arrow-path"
-          @click="emit('retry')"
-        >
-          {{ t('agent.message.retry') }}
-        </UButton>
-        
-        <UButton
-          size="xs"
-          variant="ghost"
-          icon="i-heroicons-trash"
-          color="error"
-          @click="emit('delete')"
-        >
-          {{ t('agent.message.delete') }}
-        </UButton>
       </div>
     </div>
   </div>
 </template>
 
 <style scoped>
-@reference "tailwindcss";
+.group:hover .group-hover\:opacity-100 {
+  opacity: 1;
+}
 
-/* 代码块样式 */
-:deep(.code-block) {
-  background-color: #1f2937;
-  color: #f3f4f6;
-  padding: 1rem;
+.markdown-content {
+  color: #1f2937;
+}
+
+.markdown-content h1,
+.markdown-content h2,
+.markdown-content h3,
+.markdown-content h4,
+.markdown-content h5,
+.markdown-content h6 {
+  font-weight: 600;
+  color: #111827;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.markdown-content p {
+  margin-bottom: 0.75rem;
+}
+
+.markdown-content ul,
+.markdown-content ol {
+  margin-left: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.markdown-content li {
+  margin-bottom: 0.25rem;
+}
+
+.markdown-content code {
+  background-color: #f3f4f6;
+  color: #1f2937;
+  padding: 0.125rem 0.25rem;
+  border-radius: 0.25rem;
+  font-size: 0.875rem;
+  font-family: "Monaco", "Menlo", "Ubuntu Mono", monospace;
+}
+
+.markdown-content pre {
+  background-color: #f3f4f6;
+  padding: 0.75rem;
   border-radius: 0.5rem;
   overflow-x: auto;
-  font-size: 0.875rem;
-  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
 }
 
-:deep(.code-block::before) {
-  content: attr(data-lang);
-  @apply absolute top-2 right-2 text-xs text-gray-400 uppercase;
-}
-
-:deep(.code-block) {
-  @apply relative;
-}
-
-/* 行内代码样式 */
-:deep(.inline-code) {
-  @apply bg-gray-100 text-gray-800 px-1 py-0.5 rounded text-sm;
-  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
-}
-
-/* 链接样式 */
-:deep(a) {
-  @apply text-blue-600 hover:text-blue-800 hover:underline;
-}
-
-/* 列表样式 */
-:deep(ul), :deep(ol) {
-  @apply ml-4;
-}
-
-:deep(li) {
-  @apply mb-1;
-}
-
-/* 引用样式 */
-:deep(blockquote) {
-  @apply border-l-4 border-gray-300 pl-4 italic text-gray-600;
+.markdown-content blockquote {
+  border-left: 4px solid #d1d5db;
+  padding-left: 1rem;
+  font-style: italic;
+  color: #4b5563;
 }
 </style>

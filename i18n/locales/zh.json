@@ -4,7 +4,9 @@
   "register": "注册",
   "common": {
     "language": "语言",
-    "reload": "重新加载"
+    "reload": "重新加载",
+    "scrollToBottom": "滚动到底部",
+    "newMessages": "新消息"
   },
   "user": {
     "admin": "管理员"
@@ -392,6 +394,7 @@
       "connected": "已连接",
       "responding": "回复中",
       "typing": "正在输入",
+      "generating": "生成中",
       "clear": "清空",
       "realtimeFailed": "实时连接失败",
       "welcomeTitle": "开始对话",

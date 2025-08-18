@@ -4,7 +4,9 @@
   "register": "Register",
   "common": {
     "language": "Language",
-    "reload": "Reload"
+    "reload": "Reload",
+    "scrollToBottom": "Scroll to Bottom",
+    "newMessages": "New Messages"
   },
   "user": {
     "admin": "Administrator"
@@ -393,6 +395,7 @@
       "connected": "Connected",
       "responding": "Responding",
       "typing": "Typing",
+      "generating": "Generating",
       "clear": "Clear",
       "realtimeFailed": "Realtime Connection Failed",
       "welcomeTitle": "Start Conversation",
