@@ -52,9 +52,9 @@ const messagesContainer = ref<HTMLElement>();
 const bottomSentinel = ref<HTMLDivElement>();
 
 /* ----------------- 滚动 & 可见性 ----------------- */
-const isAtBottom = ref(true); // 是否在底部（由 IO/滚动计算）
-const unreadCount = ref(0); // 非底部时新增消息数
-const DISTANCE_TOLERANCE = 10; // 允许的距离误差(px)
+const isAtBottom = ref(true);
+const unreadCount = ref(0);
+const DISTANCE_TOLERANCE = 10;
 
 function calcIsAtBottom(): boolean {
   const el = messagesContainer.value;
@@ -64,23 +64,25 @@ function calcIsAtBottom(): boolean {
 }
 
 function scrollToBottom(opts: { force?: boolean; smooth?: boolean } = {}) {
-  // 不在底部且未强制时，尊重用户，不打断
   if (!opts.force && !isAtBottom.value) return;
   bottomSentinel.value?.scrollIntoView({
     block: "end",
     behavior: opts.smooth ? "smooth" : "auto",
   });
 }
+function jumpToBottom() {
+  scrollToBottom({ force: true, smooth: true });
+  unreadCount.value = 0;
+}
 
 defineExpose({ scrollToBottom });
 
-// 监听滚动（备用判定 & 手动清零未读）
 function handleScroll() {
   isAtBottom.value = calcIsAtBottom();
   if (isAtBottom.value) unreadCount.value = 0;
 }
 
-// IO 优先判定“是否在底部”
+/* IO 判定底部 */
 let io: IntersectionObserver | null = null;
 function setupIO() {
   const root = messagesContainer.value;
@@ -90,16 +92,15 @@ function setupIO() {
   io = new IntersectionObserver(
     (entries) => {
       const e = entries[0];
-      // 只要底部哨兵进入可视区域（>=1 像素），就认为在底
       isAtBottom.value = !!e?.isIntersecting;
       if (isAtBottom.value) unreadCount.value = 0;
     },
-    { root, threshold: 0 } // 阈值 0：更灵敏
+    { root, threshold: 0 }
   );
   io.observe(target);
 }
 
-/* ----------------- 媒体加载补偿 ----------------- */
+/* 媒体加载补偿 */
 function bindMediaLoadScroll() {
   const root = messagesContainer.value;
   if (!root) return;
@@ -125,11 +126,11 @@ function bindMediaLoadScroll() {
   });
 }
 
-/* ----------------- 生命周期 & 监听 ----------------- */
+/* 生命周期 & 监听 */
 onMounted(async () => {
   await nextTick();
   setupIO();
-  scrollToBottom({ force: true }); // 首屏强制到底
+  scrollToBottom({ force: true });
   bindMediaLoadScroll();
 });
 
@@ -140,7 +141,6 @@ onBeforeUnmount(() => {
   ro = null;
 });
 
-// 新消息（长度变化）
 watch(
   () => props.messages.length,
   async (newLen, oldLen) => {
@@ -154,7 +154,6 @@ watch(
   }
 );
 
-// 流式追加：监听“最后一条消息内容”的深度变化
 watch(
   () => props.messages.at(-1)?.content,
   async () => {
@@ -164,7 +163,6 @@ watch(
   { deep: true }
 );
 
-// 输入状态变化（打字/流式开始/结束）也试图对齐
 watch(
   () => [props.isTyping, props.isStreaming],
   async () => {
@@ -173,7 +171,7 @@ watch(
   }
 );
 
-/* ----------------- 容器 Resize 时补偿滚动 ----------------- */
+/* 容器 Resize 补偿滚动 */
 let ro: ResizeObserver | null = null;
 onMounted(() => {
   if ("ResizeObserver" in window) {
@@ -190,11 +188,18 @@ function sendMessage() {
   if (!content || props.isStreaming || !props.isConnected) return;
   emit("send-message", content);
   messageInput.value = "";
-  if (inputRef.value) inputRef.value.style.height = "auto";
+  if (inputRef.value) {
+    inputRef.value.style.height = "auto";
+    inputRef.value.focus();
+  }
 }
 
 function handleKeydown(e: KeyboardEvent) {
-  if (e.key === "Enter" && !e.shiftKey && !isComposing.value) {
+  // Enter发送（IME 未组合时），Shift+Enter 换行；同时支持 Ctrl/Cmd+Enter 快捷发送
+  const sendByEnter = e.key === "Enter" && !e.shiftKey && !isComposing.value;
+  const sendByModEnter = (e.ctrlKey || e.metaKey) && e.key === "Enter";
+
+  if (sendByEnter || sendByModEnter) {
     e.preventDefault();
     sendMessage();
   }
@@ -204,7 +209,26 @@ function adjustTextareaHeight() {
   if (!inputRef.value) return;
   inputRef.value.style.height = "auto";
   inputRef.value.style.height =
-    Math.min(inputRef.value.scrollHeight, 120) + "px";
+    Math.min(inputRef.value.scrollHeight, 160) + "px";
+}
+
+/* 粘贴图片 -> 走图片上传（可选） */
+function handlePaste(e: ClipboardEvent) {
+  const items = e.clipboardData?.items;
+  if (!items) return;
+  for (const it of items) {
+    if (it.kind === "file") {
+      const file = it.getAsFile();
+      if (file && file.type.startsWith("image/")) {
+        // 复用现有上传逻辑
+        console.log("粘贴图片:", file.name);
+        // 你可以在这里直接上传，或走 handleImageUpload 的统一入口
+        // 例如：uploadImageFile(file)
+        e.preventDefault();
+        break;
+      }
+    }
+  }
 }
 
 /* ----------------- UI 辅助 ----------------- */
@@ -221,10 +245,115 @@ function getConnectionStatusColor() {
   return "text-green-500";
 }
 
-/* ----------------- “回到底部”按钮显示逻辑 ----------------- */
 const showScrollBtn = computed(() => !isAtBottom.value);
-// 也可以根据距离增强判断：如果距底部超过一定像素再显示
-// 此处有 IO + 滚动双保险，不再单独计算距离
+
+/* ----------------- 录音和多功能按钮 ----------------- */
+const isRecording = ref(false);
+
+function toggleRecording() {
+  isRecording.value = !isRecording.value;
+  if (isRecording.value) startRecording();
+  else stopRecording();
+}
+
+function startRecording() {
+  console.log("开始录音");
+}
+function stopRecording() {
+  console.log("停止录音");
+}
+function stopGeneration() {
+  console.log("停止生成");
+}
+
+function handleFileUpload() {
+  const input = document.createElement("input");
+  input.type = "file";
+  input.accept = ".pdf,.doc,.docx,.txt,.md";
+  input.onchange = (e) => {
+    const file = (e.target as HTMLInputElement).files?.[0];
+    if (file) {
+      console.log("上传文件:", file.name);
+    }
+  };
+  input.click();
+}
+
+function handleImageUpload() {
+  const input = document.createElement("input");
+  input.type = "file";
+  input.accept = "image/*";
+  input.onchange = (e) => {
+    const file = (e.target as HTMLInputElement).files?.[0];
+    if (file) {
+      console.log("上传图片:", file.name);
+    }
+  };
+  input.click();
+}
+
+function handleCreateDocument() {
+  console.log("创建文档");
+}
+function handleCreateChart() {
+  console.log("生成图表");
+}
+
+/* ---------- ChatGPT 风格：左侧 + 面板 & 模式切换 ---------- */
+type ChatMode = "default" | "code" | "vision";
+const showPlusPanel = ref(false);
+const chatMode = ref<ChatMode>("default");
+
+const modeOptions: Array<{
+  label: string;
+  value: ChatMode;
+  icon: string;
+  desc?: string;
+}> = [
+  {
+    label: "默认",
+    value: "default",
+    icon: "i-heroicons-sparkles",
+    desc: "通用对话",
+  },
+  {
+    label: "代码",
+    value: "code",
+    icon: "i-heroicons-code-bracket",
+    desc: "更偏代码与技术",
+  },
+  {
+    label: "多模态",
+    value: "vision",
+    icon: "i-heroicons-photo",
+    desc: "图片/图表理解",
+  },
+];
+
+function selectMode(m: ChatMode) {
+  chatMode.value = m;
+  showPlusPanel.value = false;
+}
+function onUploadFile() {
+  handleFileUpload();
+  showPlusPanel.value = false;
+}
+function onUploadImage() {
+  handleImageUpload();
+  showPlusPanel.value = false;
+}
+
+function onPlusOpenStateChange(isOpen: boolean) {
+  showPlusPanel.value = isOpen;
+}
+
+function onSendClick() {
+  if (props.isStreaming) {
+    stopGeneration();
+  } else {
+    sendMessage();
+  }
+}
 </script>
 
 <template>
@@ -339,19 +468,21 @@ const showScrollBtn = computed(() => !isAtBottom.value);
       </div>
 
       <!-- 消息项 -->
-      <div v-else class="divide-y divide-gray-100">
-        <MessageItem
-          v-for="message in messages"
-          :key="message.id"
-          :message="message"
-          :is-streaming="
-            isStreaming && message === messages[messages.length - 1]
-          "
-          :agent-name="currentAgent?.name"
-          @retry="$emit('retry-message')"
-          @copy="() => {}"
-          @delete="() => {}"
-        />
+      <div v-else class="max-w-4xl mx-auto px-4 py-6">
+        <div class="space-y-6">
+          <MessageItem
+            v-for="message in messages"
+            :key="message.id"
+            :message="message"
+            :is-streaming="
+              isStreaming && message === messages[messages.length - 1]
+            "
+            :agent-name="currentAgent?.name"
+            @retry="$emit('retry-message')"
+            @copy="() => {}"
+            @delete="() => {}"
+          />
+        </div>
       </div>
 
       <!-- 正在输入指示器 -->
@@ -384,23 +515,17 @@ const showScrollBtn = computed(() => !isAtBottom.value);
         </div>
       </div>
 
-      <!-- 底部哨兵（锚点，最后一个） -->
+      <!-- 底部哨兵 -->
       <div ref="bottomSentinel" aria-hidden="true" class="h-px"></div>
 
-      <!-- 回到底部：粘在容器可视区的右下角（像 ChatGPT） -->
+      <!-- 回到底部按钮（像 ChatGPT） -->
       <div class="sticky bottom-4 z-10">
         <transition name="fade">
           <button
             v-if="showScrollBtn"
             class="ml-auto mr-4 flex items-center gap-2 rounded-full shadow-lg px-3 py-2 bg-white border border-gray-200 hover:bg-gray-50 active:scale-95 transition pointer-events-auto"
-            @click="
-              () => {
-                scrollToBottom({ force: true, smooth: true });
-                unreadCount = 0;
-              }
-            "
+            @click="jumpToBottom"
           >
-            <!-- 向下箭头 -->
             <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
               <path
                 d="M6 9l6 6 6-6"
@@ -411,75 +536,220 @@ const showScrollBtn = computed(() => !isAtBottom.value);
                 stroke-linejoin="round"
               />
             </svg>
-            <span class="text-sm text-gray-700">{{
-              unreadCount > 0
-                ? t("common.newMessages", { count: unreadCount })
-                : t("common.scrollToBottom")
-            }}</span>
+            <span class="text-sm text-gray-700">
+              {{
+                unreadCount > 0
+                  ? t("common.newMessages", { count: unreadCount })
+                  : t("common.scrollToBottom")
+              }}
+            </span>
           </button>
         </transition>
       </div>
     </div>
 
-    <!-- 输入区 -->
+    <!-- 输入区（ChatGPT 风格） -->
     <div class="flex-shrink-0 border-t border-gray-200 bg-white">
       <div class="p-4">
-        <div class="flex items-end space-x-3">
-          <!-- 附件按钮 -->
-          <div class="flex-shrink-0 pb-2">
-            <UButton variant="ghost" size="sm" icon="i-heroicons-paper-clip" />
-          </div>
+        <!-- 统一定宽并居中，避免两侧元素错位 -->
+        <div class="mx-auto w-full max-w-screen-lg px-4 space-y-2">
+          <!-- 第 1 行：输入行 -->
+          <div class="flex items-center gap-2">
+            <!-- 左侧：输入壳，负责两侧绝对定位 -->
+            <div class="relative flex-1">
+              <!-- 左侧 + 下拉 -->
+              <div class="absolute left-2 top-1/2 -translate-y-1/2 z-20">
+                <UDropdownMenu
+                  :items="[
+                    [
+                      {
+                        label: '上传文件',
+                        icon: 'i-heroicons-document-plus',
+                        click: () => onUploadFile(),
+                      },
+                      {
+                        label: '上传图片',
+                        icon: 'i-heroicons-photo',
+                        click: () => onUploadImage(),
+                      },
+                    ],
+                    [
+                      {
+                        label: '默认模式',
+                        icon: 'i-heroicons-sparkles',
+                        click: () => selectMode('default'),
+                        disabled: chatMode === 'default',
+                      },
+                      {
+                        label: '代码模式',
+                        icon: 'i-heroicons-code-bracket',
+                        click: () => selectMode('code'),
+                        disabled: chatMode === 'code',
+                      },
+                      {
+                        label: '多模态模式',
+                        icon: 'i-heroicons-photo',
+                        click: () => selectMode('vision'),
+                        disabled: chatMode === 'vision',
+                      },
+                    ],
+                  ]"
+                  :popper="{ placement: 'top-start' }"
+                >
+                  <UButton
+                    variant="ghost"
+                    size="sm"
+                    aria-label="添加"
+                    class="w-8 h-8 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800"
+                    :disabled="!isConnected || isStreaming"
+                    :ui="{
+                      base: 'inline-flex items-center justify-center',
+                      padding: 'p-0',
+                      gap: 'gap-0',
+                      rounded: 'rounded-full',
+                    }"
+                  >
+                    <UIcon name="i-heroicons-plus" class="w-4 h-4" />
+                  </UButton>
+                </UDropdownMenu>
+              </div>
 
-          <!-- 输入框容器 -->
-          <div class="flex-1 relative">
-            <textarea
-              ref="inputRef"
-              v-model="messageInput"
-              :placeholder="
-                isConnected
-                  ? t('agent.chat.inputPlaceholder')
-                  : t('agent.chat.disconnectedPlaceholder')
-              "
-              :disabled="!isConnected || isStreaming"
-              class="w-full resize-none border border-gray-300 rounded-lg px-4 py-3 pr-14 focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
-              rows="1"
-              style="min-height: 44px; max-height: 120px"
-              @input="adjustTextareaHeight"
-              @keydown="handleKeydown"
-              @compositionstart="isComposing = true"
-              @compositionend="isComposing = false"
-            />
-            <!-- 发送按钮 -->
-            <div class="absolute right-2 bottom-2">
-              <UButton
-                :disabled="!messageInput.trim() || !isConnected || isStreaming"
-                size="sm"
-                icon="i-heroicons-paper-airplane"
-                @click="sendMessage"
+              <!-- 文本域 -->
+              <textarea
+                ref="inputRef"
+                v-model="messageInput"
+                :placeholder="
+                  isConnected
+                    ? t('agent.chat.inputPlaceholder')
+                    : t('agent.chat.disconnectedPlaceholder')
+                "
+                :disabled="!isConnected || isStreaming"
+                class="w-full resize-none border border-gray-300 dark:border-gray-600 rounded-xl pl-12 pr-24 px-4 py-3 leading-6 focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed dark:bg-gray-900 dark:text-white"
+                rows="1"
+                style="min-height: 44px; max-height: 160px"
+                autocomplete="off"
+                autocorrect="off"
+                autocapitalize="off"
+                spellcheck="false"
+                @input="adjustTextareaHeight"
+                @keydown="handleKeydown"
+                @compositionstart="isComposing = true"
+                @compositionend="isComposing = false"
+                @paste="handlePaste"
               />
+
+              <!-- 右侧：麦克风 & 发送/停止 -->
+              <div
+                class="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1 z-20"
+              >
+                <UButton
+                  variant="ghost"
+                  size="sm"
+                  aria-label="录音"
+                  class="w-8 h-8 transition-colors"
+                  :class="
+                    isRecording
+                      ? 'text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20'
+                      : 'text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800'
+                  "
+                  :disabled="!isConnected || isStreaming"
+                  @click="toggleRecording"
+                  :ui="{
+                    base: 'inline-flex items-center justify-center',
+                    padding: 'p-0',
+                    gap: 'gap-0',
+                    rounded: 'rounded-full',
+                  }"
+                >
+                  <UIcon
+                    :name="
+                      isRecording
+                        ? 'i-heroicons-stop'
+                        : 'i-heroicons-microphone'
+                    "
+                    class="w-4 h-4"
+                  />
+                </UButton>
+                <UButton
+                  size="sm"
+                  :aria-label="isStreaming ? '停止生成' : '发送'"
+                  class="w-8 h-8 transition-all"
+                  :class="
+                    isStreaming
+                      ? 'bg-red-500 hover:bg-red-600 text-white'
+                      : messageInput.trim() && isConnected
+                        ? 'bg-green-500 hover:bg-green-600 text-white'
+                        : 'bg-gray-200 dark:bg-gray-700 text-gray-400'
+                  "
+                  :disabled="
+                    !isConnected || (!messageInput.trim() && !isStreaming)
+                  "
+                  @click="onSendClick"
+                  :ui="{
+                    base: 'inline-flex items-center justify-center',
+                    padding: 'p-0',
+                    gap: 'gap-0',
+                    rounded: 'rounded-full',
+                  }"
+                >
+                  <UIcon
+                    :name="
+                      isStreaming
+                        ? 'i-heroicons-stop'
+                        : 'i-heroicons-paper-airplane'
+                    "
+                    class="w-4 h-4"
+                  />
+                </UButton>
+              </div>
+            </div>
+
+            <!-- 右侧：清空按钮（与输入框同一行、垂直居中） -->
+            <div class="hidden sm:flex self-center">
+              <UButton
+                variant="ghost"
+                size="sm"
+                aria-label="清空"
+                class="w-10 h-10 hover:bg-gray-100 dark:hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed"
+                :disabled="messages.length === 0"
+                @click="$emit('clear-messages')"
+                :ui="{
+                  base: 'inline-flex items-center justify-center',
+                  padding: 'p-0',
+                  gap: 'gap-0',
+                  rounded: 'rounded-full',
+                }"
+              >
+                <UIcon name="i-heroicons-trash" class="w-5 h-5" />
+              </UButton>
             </div>
           </div>
-        </div>
 
-        <!-- 提示信息 -->
-        <div
-          class="flex items-center justify-between mt-3 text-xs text-gray-500"
-        >
-          <!-- 左侧：模型信息 -->
-          <div v-if="currentAgent" class="flex items-center space-x-2">
-            <span>{{ t("agent.chat.model") }}: {{ currentAgent.model }}</span>
-            <span>•</span>
-            <span
-              >{{ t("agent.chat.temperature") }}:
-              {{ currentAgent.temperature }}</span
+          <!-- 第 2 行：底部提示（模型/温度/模式 + 快捷键），同样定宽居中 -->
+          <div class="flex items-center justify-between text-xs text-gray-500">
+            <div
+              v-if="currentAgent"
+              class="flex items-center flex-wrap gap-x-2 gap-y-1"
             >
-          </div>
-          <div v-else></div>
+              <span>{{ t("agent.chat.model") }}: {{ currentAgent.model }}</span>
+              <span>•</span>
+              <span
+                >{{ t("agent.chat.temperature") }}:
+                {{ currentAgent.temperature }}</span
+              >
+              <span>•</span>
+              <span
+                >模式：{{
+                  modeOptions.find((m) => m.value === chatMode)?.label || "默认"
+                }}</span
+              >
+            </div>
+            <div v-else></div>
 
-          <!-- 右侧：操作提示 -->
-          <div class="flex items-center space-x-4">
-            <span>{{ t("agent.chat.enterToSend") }}</span>
-            <span>{{ t("agent.chat.shiftEnterNewLine") }}</span>
+            <div class="hidden sm:flex items-center gap-4">
+              <span>{{ t("agent.chat.enterToSend") }}</span>
+              <span>{{ t("agent.chat.shiftEnterNewLine") }}</span>
+            </div>
           </div>
         </div>
       </div>
@@ -488,7 +758,6 @@ const showScrollBtn = computed(() => !isAtBottom.value);
 </template>
 
 <style scoped>
-/* 自定义滚动条（可选） */
 .overflow-y-auto::-webkit-scrollbar {
   width: 6px;
 }
@@ -503,7 +772,6 @@ const showScrollBtn = computed(() => !isAtBottom.value);
   background: #a8a8a8;
 }
 
-/* 回到底部按钮过渡 */
 .fade-enter-active,
 .fade-leave-active {
   transition:
