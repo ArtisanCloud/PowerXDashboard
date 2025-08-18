@@ -19,12 +19,14 @@
     "@vue-flow/core": "^1.45.1",
     "@vue-flow/minimap": "^1.5.3",
     "@vue-flow/node-resizer": "^1.5.0",
+    "echarts": "^5.6.0",
     "eslint": "^9.33.0",
     "file-saver": "^2.0.5",
     "nuxt": "^4.0.3",
     "papaparse": "^5.5.3",
     "typescript": "^5.9.2",
     "vue": "^3.5.18",
+    "vue-echarts": "^7.0.3",
     "vue-router": "^4.5.1"
   },
   "devDependencies": {
