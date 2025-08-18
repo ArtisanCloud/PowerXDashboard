@@ -120,12 +120,13 @@ const { quickSearch } = useSearch();
 
 const handleSearch = async () => {
   try {
-    const q = searchQuery.value.trim();
+    const q = searchQuery.value?.trim();
     if (!q) return;
     await navigateTo({ path: "/search", query: { q } });
-    showSearchSuggestions.value = false;
   } catch (err) {
     console.error("handleSearch error:", err);
+  } finally {
+    showSearchSuggestions.value = false;
   }
 };
 
@@ -156,14 +157,30 @@ const handleSearchInput = useDebounceFn(async (value: string) => {
   }
 }, 250);
 
+// 处理输入框失焦
+const handleBlur = () => {
+  // SSR 安全：只在客户端用 window
+  if (process.client) {
+    window.setTimeout(() => {
+      showSearchSuggestions.value = false;
+      isSearchFocused.value = false;
+    }, 200);
+  } else {
+    showSearchSuggestions.value = false;
+    isSearchFocused.value = false;
+  }
+};
+
 // 选择搜索建议
 const selectSearchSuggestion = async (result: any) => {
   try {
+    if (!result?.url) return;
     await navigateTo(result.url);
-    showSearchSuggestions.value = false;
-    searchQuery.value = "";
   } catch (err) {
     console.error("selectSearchSuggestion error:", err);
+  } finally {
+    showSearchSuggestions.value = false;
+    searchQuery.value = "";
   }
 };
 
@@ -235,12 +252,7 @@ const getSearchResultTypeIcon = (type: string) => {
           @keyup.enter="handleSearch"
           @update:model-value="handleSearchInput"
           @focus="isSearchFocused = true"
-          @blur="
-            setTimeout(() => {
-              showSearchSuggestions = false;
-              isSearchFocused = false;
-            }, 200)
-          "
+          @blur="handleBlur"
         />
 
         <!-- 搜索建议下拉框 -->
@@ -257,7 +269,7 @@ const getSearchResultTypeIcon = (type: string) => {
                 v-for="suggestion in searchSuggestions"
                 :key="suggestion.id"
                 class="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 dark:hover:bg-gray-700 rounded flex items-center space-x-2"
-                @click="selectSearchSuggestion(suggestion)"
+                @mousedown.prevent="selectSearchSuggestion(suggestion)"
               >
                 <UIcon
                   :name="getSearchResultTypeIcon(suggestion.type)"
