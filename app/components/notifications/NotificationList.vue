@@ -37,7 +37,7 @@ const stats = computed(() => getStats());
 
 // 过滤选项
 const categoryOptions = [
-  { label: "全部分类", value: "" },
+  { label: "全部分类", value: null },
   { label: "系统通知", value: NOTIFICATION_CATEGORIES.SYSTEM },
   { label: "Agent 通知", value: NOTIFICATION_CATEGORIES.AGENT },
   { label: "工作流通知", value: NOTIFICATION_CATEGORIES.WORKFLOW },
@@ -47,7 +47,7 @@ const categoryOptions = [
 ];
 
 const typeOptions = [
-  { label: "全部类型", value: "" },
+  { label: "全部类型", value: null },
   { label: "信息", value: NOTIFICATION_TYPES.INFO },
   { label: "成功", value: NOTIFICATION_TYPES.SUCCESS },
   { label: "警告", value: NOTIFICATION_TYPES.WARNING },
@@ -56,15 +56,15 @@ const typeOptions = [
 ];
 
 const readOptions = [
-  { label: "全部状态", value: "" },
+  { label: "全部状态", value: null },
   { label: "未读", value: "false" },
   { label: "已读", value: "true" },
 ];
 
 // 当前过滤器值
-const selectedCategory = ref("");
-const selectedType = ref("");
-const selectedRead = ref("");
+const selectedCategory = ref(null);
+const selectedType = ref(null);
+const selectedRead = ref(null);
 const showImportantOnly = ref(false);
 
 // 监听过滤器变化
@@ -182,7 +182,7 @@ onMounted(() => {
           <UButton
             variant="ghost"
             size="sm"
-            icon="i-heroicons-check-double"
+            icon="i-heroicons-check"
             @click="markAllAsRead"
             :disabled="stats.unread === 0"
           >
@@ -213,19 +213,19 @@ onMounted(() => {
       <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
         <USelect
           v-model="selectedCategory"
-          :options="categoryOptions"
+          :items="categoryOptions"
           placeholder="选择分类"
           size="sm"
         />
         <USelect
           v-model="selectedType"
-          :options="typeOptions"
+          :items="typeOptions"
           placeholder="选择类型"
           size="sm"
         />
         <USelect
           v-model="selectedRead"
-          :options="readOptions"
+          :items="readOptions"
           placeholder="读取状态"
           size="sm"
         />

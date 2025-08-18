@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import ThemeSwitcher from "../ThemeSwitcher.vue";
+import { useDebounceFn } from "@vueuse/core";
 const { t } = useI18n();
 
 // 用户信息
@@ -111,11 +112,84 @@ const handleLogout = async () => {
 // 搜索功能
 const searchQuery = ref("");
 const isSearchFocused = ref(false);
+const searchSuggestions = ref<any[]>([]);
+const showSearchSuggestions = ref(false);
 
-const handleSearch = () => {
-  if (searchQuery.value.trim()) {
-    // 执行搜索逻辑
-    console.log("搜索:", searchQuery.value);
+// 使用搜索功能
+const { quickSearch } = useSearch();
+
+const handleSearch = async () => {
+  try {
+    const q = searchQuery.value.trim();
+    if (!q) return;
+    await navigateTo({ path: "/search", query: { q } });
+    showSearchSuggestions.value = false;
+  } catch (err) {
+    console.error("handleSearch error:", err);
+  }
+};
+
+// 搜索建议 - 使用防抖和错误处理
+const handleSearchInput = useDebounceFn(async (value: string) => {
+  try {
+    if (!value?.trim()) {
+      showSearchSuggestions.value = false;
+      searchSuggestions.value = [];
+      return;
+    }
+
+    showSearchSuggestions.value = true;
+    const results = await quickSearch(value);
+
+    // 转换为建议格式
+    searchSuggestions.value = results.slice(0, 5).map((r) => ({
+      id: r.id,
+      title: r.title,
+      type: r.type,
+      category: r.category,
+      url: r.url,
+    }));
+  } catch (e) {
+    console.error("handleSearchInput error:", e);
+    // 不要把异常往外抛，避免"Unhandled error …"
+    searchSuggestions.value = [];
+  }
+}, 250);
+
+// 选择搜索建议
+const selectSearchSuggestion = async (result: any) => {
+  try {
+    await navigateTo(result.url);
+    showSearchSuggestions.value = false;
+    searchQuery.value = "";
+  } catch (err) {
+    console.error("selectSearchSuggestion error:", err);
+  }
+};
+
+// 获取搜索结果类型图标
+const getSearchResultTypeIcon = (type: string) => {
+  switch (type) {
+    case "user":
+      return "i-heroicons-user";
+    case "content":
+      return "i-heroicons-document-text";
+    case "product":
+      return "i-heroicons-cube";
+    case "order":
+      return "i-heroicons-shopping-cart";
+    case "plugin":
+      return "i-heroicons-puzzle-piece";
+    case "agent":
+      return "i-heroicons-cpu-chip";
+    case "workflow":
+      return "i-heroicons-arrow-path";
+    case "setting":
+      return "i-heroicons-cog-6-tooth";
+    case "notification":
+      return "i-heroicons-bell";
+    default:
+      return "i-heroicons-magnifying-glass";
   }
 };
 </script>
@@ -159,13 +233,19 @@ const handleSearch = () => {
           size="md"
           class="w-full"
           @keyup.enter="handleSearch"
+          @update:model-value="handleSearchInput"
           @focus="isSearchFocused = true"
-          @blur="isSearchFocused = false"
+          @blur="
+            setTimeout(() => {
+              showSearchSuggestions = false;
+              isSearchFocused = false;
+            }, 200)
+          "
         />
 
         <!-- 搜索建议下拉框 -->
         <div
-          v-if="isSearchFocused && searchQuery"
+          v-if="showSearchSuggestions && searchSuggestions.length > 0"
           class="absolute top-full left-0 right-0 mt-1 bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm border border-gray-200/60 dark:border-gray-700/60 rounded-lg shadow-xl z-50"
         >
           <div class="p-2">
@@ -174,14 +254,21 @@ const handleSearch = () => {
             </div>
             <div class="space-y-1">
               <button
-                class="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 rounded"
+                v-for="suggestion in searchSuggestions"
+                :key="suggestion.id"
+                class="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 dark:hover:bg-gray-700 rounded flex items-center space-x-2"
+                @click="selectSearchSuggestion(suggestion)"
               >
-                搜索用户 "{{ searchQuery }}"
-              </button>
-              <button
-                class="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 rounded"
-              >
-                搜索内容 "{{ searchQuery }}"
+                <UIcon
+                  :name="getSearchResultTypeIcon(suggestion.type)"
+                  class="w-4 h-4 text-gray-400"
+                />
+                <div class="flex-1">
+                  <div class="font-medium">{{ suggestion.title }}</div>
+                  <div class="text-xs text-gray-500">
+                    {{ suggestion.category }}
+                  </div>
+                </div>
               </button>
             </div>
           </div>
