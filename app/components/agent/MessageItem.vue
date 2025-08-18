@@ -93,58 +93,78 @@ const getLanguageDisplayName = (lang: string) => {
 // 简单的 Markdown 渲染函数
 const renderMarkdown = (markdown: string) => {
   let html = markdown;
-  
+
   // 转义 HTML 特殊字符
   const escapeHtml = (text: string) => {
-    const div = document.createElement('div');
+    const div = document.createElement("div");
     div.textContent = text;
     return div.innerHTML;
   };
-  
+
   // 标题
-  html = html.replace(/^### (.*$)/gim, '<h3>$1</h3>');
-  html = html.replace(/^## (.*$)/gim, '<h2>$1</h2>');
-  html = html.replace(/^# (.*$)/gim, '<h1>$1</h1>');
-  
+  html = html.replace(/^### (.*$)/gim, "<h3>$1</h3>");
+  html = html.replace(/^## (.*$)/gim, "<h2>$1</h2>");
+  html = html.replace(/^# (.*$)/gim, "<h1>$1</h1>");
+
   // 粗体
-  html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-  
+  html = html.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
+
   // 斜体
-  html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
-  
+  html = html.replace(/\*(.*?)\*/g, "<em>$1</em>");
+
   // 行内代码
-  html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
-  
+  html = html.replace(/`([^`]+)`/g, "<code>$1</code>");
+
   // 链接
-  html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" class="text-blue-600 hover:underline">$1</a>');
-  
+  html = html.replace(
+    /\[([^\]]+)\]\(([^)]+)\)/g,
+    '<a href="$2" target="_blank" class="text-blue-600 hover:underline">$1</a>'
+  );
+
   // 无序列表
-  html = html.replace(/^\- (.*$)/gim, '<li>$1</li>');
-  html = html.replace(/(<li>.*<\/li>)/s, '<ul>$1</ul>');
-  
+  html = html.replace(/^\- (.*$)/gim, "<li>$1</li>");
+  html = html.replace(/(<li>.*<\/li>)/s, "<ul>$1</ul>");
+
   // 有序列表
-  html = html.replace(/^\d+\. (.*$)/gim, '<li>$1</li>');
-  
+  html = html.replace(/^\d+\. (.*$)/gim, "<li>$1</li>");
+
   // 引用
-  html = html.replace(/^> (.*$)/gim, '<blockquote>$1</blockquote>');
-  
+  html = html.replace(/^> (.*$)/gim, "<blockquote>$1</blockquote>");
+
   // 表格（简单处理）
   const tableRegex = /\|(.+)\|\n\|[-\s|]+\|\n((?:\|.+\|\n?)*)/g;
   html = html.replace(tableRegex, (match, header, rows) => {
-    const headerCells = header.split('|').map((cell: string) => cell.trim()).filter((cell: string) => cell);
-    const headerRow = '<tr>' + headerCells.map((cell: string) => `<th>${cell}</th>`).join('') + '</tr>';
-    
-    const bodyRows = rows.trim().split('\n').map((row: string) => {
-      const cells = row.split('|').map((cell: string) => cell.trim()).filter((cell: string) => cell);
-      return '<tr>' + cells.map((cell: string) => `<td>${cell}</td>`).join('') + '</tr>';
-    }).join('');
-    
+    const headerCells = header
+      .split("|")
+      .map((cell: string) => cell.trim())
+      .filter((cell: string) => cell);
+    const headerRow =
+      "<tr>" +
+      headerCells.map((cell: string) => `<th>${cell}</th>`).join("") +
+      "</tr>";
+
+    const bodyRows = rows
+      .trim()
+      .split("\n")
+      .map((row: string) => {
+        const cells = row
+          .split("|")
+          .map((cell: string) => cell.trim())
+          .filter((cell: string) => cell);
+        return (
+          "<tr>" +
+          cells.map((cell: string) => `<td>${cell}</td>`).join("") +
+          "</tr>"
+        );
+      })
+      .join("");
+
     return `<table class="border-collapse border border-gray-300"><thead>${headerRow}</thead><tbody>${bodyRows}</tbody></table>`;
   });
-  
+
   // 换行
-  html = html.replace(/\n/g, '<br>');
-  
+  html = html.replace(/\n/g, "<br>");
+
   return html;
 };
 </script>
@@ -338,26 +358,26 @@ const renderMarkdown = (markdown: string) => {
             <!-- 卡片消息 -->
             <div
               v-else-if="content.type === 'card'"
-              class="border border-gray-200 rounded-lg overflow-hidden bg-white shadow-sm"
+              class="max-w-sm border border-gray-200 rounded-lg overflow-hidden bg-white shadow-sm"
             >
-              <div v-if="content.data.image" class="aspect-video bg-gray-100">
+              <div v-if="content.data.image" class="aspect-[4/3] bg-gray-100">
                 <img
                   :src="content.data.image"
                   :alt="content.data.title"
                   class="w-full h-full object-cover"
                 />
               </div>
-              <div class="p-4">
-                <h3 class="font-semibold text-gray-900 mb-2">
+              <div class="p-3">
+                <h3 class="font-semibold text-gray-900 mb-1 text-sm">
                   {{ content.data.title }}
                 </h3>
                 <p
                   v-if="content.data.description"
-                  class="text-gray-600 text-sm mb-3"
+                  class="text-gray-600 text-xs mb-2 line-clamp-2"
                 >
                   {{ content.data.description }}
                 </p>
-                <div v-if="content.data.metadata" class="space-y-1 mb-3">
+                <div v-if="content.data.metadata" class="space-y-0.5 mb-2">
                   <div
                     v-for="(value, key) in content.data.metadata"
                     :key="key"
@@ -367,12 +387,12 @@ const renderMarkdown = (markdown: string) => {
                     <span>{{ value }}</span>
                   </div>
                 </div>
-                <div v-if="content.data.actions" class="flex space-x-2">
+                <div v-if="content.data.actions" class="flex space-x-1">
                   <UButton
                     v-for="action in content.data.actions"
                     :key="action.label"
                     :variant="action.variant || 'outline'"
-                    size="sm"
+                    size="xs"
                     @click="console.log('Action:', action.action)"
                   >
                     {{ action.label }}
