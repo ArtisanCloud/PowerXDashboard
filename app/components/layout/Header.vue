@@ -57,7 +57,7 @@ const notificationItems = computed(() => {
         : notification.content,
     icon: getNotificationIcon(notification.type),
     badge: !notification.isRead ? "new" : undefined,
-    to: { path: "/notifications", query: { id: notification.id } },
+    to: `/notifications?id=${notification.id}`,
   }));
 
   // 添加分隔符和查看全部按钮
@@ -76,7 +76,6 @@ const notificationItems = computed(() => {
       {
         label: "暂无通知",
         icon: "i-heroicons-bell-slash",
-        disabled: true,
       },
     ]);
   }

@@ -412,22 +412,23 @@ const handleResultClick = (url: string) => {
                 >
                   {{ t("search.sortBy") }}
                 </h4>
-                <USelect
-                  v-model="sortBy"
-                  :options="[
-                    { value: 'relevance', label: t('search.sortRelevance') },
-                    { value: 'date', label: t('search.sortDate') },
-                    { value: 'title', label: t('search.sortTitle') },
-                  ]"
-                  class="mb-2"
-                />
-                <USelect
-                  v-model="sortOrder"
-                  :options="[
-                    { value: 'desc', label: t('search.sortDesc') },
-                    { value: 'asc', label: t('search.sortAsc') },
-                  ]"
-                />
+                <div class="space-y-2">
+                  <USelect
+                    v-model="sortBy"
+                    :options="[
+                      { value: 'relevance', label: t('search.sortRelevance') },
+                      { value: 'date', label: t('search.sortDate') },
+                      { value: 'title', label: t('search.sortTitle') },
+                    ]"
+                  />
+                  <USelect
+                    v-model="sortOrder"
+                    :options="[
+                      { value: 'desc', label: t('search.sortDesc') },
+                      { value: 'asc', label: t('search.sortAsc') },
+                    ]"
+                  />
+                </div>
               </div>
 
               <!-- 应用过滤器按钮 -->
