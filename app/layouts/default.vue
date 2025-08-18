@@ -5,6 +5,15 @@ import Sidebar from "../components/layout/Sidebar.vue";
 import Header from "../components/layout/Header.vue";
 import FooterBar from "../components/layout/FooterBar.vue";
 
+// 获取当前路由
+const route = useRoute();
+
+// 判断是否应该隐藏 FooterBar
+const shouldHideFooter = computed(() => {
+  const path = route.path;
+  return path.startsWith("/agent") || path.startsWith("/workflow");
+});
+
 // 侧边栏折叠状态
 const sidebarCollapsed = ref(false);
 
@@ -73,28 +82,6 @@ const closeMobileSidebar = () => {
       <!-- 页面内容 -->
       <main class="flex-1 overflow-y-auto">
         <div class="p-6">
-          <!-- 页面标题区域 -->
-          <div v-if="$route.meta.title" class="mb-6">
-            <div class="flex items-center justify-between">
-              <!-- <div>
-                <h1 class="text-2xl font-bold text-gray-900">
-                  {{ $route.meta.title }}
-                </h1>
-                <p v-if="$route.meta.description" class="mt-1 text-sm text-gray-600">
-                  {{ $route.meta.description }}
-                </p>
-              </div> -->
-
-              <!-- 页面操作按钮区域 -->
-              <div
-                v-if="$route.meta.actions"
-                class="flex items-center space-x-3"
-              >
-                <slot name="page-actions" />
-              </div>
-            </div>
-          </div>
-
           <!-- 主要内容插槽 -->
           <div
             class="bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm rounded-xl shadow-lg border border-gray-200/60 dark:border-gray-700/60 overflow-hidden"
@@ -105,7 +92,7 @@ const closeMobileSidebar = () => {
       </main>
 
       <!-- 页脚 -->
-      <FooterBar />
+      <FooterBar v-if="!shouldHideFooter" />
     </div>
   </div>
 </template>

@@ -425,13 +425,12 @@ const showScrollBtn = computed(() => !isAtBottom.value);
     <div class="flex-shrink-0 border-t border-gray-200 bg-white">
       <div class="p-4">
         <div class="flex items-end space-x-3">
-          <UButton
-            variant="ghost"
-            size="sm"
-            icon="i-heroicons-paper-clip"
-            class="flex-shrink-0"
-          />
+          <!-- 附件按钮 -->
+          <div class="flex-shrink-0 pb-2">
+            <UButton variant="ghost" size="sm" icon="i-heroicons-paper-clip" />
+          </div>
 
+          <!-- 输入框容器 -->
           <div class="flex-1 relative">
             <textarea
               ref="inputRef"
@@ -442,7 +441,7 @@ const showScrollBtn = computed(() => !isAtBottom.value);
                   : t('agent.chat.disconnectedPlaceholder')
               "
               :disabled="!isConnected || isStreaming"
-              class="w-full resize-none border border-gray-300 rounded-lg px-4 py-3 pr-12 focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+              class="w-full resize-none border border-gray-300 rounded-lg px-4 py-3 pr-14 focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
               rows="1"
               style="min-height: 44px; max-height: 120px"
               @input="adjustTextareaHeight"
@@ -450,23 +449,23 @@ const showScrollBtn = computed(() => !isAtBottom.value);
               @compositionstart="isComposing = true"
               @compositionend="isComposing = false"
             />
-            <UButton
-              :disabled="!messageInput.trim() || !isConnected || isStreaming"
-              size="sm"
-              icon="i-heroicons-paper-airplane"
-              class="absolute right-2 bottom-2"
-              @click="sendMessage"
-            />
+            <!-- 发送按钮 -->
+            <div class="absolute right-2 bottom-2">
+              <UButton
+                :disabled="!messageInput.trim() || !isConnected || isStreaming"
+                size="sm"
+                icon="i-heroicons-paper-airplane"
+                @click="sendMessage"
+              />
+            </div>
           </div>
         </div>
 
+        <!-- 提示信息 -->
         <div
-          class="flex items-center justify-between mt-2 text-xs text-gray-500"
+          class="flex items-center justify-between mt-3 text-xs text-gray-500"
         >
-          <div class="flex items-center space-x-4">
-            <span>{{ t("agent.chat.enterToSend") }}</span>
-            <span>{{ t("agent.chat.shiftEnterNewLine") }}</span>
-          </div>
+          <!-- 左侧：模型信息 -->
           <div v-if="currentAgent" class="flex items-center space-x-2">
             <span>{{ t("agent.chat.model") }}: {{ currentAgent.model }}</span>
             <span>•</span>
@@ -474,6 +473,13 @@ const showScrollBtn = computed(() => !isAtBottom.value);
               >{{ t("agent.chat.temperature") }}:
               {{ currentAgent.temperature }}</span
             >
+          </div>
+          <div v-else></div>
+
+          <!-- 右侧：操作提示 -->
+          <div class="flex items-center space-x-4">
+            <span>{{ t("agent.chat.enterToSend") }}</span>
+            <span>{{ t("agent.chat.shiftEnterNewLine") }}</span>
           </div>
         </div>
       </div>
