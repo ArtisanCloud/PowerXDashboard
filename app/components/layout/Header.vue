@@ -9,38 +9,17 @@ const user = ref({
   avatar: null,
 });
 
-// 通知数据
-const notifications = ref([
-  {
-    id: 1,
-    title: "新用户注册",
-    message: "用户 john@example.com 刚刚注册了账户",
-    time: "2分钟前",
-    read: false,
-    type: "user",
-  },
-  {
-    id: 2,
-    title: "系统更新",
-    message: "系统将在今晚 23:00 进行维护更新",
-    time: "1小时前",
-    read: false,
-    type: "system",
-  },
-  {
-    id: 3,
-    title: "数据备份完成",
-    message: "今日数据备份已成功完成",
-    time: "3小时前",
-    read: true,
-    type: "success",
-  },
-]);
+// 使用通知系统
+const { getStats, notifications, fetchNotifications } = useNotifications();
 
-// 未读通知数量
-const unreadCount = computed(
-  () => notifications.value.filter((n) => !n.read).length
-);
+// 获取通知统计信息
+const notificationStats = computed(() => getStats());
+const unreadCount = computed(() => notificationStats.value.unread);
+
+// 初始化通知数据
+onMounted(() => {
+  fetchNotifications();
+});
 
 // 用户菜单项
 const userMenuItems = computed(() => [
@@ -48,53 +27,77 @@ const userMenuItems = computed(() => [
     {
       label: t("header.profile"),
       icon: "i-heroicons-user",
-      click: () => navigateTo("/profile"),
+      to: "/profile",
     },
     {
       label: t("header.settings"),
       icon: "i-heroicons-cog-6-tooth",
-      click: () => navigateTo("/settings"),
+      to: "/settings",
     },
   ],
   [
     {
       label: t("header.logout"),
       icon: "i-heroicons-arrow-right-on-rectangle",
-      click: handleLogout,
+      onSelect: handleLogout,
     },
   ],
 ]);
 
 // 通知菜单项
-const notificationItems = computed(() => [
-  notifications.value.map((notification) => ({
+const notificationItems = computed(() => {
+  const recentNotifications = notifications.value.slice(0, 5); // 只显示最近5条
+
+  const notificationMenuItems = recentNotifications.map((notification) => ({
     label: notification.title,
-    description: notification.message,
+    description:
+      notification.content.length > 50
+        ? notification.content.substring(0, 50) + "..."
+        : notification.content,
     icon: getNotificationIcon(notification.type),
-    badge: !notification.read ? "new" : undefined,
-    click: () => markAsRead(notification.id),
-  })),
-]);
+    badge: !notification.isRead ? "new" : undefined,
+    to: { path: "/notifications", query: { id: notification.id } },
+  }));
+
+  // 添加分隔符和查看全部按钮
+  const menuItems = [notificationMenuItems];
+
+  if (recentNotifications.length > 0) {
+    menuItems.push([
+      {
+        label: "查看所有通知",
+        icon: "i-heroicons-eye",
+        to: "/notifications",
+      },
+    ]);
+  } else {
+    menuItems.push([
+      {
+        label: "暂无通知",
+        icon: "i-heroicons-bell-slash",
+        disabled: true,
+      },
+    ]);
+  }
+
+  return menuItems;
+});
 
 // 获取通知图标
 const getNotificationIcon = (type: string) => {
   switch (type) {
-    case "user":
-      return "i-heroicons-user-plus";
-    case "system":
-      return "i-heroicons-cog-6-tooth";
     case "success":
       return "i-heroicons-check-circle";
+    case "warning":
+      return "i-heroicons-exclamation-triangle";
+    case "error":
+      return "i-heroicons-x-circle";
+    case "info":
+      return "i-heroicons-information-circle";
+    case "system":
+      return "i-heroicons-cog-6-tooth";
     default:
       return "i-heroicons-bell";
-  }
-};
-
-// 标记通知为已读
-const markAsRead = (id: number) => {
-  const notification = notifications.value.find((n) => n.id === id);
-  if (notification) {
-    notification.read = true;
   }
 };
 
