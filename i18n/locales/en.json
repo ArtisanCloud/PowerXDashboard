@@ -358,6 +358,41 @@
       "reset": "Reset"
     }
   },
+  "auth": {
+    "backToHome": "Back to Home",
+    "welcomeBack": "Welcome Back",
+    "loginSubtitle": "Sign in to your account to continue",
+    "createAccount": "Create Account",
+    "registerSubtitle": "Create a new account to get started",
+    "email": "Email",
+    "password": "Password",
+    "username": "Username",
+    "confirmPassword": "Confirm Password",
+    "remember": "Remember me",
+    "forgot": "Forgot password?",
+    "signingIn": "Signing in...",
+    "creatingAccount": "Creating account...",
+    "noAccount": "Don't have an account?",
+    "hasAccount": "Already have an account?",
+    "signUpNow": "Sign up now",
+    "signInNow": "Sign in now",
+    "required": "This field is required",
+    "loginFailed": "Login failed, please check your credentials",
+    "registerFailed": "Registration failed, please try again",
+    "registerSuccess": "Registration successful!",
+    "redirectingToLogin": "Redirecting to login page...",
+    "invalidEmail": "Please enter a valid email address",
+    "passwordTooShort": "Password must be at least 6 characters",
+    "passwordMismatch": "Passwords do not match",
+    "mustAgreeTerms": "You must agree to the terms of service to register",
+    "agreeTerms": "I agree to the",
+    "and": "and",
+    "passwordStrength": {
+      "weak": "Weak",
+      "medium": "Medium",
+      "strong": "Strong"
+    }
+  },
   "agent": {
     "selector": {
       "title": "AI Agents",

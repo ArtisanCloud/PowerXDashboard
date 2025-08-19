@@ -49,44 +49,52 @@ const passwordStrength = computed(() => {
   if (/[^A-Za-z0-9]/.test(password)) score++;
 
   if (score <= 2)
-    return { level: score, text: t("passwordStrength.weak"), color: "red" };
+    return {
+      level: score,
+      text: t("auth.passwordStrength.weak"),
+      color: "red",
+    };
   if (score <= 3)
     return {
       level: score,
-      text: t("passwordStrength.medium"),
+      text: t("auth.passwordStrength.medium"),
       color: "yellow",
     };
-  return { level: score, text: t("passwordStrength.strong"), color: "green" };
+  return {
+    level: score,
+    text: t("auth.passwordStrength.strong"),
+    color: "green",
+  };
 });
 
 // 表单验证
 const validateForm = () => {
   if (!form.username.trim()) {
-    error.value = t("required");
+    error.value = t("auth.required");
     return false;
   }
   if (!form.email.trim()) {
-    error.value = t("required");
+    error.value = t("auth.required");
     return false;
   }
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
-    error.value = t("invalidEmail");
+    error.value = t("auth.invalidEmail");
     return false;
   }
   if (!form.password) {
-    error.value = t("required");
+    error.value = t("auth.required");
     return false;
   }
   if (form.password.length < 6) {
-    error.value = t("passwordTooShort");
+    error.value = t("auth.passwordTooShort");
     return false;
   }
   if (form.password !== form.confirmPassword) {
-    error.value = t("passwordMismatch");
+    error.value = t("auth.passwordMismatch");
     return false;
   }
   if (!form.agree) {
-    error.value = t("mustAgreeTerms");
+    error.value = t("auth.mustAgreeTerms");
     return false;
   }
   return true;
@@ -111,7 +119,7 @@ const handleRegister = async () => {
       navigateTo(localePath("/users/login"));
     }, 2000);
   } catch (err) {
-    error.value = t("registerFailed");
+    error.value = t("auth.registerFailed");
   } finally {
     loading.value = false;
   }
@@ -142,7 +150,7 @@ const handleRegister = async () => {
               d="M15 19l-7-7 7-7"
             ></path>
           </svg>
-          {{ $t("backToHome") }}
+          {{ $t("auth.backToHome") }}
         </NuxtLink>
       </div>
 
@@ -157,9 +165,11 @@ const handleRegister = async () => {
               PowerX
             </h1>
             <h2 class="text-xl font-semibold text-gray-900 mb-2">
-              {{ $t("createAccount") }}
+              {{ $t("auth.createAccount") }}
             </h2>
-            <p class="text-gray-600 text-sm">{{ $t("registerSubtitle") }}</p>
+            <p class="text-gray-600 text-sm">
+              {{ $t("auth.registerSubtitle") }}
+            </p>
           </div>
         </template>
 
@@ -169,8 +179,8 @@ const handleRegister = async () => {
             v-if="success"
             color="success"
             variant="soft"
-            :title="$t('registerSuccess')"
-            :description="$t('redirectingToLogin')"
+            :title="$t('auth.registerSuccess')"
+            :description="$t('auth.redirectingToLogin')"
             class="mb-6"
           />
 
@@ -197,13 +207,13 @@ const handleRegister = async () => {
                 for="username"
                 class="block text-sm font-medium text-gray-700 mb-3"
               >
-                {{ $t("username") }} <span class="text-red-500">*</span>
+                {{ $t("auth.username") }} <span class="text-red-500">*</span>
               </label>
               <UInput
                 id="username"
                 name="username"
                 v-model="form.username"
-                :placeholder="$t('username')"
+                :placeholder="$t('auth.username')"
                 size="lg"
                 :disabled="loading"
                 class="w-full"
@@ -216,14 +226,14 @@ const handleRegister = async () => {
                 for="email"
                 class="block text-sm font-medium text-gray-700 mb-3"
               >
-                {{ $t("email") }} <span class="text-red-500">*</span>
+                {{ $t("auth.email") }} <span class="text-red-500">*</span>
               </label>
               <UInput
                 id="email"
                 name="email"
                 v-model="form.email"
                 type="email"
-                :placeholder="$t('email')"
+                :placeholder="$t('auth.email')"
                 size="lg"
                 :disabled="loading"
                 class="w-full"
@@ -236,14 +246,14 @@ const handleRegister = async () => {
                 for="password"
                 class="block text-sm font-medium text-gray-700 mb-3"
               >
-                {{ $t("password") }} <span class="text-red-500">*</span>
+                {{ $t("auth.password") }} <span class="text-red-500">*</span>
               </label>
               <UInput
                 id="password"
                 name="password"
                 v-model="form.password"
                 type="password"
-                :placeholder="$t('password')"
+                :placeholder="$t('auth.password')"
                 size="lg"
                 :disabled="loading"
                 class="w-full"
@@ -284,14 +294,15 @@ const handleRegister = async () => {
                 for="confirmPassword"
                 class="block text-sm font-medium text-gray-700 mb-3"
               >
-                {{ $t("confirmPassword") }} <span class="text-red-500">*</span>
+                {{ $t("auth.confirmPassword") }}
+                <span class="text-red-500">*</span>
               </label>
               <UInput
                 id="confirmPassword"
                 name="confirmPassword"
                 v-model="form.confirmPassword"
                 type="password"
-                :placeholder="$t('confirmPassword')"
+                :placeholder="$t('auth.confirmPassword')"
                 size="lg"
                 :disabled="loading"
                 class="w-full"
@@ -306,11 +317,11 @@ const handleRegister = async () => {
                 class="mt-0.5"
               />
               <p class="text-sm text-gray-600 leading-relaxed">
-                {{ $t("agreeTerms") }}
+                {{ $t("auth.agreeTerms") }}
                 <a href="#" class="text-blue-600 hover:text-blue-700">{{
                   $t("termsOfService")
                 }}</a>
-                {{ $t("and") }}
+                {{ $t("auth.and") }}
                 <a href="#" class="text-blue-600 hover:text-blue-700">{{
                   $t("privacyPolicy")
                 }}</a>
@@ -327,7 +338,11 @@ const handleRegister = async () => {
                 :disabled="!form.agree"
                 class="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
               >
-                {{ loading ? $t("creatingAccount") : $t("createAccount") }}
+                {{
+                  loading
+                    ? $t("auth.creatingAccount")
+                    : $t("auth.createAccount")
+                }}
               </UButton>
             </div>
           </form>
@@ -335,12 +350,12 @@ const handleRegister = async () => {
           <!-- 登录链接 -->
           <div class="text-center mt-6 pt-4 border-t border-gray-200">
             <p class="text-gray-600 text-sm">
-              {{ $t("hasAccount") }}
+              {{ $t("auth.hasAccount") }}
               <NuxtLink
                 :to="$localePath('/users/login')"
                 class="text-blue-600 hover:text-blue-700 font-medium"
               >
-                {{ $t("signInNow") }}
+                {{ $t("auth.signInNow") }}
               </NuxtLink>
             </p>
           </div>
