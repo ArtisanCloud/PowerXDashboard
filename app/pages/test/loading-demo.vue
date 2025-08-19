@@ -118,6 +118,12 @@
           >
             重置所有状态
           </button>
+          <button
+            @click="testCountdown"
+            class="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700"
+          >
+            倒计时测试 (10秒)
+          </button>
         </div>
       </div>
 
@@ -190,11 +196,24 @@ function clearLogs() {
 function showBasic() {
   gl.show({ message: "基础 Loading 显示" });
   addLog("显示基础 Loading");
+
+  // 3秒后自动关闭
+  setTimeout(() => {
+    gl.hide();
+    addLog("基础 Loading 自动关闭");
+  }, 3000);
 }
 
 function showWithLock() {
   gl.show({ lock: true, message: "锁屏 Loading 显示" });
   addLog("显示锁屏 Loading");
+
+  // 3秒后自动关闭
+  setTimeout(() => {
+    gl.hide();
+    gl.unlock();
+    addLog("锁屏 Loading 自动关闭");
+  }, 3000);
 }
 
 function hide() {
@@ -311,7 +330,7 @@ async function testErrorHandling() {
     await new Promise((resolve, reject) => {
       setTimeout(() => reject(new Error("模拟错误")), 1000);
     });
-  } catch (error) {
+  } catch (error: any) {
     addLog("捕获到错误: " + error.message);
     gl.setMessage("操作失败");
     setTimeout(() => {
@@ -331,6 +350,34 @@ function resetAll() {
   }
   gl.setMessage("加载中…");
   addLog("重置所有状态");
+}
+
+function testCountdown() {
+  addLog("开始倒计时测试 (10秒)");
+  let countdown = 10;
+
+  gl.show({
+    lock: true,
+    message: `🕐 倒计时自动关闭 ${countdown} 秒...`,
+  });
+
+  const timer = setInterval(() => {
+    countdown--;
+    if (countdown > 0) {
+      const emoji = countdown <= 3 ? "⚠️" : countdown <= 5 ? "⏰" : "🕐";
+      gl.setMessage(`${emoji} 倒计时自动关闭 ${countdown} 秒...`);
+      addLog(`倒计时剩余 ${countdown} 秒`);
+    } else {
+      clearInterval(timer);
+      gl.setMessage("✅ 倒计时结束，正在关闭...");
+      addLog("倒计时结束");
+      setTimeout(() => {
+        gl.hide();
+        gl.unlock();
+        addLog("倒计时测试完成");
+      }, 800);
+    }
+  }, 1000);
 }
 
 // 页面加载时添加欢迎日志

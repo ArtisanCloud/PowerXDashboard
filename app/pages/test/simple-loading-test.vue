@@ -30,6 +30,13 @@
         >
           锁屏测试 (3秒)
         </button>
+
+        <button
+          @click="testCountdown"
+          class="px-4 py-2 bg-purple-500 text-white rounded"
+        >
+          倒计时测试 (5秒)
+        </button>
       </div>
 
       <div class="mt-8">
@@ -66,6 +73,12 @@ const debugInfo = computed(() => ({
 function testShow() {
   console.log("显示 Loading");
   gl.show({ message: "测试显示 Loading..." });
+
+  // 3秒后自动关闭
+  setTimeout(() => {
+    gl.hide();
+    console.log("自动关闭 Loading");
+  }, 3000);
 }
 
 function testHide() {
@@ -85,7 +98,32 @@ function testLock() {
     console.log("锁屏测试结束");
     gl.hide();
     gl.unlock();
-  }, 3500);
+  }, 3000);
+}
+
+function testCountdown() {
+  console.log("倒计时测试开始");
+  let countdown = 5;
+
+  gl.show({
+    lock: true,
+    message: `倒计时关闭 ${countdown} 秒...`,
+  });
+
+  const timer = setInterval(() => {
+    countdown--;
+    if (countdown > 0) {
+      gl.setMessage(`倒计时关闭 ${countdown} 秒...`);
+    } else {
+      clearInterval(timer);
+      gl.setMessage("倒计时结束，正在关闭...");
+      setTimeout(() => {
+        gl.hide();
+        gl.unlock();
+        console.log("倒计时测试结束");
+      }, 500);
+    }
+  }, 1000);
 }
 
 // 页面加载时的调试信息
