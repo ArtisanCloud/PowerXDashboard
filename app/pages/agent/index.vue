@@ -253,7 +253,7 @@ const selectedAgent = computed(() => {
           hide();
         }
       "
-      class="fixed bottom-4 right-4 max-w-sm"
+      class="fixed bottom-4 right-4 max-w-sm z-50"
     />
   </div>
 </template>

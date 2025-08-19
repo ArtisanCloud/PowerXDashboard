@@ -1,13 +1,13 @@
 <script setup>
-// import '~/assets/css/theme.css'
+import "~/assets/css/theme.css";
 </script>
 
 <template>
   <div>
-    <NuxtRouteAnnouncer />
+    <NuxtLoadingIndicator />
+    <!-- <NuxtRouteAnnouncer /> -->
     <NuxtLayout>
       <NuxtPage />
     </NuxtLayout>
   </div>
 </template>
-
