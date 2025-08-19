@@ -44,7 +44,7 @@ export interface MenuUpdateParams {
  */
 export const useMenuService = () => {
   const apiClient = useApiClient();
-  const baseUrl = "/menus";
+  const baseUrl = "/api/admin/menus";
 
   return {
     /**
@@ -52,158 +52,95 @@ export const useMenuService = () => {
      */
     getUserMenus: () => {
       // 模拟菜单数据，使用翻译键而不是直接的中文文本
-      const mockMenuData: MenuItem[] = [
-        {
-          id: "agent",
-          title: "menu.agent",
-          icon: "i-heroicons-chat-bubble-left-right",
-          path: "/agent",
-          order: 1,
-          visible: true,
-        },
-        {
-          id: "workflow",
-          title: "menu.workflow",
-          icon: "i-heroicons-squares-2x2",
-          path: "/workflow",
-          order: 2,
-          visible: true,
-        },
-        {
-          id: "plugins",
-          title: "menu.pluginMarketplace",
-          icon: "i-heroicons-puzzle-piece",
-          path: "/plugins",
-          order: 4,
-          visible: true,
-        },
-        {
-          id: "dashboard",
-          title: "menu.dashboard",
-          icon: "i-heroicons-home",
-          path: "/dashboard",
-          order: 3,
-          visible: true,
-        },
-        // {
-        //   id: "customers",
-        //   title: "menu.customers",
-        //   icon: "i-heroicons-users",
-        //   order: 2,
-        //   visible: true,
-        //   children: [
-        //     {
-        //       id: "customer-list",
-        //       title: "menu.customerList",
-        //       icon: "i-heroicons-list-bullet",
-        //       path: "/customers",
-        //       order: 1,
-        //       visible: true,
-        //       parentId: "customers",
-        //     },
-        //     {
-        //       id: "customer-groups",
-        //       title: "menu.customerGroups",
-        //       icon: "i-heroicons-user-group",
-        //       path: "/customer-groups",
-        //       order: 2,
-        //       visible: true,
-        //       parentId: "customers",
-        //     },
-        //   ],
-        // },
-        // {
-        //   id: "products",
-        //   title: "menu.products",
-        //   icon: "i-heroicons-cube",
-        //   order: 4,
-        //   visible: true,
-        //   children: [
-        //     {
-        //       id: "product-list",
-        //       title: "menu.productList",
-        //       icon: "i-heroicons-squares-2x2",
-        //       path: "/products",
-        //       order: 1,
-        //       visible: true,
-        //       parentId: "products",
-        //     },
-        //     {
-        //       id: "product-categories",
-        //       title: "menu.productCategories",
-        //       icon: "i-heroicons-tag",
-        //       path: "/product-categories",
-        //       order: 2,
-        //       visible: true,
-        //       parentId: "products",
-        //     },
-        //   ],
-        // },
-        // {
-        //   id: "orders",
-        //   title: "menu.orders",
-        //   icon: "i-heroicons-shopping-cart",
-        //   path: "/orders",
-        //   order: 5,
-        //   visible: true,
-        //   badge: "menu.badge.new",
-        // },
-        {
-          id: "settings",
-          title: "menu.settings",
-          icon: "i-heroicons-cog-6-tooth",
-          order: 6,
-          visible: true,
-          children: [
-            {
-              id: "user-management",
-              title: "menu.userManagement",
-              icon: "i-heroicons-user",
-              path: "/settings/users",
-              order: 1,
-              visible: true,
-              parentId: "settings",
-            },
-            {
-              id: "role-management",
-              title: "menu.roleManagement",
-              icon: "i-heroicons-shield-check",
-              path: "/settings/roles",
-              order: 2,
-              visible: true,
-              parentId: "settings",
-            },
-            {
-              id: "system-config",
-              title: "menu.systemConfig",
-              icon: "i-heroicons-wrench-screwdriver",
-              path: "/settings/config",
-              order: 3,
-              visible: true,
-              parentId: "settings",
-            },
-            {
-              id: "ai-settings",
-              title: "menu.aiSettings",
-              icon: "i-heroicons-cpu-chip",
-              path: "/settings/ai",
-              order: 4,
-              visible: true,
-              parentId: "settings",
-            },
-          ],
-        },
-      ];
+      // const mockMenuData: MenuItem[] = [
+      //   {
+      //     id: "agent",
+      //     title: "menu.agent",
+      //     icon: "i-heroicons-chat-bubble-left-right",
+      //     path: "/agent",
+      //     order: 1,
+      //     visible: true,
+      //   },
+      //   {
+      //     id: "workflow",
+      //     title: "menu.workflow",
+      //     icon: "i-heroicons-squares-2x2",
+      //     path: "/workflow",
+      //     order: 2,
+      //     visible: true,
+      //   },
+      //   {
+      //     id: "plugins",
+      //     title: "menu.pluginMarketplace",
+      //     icon: "i-heroicons-puzzle-piece",
+      //     path: "/plugins",
+      //     order: 4,
+      //     visible: true,
+      //   },
+      //   {
+      //     id: "dashboard",
+      //     title: "menu.dashboard",
+      //     icon: "i-heroicons-home",
+      //     path: "/dashboard",
+      //     order: 3,
+      //     visible: true,
+      //   },
+      //   {
+      //     id: "settings",
+      //     title: "menu.settings",
+      //     icon: "i-heroicons-cog-6-tooth",
+      //     order: 6,
+      //     visible: true,
+      //     children: [
+      //       {
+      //         id: "user-management",
+      //         title: "menu.userManagement",
+      //         icon: "i-heroicons-user",
+      //         path: "/settings/users",
+      //         order: 1,
+      //         visible: true,
+      //         parentId: "settings",
+      //       },
+      //       {
+      //         id: "role-management",
+      //         title: "menu.roleManagement",
+      //         icon: "i-heroicons-shield-check",
+      //         path: "/settings/roles",
+      //         order: 2,
+      //         visible: true,
+      //         parentId: "settings",
+      //       },
+      //       {
+      //         id: "system-config",
+      //         title: "menu.systemConfig",
+      //         icon: "i-heroicons-wrench-screwdriver",
+      //         path: "/settings/config",
+      //         order: 3,
+      //         visible: true,
+      //         parentId: "settings",
+      //       },
+      //       {
+      //         id: "ai-settings",
+      //         title: "menu.aiSettings",
+      //         icon: "i-heroicons-cpu-chip",
+      //         path: "/settings/ai",
+      //         order: 4,
+      //         visible: true,
+      //         parentId: "settings",
+      //       },
+      //     ],
+      //   },
+      // ];
 
       // 返回模拟数据
-      return Promise.resolve({
-        code: 0,
-        message: "success",
-        data: mockMenuData,
-      });
+      // return Promise.resolve({
+      //   code: 0,
+      //   message: "success",
+      //   data: mockMenuData,
+      // });
 
       // 实际 API 调用（注释掉，使用模拟数据）
-      // return apiClient.get<ApiResponse<MenuItem[]>>(`${baseUrl}/user`);
+      return apiClient.get<ApiResponse<MenuItem[]>>(`${baseUrl}`);
     },
 
     /**
