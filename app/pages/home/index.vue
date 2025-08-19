@@ -226,27 +226,27 @@ onMounted(() => {
           <div class="relative">
             <!-- 主控制台界面 -->
             <div
-              class="bg-gradient-to-br from-slate-900/80 via-gray-900/90 to-slate-800/80 dark:from-slate-950/90 dark:via-gray-950/95 dark:to-slate-900/90 backdrop-blur-2xl rounded-3xl border border-white/10 dark:border-white/5 shadow-2xl shadow-black/20 p-8 md:p-12 relative overflow-hidden"
+              class="bg-white/20 dark:bg-slate-900/80 backdrop-blur-2xl rounded-3xl border border-white/20 dark:border-white/10 shadow-2xl shadow-black/10 dark:shadow-black/20 p-8 md:p-12 relative overflow-hidden transition-all duration-500"
             >
               <!-- 高级光效边框 -->
               <div class="absolute inset-0 rounded-3xl">
                 <div
-                  class="absolute top-0 left-0 w-24 h-24 border-t border-l border-white/20 rounded-tl-3xl animate-pulse"
+                  class="absolute top-0 left-0 w-24 h-24 border-t border-l border-gray-400/30 dark:border-white/20 rounded-tl-3xl animate-pulse transition-colors duration-500"
                 ></div>
                 <div
-                  class="absolute top-0 right-0 w-24 h-24 border-t border-r border-white/20 rounded-tr-3xl animate-pulse delay-500"
+                  class="absolute top-0 right-0 w-24 h-24 border-t border-r border-gray-400/30 dark:border-white/20 rounded-tr-3xl animate-pulse delay-500 transition-colors duration-500"
                 ></div>
                 <div
-                  class="absolute bottom-0 left-0 w-24 h-24 border-b border-l border-white/20 rounded-bl-3xl animate-pulse delay-1000"
+                  class="absolute bottom-0 left-0 w-24 h-24 border-b border-l border-gray-400/30 dark:border-white/20 rounded-bl-3xl animate-pulse delay-1000 transition-colors duration-500"
                 ></div>
                 <div
-                  class="absolute bottom-0 right-0 w-24 h-24 border-b border-r border-white/20 rounded-br-3xl animate-pulse delay-1500"
+                  class="absolute bottom-0 right-0 w-24 h-24 border-b border-r border-gray-400/30 dark:border-white/20 rounded-br-3xl animate-pulse delay-1500 transition-colors duration-500"
                 ></div>
               </div>
 
               <!-- 内部光晕效果 -->
               <div
-                class="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-emerald-500/5 rounded-3xl"
+                class="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-emerald-500/5 dark:from-blue-500/10 dark:via-transparent dark:to-emerald-500/10 rounded-3xl transition-all duration-500"
               ></div>
 
               <!-- 顶部状态栏 -->
@@ -261,11 +261,14 @@ onMounted(() => {
                   <div
                     class="w-2 h-2 bg-purple-400 rounded-full animate-pulse delay-600 shadow-sm shadow-purple-400/50"
                   ></div>
-                  <span class="text-white/80 font-mono text-sm tracking-wider"
+                  <span
+                    class="text-gray-700 dark:text-white/80 font-mono text-sm tracking-wider transition-colors duration-500"
                     >SYSTEM ONLINE</span
                   >
                 </div>
-                <div class="text-white/60 font-mono text-sm">
+                <div
+                  class="text-gray-600 dark:text-white/60 font-mono text-sm transition-colors duration-500"
+                >
                   {{ new Date().toLocaleTimeString() }}
                 </div>
               </div>
@@ -276,12 +279,16 @@ onMounted(() => {
                 <div class="space-y-6 animate-slide-in-left">
                   <!-- 终端标题 -->
                   <div
-                    class="bg-slate-800/50 dark:bg-slate-900/50 rounded-xl p-6 border border-white/10 font-mono backdrop-blur-sm"
+                    class="bg-white/30 dark:bg-slate-800/50 rounded-xl p-6 border border-gray-300/30 dark:border-white/10 font-mono backdrop-blur-sm transition-all duration-500"
                   >
-                    <div class="text-emerald-400 text-sm mb-3 tracking-wider">
+                    <div
+                      class="text-emerald-600 dark:text-emerald-400 text-sm mb-3 tracking-wider transition-colors duration-500"
+                    >
                       $ system --status
                     </div>
-                    <div class="text-white text-2xl md:text-4xl font-bold">
+                    <div
+                      class="text-gray-800 dark:text-white text-2xl md:text-4xl font-bold transition-colors duration-500"
+                    >
                       {{ $t("welcome") }}
                       <span
                         class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-emerald-400 animate-gradient-x"
@@ -293,14 +300,16 @@ onMounted(() => {
 
                   <!-- 系统信息面板 -->
                   <div
-                    class="bg-slate-800/50 dark:bg-slate-900/50 rounded-xl p-6 border border-white/10 backdrop-blur-sm"
+                    class="bg-white/30 dark:bg-slate-800/50 rounded-xl p-6 border border-gray-300/30 dark:border-white/10 backdrop-blur-sm transition-all duration-500"
                   >
                     <div
-                      class="text-blue-400 font-mono text-sm mb-3 tracking-wider"
+                      class="text-blue-600 dark:text-blue-400 font-mono text-sm mb-3 tracking-wider transition-colors duration-500"
                     >
                       SYSTEM_INFO:
                     </div>
-                    <p class="text-white/80 text-lg leading-relaxed">
+                    <p
+                      class="text-gray-700 dark:text-white/80 text-lg leading-relaxed transition-colors duration-500"
+                    >
                       {{ $t("home.subtitle") }}
                     </p>
                   </div>
@@ -337,11 +346,11 @@ onMounted(() => {
                 <div class="relative animate-slide-in-right">
                   <!-- 主显示屏 -->
                   <div
-                    class="bg-slate-800/40 dark:bg-slate-900/60 rounded-2xl border border-white/10 p-6 relative overflow-hidden backdrop-blur-sm"
+                    class="bg-white/20 dark:bg-slate-800/40 rounded-2xl border border-gray-300/20 dark:border-white/10 p-6 relative overflow-hidden backdrop-blur-sm transition-all duration-500"
                   >
                     <!-- 屏幕扫描线 -->
                     <div
-                      class="absolute inset-0 bg-gradient-to-b from-transparent via-white/3 to-transparent animate-scan-line"
+                      class="absolute inset-0 bg-gradient-to-b from-transparent via-gray-400/10 dark:via-white/3 to-transparent animate-scan-line transition-all duration-500"
                     ></div>
 
                     <!-- 中央全息投影效果 -->
@@ -404,24 +413,46 @@ onMounted(() => {
                     <!-- 底部状态信息 -->
                     <div class="mt-6 grid grid-cols-3 gap-4 text-center">
                       <div
-                        class="bg-cyan-500/10 rounded-lg p-3 border border-cyan-400/20 backdrop-blur-sm"
+                        class="bg-cyan-500/10 rounded-lg p-3 border border-cyan-400/20 backdrop-blur-sm transition-all duration-500"
                       >
-                        <div class="text-cyan-400 font-mono text-xs">CPU</div>
-                        <div class="text-white font-bold">98%</div>
+                        <div
+                          class="text-cyan-600 dark:text-cyan-400 font-mono text-xs transition-colors duration-500"
+                        >
+                          CPU
+                        </div>
+                        <div
+                          class="text-gray-800 dark:text-white font-bold transition-colors duration-500"
+                        >
+                          98%
+                        </div>
                       </div>
                       <div
-                        class="bg-teal-500/10 rounded-lg p-3 border border-teal-400/20 backdrop-blur-sm"
+                        class="bg-teal-500/10 rounded-lg p-3 border border-teal-400/20 backdrop-blur-sm transition-all duration-500"
                       >
-                        <div class="text-teal-400 font-mono text-xs">RAM</div>
-                        <div class="text-white font-bold">16GB</div>
+                        <div
+                          class="text-teal-600 dark:text-teal-400 font-mono text-xs transition-colors duration-500"
+                        >
+                          RAM
+                        </div>
+                        <div
+                          class="text-gray-800 dark:text-white font-bold transition-colors duration-500"
+                        >
+                          16GB
+                        </div>
                       </div>
                       <div
-                        class="bg-emerald-500/10 rounded-lg p-3 border border-emerald-400/20 backdrop-blur-sm"
+                        class="bg-emerald-500/10 rounded-lg p-3 border border-emerald-400/20 backdrop-blur-sm transition-all duration-500"
                       >
-                        <div class="text-emerald-400 font-mono text-xs">
+                        <div
+                          class="text-emerald-600 dark:text-emerald-400 font-mono text-xs transition-colors duration-500"
+                        >
                           NET
                         </div>
-                        <div class="text-white font-bold">1Gb/s</div>
+                        <div
+                          class="text-gray-800 dark:text-white font-bold transition-colors duration-500"
+                        >
+                          1Gb/s
+                        </div>
                       </div>
                     </div>
                   </div>
