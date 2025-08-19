@@ -1,9 +1,18 @@
 <script setup lang="ts">
-const props = defineProps<{ message?: string }>();
+const props = defineProps<{
+  message?: string;
+  progress?: number; // 0-100 的百分比，如果提供则显示进度条，否则显示跳动点
+}>();
 
 // 检测当前主题模式
 const colorMode = useColorMode();
 const isDark = computed(() => colorMode.value === "dark");
+
+// 判断是否为百分比模式
+const isProgressMode = computed(() => typeof props.progress === "number");
+const progressValue = computed(() =>
+  Math.max(0, Math.min(100, props.progress || 0))
+);
 </script>
 
 <template>
@@ -17,96 +26,226 @@ const isDark = computed(() => colorMode.value === "dark");
   >
     <template #body>
       <div
-        class="h-svh w-svw grid place-items-center backdrop-blur-md"
+        class="h-svh w-svw relative overflow-hidden"
         :class="[
           isDark
-            ? 'bg-gradient-to-br from-gray-900/95 via-gray-800/95 to-gray-900/95'
-            : 'bg-gradient-to-br from-white/95 via-gray-50/95 to-white/95',
+            ? 'bg-gradient-to-br from-slate-900 via-purple-900/20 to-slate-900'
+            : 'bg-gradient-to-br from-blue-50 via-indigo-50/50 to-purple-50',
         ]"
       >
-        <!-- 背景装饰 -->
-        <div class="absolute inset-0 overflow-hidden">
+        <!-- 动态背景粒子 -->
+        <div class="absolute inset-0">
+          <!-- 大光晕 -->
           <div
-            class="absolute -top-40 -right-40 w-80 h-80 rounded-full blur-3xl animate-pulse"
-            :class="[isDark ? 'bg-primary-500/10' : 'bg-primary-500/5']"
+            class="absolute top-1/4 left-1/4 w-96 h-96 rounded-full blur-3xl animate-float-slow opacity-30"
+            :class="[
+              isDark
+                ? 'bg-gradient-to-r from-purple-500/30 to-blue-500/30'
+                : 'bg-gradient-to-r from-blue-400/20 to-purple-400/20',
+            ]"
           ></div>
           <div
-            class="absolute -bottom-40 -left-40 w-80 h-80 rounded-full blur-3xl animate-pulse delay-1000"
-            :class="[isDark ? 'bg-primary-600/10' : 'bg-primary-600/5']"
+            class="absolute bottom-1/4 right-1/4 w-80 h-80 rounded-full blur-3xl animate-float-reverse opacity-25"
+            :class="[
+              isDark
+                ? 'bg-gradient-to-r from-indigo-500/30 to-purple-500/30'
+                : 'bg-gradient-to-r from-indigo-400/20 to-pink-400/20',
+            ]"
+          ></div>
+
+          <!-- 小光点 -->
+          <div
+            class="absolute top-1/3 right-1/3 w-32 h-32 rounded-full blur-2xl animate-pulse-slow"
+            :class="[
+              isDark
+                ? 'bg-gradient-to-r from-cyan-400/40 to-blue-400/40'
+                : 'bg-gradient-to-r from-cyan-300/30 to-blue-300/30',
+            ]"
+          ></div>
+          <div
+            class="absolute bottom-1/3 left-1/3 w-24 h-24 rounded-full blur-xl animate-pulse-slower"
+            :class="[
+              isDark
+                ? 'bg-gradient-to-r from-pink-400/40 to-purple-400/40'
+                : 'bg-gradient-to-r from-pink-300/30 to-purple-300/30',
+            ]"
           ></div>
         </div>
 
-        <!-- 主要内容 -->
-        <div class="relative z-10 flex flex-col items-center space-y-6">
-          <!-- Logo 或品牌区域 -->
-          <div
-            class="flex items-center justify-center w-20 h-20 bg-gradient-to-br from-primary-500 to-primary-600 rounded-2xl shadow-2xl"
-          >
-            <svg
-              class="w-10 h-10 text-white"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M13 10V3L4 14h7v7l9-11h-7z"
-              ></path>
-            </svg>
-          </div>
+        <!-- 网格背景 -->
+        <div
+          class="absolute inset-0 opacity-5"
+          :class="[
+            isDark
+              ? 'bg-[radial-gradient(circle_at_1px_1px,_white_1px,_transparent_0)]'
+              : 'bg-[radial-gradient(circle_at_1px_1px,_rgb(99_102_241)_1px,_transparent_0)]',
+          ]"
+          style="background-size: 40px 40px"
+        ></div>
 
-          <!-- 加载动画 -->
-          <div class="relative">
-            <!-- 外圈 -->
+        <!-- 主要内容 -->
+        <div
+          class="relative z-10 h-full flex flex-col items-center justify-center"
+        >
+          <!-- Logo 容器 -->
+          <div class="relative mb-12">
+            <!-- 外层光环 -->
             <div
-              class="w-16 h-16 border-4 rounded-full animate-spin-slow"
-              :class="[isDark ? 'border-gray-600/30' : 'border-gray-300/50']"
-            ></div>
-            <!-- 内圈 -->
-            <div
-              class="absolute inset-2 w-12 h-12 border-4 border-transparent rounded-full animate-spin"
+              class="absolute inset-0 w-32 h-32 rounded-full animate-spin-slow opacity-60"
               :class="[
                 isDark
-                  ? 'border-t-primary-400 border-r-primary-500'
-                  : 'border-t-primary-500 border-r-primary-600',
+                  ? 'bg-gradient-to-r from-purple-500/30 via-blue-500/30 to-cyan-500/30'
+                  : 'bg-gradient-to-r from-blue-500/20 via-purple-500/20 to-indigo-500/20',
+              ]"
+              style="filter: blur(8px)"
+            ></div>
+
+            <!-- Logo 主体 -->
+            <div
+              class="relative w-24 h-24 rounded-2xl shadow-2xl backdrop-blur-sm border animate-float"
+              :class="[
+                isDark
+                  ? 'bg-gradient-to-br from-slate-800/80 to-slate-900/80 border-white/10'
+                  : 'bg-gradient-to-br from-white/80 to-gray-50/80 border-gray-200/50',
+              ]"
+            >
+              <div
+                class="absolute inset-0 rounded-2xl bg-gradient-to-br from-primary-500/20 to-primary-600/20"
+              ></div>
+              <div
+                class="relative w-full h-full flex items-center justify-center"
+              >
+                <svg
+                  class="w-12 h-12 animate-pulse-gentle"
+                  :class="[isDark ? 'text-white' : 'text-primary-600']"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M13 10V3L4 14h7v7l9-11h-7z"
+                  ></path>
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <!-- 多层加载动画 -->
+          <div class="relative w-20 h-20 mb-8">
+            <!-- 最外层旋转环 -->
+            <div
+              class="absolute inset-0 w-20 h-20 border-2 border-transparent rounded-full animate-spin-slow"
+              :class="[
+                isDark
+                  ? 'border-t-purple-400/60 border-r-blue-400/40'
+                  : 'border-t-blue-500/60 border-r-purple-500/40',
               ]"
             ></div>
-            <!-- 中心点 -->
+
+            <!-- 中层反向旋转环 -->
             <div
-              class="absolute inset-6 w-4 h-4 bg-gradient-to-r from-primary-400 to-primary-500 rounded-full animate-pulse"
+              class="absolute inset-2 w-16 h-16 border-2 border-transparent rounded-full animate-spin-reverse"
+              :class="[
+                isDark
+                  ? 'border-l-cyan-400/60 border-b-indigo-400/40'
+                  : 'border-l-indigo-500/60 border-b-cyan-500/40',
+              ]"
+            ></div>
+
+            <!-- 内层快速旋转环 -->
+            <div
+              class="absolute inset-4 w-12 h-12 border-2 border-transparent rounded-full animate-spin"
+              :class="[
+                isDark
+                  ? 'border-t-pink-400/80 border-r-purple-400/60'
+                  : 'border-t-purple-500/80 border-r-pink-500/60',
+              ]"
+            ></div>
+
+            <!-- 中心脉冲点 -->
+            <div
+              class="absolute inset-6 w-8 h-8 rounded-full animate-pulse-fast"
+              :class="[
+                isDark
+                  ? 'bg-gradient-to-r from-purple-400 to-cyan-400'
+                  : 'bg-gradient-to-r from-blue-500 to-purple-500',
+              ]"
             ></div>
           </div>
 
           <!-- 消息文本 -->
-          <div class="text-center space-y-2">
-            <p
-              class="text-xl font-medium"
-              :class="[isDark ? 'text-white' : 'text-gray-900']"
+          <div class="text-center space-y-4 mb-8">
+            <h2
+              class="text-2xl font-bold tracking-wide animate-fade-in"
+              :class="[
+                isDark
+                  ? 'text-white drop-shadow-lg'
+                  : 'text-gray-800 drop-shadow-sm',
+              ]"
             >
               {{ props.message ?? "加载中…" }}
-            </p>
-            <div class="flex space-x-1 justify-center">
+            </h2>
+
+            <!-- 跳动点 (仅在非百分比模式下显示) -->
+            <div v-if="!isProgressMode" class="flex space-x-2 justify-center">
               <div
-                class="w-2 h-2 bg-primary-400 rounded-full animate-bounce"
+                class="w-3 h-3 rounded-full animate-bounce-1"
+                :class="[
+                  isDark
+                    ? 'bg-gradient-to-r from-purple-400 to-blue-400'
+                    : 'bg-gradient-to-r from-blue-500 to-purple-500',
+                ]"
               ></div>
               <div
-                class="w-2 h-2 bg-primary-500 rounded-full animate-bounce delay-100"
+                class="w-3 h-3 rounded-full animate-bounce-2"
+                :class="[
+                  isDark
+                    ? 'bg-gradient-to-r from-blue-400 to-cyan-400'
+                    : 'bg-gradient-to-r from-purple-500 to-indigo-500',
+                ]"
               ></div>
               <div
-                class="w-2 h-2 bg-primary-600 rounded-full animate-bounce delay-200"
+                class="w-3 h-3 rounded-full animate-bounce-3"
+                :class="[
+                  isDark
+                    ? 'bg-gradient-to-r from-cyan-400 to-purple-400'
+                    : 'bg-gradient-to-r from-indigo-500 to-pink-500',
+                ]"
               ></div>
+            </div>
+
+            <!-- 百分比显示 (仅在百分比模式下显示) -->
+            <div v-if="isProgressMode" class="text-center">
+              <span
+                class="text-lg font-semibold"
+                :class="[isDark ? 'text-purple-300' : 'text-purple-600']"
+              >
+                {{ progressValue }}%
+              </span>
             </div>
           </div>
 
-          <!-- 进度条效果 -->
+          <!-- 进度条 (仅在百分比模式下显示) -->
           <div
-            class="w-64 h-1 rounded-full overflow-hidden"
-            :class="[isDark ? 'bg-gray-600/30' : 'bg-gray-300/50']"
+            v-if="isProgressMode"
+            class="w-80 h-3 rounded-full overflow-hidden backdrop-blur-sm"
+            :class="[
+              isDark
+                ? 'bg-white/10 shadow-inner'
+                : 'bg-gray-200/50 shadow-inner',
+            ]"
           >
             <div
-              class="h-full bg-gradient-to-r from-primary-400 via-primary-500 to-primary-600 rounded-full animate-loading-bar"
+              class="h-full rounded-full transition-all duration-300 ease-out"
+              :class="[
+                isDark
+                  ? 'bg-gradient-to-r from-purple-400 via-blue-400 to-cyan-400'
+                  : 'bg-gradient-to-r from-blue-500 via-purple-500 to-indigo-500',
+              ]"
+              :style="{ width: `${progressValue}%` }"
             ></div>
           </div>
         </div>
@@ -116,6 +255,7 @@ const isDark = computed(() => colorMode.value === "dark");
 </template>
 
 <style scoped>
+/* 基础旋转动画 */
 @keyframes spin {
   to {
     transform: rotate(360deg);
@@ -128,39 +268,212 @@ const isDark = computed(() => colorMode.value === "dark");
   }
 }
 
-@keyframes loading-bar {
-  0% {
-    transform: translateX(-100%);
-  }
-  50% {
-    transform: translateX(0%);
-  }
-  100% {
-    transform: translateX(100%);
+@keyframes spin-reverse {
+  to {
+    transform: rotate(-360deg);
   }
 }
 
+/* 浮动动画 */
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0px) scale(1);
+  }
+  50% {
+    transform: translateY(-10px) scale(1.02);
+  }
+}
+
+@keyframes float-slow {
+  0%,
+  100% {
+    transform: translate(0px, 0px) scale(1);
+  }
+  33% {
+    transform: translate(30px, -30px) scale(1.1);
+  }
+  66% {
+    transform: translate(-20px, 20px) scale(0.9);
+  }
+}
+
+@keyframes float-reverse {
+  0%,
+  100% {
+    transform: translate(0px, 0px) scale(1);
+  }
+  33% {
+    transform: translate(-30px, 30px) scale(0.9);
+  }
+  66% {
+    transform: translate(20px, -20px) scale(1.1);
+  }
+}
+
+/* 脉冲动画 */
+@keyframes pulse-gentle {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.05);
+  }
+}
+
+@keyframes pulse-fast {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(1.2);
+  }
+}
+
+@keyframes pulse-slow {
+  0%,
+  100% {
+    opacity: 0.3;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(1.1);
+  }
+}
+
+@keyframes pulse-slower {
+  0%,
+  100% {
+    opacity: 0.2;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(1.15);
+  }
+}
+
+/* 跳动动画 */
+@keyframes bounce-1 {
+  0%,
+  80%,
+  100% {
+    transform: scale(1) translateY(0);
+  }
+  40% {
+    transform: scale(1.1) translateY(-8px);
+  }
+}
+
+@keyframes bounce-2 {
+  0%,
+  80%,
+  100% {
+    transform: scale(1) translateY(0);
+  }
+  40% {
+    transform: scale(1.1) translateY(-8px);
+  }
+}
+
+@keyframes bounce-3 {
+  0%,
+  80%,
+  100% {
+    transform: scale(1) translateY(0);
+  }
+  40% {
+    transform: scale(1.1) translateY(-8px);
+  }
+}
+
+/* 进度条波浪动画 */
+@keyframes loading-wave {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* 淡入动画 */
+@keyframes fade-in {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 应用动画类 */
 .animate-spin {
   animation: spin 1s linear infinite;
 }
 
 .animate-spin-slow {
-  animation: spin-slow 3s linear infinite;
+  animation: spin-slow 4s linear infinite;
 }
 
-.animate-loading-bar {
-  animation: loading-bar 2s ease-in-out infinite;
+.animate-spin-reverse {
+  animation: spin-reverse 3s linear infinite;
 }
 
-.delay-100 {
-  animation-delay: 0.1s;
+.animate-float {
+  animation: float 3s ease-in-out infinite;
 }
 
-.delay-200 {
-  animation-delay: 0.2s;
+.animate-float-slow {
+  animation: float-slow 8s ease-in-out infinite;
 }
 
-.delay-1000 {
-  animation-delay: 1s;
+.animate-float-reverse {
+  animation: float-reverse 10s ease-in-out infinite;
+}
+
+.animate-pulse-gentle {
+  animation: pulse-gentle 2s ease-in-out infinite;
+}
+
+.animate-pulse-fast {
+  animation: pulse-fast 1s ease-in-out infinite;
+}
+
+.animate-pulse-slow {
+  animation: pulse-slow 3s ease-in-out infinite;
+}
+
+.animate-pulse-slower {
+  animation: pulse-slower 4s ease-in-out infinite;
+}
+
+.animate-bounce-1 {
+  animation: bounce-1 1.4s ease-in-out infinite;
+}
+
+.animate-bounce-2 {
+  animation: bounce-2 1.4s ease-in-out infinite 0.2s;
+}
+
+.animate-bounce-3 {
+  animation: bounce-3 1.4s ease-in-out infinite 0.4s;
+}
+
+.animate-loading-wave {
+  animation: loading-wave 2s ease-in-out infinite;
+}
+
+.animate-fade-in {
+  animation: fade-in 1s ease-out;
 }
 </style>

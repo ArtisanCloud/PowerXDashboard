@@ -37,6 +37,13 @@
         >
           倒计时测试 (5秒)
         </button>
+
+        <button
+          @click="testProgress"
+          class="px-4 py-2 bg-green-500 text-white rounded"
+        >
+          进度条测试
+        </button>
       </div>
 
       <div class="mt-8">
@@ -124,6 +131,36 @@ function testCountdown() {
       }, 500);
     }
   }, 1000);
+}
+
+function testProgress() {
+  console.log("进度条测试开始");
+  let progress = 0;
+
+  gl.show({
+    message: "文件上传中...",
+    progress: 0,
+  });
+
+  const timer = setInterval(() => {
+    progress += Math.random() * 15;
+    if (progress >= 100) {
+      progress = 100;
+      gl.setProgress(100);
+      gl.setMessage("上传完成！");
+      console.log("进度条测试完成");
+
+      setTimeout(() => {
+        gl.hide();
+        console.log("进度条测试结束");
+      }, 1000);
+
+      clearInterval(timer);
+    } else {
+      gl.setProgress(Math.floor(progress));
+      gl.setMessage(`文件上传中... ${Math.floor(progress)}%`);
+    }
+  }, 200);
 }
 
 // 页面加载时的调试信息
