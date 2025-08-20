@@ -878,8 +878,8 @@ onMounted(() => {
     <!-- 用户表单对话框 -->
     <UModal
       v-model:open="showForm"
-      aria-labelledby="user-manager-title"
-      aria-describedby="user-manager-desc"
+      title="user-manager-title"
+      description="user-manager-desc"
       :ui="{
         width: 'w-full max-w-6xl', // 改这里就能控制宽度
         content: 'sm:max-w-6xl w-full', // 确保内部 DialogContent 撑开

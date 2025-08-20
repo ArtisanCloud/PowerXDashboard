@@ -315,7 +315,11 @@
     </div>
 
     <!-- 修改密码模态框 -->
-    <UModal v-model="showPasswordModal">
+    <UModal
+      v-model="showPasswordModal"
+      title="profile-title"
+      description="profile-description"
+    >
       <template #content>
         <UCard>
           <template #header>

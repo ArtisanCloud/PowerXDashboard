@@ -233,8 +233,8 @@ try {
 <template>
   <UModal
     v-model="open"
-    aria-labelledby="loading-title"
-    aria-describedby="loading-desc"
+    title="loading-title"
+    description="loading-desc"
     :prevent-close="true"
     :fullscreen="true"
   >

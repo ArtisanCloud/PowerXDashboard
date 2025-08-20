@@ -17,9 +17,8 @@ const progressValue = computed(() =>
 
 <template>
   <UModal
-    aria-labelledby="loading-title"
-    aria-describedby="loading-desc"
-    :title="undefined"
+    title="loading - title"
+    description="loading - description"
     :close="false"
     :dismissible="false"
     :overlay="true"

@@ -211,8 +211,8 @@
     <!-- 新建工作流对话框 -->
     <UModal
       v-model="showNewWorkflowModal"
-      aria-labelledby="workflow-title"
-      aria-describedby="workflow-desc"
+      title="workflow-title"
+      description="workflow-desc"
     >
       <template #content>
         <UCard>

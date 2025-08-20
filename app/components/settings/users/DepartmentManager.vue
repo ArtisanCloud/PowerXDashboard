@@ -396,8 +396,8 @@ const columns = computed(() => {
     <!-- 表单 -->
     <UModal
       v-model:open="showForm"
-      aria-labelledby="department-manager-title"
-      aria-describedby="department-manager-desc"
+      title="department-manager-title"
+      description="department-manager-desc"
       :ui="{ content: 'sm:max-w-md' }"
     >
       <template #content>

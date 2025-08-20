@@ -686,8 +686,8 @@ const columns = computed(() => {
     <!-- 角色表单对话框 -->
     <UModal
       v-model:open="showForm"
-      aria-labelledby="role-manager-title"
-      aria-describedby="role-manager-desc"
+      title="role-manager-title"
+      description="role-manager-desc"
       :ui="{ content: 'sm:max-w-md' }"
     >
       <template #content>
