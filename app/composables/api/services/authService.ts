@@ -15,28 +15,70 @@ export interface LoginParams {
 }
 
 export interface RegisterParams {
+  tenant_id: number;
+  username: string;
+  email: string;
+  phone?: string;
+  password: string;
+  display_name?: string;
+  avatar_url?: string;
+  invite_token?: string;
+  meta?: Record<string, any>;
+}
+
+// 前端表单数据接口（包含确认密码）
+export interface RegisterFormData {
   username: string;
   email: string;
   password: string;
   confirmPassword: string;
   phone?: string;
-  departmentId?: string;
+  displayName?: string;
+  avatarUrl?: string;
+  inviteToken?: string;
+}
+
+// 注册响应接口
+export interface RegisterResponse {
+  user: User;
+  member: Member;
+  tenant?: Tenant;
 }
 
 export interface User {
   id: string;
-  username: string;
+  created_at: string;
+  updated_at: string;
   email: string;
   phone?: string;
-  avatar?: string;
-  status: "active" | "inactive" | "suspended";
-  roles: Role[];
-  permissions: Permission[];
-  departmentId?: string;
-  department?: Department;
-  createdAt: string;
-  updatedAt: string;
-  lastLoginAt?: string;
+  display_name?: string;
+  avatar_url?: string;
+  status: number; // 1=active, 0=disabled
+  meta?: Record<string, any>;
+  last_login_at?: number;
+}
+
+export interface Tenant {
+  id: string;
+  created_at: string;
+  updated_at: string;
+  key: string; // 全局唯一，如 system、acme
+  name: string;
+  status: number; // 1=active, 0=disabled
+  plan: string; // 默认 'free'
+}
+
+export interface Member {
+  id: string;
+  created_at: string;
+  updated_at: string;
+  tenant_id: number;
+  user_id: number;
+  username: string; // 建议统一小写
+  display_name?: string;
+  avatar_url?: string;
+  status: number; // 1=active, 0=disabled
+  meta?: Record<string, any>;
 }
 
 export interface Role {
@@ -72,9 +114,11 @@ export interface Department {
 
 export interface LoginResponse {
   user: User;
+  member?: Member; // 当前租户下的成员信息
+  tenant?: Tenant; // 当前租户信息
   token: string;
-  refreshToken: string;
-  expiresIn: number;
+  refresh_token?: string;
+  expires_in: number;
 }
 
 export interface RefreshTokenParams {
@@ -118,7 +162,7 @@ export interface DepartmentFilters extends PaginationParams {
 
 export const useAuthService = () => {
   const apiClient = useApiClient();
-  const baseUrl = "/auth";
+  const baseUrl = "/user/auth";
 
   return {
     /**
@@ -135,7 +179,34 @@ export const useAuthService = () => {
      * 用户注册
      */
     register: (data: RegisterParams) => {
-      return apiClient.post<ApiResponse<User>>(`${baseUrl}/register`, data);
+      return apiClient.post<ApiResponse<RegisterResponse>>(
+        `${baseUrl}/register`,
+        data
+      );
+    },
+
+    /**
+     * 前端表单注册（转换数据格式）
+     */
+    registerFromForm: (formData: RegisterFormData) => {
+      const registerData: RegisterParams = {
+        tenant_id: 1, // 默认租户ID，可以根据需要调整
+        username: formData.username,
+        email: formData.email,
+        phone: formData.phone,
+        password: formData.password,
+        display_name: formData.displayName || formData.username,
+        avatar_url: formData.avatarUrl,
+        invite_token: formData.inviteToken,
+        meta: {
+          locale: "zh-CN", // 默认语言
+          title: "User", // 默认标题
+        },
+      };
+      return apiClient.post<ApiResponse<RegisterResponse>>(
+        `${baseUrl}/register`,
+        registerData
+      );
     },
 
     /**
@@ -221,7 +292,7 @@ export const useAuthService = () => {
      */
     getUsers: (filters?: UserFilters) => {
       return apiClient.get<ApiResponse<PaginatedResponse<User>>>(
-        `${baseUrl}/users`,
+        `${adminBaseUrl}/users`,
         { params: filters }
       );
     },
@@ -230,28 +301,31 @@ export const useAuthService = () => {
      * 获取指定用户
      */
     getUser: (id: string) => {
-      return apiClient.get<ApiResponse<User>>(`${baseUrl}/users/${id}`);
+      return apiClient.get<ApiResponse<User>>(`${adminBaseUrl}/users/${id}`);
     },
 
     /**
      * 创建用户
      */
     createUser: (data: RegisterParams) => {
-      return apiClient.post<ApiResponse<User>>(`${baseUrl}/users`, data);
+      return apiClient.post<ApiResponse<User>>(`${adminBaseUrl}/users`, data);
     },
 
     /**
      * 更新用户
      */
     updateUser: (id: string, data: Partial<User>) => {
-      return apiClient.put<ApiResponse<User>>(`${baseUrl}/users/${id}`, data);
+      return apiClient.put<ApiResponse<User>>(
+        `${adminBaseUrl}/users/${id}`,
+        data
+      );
     },
 
     /**
      * 删除用户
      */
     deleteUser: (id: string) => {
-      return apiClient.delete<ApiResponse<null>>(`${baseUrl}/users/${id}`);
+      return apiClient.delete<ApiResponse<null>>(`${adminBaseUrl}/users/${id}`);
     },
 
     /**
@@ -259,7 +333,7 @@ export const useAuthService = () => {
      */
     batchDeleteUsers: (ids: string[]) => {
       return apiClient.post<ApiResponse<null>>(
-        `${baseUrl}/users/batch-delete`,
+        `${adminBaseUrl}/users/batch-delete`,
         {
           ids,
         }
@@ -269,9 +343,9 @@ export const useAuthService = () => {
     /**
      * 启用/禁用用户
      */
-    toggleUserStatus: (id: string, status: "active" | "inactive") => {
+    toggleUserStatus: (id: string, status: number) => {
       return apiClient.patch<ApiResponse<User>>(
-        `${baseUrl}/users/${id}/status`,
+        `${adminBaseUrl}/users/${id}/status`,
         {
           status,
         }
@@ -284,7 +358,7 @@ export const useAuthService = () => {
      */
     getRoles: (filters?: RoleFilters) => {
       return apiClient.get<ApiResponse<PaginatedResponse<Role>>>(
-        `${baseUrl}/roles`,
+        `${adminBaseUrl}/roles`,
         { params: filters }
       );
     },
@@ -293,28 +367,31 @@ export const useAuthService = () => {
      * 获取指定角色
      */
     getRole: (id: string) => {
-      return apiClient.get<ApiResponse<Role>>(`${baseUrl}/roles/${id}`);
+      return apiClient.get<ApiResponse<Role>>(`${adminBaseUrl}/roles/${id}`);
     },
 
     /**
      * 创建角色
      */
     createRole: (data: Omit<Role, "id" | "createdAt" | "updatedAt">) => {
-      return apiClient.post<ApiResponse<Role>>(`${baseUrl}/roles`, data);
+      return apiClient.post<ApiResponse<Role>>(`${adminBaseUrl}/roles`, data);
     },
 
     /**
      * 更新角色
      */
     updateRole: (id: string, data: Partial<Role>) => {
-      return apiClient.put<ApiResponse<Role>>(`${baseUrl}/roles/${id}`, data);
+      return apiClient.put<ApiResponse<Role>>(
+        `${adminBaseUrl}/roles/${id}`,
+        data
+      );
     },
 
     /**
      * 删除角色
      */
     deleteRole: (id: string) => {
-      return apiClient.delete<ApiResponse<null>>(`${baseUrl}/roles/${id}`);
+      return apiClient.delete<ApiResponse<null>>(`${adminBaseUrl}/roles/${id}`);
     },
 
     /**
@@ -322,7 +399,7 @@ export const useAuthService = () => {
      */
     assignRolePermissions: (roleId: string, permissionIds: string[]) => {
       return apiClient.post<ApiResponse<Role>>(
-        `${baseUrl}/roles/${roleId}/permissions`,
+        `${adminBaseUrl}/roles/${roleId}/permissions`,
         { permissionIds }
       );
     },
@@ -333,7 +410,7 @@ export const useAuthService = () => {
      */
     getDepartments: (filters?: DepartmentFilters) => {
       return apiClient.get<ApiResponse<PaginatedResponse<Department>>>(
-        `${baseUrl}/departments`,
+        `${adminBaseUrl}/departments`,
         { params: filters }
       );
     },
@@ -343,7 +420,7 @@ export const useAuthService = () => {
      */
     getDepartmentTree: () => {
       return apiClient.get<ApiResponse<Department[]>>(
-        `${baseUrl}/departments/tree`
+        `${adminBaseUrl}/departments/tree`
       );
     },
 
@@ -352,7 +429,7 @@ export const useAuthService = () => {
      */
     getDepartment: (id: string) => {
       return apiClient.get<ApiResponse<Department>>(
-        `${baseUrl}/departments/${id}`
+        `${adminBaseUrl}/departments/${id}`
       );
     },
 
@@ -363,7 +440,7 @@ export const useAuthService = () => {
       data: Omit<Department, "id" | "createdAt" | "updatedAt" | "children">
     ) => {
       return apiClient.post<ApiResponse<Department>>(
-        `${baseUrl}/departments`,
+        `${adminBaseUrl}/departments`,
         data
       );
     },
@@ -373,7 +450,7 @@ export const useAuthService = () => {
      */
     updateDepartment: (id: string, data: Partial<Department>) => {
       return apiClient.put<ApiResponse<Department>>(
-        `${baseUrl}/departments/${id}`,
+        `${adminBaseUrl}/departments/${id}`,
         data
       );
     },
@@ -383,7 +460,7 @@ export const useAuthService = () => {
      */
     deleteDepartment: (id: string) => {
       return apiClient.delete<ApiResponse<null>>(
-        `${baseUrl}/departments/${id}`
+        `${adminBaseUrl}/departments/${id}`
       );
     },
 
@@ -392,7 +469,9 @@ export const useAuthService = () => {
      * 获取所有权限
      */
     getAllPermissions: () => {
-      return apiClient.get<ApiResponse<Permission[]>>(`${baseUrl}/permissions`);
+      return apiClient.get<ApiResponse<Permission[]>>(
+        `${adminBaseUrl}/permissions`
+      );
     },
 
     /**
@@ -400,7 +479,7 @@ export const useAuthService = () => {
      */
     getPermissionGroups: () => {
       return apiClient.get<ApiResponse<Record<string, Permission[]>>>(
-        `${baseUrl}/permissions/groups`
+        `${adminBaseUrl}/permissions/groups`
       );
     },
   };

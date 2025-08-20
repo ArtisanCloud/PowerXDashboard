@@ -5,6 +5,12 @@ definePageMeta({
 
 const { t } = useI18n();
 
+// ========== 强制阅读功能开关 ==========
+// 设置为 false 可以关闭强制阅读功能，用户可以直接勾选同意
+// const ENABLE_FORCED_READING = ref(true);
+const ENABLE_FORCED_READING = ref(false);
+// =====================================
+
 // 使用全局主题状态
 const theme = useState("theme", () => "auto");
 
@@ -35,13 +41,21 @@ const form = reactive({
 const loading = ref(false);
 const error = ref("");
 const success = ref(false);
+const countdown = ref(3);
 
 // 阅读状态
 const hasReadTerms = ref(false);
 const hasReadPrivacy = ref(false);
 
 // 计算是否可以勾选同意
-const canAgree = computed(() => hasReadTerms.value && hasReadPrivacy.value);
+const canAgree = computed(() => {
+  // 如果关闭了强制阅读功能，直接返回 true
+  if (!ENABLE_FORCED_READING.value) {
+    return true;
+  }
+  // 否则需要阅读完条款和隐私政策
+  return hasReadTerms.value && hasReadPrivacy.value;
+});
 
 // 弹层控制
 const showTermsModal = ref(false);
@@ -282,18 +296,49 @@ const handleRegister = async () => {
   error.value = "";
 
   try {
-    // 这里添加实际的注册逻辑
-    await new Promise((resolve) => setTimeout(resolve, 1500)); // 模拟API调用
+    // 调用注册接口
+    const { useAuthService } = await import(
+      "~/composables/api/services/authService"
+    );
+    const authService = useAuthService();
 
-    success.value = true;
+    const registerData = {
+      username: form.username,
+      email: form.email,
+      password: form.password,
+      displayName: form.username, // 使用用户名作为显示名称
+    };
 
-    // 注册成功后延迟跳转到登录页面
-    const localePath = useLocalePath();
-    setTimeout(() => {
-      navigateTo(localePath("/users/login"));
-    }, 2000);
-  } catch (err) {
-    error.value = t("auth.registerFailed");
+    const response = await authService.registerFromForm(registerData);
+
+    if (response.success) {
+      success.value = true;
+      countdown.value = 3;
+
+      // 开始倒计时
+      const timer = setInterval(() => {
+        countdown.value--;
+        if (countdown.value <= 0) {
+          clearInterval(timer);
+          // 跳转到首页
+          const localePath = useLocalePath();
+          navigateTo(localePath("/"));
+        }
+      }, 1000);
+    } else {
+      error.value = response.message || t("auth.registerFailed");
+    }
+  } catch (err: any) {
+    console.error("注册失败:", err);
+
+    // 处理不同类型的错误
+    if (err.response?.data?.message) {
+      error.value = err.response.data.message;
+    } else if (err.message) {
+      error.value = err.message;
+    } else {
+      error.value = t("auth.registerFailed");
+    }
   } finally {
     loading.value = false;
   }
@@ -349,14 +394,22 @@ const handleRegister = async () => {
 
         <div class="px-6 pb-6">
           <!-- 成功提示 -->
-          <UAlert
-            v-if="success"
-            color="success"
-            variant="soft"
-            :title="$t('auth.registerSuccess')"
-            :description="$t('auth.redirectingToLogin')"
-            class="mb-6"
-          />
+          <UAlert v-if="success" color="green" variant="soft" class="mb-6">
+            <template #title>
+              <div class="flex items-center space-x-2">
+                <UIcon
+                  name="i-heroicons-check-circle"
+                  class="w-5 h-5 text-green-500"
+                />
+                <span class="text-green-800 font-semibold">注册成功！</span>
+              </div>
+            </template>
+            <template #description>
+              <p class="text-green-700">
+                恭喜您注册成功！{{ countdown }}秒后将自动跳转到首页...
+              </p>
+            </template>
+          </UAlert>
 
           <form v-else @submit.prevent="handleRegister" class="space-y-5">
             <!-- 错误提示 -->
@@ -514,18 +567,25 @@ const handleRegister = async () => {
 
             <!-- 阅读状态提示 -->
             <div
-              v-if="!canAgree"
+              v-if="ENABLE_FORCED_READING && !canAgree"
               class="text-xs text-amber-600 dark:text-amber-400 flex items-center space-x-1"
             >
               <UIcon name="i-heroicons-information-circle" class="w-4 h-4" />
               <span>请先阅读并同意服务条款和隐私政策</span>
             </div>
             <div
-              v-else-if="canAgree && !form.agree"
+              v-else-if="ENABLE_FORCED_READING && canAgree && !form.agree"
               class="text-xs text-green-600 dark:text-green-400 flex items-center space-x-1"
             >
               <UIcon name="i-heroicons-check-circle" class="w-4 h-4" />
               <span>您已完成阅读，现在可以勾选同意</span>
+            </div>
+            <div
+              v-else-if="!ENABLE_FORCED_READING"
+              class="text-xs text-blue-600 dark:text-blue-400 flex items-center space-x-1"
+            >
+              <UIcon name="i-heroicons-information-circle" class="w-4 h-4" />
+              <span>点击链接可查看服务条款和隐私政策</span>
             </div>
 
             <!-- 注册按钮 -->

@@ -2,9 +2,12 @@ import { defineNuxtPlugin } from '#app';
 import { setApiConfig } from '~/composables/api';
 
 export default defineNuxtPlugin((nuxtApp) => {
+  // 获取运行时配置
+  const config = useRuntimeConfig();
+  
   // 设置 API 配置
   setApiConfig({
-    baseURL: '/api', // API 基础路径
+    baseURL: config.public.apiBase || '/api', // 使用运行时配置的 API 基础路径
     timeout: 10000, // 请求超时时间
     headers: {
       'Content-Type': 'application/json',
