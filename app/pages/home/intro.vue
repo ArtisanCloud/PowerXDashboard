@@ -827,7 +827,7 @@ const products = computed(() => [
               {{ $t("intro.cta.getStarted") }}
             </button>
             <button
-              class="px-8 py-4 border-2 border-white/60 dark:border-emerald-300/60 text-white dark:text-emerald-100 hover:bg-white/10 dark:hover:bg-emerald-400/10 hover:border-white dark:hover:border-emerald-300 hover:scale-105 rounded-xl font-semibold text-lg transition-all duration-300 backdrop-blur-sm"
+              class="px-8 py-4 border-2 border-white/60 dark:border-emerald-400/40 text-emerald-600 dark:text-emerald-400 hover:border-emerald-400/60 hover:bg-emerald-400/10 rounded-xl font-semibold text-lg transition-all duration-300 backdrop-blur-sm"
               @click="navigateTo('/users/login')"
             >
               {{ $t("intro.cta.signIn") }}

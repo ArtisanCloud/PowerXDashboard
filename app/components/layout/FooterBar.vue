@@ -12,13 +12,17 @@
         <LanguageSwitcher />
         <ThemeSwitcher />
         <!-- 原有链接 -->
-        <a href="#" class="hover:text-gray-900">{{
+        <NuxtLink :to="$localePath('/about')" class="hover:text-gray-900">{{
           $t("intro.footer.aboutUs")
-        }}</a>
-        <a href="#" class="hover:text-gray-900">{{
+        }}</NuxtLink>
+        <NuxtLink :to="$localePath('/contact')" class="hover:text-gray-900">{{
           $t("intro.footer.contactUs")
-        }}</a>
-        <a href="#" class="hover:text-gray-900">{{ $t("privacyPolicy") }}</a>
+        }}</NuxtLink>
+        <NuxtLink
+          :to="$localePath('/users/privacy')"
+          class="hover:text-gray-900"
+          >{{ $t("privacyPolicy") }}</NuxtLink
+        >
       </div>
     </div>
   </footer>
