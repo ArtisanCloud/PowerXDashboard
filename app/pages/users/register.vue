@@ -36,6 +36,51 @@ const loading = ref(false);
 const error = ref("");
 const success = ref(false);
 
+// 阅读状态
+const hasReadTerms = ref(false);
+const hasReadPrivacy = ref(false);
+
+// 计算是否可以勾选同意
+const canAgree = computed(() => hasReadTerms.value && hasReadPrivacy.value);
+
+// 弹层控制
+const showTermsModal = ref(false);
+const showPrivacyModal = ref(false);
+
+// 打开条款弹层
+const openTermsModal = (e: Event) => {
+  e.preventDefault();
+  showTermsModal.value = true;
+};
+
+// 打开隐私政策弹层
+const openPrivacyModal = (e: Event) => {
+  e.preventDefault();
+  showPrivacyModal.value = true;
+};
+
+// 处理条款同意
+const handleTermsAgree = (agreed: boolean) => {
+  showTermsModal.value = false;
+  if (agreed) {
+    hasReadTerms.value = true;
+    if (canAgree.value && !form.agree) {
+      form.agree = true;
+    }
+  }
+};
+
+// 处理隐私政策同意
+const handlePrivacyAgree = (agreed: boolean) => {
+  showPrivacyModal.value = false;
+  if (agreed) {
+    hasReadPrivacy.value = true;
+    if (canAgree.value && !form.agree) {
+      form.agree = true;
+    }
+  }
+};
+
 // 密码强度检查
 const passwordStrength = computed(() => {
   const password = form.password;
@@ -313,23 +358,45 @@ const handleRegister = async () => {
             <div class="flex items-start space-x-3 pt-1">
               <UCheckbox
                 v-model="form.agree"
-                :disabled="loading"
+                :disabled="loading || !canAgree"
                 class="mt-0.5"
               />
               <p class="text-sm text-gray-600 leading-relaxed">
                 {{ $t("auth.agreeTerms") }}
-                <NuxtLink
-                  :to="$localePath('/users/terms')"
-                  class="text-blue-600 hover:text-blue-700"
-                  >{{ $t("termsOfService") }}</NuxtLink
+                <a
+                  href="#"
+                  role="button"
+                  aria-controls="terms-modal"
+                  @click="openTermsModal"
+                  class="text-blue-600 hover:text-blue-700 underline"
+                  >{{ $t("termsOfService") }}</a
                 >
                 {{ $t("auth.and") }}
-                <NuxtLink
-                  :to="$localePath('/users/privacy')"
-                  class="text-blue-600 hover:text-blue-700"
-                  >{{ $t("privacyPolicy") }}</NuxtLink
+                <a
+                  href="#"
+                  role="button"
+                  aria-controls="privacy-modal"
+                  @click="openPrivacyModal"
+                  class="text-blue-600 hover:text-blue-700 underline"
+                  >{{ $t("privacyPolicy") }}</a
                 >
               </p>
+            </div>
+
+            <!-- 阅读状态提示 -->
+            <div
+              v-if="!canAgree"
+              class="text-xs text-amber-600 dark:text-amber-400 flex items-center space-x-1"
+            >
+              <UIcon name="i-heroicons-information-circle" class="w-4 h-4" />
+              <span>请先阅读并同意服务条款和隐私政策</span>
+            </div>
+            <div
+              v-else-if="canAgree && !form.agree"
+              class="text-xs text-green-600 dark:text-green-400 flex items-center space-x-1"
+            >
+              <UIcon name="i-heroicons-check-circle" class="w-4 h-4" />
+              <span>您已完成阅读，现在可以勾选同意</span>
             </div>
 
             <!-- 注册按钮 -->
@@ -366,5 +433,98 @@ const handleRegister = async () => {
         </div>
       </UCard>
     </div>
+
+    <!-- 条款 -->
+    <UModal
+      v-model:open="showTermsModal"
+      :prevent-close="!canCloseTerms"
+      :ui="{
+        panel: 'w-full max-w-3xl max-h-[85dvh] overflow-hidden flex flex-col',
+      }"
+    >
+      <template #content>
+        <header
+          class="px-4 py-3 border-b shrink-0 flex justify-between items-center"
+        >
+          <h3 class="text-base font-semibold">服务条款</h3>
+          <UButton
+            variant="ghost"
+            icon="i-heroicons-x-mark"
+            :disabled="!canCloseTerms"
+            @click="handleTermsAgree(false)"
+          />
+        </header>
+
+        <div class="flex-1 min-h-0 overflow-y-auto overscroll-contain">
+          <!-- 让子组件负责“解锁”逻辑 -->
+          <UsersTermsModal
+            :locked="true"
+            @unlock="canCloseTerms = true"
+            @agree="handleTermsAgree"
+          />
+        </div>
+
+        <footer class="px-4 py-3 border-t shrink-0 flex justify-end gap-2">
+          <UButton
+            variant="soft"
+            :disabled="!canCloseTerms"
+            @click="handleTermsAgree(false)"
+            >关闭</UButton
+          >
+          <UButton
+            color="primary"
+            :disabled="!canCloseTerms"
+            @click="handleTermsAgree(true)"
+            >我已阅读并同意</UButton
+          >
+        </footer>
+      </template>
+    </UModal>
+
+    <!-- 隐私 -->
+    <UModal
+      v-model:open="showPrivacyModal"
+      :prevent-close="!canClosePrivacy"
+      :ui="{
+        panel: 'w-full max-w-3xl max-h-[85dvh] overflow-hidden flex flex-col',
+      }"
+    >
+      <template #content>
+        <header
+          class="px-4 py-3 border-b shrink-0 flex justify-between items-center"
+        >
+          <h3 class="text-base font-semibold">隐私政策</h3>
+          <UButton
+            variant="ghost"
+            icon="i-heroicons-x-mark"
+            :disabled="!canClosePrivacy"
+            @click="handlePrivacyAgree(false)"
+          />
+        </header>
+
+        <div class="flex-1 min-h-0 overflow-y-auto overscroll-contain">
+          <UsersPrivacyModal
+            :locked="true"
+            @unlock="canClosePrivacy = true"
+            @agree="handlePrivacyAgree"
+          />
+        </div>
+
+        <footer class="px-4 py-3 border-t shrink-0 flex justify-end gap-2">
+          <UButton
+            variant="soft"
+            :disabled="!canClosePrivacy"
+            @click="handlePrivacyAgree(false)"
+            >关闭</UButton
+          >
+          <UButton
+            color="primary"
+            :disabled="!canClosePrivacy"
+            @click="handlePrivacyAgree(true)"
+            >我已阅读并同意</UButton
+          >
+        </footer>
+      </template>
+    </UModal>
   </div>
 </template>
