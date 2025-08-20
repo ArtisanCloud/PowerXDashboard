@@ -46,21 +46,134 @@ const canAgree = computed(() => hasReadTerms.value && hasReadPrivacy.value);
 // 弹层控制
 const showTermsModal = ref(false);
 const showPrivacyModal = ref(false);
+const canCloseTerms = ref(false);
+const canClosePrivacy = ref(false);
+
+// 强制阅读逻辑
+const termsReadingTime = ref(0);
+const privacyReadingTime = ref(0);
+const termsScrolledToBottom = ref(false);
+const privacyScrolledToBottom = ref(false);
+const termsTimer = ref<NodeJS.Timeout | null>(null);
+const privacyTimer = ref<NodeJS.Timeout | null>(null);
+
+const MIN_READING_TIME = 5; // 最少阅读5秒
 
 // 打开条款弹层
 const openTermsModal = (e: Event) => {
   e.preventDefault();
+  // 重置阅读状态
+  canCloseTerms.value = false;
+  termsReadingTime.value = 0;
+  termsScrolledToBottom.value = false;
   showTermsModal.value = true;
+
+  // 开始计时
+  startTermsTimer();
 };
 
 // 打开隐私政策弹层
 const openPrivacyModal = (e: Event) => {
   e.preventDefault();
+  // 重置阅读状态
+  canClosePrivacy.value = false;
+  privacyReadingTime.value = 0;
+  privacyScrolledToBottom.value = false;
   showPrivacyModal.value = true;
+
+  // 开始计时
+  startPrivacyTimer();
 };
+
+// 开始条款阅读计时
+const startTermsTimer = () => {
+  if (termsTimer.value) {
+    clearInterval(termsTimer.value);
+  }
+
+  termsTimer.value = setInterval(() => {
+    termsReadingTime.value++;
+
+    // 检查是否满足解锁条件
+    if (
+      termsReadingTime.value >= MIN_READING_TIME &&
+      termsScrolledToBottom.value
+    ) {
+      canCloseTerms.value = true;
+      if (termsTimer.value) {
+        clearInterval(termsTimer.value);
+        termsTimer.value = null;
+      }
+    }
+  }, 1000);
+};
+
+// 开始隐私政策阅读计时
+const startPrivacyTimer = () => {
+  if (privacyTimer.value) {
+    clearInterval(privacyTimer.value);
+  }
+
+  privacyTimer.value = setInterval(() => {
+    privacyReadingTime.value++;
+
+    // 检查是否满足解锁条件
+    if (
+      privacyReadingTime.value >= MIN_READING_TIME &&
+      privacyScrolledToBottom.value
+    ) {
+      canClosePrivacy.value = true;
+      if (privacyTimer.value) {
+        clearInterval(privacyTimer.value);
+        privacyTimer.value = null;
+      }
+    }
+  }, 1000);
+};
+
+// 处理条款滚动
+const handleTermsScroll = (event: Event) => {
+  const target = event.target as HTMLElement;
+  const scrollTop = target.scrollTop;
+  const scrollHeight = target.scrollHeight;
+  const clientHeight = target.clientHeight;
+
+  // 检查是否滚动到底部（允许10px的误差）
+  if (scrollTop + clientHeight >= scrollHeight - 10) {
+    termsScrolledToBottom.value = true;
+  }
+};
+
+// 处理隐私政策滚动
+const handlePrivacyScroll = (event: Event) => {
+  const target = event.target as HTMLElement;
+  const scrollTop = target.scrollTop;
+  const scrollHeight = target.scrollHeight;
+  const clientHeight = target.clientHeight;
+
+  // 检查是否滚动到底部（允许10px的误差）
+  if (scrollTop + clientHeight >= scrollHeight - 10) {
+    privacyScrolledToBottom.value = true;
+  }
+};
+
+// 计算剩余时间
+const termsRemainingTime = computed(() => {
+  return Math.max(0, MIN_READING_TIME - termsReadingTime.value);
+});
+
+const privacyRemainingTime = computed(() => {
+  return Math.max(0, MIN_READING_TIME - privacyReadingTime.value);
+});
 
 // 处理条款同意
 const handleTermsAgree = (agreed: boolean) => {
+  // 清理计时器
+  if (termsTimer.value) {
+    clearInterval(termsTimer.value);
+    termsTimer.value = null;
+  }
+
   showTermsModal.value = false;
   if (agreed) {
     hasReadTerms.value = true;
@@ -72,6 +185,12 @@ const handleTermsAgree = (agreed: boolean) => {
 
 // 处理隐私政策同意
 const handlePrivacyAgree = (agreed: boolean) => {
+  // 清理计时器
+  if (privacyTimer.value) {
+    clearInterval(privacyTimer.value);
+    privacyTimer.value = null;
+  }
+
   showPrivacyModal.value = false;
   if (agreed) {
     hasReadPrivacy.value = true;
@@ -80,6 +199,16 @@ const handlePrivacyAgree = (agreed: boolean) => {
     }
   }
 };
+
+// 组件卸载时清理计时器
+onUnmounted(() => {
+  if (termsTimer.value) {
+    clearInterval(termsTimer.value);
+  }
+  if (privacyTimer.value) {
+    clearInterval(privacyTimer.value);
+  }
+});
 
 // 密码强度检查
 const passwordStrength = computed(() => {
@@ -455,13 +584,81 @@ const handleRegister = async () => {
           />
         </header>
 
-        <div class="flex-1 min-h-0 overflow-y-auto overscroll-contain">
-          <!-- 让子组件负责“解锁”逻辑 -->
-          <UsersTermsModal
-            :locked="true"
-            @unlock="canCloseTerms = true"
-            @agree="handleTermsAgree"
-          />
+        <div
+          class="flex-1 min-h-0 overflow-y-auto overscroll-contain"
+          @scroll="handleTermsScroll"
+        >
+          <!-- 阅读进度提示 -->
+          <div
+            class="p-4 bg-blue-50 dark:bg-blue-900/20 border-b border-blue-200 dark:border-blue-800"
+          >
+            <div class="flex items-center justify-between text-sm">
+              <div class="flex items-center space-x-4">
+                <div class="flex items-center space-x-2">
+                  <UIcon
+                    :name="
+                      termsScrolledToBottom
+                        ? 'i-heroicons-check-circle'
+                        : 'i-heroicons-arrow-down'
+                    "
+                    :class="
+                      termsScrolledToBottom ? 'text-green-500' : 'text-gray-400'
+                    "
+                    class="w-4 h-4"
+                  />
+                  <span
+                    :class="
+                      termsScrolledToBottom ? 'text-green-600' : 'text-gray-500'
+                    "
+                  >
+                    {{
+                      termsScrolledToBottom ? "已阅读完整内容" : "请滚动到底部"
+                    }}
+                  </span>
+                </div>
+
+                <div class="flex items-center space-x-2">
+                  <UIcon
+                    :name="
+                      termsRemainingTime === 0
+                        ? 'i-heroicons-check-circle'
+                        : 'i-heroicons-clock'
+                    "
+                    :class="
+                      termsRemainingTime === 0
+                        ? 'text-green-500'
+                        : 'text-gray-400'
+                    "
+                    class="w-4 h-4"
+                  />
+                  <span
+                    :class="
+                      termsRemainingTime === 0
+                        ? 'text-green-600'
+                        : 'text-gray-500'
+                    "
+                  >
+                    {{
+                      termsRemainingTime === 0
+                        ? "阅读时间充足"
+                        : `还需 ${termsRemainingTime} 秒`
+                    }}
+                  </span>
+                </div>
+              </div>
+
+              <!-- 解锁状态 -->
+              <div
+                v-if="canCloseTerms"
+                class="flex items-center space-x-2 text-green-600"
+              >
+                <UIcon name="i-heroicons-check-circle" class="w-4 h-4" />
+                <span class="text-sm font-medium">可以同意条款</span>
+              </div>
+            </div>
+          </div>
+
+          <UsersTermsModal />
         </div>
 
         <footer class="px-4 py-3 border-t shrink-0 flex justify-end gap-2">
@@ -502,12 +699,87 @@ const handleRegister = async () => {
           />
         </header>
 
-        <div class="flex-1 min-h-0 overflow-y-auto overscroll-contain">
-          <UsersPrivacyModal
-            :locked="true"
-            @unlock="canClosePrivacy = true"
-            @agree="handlePrivacyAgree"
-          />
+        <div
+          class="flex-1 min-h-0 overflow-y-auto overscroll-contain"
+          @scroll="handlePrivacyScroll"
+        >
+          <!-- 阅读进度提示 -->
+          <div
+            class="p-4 bg-blue-50 dark:bg-blue-900/20 border-b border-blue-200 dark:border-blue-800"
+          >
+            <div class="flex items-center justify-between text-sm">
+              <div class="flex items-center space-x-4">
+                <div class="flex items-center space-x-2">
+                  <UIcon
+                    :name="
+                      privacyScrolledToBottom
+                        ? 'i-heroicons-check-circle'
+                        : 'i-heroicons-arrow-down'
+                    "
+                    :class="
+                      privacyScrolledToBottom
+                        ? 'text-green-500'
+                        : 'text-gray-400'
+                    "
+                    class="w-4 h-4"
+                  />
+                  <span
+                    :class="
+                      privacyScrolledToBottom
+                        ? 'text-green-600'
+                        : 'text-gray-500'
+                    "
+                  >
+                    {{
+                      privacyScrolledToBottom
+                        ? "已阅读完整内容"
+                        : "请滚动到底部"
+                    }}
+                  </span>
+                </div>
+
+                <div class="flex items-center space-x-2">
+                  <UIcon
+                    :name="
+                      privacyRemainingTime === 0
+                        ? 'i-heroicons-check-circle'
+                        : 'i-heroicons-clock'
+                    "
+                    :class="
+                      privacyRemainingTime === 0
+                        ? 'text-green-500'
+                        : 'text-gray-400'
+                    "
+                    class="w-4 h-4"
+                  />
+                  <span
+                    :class="
+                      privacyRemainingTime === 0
+                        ? 'text-green-600'
+                        : 'text-gray-500'
+                    "
+                  >
+                    {{
+                      privacyRemainingTime === 0
+                        ? "阅读时间充足"
+                        : `还需 ${privacyRemainingTime} 秒`
+                    }}
+                  </span>
+                </div>
+              </div>
+
+              <!-- 解锁状态 -->
+              <div
+                v-if="canClosePrivacy"
+                class="flex items-center space-x-2 text-green-600"
+              >
+                <UIcon name="i-heroicons-check-circle" class="w-4 h-4" />
+                <span class="text-sm font-medium">可以同意政策</span>
+              </div>
+            </div>
+          </div>
+
+          <UsersPrivacyModal />
         </div>
 
         <footer class="px-4 py-3 border-t shrink-0 flex justify-end gap-2">
