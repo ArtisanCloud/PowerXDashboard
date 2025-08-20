@@ -194,6 +194,12 @@
         }
       }
     },
+    "cta": {
+      "title": "Ready to Get Started?",
+      "subtitle": "Experience the power of PowerX today and begin your digital transformation journey",
+      "getStarted": "Get Started",
+      "signIn": "Sign In"
+    },
     "footer": {
       "aboutUs": "About Us",
       "contactUs": "Contact Us",

@@ -652,6 +652,12 @@
         }
       }
     },
+    "cta": {
+      "title": "准备开始了吗？",
+      "subtitle": "立即体验 PowerX 的强大功能，开启您的数字化转型之旅",
+      "getStarted": "立即开始",
+      "signIn": "登录"
+    },
     "footer": {
       "aboutUs": "关于我们",
       "contactUs": "联系我们",

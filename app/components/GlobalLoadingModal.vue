@@ -29,7 +29,7 @@ const progressValue = computed(() =>
         class="h-svh w-svw relative overflow-hidden"
         :class="[
           isDark
-            ? 'bg-gradient-to-br from-slate-900 via-purple-900/20 to-slate-900'
+            ? 'bg-gradient-to-br from-gray-900 via-purple-900/40 to-indigo-900/30'
             : 'bg-gradient-to-br from-blue-50 via-indigo-50/50 to-purple-50',
         ]"
       >
@@ -40,7 +40,7 @@ const progressValue = computed(() =>
             class="absolute top-1/4 left-1/4 w-96 h-96 rounded-full blur-3xl animate-float-slow opacity-30"
             :class="[
               isDark
-                ? 'bg-gradient-to-r from-purple-500/30 to-blue-500/30'
+                ? 'bg-gradient-to-r from-purple-500/50 to-blue-500/50'
                 : 'bg-gradient-to-r from-blue-400/20 to-purple-400/20',
             ]"
           ></div>
@@ -48,7 +48,7 @@ const progressValue = computed(() =>
             class="absolute bottom-1/4 right-1/4 w-80 h-80 rounded-full blur-3xl animate-float-reverse opacity-25"
             :class="[
               isDark
-                ? 'bg-gradient-to-r from-indigo-500/30 to-purple-500/30'
+                ? 'bg-gradient-to-r from-indigo-500/45 to-purple-500/45'
                 : 'bg-gradient-to-r from-indigo-400/20 to-pink-400/20',
             ]"
           ></div>
@@ -58,7 +58,7 @@ const progressValue = computed(() =>
             class="absolute top-1/3 right-1/3 w-32 h-32 rounded-full blur-2xl animate-pulse-slow"
             :class="[
               isDark
-                ? 'bg-gradient-to-r from-cyan-400/40 to-blue-400/40'
+                ? 'bg-gradient-to-r from-cyan-400/60 to-blue-400/60'
                 : 'bg-gradient-to-r from-cyan-300/30 to-blue-300/30',
             ]"
           ></div>
@@ -66,7 +66,7 @@ const progressValue = computed(() =>
             class="absolute bottom-1/3 left-1/3 w-24 h-24 rounded-full blur-xl animate-pulse-slower"
             :class="[
               isDark
-                ? 'bg-gradient-to-r from-pink-400/40 to-purple-400/40'
+                ? 'bg-gradient-to-r from-pink-400/55 to-purple-400/55'
                 : 'bg-gradient-to-r from-pink-300/30 to-purple-300/30',
             ]"
           ></div>
@@ -74,11 +74,11 @@ const progressValue = computed(() =>
 
         <!-- 网格背景 -->
         <div
-          class="absolute inset-0 opacity-5"
+          class="absolute inset-0"
           :class="[
             isDark
-              ? 'bg-[radial-gradient(circle_at_1px_1px,_white_1px,_transparent_0)]'
-              : 'bg-[radial-gradient(circle_at_1px_1px,_rgb(99_102_241)_1px,_transparent_0)]',
+              ? 'bg-[radial-gradient(circle_at_1px_1px,_rgba(255,255,255,0.1)_1px,_transparent_0)] opacity-10'
+              : 'bg-[radial-gradient(circle_at_1px_1px,_rgb(99_102_241)_1px,_transparent_0)] opacity-5',
           ]"
           style="background-size: 40px 40px"
         ></div>
@@ -94,7 +94,7 @@ const progressValue = computed(() =>
               class="absolute inset-0 w-32 h-32 rounded-full animate-spin-slow opacity-60"
               :class="[
                 isDark
-                  ? 'bg-gradient-to-r from-purple-500/30 via-blue-500/30 to-cyan-500/30'
+                  ? 'bg-gradient-to-r from-purple-500/50 via-blue-500/50 to-cyan-500/50'
                   : 'bg-gradient-to-r from-blue-500/20 via-purple-500/20 to-indigo-500/20',
               ]"
               style="filter: blur(8px)"
@@ -105,7 +105,7 @@ const progressValue = computed(() =>
               class="relative w-24 h-24 rounded-2xl shadow-2xl backdrop-blur-sm border animate-float"
               :class="[
                 isDark
-                  ? 'bg-gradient-to-br from-slate-800/80 to-slate-900/80 border-white/10'
+                  ? 'bg-gradient-to-br from-slate-800/90 to-slate-900/90 border-white/20 shadow-2xl shadow-purple-500/20'
                   : 'bg-gradient-to-br from-white/80 to-gray-50/80 border-gray-200/50',
               ]"
             >
@@ -117,7 +117,9 @@ const progressValue = computed(() =>
               >
                 <svg
                   class="w-12 h-12 animate-pulse-gentle"
-                  :class="[isDark ? 'text-white' : 'text-primary-600']"
+                  :class="[
+                    isDark ? 'text-white drop-shadow-lg' : 'text-primary-600',
+                  ]"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -140,7 +142,7 @@ const progressValue = computed(() =>
               class="absolute inset-0 w-20 h-20 border-2 border-transparent rounded-full animate-spin-slow"
               :class="[
                 isDark
-                  ? 'border-t-purple-400/60 border-r-blue-400/40'
+                  ? 'border-t-purple-400/80 border-r-blue-400/60'
                   : 'border-t-blue-500/60 border-r-purple-500/40',
               ]"
             ></div>
@@ -150,7 +152,7 @@ const progressValue = computed(() =>
               class="absolute inset-2 w-16 h-16 border-2 border-transparent rounded-full animate-spin-reverse"
               :class="[
                 isDark
-                  ? 'border-l-cyan-400/60 border-b-indigo-400/40'
+                  ? 'border-l-cyan-400/80 border-b-indigo-400/60'
                   : 'border-l-indigo-500/60 border-b-cyan-500/40',
               ]"
             ></div>
@@ -160,7 +162,7 @@ const progressValue = computed(() =>
               class="absolute inset-4 w-12 h-12 border-2 border-transparent rounded-full animate-spin"
               :class="[
                 isDark
-                  ? 'border-t-pink-400/80 border-r-purple-400/60'
+                  ? 'border-t-pink-400/90 border-r-purple-400/80'
                   : 'border-t-purple-500/80 border-r-pink-500/60',
               ]"
             ></div>
@@ -170,7 +172,7 @@ const progressValue = computed(() =>
               class="absolute inset-6 w-8 h-8 rounded-full animate-pulse-fast"
               :class="[
                 isDark
-                  ? 'bg-gradient-to-r from-purple-400 to-cyan-400'
+                  ? 'bg-gradient-to-r from-purple-400 to-cyan-400 shadow-lg shadow-purple-400/50'
                   : 'bg-gradient-to-r from-blue-500 to-purple-500',
               ]"
             ></div>
@@ -182,7 +184,7 @@ const progressValue = computed(() =>
               class="text-2xl font-bold tracking-wide animate-fade-in"
               :class="[
                 isDark
-                  ? 'text-white drop-shadow-lg'
+                  ? 'text-white drop-shadow-2xl'
                   : 'text-gray-800 drop-shadow-sm',
               ]"
             >
@@ -195,7 +197,7 @@ const progressValue = computed(() =>
                 class="w-3 h-3 rounded-full animate-bounce-1"
                 :class="[
                   isDark
-                    ? 'bg-gradient-to-r from-purple-400 to-blue-400'
+                    ? 'bg-gradient-to-r from-purple-400 to-blue-400 shadow-sm shadow-purple-400/50'
                     : 'bg-gradient-to-r from-blue-500 to-purple-500',
                 ]"
               ></div>
@@ -203,7 +205,7 @@ const progressValue = computed(() =>
                 class="w-3 h-3 rounded-full animate-bounce-2"
                 :class="[
                   isDark
-                    ? 'bg-gradient-to-r from-blue-400 to-cyan-400'
+                    ? 'bg-gradient-to-r from-blue-400 to-cyan-400 shadow-sm shadow-blue-400/50'
                     : 'bg-gradient-to-r from-purple-500 to-indigo-500',
                 ]"
               ></div>
@@ -211,7 +213,7 @@ const progressValue = computed(() =>
                 class="w-3 h-3 rounded-full animate-bounce-3"
                 :class="[
                   isDark
-                    ? 'bg-gradient-to-r from-cyan-400 to-purple-400'
+                    ? 'bg-gradient-to-r from-cyan-400 to-purple-400 shadow-sm shadow-cyan-400/50'
                     : 'bg-gradient-to-r from-indigo-500 to-pink-500',
                 ]"
               ></div>
@@ -221,7 +223,9 @@ const progressValue = computed(() =>
             <div v-if="isProgressMode" class="text-center">
               <span
                 class="text-lg font-semibold"
-                :class="[isDark ? 'text-purple-300' : 'text-purple-600']"
+                :class="[
+                  isDark ? 'text-purple-200 drop-shadow-lg' : 'text-purple-600',
+                ]"
               >
                 {{ progressValue }}%
               </span>
@@ -234,7 +238,7 @@ const progressValue = computed(() =>
             class="w-80 h-3 rounded-full overflow-hidden backdrop-blur-sm"
             :class="[
               isDark
-                ? 'bg-white/10 shadow-inner'
+                ? 'bg-white/15 shadow-inner border border-white/10'
                 : 'bg-gray-200/50 shadow-inner',
             ]"
           >
@@ -242,7 +246,7 @@ const progressValue = computed(() =>
               class="h-full rounded-full transition-all duration-300 ease-out"
               :class="[
                 isDark
-                  ? 'bg-gradient-to-r from-purple-400 via-blue-400 to-cyan-400'
+                  ? 'bg-gradient-to-r from-purple-400 via-blue-400 to-cyan-400 shadow-lg shadow-purple-400/30'
                   : 'bg-gradient-to-r from-blue-500 via-purple-500 to-indigo-500',
               ]"
               :style="{ width: `${progressValue}%` }"
