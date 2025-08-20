@@ -376,6 +376,7 @@
     "confirmPassword": "Confirm Password",
     "remember": "Remember me",
     "forgot": "Forgot password?",
+    "forgotPassword": "Forgot password?",
     "signingIn": "Signing in...",
     "creatingAccount": "Creating account...",
     "noAccount": "Don't have an account?",

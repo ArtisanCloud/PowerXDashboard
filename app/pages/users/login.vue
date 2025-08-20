@@ -173,14 +173,12 @@ const handleForgotPassword = () => {
                 :disabled="loading"
                 :label="$t('auth.remember')"
               />
-              <button
-                type="button"
+              <NuxtLink
+                :to="$localePath('/users/forgot-password')"
                 class="text-sm text-blue-600 hover:text-blue-700"
-                @click="handleForgotPassword"
-                :disabled="loading"
               >
-                {{ $t("auth.forgot") }}
-              </button>
+                {{ $t("auth.forgotPassword") }}
+              </NuxtLink>
             </div>
 
             <!-- 登录按钮 -->
