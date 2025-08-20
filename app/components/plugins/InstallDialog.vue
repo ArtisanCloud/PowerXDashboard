@@ -1,5 +1,10 @@
 <template>
-  <UModal v-model="open" :ui="{ width: 'sm:max-w-lg' }">
+  <UModal
+    v-model="open"
+    aria-labelledby="install-plugin-title"
+    aria-describedby="install-plugin-desc"
+    :ui="{ width: 'sm:max-w-lg' }"
+  >
     <template #content>
       <div class="p-4">
         <div class="flex items-start gap-3">

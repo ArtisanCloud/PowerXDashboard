@@ -394,7 +394,12 @@ const columns = computed(() => {
     </div>
 
     <!-- 表单 -->
-    <UModal v-model:open="showForm" :ui="{ content: 'sm:max-w-md' }">
+    <UModal
+      v-model:open="showForm"
+      aria-labelledby="department-manager-title"
+      aria-describedby="department-manager-desc"
+      :ui="{ content: 'sm:max-w-md' }"
+    >
       <template #content>
         <UCard>
           <template #header>

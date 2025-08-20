@@ -915,6 +915,8 @@ const isFormModulePartiallySelected = (module: string) => {
     <UModal
       v-model:open="showRoleForm"
       :ui="{ content: 'w-full max-w-5xl' }"
+      aria-labelledby="permission-manager-title"
+      aria-describedby="permission-manager-desc"
       :title="
         isEditing
           ? $t('organization.permission.edit')

@@ -231,7 +231,13 @@ try {
 
 ```vue
 <template>
-  <UModal v-model="open" :prevent-close="true" :fullscreen="true">
+  <UModal
+    v-model="open"
+    aria-labelledby="loading-title"
+    aria-describedby="loading-desc"
+    :prevent-close="true"
+    :fullscreen="true"
+  >
     <!-- 自定义你的 Loading UI -->
     <div class="h-screen w-screen flex items-center justify-center bg-black/80">
       <div class="text-center">

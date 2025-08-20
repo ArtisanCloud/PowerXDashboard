@@ -566,6 +566,8 @@ const handleRegister = async () => {
     <!-- 条款 -->
     <UModal
       v-model:open="showTermsModal"
+      aria-labelledby="register-terms-title"
+      aria-describedby="register-terms-desc"
       :prevent-close="!canCloseTerms"
       :ui="{
         panel: 'w-full max-w-3xl max-h-[85dvh] overflow-hidden flex flex-col',
@@ -680,6 +682,8 @@ const handleRegister = async () => {
 
     <!-- 隐私 -->
     <UModal
+      aria-labelledby="register-privacy-title"
+      aria-describedby="register-privacy-desc"
       v-model:open="showPrivacyModal"
       :prevent-close="!canClosePrivacy"
       :ui="{
