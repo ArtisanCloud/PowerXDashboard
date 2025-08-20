@@ -318,13 +318,17 @@ const handleRegister = async () => {
               />
               <p class="text-sm text-gray-600 leading-relaxed">
                 {{ $t("auth.agreeTerms") }}
-                <a href="#" class="text-blue-600 hover:text-blue-700">{{
-                  $t("termsOfService")
-                }}</a>
+                <NuxtLink
+                  :to="$localePath('/users/terms')"
+                  class="text-blue-600 hover:text-blue-700"
+                  >{{ $t("termsOfService") }}</NuxtLink
+                >
                 {{ $t("auth.and") }}
-                <a href="#" class="text-blue-600 hover:text-blue-700">{{
-                  $t("privacyPolicy")
-                }}</a>
+                <NuxtLink
+                  :to="$localePath('/users/privacy')"
+                  class="text-blue-600 hover:text-blue-700"
+                  >{{ $t("privacyPolicy") }}</NuxtLink
+                >
               </p>
             </div>
 
