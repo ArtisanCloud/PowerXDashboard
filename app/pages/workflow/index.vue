@@ -224,16 +224,16 @@
           </template>
 
           <div class="space-y-4">
-            <UFormGroup label="工作流名称" required>
+            <UFormField label="工作流名称" required>
               <UInput v-model="newWorkflow.name" placeholder="输入工作流名称" />
-            </UFormGroup>
+            </UFormField>
 
-            <UFormGroup label="描述">
+            <UFormField label="描述">
               <UTextarea
                 v-model="newWorkflow.description"
                 placeholder="输入工作流描述（可选）"
               />
-            </UFormGroup>
+            </UFormField>
           </div>
 
           <template #footer>

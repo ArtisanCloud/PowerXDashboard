@@ -15,20 +15,15 @@ export default defineNuxtConfig({
 
   // 添加开发服务器代理配置
   nitro: {
+    routeRules: {
+      "/__up/_p/**": { proxy: "http://127.0.0.1:8077/_p/**" },
+    },
     devProxy: {
       "/api/_nuxt_icon": {},
       "/api/": {
         target: "http://127.0.0.1:8077/api",
         changeOrigin: true,
         prependPath: true,
-        onRequest(req) {
-          console.log(`[代理请求] ${req.method} ${req.url}`);
-        },
-        onResponse(req, res) {
-          console.log(
-            `[代理响应] ${req.method} ${req.url} - 状态码: ${res.statusCode}`
-          );
-        },
       },
     },
   },

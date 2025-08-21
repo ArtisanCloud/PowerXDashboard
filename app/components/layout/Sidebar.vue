@@ -5,9 +5,28 @@ import {
 } from "~/composables/api/services/menuService";
 
 // 使用 i18n 进行菜单标题翻译
-const { t } = useI18n();
 const route = useRoute();
 const menuService = useMenuService();
+
+const { locale, t } = useI18n();
+
+const isPluginPath = (p?: string) => !!p && p.startsWith("/_p/");
+
+// 对插件路径，直接返回原始 path；其它仍走 localePath
+const linkFor = (p?: string) => {
+  if (!p) return "";
+  return isPluginPath(p) ? p : (useLocalePath() as any)(p);
+};
+
+// 活跃判断也要兼容 /_p/
+const isActive = (path?: string) => {
+  if (!path) return false;
+  if (isPluginPath(path)) {
+    return route.path === path || route.path.startsWith(path);
+  }
+  const localized = (useLocalePath() as any)(path);
+  return route.path === localized || route.path.startsWith(localized + "/");
+};
 
 // 从 API 获取菜单数据
 const {
@@ -31,18 +50,18 @@ const menuItems = computed<MenuItem[]>(() => {
     console.log("菜单数据为空");
     return [];
   }
+  // console.log("处理后的菜单数据:", menuResponse.value);
 
   const processMenuItems = (items: MenuItem[]): MenuItem[] => {
     return items
       .filter((item) => item.visible !== false) // 确保即使 visible 未定义也会显示
-      .sort((a, b) => (a.order || 0) - (b.order || 0)) // 防止 order 未定义
       .map((item) => {
         // console.log("处理菜单项:", item);
         // 处理菜单项，翻译标题和 badge
         const processedItem = {
           ...item,
           // 使用 i18n 翻译菜单标题
-          title: item.title ? t(item.title) : "未命名菜单",
+          title: translateTitle(item.title),
           // 如果 badge 是翻译键（以 menu. 开头），则翻译它
           badge:
             item.badge &&
@@ -65,9 +84,9 @@ const menuItems = computed<MenuItem[]>(() => {
       });
   };
 
-  const result = processMenuItems(menuResponse.value.data);
-  // console.log("处理后的菜单项:", result);
-  return result;
+  const processed = processMenuItems(menuResponse.value.data);
+  // console.log("处理后的菜单项:", processed);
+  return processed;
 });
 
 // 展开状态管理
@@ -82,17 +101,19 @@ const toggleExpanded = (itemId: string) => {
   }
 };
 
-// 检查是否为当前路由
-const isActive = (path?: string) => {
-  if (!path) return false;
-  return route.path === path || route.path.startsWith(path + "/");
-};
-
 // 检查是否有子项处于激活状态
 const hasActiveChild = (children?: MenuItem[]) => {
   if (!children) return false;
   return children.some((child) => isActive(child.path));
 };
+
+// 仅翻译以 "menu." 开头的 key；插件返回纯文案时不去查 i18n
+const translateTitle = (title?: string) =>
+  title?.startsWith("menu.") ? t(title) : title || "未命名菜单";
+
+// 图标兜底：插件可能传 "Smile" 这类非 i- 前缀，统一回退为拼图图标
+const resolveIcon = (name?: string) =>
+  name?.startsWith("i-") ? name : "i-heroicons-puzzle-piece";
 
 // 初始化展开状态（如果有子项处于激活状态，则展开父项）
 onMounted(() => {
@@ -197,7 +218,10 @@ onMounted(() => {
             >
               <div class="flex items-center space-x-3">
                 <span class="w-5 h-5 inline-block">
-                  <UIcon class="w-5 h-5 inline-block" :name="item.icon" />
+                  <UIcon
+                    class="w-5 h-5 inline-block"
+                    :name="resolveIcon(item.icon)"
+                  />
                 </span>
                 <span>{{ item.title }}</span>
               </div>
@@ -231,7 +255,7 @@ onMounted(() => {
                 <li v-for="child in item.children" :key="child.id">
                   <NuxtLink
                     v-if="child.path"
-                    :to="$localePath(child.path)"
+                    :to="linkFor(child.path)"
                     class="flex items-center space-x-3 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400/40 dark:focus-visible:ring-white/20 px-3 py-2 text-sm rounded-md"
                     :class="
                       isActive(child.path)
@@ -240,7 +264,10 @@ onMounted(() => {
                     "
                   >
                     <span class="w-4 h-4 inline-block">
-                      <UIcon class="w-4 h-4 inline-block" :name="child.icon" />
+                      <UIcon
+                        class="w-4 h-4 inline-block"
+                        :name="resolveIcon(child.icon)"
+                      />
                     </span>
                     <span>{{ child.title }}</span>
                   </NuxtLink>
@@ -252,7 +279,7 @@ onMounted(() => {
           <!-- 无子菜单的项目 -->
           <NuxtLink
             v-else-if="item.path"
-            :to="$localePath(item.path)"
+            :to="linkFor(item.path)"
             class="flex items-center justify-between transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400/40 dark:focus-visible:ring-white/20 px-3 py-2 text-sm font-medium rounded-md"
             :class="
               isActive(item.path)
@@ -262,7 +289,10 @@ onMounted(() => {
           >
             <div class="flex items-center space-x-3">
               <span class="w-5 h-5 inline-block">
-                <UIcon class="w-5 h-5 inline-block" :name="item.icon" />
+                <UIcon
+                  class="w-5 h-5 inline-block"
+                  :name="resolveIcon(item.icon)"
+                />
               </span>
               <span>{{ item.title }}</span>
             </div>

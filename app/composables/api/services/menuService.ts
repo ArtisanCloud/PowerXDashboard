@@ -13,6 +13,7 @@ export interface MenuItem {
   badge?: string | number;
   order: number;
   visible: boolean;
+  origin: string;
   permissions?: string[];
   parentId?: string;
 }
@@ -70,17 +71,10 @@ function normalizeTree(list: any[]): MenuItem[] {
           permissions: Array.isArray(n.permissions) ? n.permissions : undefined,
           parentId: typeof n.parentId === "string" ? n.parentId : undefined,
           children,
-          // 透传其它字段（如 origin、badge 等）
+          // 透传其它字段（如 origin、badge、slot 等）
           ...n,
         };
         return item;
-      })
-      .sort((a, b) => {
-        const ao = a.order ?? 0;
-        const bo = b.order ?? 0;
-        if (ao !== bo) return ao - bo;
-        if (a.title !== b.title) return a.title.localeCompare(b.title);
-        return a.id.localeCompare(b.id);
       });
 
   return walk(list);

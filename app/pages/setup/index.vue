@@ -478,7 +478,7 @@ onMounted(() => {
                 <div class="mb-8">
                   <h4 class="text-md font-medium mb-4">域名设置</h4>
                   <div class="space-y-4">
-                    <UFormGroup label="系统域名" required>
+                    <UFormField label="系统域名" required>
                       <UInput
                         v-model="step2Data.domain"
                         placeholder="例如：powerx.example.com"
@@ -489,9 +489,9 @@ onMounted(() => {
                           请输入系统的完整域名，不包含协议前缀
                         </span>
                       </template>
-                    </UFormGroup>
+                    </UFormField>
 
-                    <UFormGroup label="API 子域名">
+                    <UFormField label="API 子域名">
                       <UInput
                         v-model="step2Data.apiSubdomain"
                         placeholder="例如：api"
@@ -502,7 +502,7 @@ onMounted(() => {
                           API 接口的子域名，留空则使用主域名
                         </span>
                       </template>
-                    </UFormGroup>
+                    </UFormField>
                   </div>
                 </div>
 
@@ -527,7 +527,7 @@ onMounted(() => {
                       v-if="step2Data.httpsMode === 'auto'"
                       class="pl-6 space-y-4"
                     >
-                      <UFormGroup label="邮箱地址" required>
+                      <UFormField label="邮箱地址" required>
                         <UInput
                           v-model="step2Data.certEmail"
                           type="email"
@@ -539,7 +539,7 @@ onMounted(() => {
                             用于 Let's Encrypt 证书申请和续期通知
                           </span>
                         </template>
-                      </UFormGroup>
+                      </UFormField>
                     </div>
 
                     <!-- 手动证书上传 -->
@@ -547,21 +547,21 @@ onMounted(() => {
                       v-if="step2Data.httpsMode === 'manual'"
                       class="pl-6 space-y-4"
                     >
-                      <UFormGroup label="证书文件 (.crt)" required>
+                      <UFormField label="证书文件 (.crt)" required>
                         <UTextarea
                           v-model="step2Data.certContent"
                           placeholder="-----BEGIN CERTIFICATE-----"
                           rows="6"
                         />
-                      </UFormGroup>
+                      </UFormField>
 
-                      <UFormGroup label="私钥文件 (.key)" required>
+                      <UFormField label="私钥文件 (.key)" required>
                         <UTextarea
                           v-model="step2Data.keyContent"
                           placeholder="-----BEGIN PRIVATE KEY-----"
                           rows="6"
                         />
-                      </UFormGroup>
+                      </UFormField>
                     </div>
 
                     <!-- HTTPS 禁用警告 -->
@@ -585,13 +585,13 @@ onMounted(() => {
                   />
 
                   <div v-if="step2Data.enableCdn" class="pl-6 space-y-4">
-                    <UFormGroup label="CDN 域名">
+                    <UFormField label="CDN 域名">
                       <UInput
                         v-model="step2Data.cdnDomain"
                         placeholder="例如：cdn.example.com"
                         icon="i-lucide-zap"
                       />
-                    </UFormGroup>
+                    </UFormField>
                   </div>
                 </div>
               </div>
@@ -628,7 +628,7 @@ onMounted(() => {
                 <div class="mb-8">
                   <h4 class="text-md font-medium mb-4">数据库设置</h4>
                   <div class="grid grid-cols-2 gap-4 mb-4">
-                    <UFormGroup label="数据库类型" required>
+                    <UFormField label="数据库类型" required>
                       <USelect
                         v-model="step3Data.dbType"
                         :options="[
@@ -637,30 +637,30 @@ onMounted(() => {
                           { label: 'SQLite', value: 'sqlite' },
                         ]"
                       />
-                    </UFormGroup>
+                    </UFormField>
 
-                    <UFormGroup label="数据库版本">
+                    <UFormField label="数据库版本">
                       <UInput
                         v-model="step3Data.dbVersion"
                         placeholder="例如：8.0"
                         :disabled="step3Data.dbType === 'sqlite'"
                       />
-                    </UFormGroup>
+                    </UFormField>
                   </div>
 
                   <div
                     v-if="step3Data.dbType !== 'sqlite'"
                     class="grid grid-cols-2 gap-4 mb-4"
                   >
-                    <UFormGroup label="主机地址" required>
+                    <UFormField label="主机地址" required>
                       <UInput
                         v-model="step3Data.dbHost"
                         placeholder="localhost"
                         icon="i-lucide-server"
                       />
-                    </UFormGroup>
+                    </UFormField>
 
-                    <UFormGroup label="端口" required>
+                    <UFormField label="端口" required>
                       <UInput
                         v-model="step3Data.dbPort"
                         type="number"
@@ -668,22 +668,22 @@ onMounted(() => {
                           step3Data.dbType === 'mysql' ? '3306' : '5432'
                         "
                       />
-                    </UFormGroup>
+                    </UFormField>
                   </div>
 
                   <div
                     v-if="step3Data.dbType !== 'sqlite'"
                     class="grid grid-cols-2 gap-4 mb-4"
                   >
-                    <UFormGroup label="数据库名" required>
+                    <UFormField label="数据库名" required>
                       <UInput
                         v-model="step3Data.dbName"
                         placeholder="powerx"
                         icon="i-lucide-database"
                       />
-                    </UFormGroup>
+                    </UFormField>
 
-                    <UFormGroup label="字符集">
+                    <UFormField label="字符集">
                       <USelect
                         v-model="step3Data.dbCharset"
                         :options="[
@@ -691,39 +691,39 @@ onMounted(() => {
                           { label: 'utf8', value: 'utf8' },
                         ]"
                       />
-                    </UFormGroup>
+                    </UFormField>
                   </div>
 
                   <div
                     v-if="step3Data.dbType !== 'sqlite'"
                     class="grid grid-cols-2 gap-4"
                   >
-                    <UFormGroup label="用户名" required>
+                    <UFormField label="用户名" required>
                       <UInput
                         v-model="step3Data.dbUsername"
                         placeholder="root"
                         icon="i-lucide-user"
                       />
-                    </UFormGroup>
+                    </UFormField>
 
-                    <UFormGroup label="密码" required>
+                    <UFormField label="密码" required>
                       <UInput
                         v-model="step3Data.dbPassword"
                         type="password"
                         placeholder="数据库密码"
                         icon="i-lucide-lock"
                       />
-                    </UFormGroup>
+                    </UFormField>
                   </div>
 
                   <div v-else class="space-y-4">
-                    <UFormGroup label="数据库文件路径">
+                    <UFormField label="数据库文件路径">
                       <UInput
                         v-model="step3Data.sqlitePath"
                         placeholder="/data/powerx.db"
                         icon="i-lucide-file"
                       />
-                    </UFormGroup>
+                    </UFormField>
                   </div>
                 </div>
 
@@ -731,7 +731,7 @@ onMounted(() => {
                 <div class="mb-8">
                   <h4 class="text-md font-medium mb-4">缓存配置</h4>
                   <div class="space-y-4">
-                    <UFormGroup label="缓存类型">
+                    <UFormField label="缓存类型">
                       <USelect
                         v-model="step3Data.cacheType"
                         :options="[
@@ -740,49 +740,49 @@ onMounted(() => {
                           { label: '文件缓存', value: 'file' },
                         ]"
                       />
-                    </UFormGroup>
+                    </UFormField>
 
                     <div
                       v-if="step3Data.cacheType === 'redis'"
                       class="grid grid-cols-2 gap-4"
                     >
-                      <UFormGroup label="Redis 主机">
+                      <UFormField label="Redis 主机">
                         <UInput
                           v-model="step3Data.redisHost"
                           placeholder="localhost"
                           icon="i-lucide-server"
                         />
-                      </UFormGroup>
+                      </UFormField>
 
-                      <UFormGroup label="Redis 端口">
+                      <UFormField label="Redis 端口">
                         <UInput
                           v-model="step3Data.redisPort"
                           type="number"
                           placeholder="6379"
                         />
-                      </UFormGroup>
+                      </UFormField>
                     </div>
 
                     <div
                       v-if="step3Data.cacheType === 'redis'"
                       class="grid grid-cols-2 gap-4"
                     >
-                      <UFormGroup label="Redis 密码">
+                      <UFormField label="Redis 密码">
                         <UInput
                           v-model="step3Data.redisPassword"
                           type="password"
                           placeholder="Redis 密码（可选）"
                           icon="i-lucide-lock"
                         />
-                      </UFormGroup>
+                      </UFormField>
 
-                      <UFormGroup label="数据库索引">
+                      <UFormField label="数据库索引">
                         <UInput
                           v-model="step3Data.redisDb"
                           type="number"
                           placeholder="0"
                         />
-                      </UFormGroup>
+                      </UFormField>
                     </div>
                   </div>
                 </div>
@@ -790,7 +790,7 @@ onMounted(() => {
                 <!-- 存储配置 -->
                 <div class="space-y-4">
                   <h4 class="text-md font-medium mb-4">文件存储配置</h4>
-                  <UFormGroup label="存储类型">
+                  <UFormField label="存储类型">
                     <USelect
                       v-model="step3Data.storageType"
                       :options="[
@@ -800,62 +800,62 @@ onMounted(() => {
                         { label: 'AWS S3', value: 'aws' },
                       ]"
                     />
-                  </UFormGroup>
+                  </UFormField>
 
                   <div
                     v-if="step3Data.storageType === 'local'"
                     class="space-y-4"
                   >
-                    <UFormGroup label="存储路径">
+                    <UFormField label="存储路径">
                       <UInput
                         v-model="step3Data.localStoragePath"
                         placeholder="/data/uploads"
                         icon="i-lucide-folder"
                       />
-                    </UFormGroup>
+                    </UFormField>
                   </div>
 
                   <div
                     v-if="step3Data.storageType !== 'local'"
                     class="grid grid-cols-2 gap-4"
                   >
-                    <UFormGroup label="Access Key ID" required>
+                    <UFormField label="Access Key ID" required>
                       <UInput
                         v-model="step3Data.storageAccessKey"
                         placeholder="访问密钥 ID"
                         icon="i-lucide-key"
                       />
-                    </UFormGroup>
+                    </UFormField>
 
-                    <UFormGroup label="Secret Access Key" required>
+                    <UFormField label="Secret Access Key" required>
                       <UInput
                         v-model="step3Data.storageSecretKey"
                         type="password"
                         placeholder="访问密钥"
                         icon="i-lucide-lock"
                       />
-                    </UFormGroup>
+                    </UFormField>
                   </div>
 
                   <div
                     v-if="step3Data.storageType !== 'local'"
                     class="grid grid-cols-2 gap-4"
                   >
-                    <UFormGroup label="存储桶名称" required>
+                    <UFormField label="存储桶名称" required>
                       <UInput
                         v-model="step3Data.storageBucket"
                         placeholder="bucket-name"
                         icon="i-lucide-archive"
                       />
-                    </UFormGroup>
+                    </UFormField>
 
-                    <UFormGroup label="区域" required>
+                    <UFormField label="区域" required>
                       <UInput
                         v-model="step3Data.storageRegion"
                         placeholder="例如：cn-hangzhou"
                         icon="i-lucide-map-pin"
                       />
-                    </UFormGroup>
+                    </UFormField>
                   </div>
                 </div>
               </div>
@@ -894,60 +894,60 @@ onMounted(() => {
                 <div class="mb-8">
                   <h4 class="text-md font-medium mb-4">超级管理员账户</h4>
                   <div class="grid grid-cols-2 gap-4 mb-4">
-                    <UFormGroup label="管理员用户名" required>
+                    <UFormField label="管理员用户名" required>
                       <UInput
                         v-model="step4Data.adminUsername"
                         placeholder="admin"
                         icon="i-lucide-user"
                       />
-                    </UFormGroup>
+                    </UFormField>
 
-                    <UFormGroup label="管理员邮箱" required>
+                    <UFormField label="管理员邮箱" required>
                       <UInput
                         v-model="step4Data.adminEmail"
                         type="email"
                         placeholder="admin@example.com"
                         icon="i-lucide-mail"
                       />
-                    </UFormGroup>
+                    </UFormField>
                   </div>
 
                   <div class="grid grid-cols-2 gap-4 mb-4">
-                    <UFormGroup label="管理员密码" required>
+                    <UFormField label="管理员密码" required>
                       <UInput
                         v-model="step4Data.adminPassword"
                         type="password"
                         placeholder="请输入强密码"
                         icon="i-lucide-lock"
                       />
-                    </UFormGroup>
+                    </UFormField>
 
-                    <UFormGroup label="确认密码" required>
+                    <UFormField label="确认密码" required>
                       <UInput
                         v-model="step4Data.adminPasswordConfirm"
                         type="password"
                         placeholder="再次输入密码"
                         icon="i-lucide-lock"
                       />
-                    </UFormGroup>
+                    </UFormField>
                   </div>
 
                   <div class="grid grid-cols-2 gap-4">
-                    <UFormGroup label="管理员姓名">
+                    <UFormField label="管理员姓名">
                       <UInput
                         v-model="step4Data.adminName"
                         placeholder="系统管理员"
                         icon="i-lucide-user-circle"
                       />
-                    </UFormGroup>
+                    </UFormField>
 
-                    <UFormGroup label="手机号码">
+                    <UFormField label="手机号码">
                       <UInput
                         v-model="step4Data.adminPhone"
                         placeholder="13800138000"
                         icon="i-lucide-phone"
                       />
-                    </UFormGroup>
+                    </UFormField>
                   </div>
                 </div>
 
@@ -958,15 +958,15 @@ onMounted(() => {
                 >
                   <h4 class="text-md font-medium mb-4">默认租户设置</h4>
                   <div class="grid grid-cols-2 gap-4 mb-4">
-                    <UFormGroup label="租户名称" required>
+                    <UFormField label="租户名称" required>
                       <UInput
                         v-model="step4Data.tenantName"
                         placeholder="默认租户"
                         icon="i-lucide-building"
                       />
-                    </UFormGroup>
+                    </UFormField>
 
-                    <UFormGroup label="租户标识" required>
+                    <UFormField label="租户标识" required>
                       <UInput
                         v-model="step4Data.tenantCode"
                         placeholder="default"
@@ -977,17 +977,17 @@ onMounted(() => {
                           租户的唯一标识，只能包含字母、数字和下划线
                         </span>
                       </template>
-                    </UFormGroup>
+                    </UFormField>
                   </div>
 
                   <div class="space-y-4">
-                    <UFormGroup label="租户描述">
+                    <UFormField label="租户描述">
                       <UTextarea
                         v-model="step4Data.tenantDescription"
                         placeholder="租户描述信息"
                         rows="3"
                       />
-                    </UFormGroup>
+                    </UFormField>
                   </div>
                 </div>
 
@@ -1005,13 +1005,13 @@ onMounted(() => {
                     class="pl-6 space-y-4"
                   >
                     <div class="grid grid-cols-2 gap-4">
-                      <UFormGroup label="公司名称">
+                      <UFormField label="公司名称">
                         <UInput
                           v-model="step4Data.companyName"
                           placeholder="我的公司"
                           icon="i-lucide-building-2"
                         />
-                      </UFormGroup>
+                      </UFormField>
                     </div>
                   </div>
                 </div>

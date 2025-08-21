@@ -1,5 +1,5 @@
 import type { LoginResponse } from "./api/services/authService";
-
+import { useAuthService } from "./api/services/authService";
 /**
  * 认证状态管理
  */
@@ -104,13 +104,6 @@ export const useAuth = () => {
       await navigateTo("/users/login");
     }
   };
-
-  // 在客户端初始化
-  if (process.client) {
-    onMounted(() => {
-      initAuth();
-    });
-  }
 
   return {
     isAuthenticated: readonly(isAuthenticated),
