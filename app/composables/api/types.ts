@@ -7,7 +7,7 @@ export interface PaginationParams {
   page?: number;
   pageSize?: number;
   sortBy?: string;
-  sortOrder?: 'asc' | 'desc';
+  sortOrder?: "asc" | "desc";
 }
 
 // 基础响应结构
@@ -15,6 +15,7 @@ export interface ApiResponse<T> {
   code: number;
   message: string;
   data: T;
+  timestamp: number;
 }
 
 // 分页响应结构
@@ -35,11 +36,13 @@ export interface ApiRequestConfig extends RequestInit {
 }
 
 // 请求方法类型
-export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
+export type HttpMethod = "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
 
 // 请求拦截器
 export interface RequestInterceptor {
-  onRequest?: (config: ApiRequestConfig) => ApiRequestConfig | Promise<ApiRequestConfig>;
+  onRequest?: (
+    config: ApiRequestConfig
+  ) => ApiRequestConfig | Promise<ApiRequestConfig>;
   onRequestError?: (error: any) => any | Promise<any>;
 }
 

@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { useAuthService } from "~/composables/api/services/authService";
+
 definePageMeta({
   layout: false, // 禁用layout
 });
@@ -22,6 +24,10 @@ onMounted(() => {
   }
 });
 
+// 导入认证服务
+const { login } = useAuthService();
+const { setAuth } = useAuth();
+
 // 表单数据
 const form = reactive({
   email: "",
@@ -44,13 +50,31 @@ const handleLogin = async () => {
   error.value = "";
 
   try {
-    // 这里添加实际的登录逻辑
-    await new Promise((resolve) => setTimeout(resolve, 1000)); // 模拟API调用
+    // 调用登录API
+    const response = await login({
+      tenant: "",
+      identifier: form.email,
+      password: form.password,
+    });
 
-    // 登录成功后跳转到仪表板
-    await navigateTo("/dashboard");
-  } catch (err) {
-    error.value = t("auth.loginFailed");
+    console.log("登录结果:", response);
+
+    if (response.code === 200) {
+      // 保存认证信息
+      setAuth(response.data);
+
+      // 获取重定向URL
+      const route = useRoute();
+      const redirectTo = (route.query.redirect as string) || "/dashboard";
+
+      // 登录成功后跳转
+      await navigateTo(redirectTo);
+    } else {
+      error.value = response.message || t("auth.loginFailed");
+    }
+  } catch (err: any) {
+    console.error("登录错误:", err);
+    error.value = err.response?.data?.message || t("auth.loginFailed");
   } finally {
     loading.value = false;
   }

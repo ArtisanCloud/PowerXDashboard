@@ -9,7 +9,8 @@ import type {
  * 认证相关类型定义
  */
 export interface LoginParams {
-  email: string;
+  tenant: string;
+  identifier: string;
   password: string;
   remember?: boolean;
 }
@@ -113,12 +114,18 @@ export interface Department {
 }
 
 export interface LoginResponse {
+  token_type: string;
+  access_token: string;
+  expires_in: number;
+  refresh_token: string;
+  scope: string;
+}
+
+// 用户信息响应接口（用于获取用户详情）
+export interface UserInfoResponse {
   user: User;
   member?: Member; // 当前租户下的成员信息
   tenant?: Tenant; // 当前租户信息
-  token: string;
-  refresh_token?: string;
-  expires_in: number;
 }
 
 export interface RefreshTokenParams {
@@ -163,6 +170,7 @@ export interface DepartmentFilters extends PaginationParams {
 export const useAuthService = () => {
   const apiClient = useApiClient();
   const baseUrl = "/user/auth";
+  const adminBaseUrl = "/admin"; // 添加管理员基础URL
 
   return {
     /**
@@ -230,7 +238,7 @@ export const useAuthService = () => {
      * 获取当前用户信息
      */
     getCurrentUser: () => {
-      return apiClient.get<ApiResponse<User>>(`${baseUrl}/me`);
+      return apiClient.get<ApiResponse<UserInfoResponse>>(`${baseUrl}/me`);
     },
 
     /**

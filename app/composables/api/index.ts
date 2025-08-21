@@ -1,9 +1,9 @@
-import type { 
-  ApiRequestConfig, 
-  HttpMethod, 
-  RequestInterceptor, 
-  ResponseInterceptor 
-} from './types';
+import type {
+  ApiRequestConfig,
+  HttpMethod,
+  RequestInterceptor,
+  ResponseInterceptor,
+} from "./types";
 
 // API 客户端配置
 interface ApiClientConfig {
@@ -16,14 +16,31 @@ interface ApiClientConfig {
 
 // 全局 API 配置
 let globalConfig: ApiClientConfig = {
-  baseURL: '/api',
+  baseURL: "/api",
   timeout: 30000,
   headers: {
-    'Content-Type': 'application/json',
-    'Accept': 'application/json'
+    "Content-Type": "application/json",
+    Accept: "application/json",
   },
-  requestInterceptors: [],
-  responseInterceptors: []
+  requestInterceptors: [
+    {
+      onRequest: async (config) => {
+        // 自动添加认证头
+        if (process.client && !config.skipAuth) {
+          const token = localStorage.getItem("access_token");
+          const tokenType = localStorage.getItem("token_type") || "Bearer";
+          if (token) {
+            config.headers = {
+              ...config.headers,
+              Authorization: `${tokenType} ${token}`,
+            };
+          }
+        }
+        return config;
+      },
+    },
+  ],
+  responseInterceptors: [],
 };
 
 /**
@@ -36,8 +53,8 @@ export const setApiConfig = (config: Partial<ApiClientConfig>) => {
     ...config,
     headers: {
       ...globalConfig.headers,
-      ...config.headers
-    }
+      ...config.headers,
+    },
   };
 };
 
@@ -49,18 +66,22 @@ export const setApiConfig = (config: Partial<ApiClientConfig>) => {
  */
 const handleUrl = (url: string, params?: Record<string, any>): string => {
   if (!params) return url;
-  
+
   const queryString = Object.entries(params)
     .filter(([_, value]) => value !== undefined && value !== null)
     .map(([key, value]) => {
       if (Array.isArray(value)) {
-        return value.map(v => `${encodeURIComponent(key)}=${encodeURIComponent(v)}`).join('&');
+        return value
+          .map((v) => `${encodeURIComponent(key)}=${encodeURIComponent(v)}`)
+          .join("&");
       }
       return `${encodeURIComponent(key)}=${encodeURIComponent(value)}`;
     })
-    .join('&');
-  
-  return queryString ? `${url}${url.includes('?') ? '&' : '?'}${queryString}` : url;
+    .join("&");
+
+  return queryString
+    ? `${url}${url.includes("?") ? "&" : "?"}${queryString}`
+    : url;
 };
 
 /**
@@ -83,17 +104,17 @@ const handleRequestConfig = async (
     method,
     headers: {
       ...globalConfig.headers,
-      ...config.headers
-    }
+      ...config.headers,
+    },
   };
-  
+
   // 处理 URL
-  let fullUrl = url.startsWith('http') ? url : `${globalConfig.baseURL}${url}`;
+  let fullUrl = url.startsWith("http") ? url : `${globalConfig.baseURL}${url}`;
   fullUrl = handleUrl(fullUrl, config.params);
-  
+
   // 处理请求体
   if (data !== undefined) {
-    if (method === 'GET' || method === 'DELETE') {
+    if (method === "GET" || method === "DELETE") {
       // GET 和 DELETE 请求通常不带请求体，将数据作为查询参数
       fullUrl = handleUrl(fullUrl, data);
     } else {
@@ -101,7 +122,7 @@ const handleRequestConfig = async (
       mergedConfig.body = JSON.stringify(data);
     }
   }
-  
+
   // 应用请求拦截器
   let finalConfig = mergedConfig;
   for (const interceptor of globalConfig.requestInterceptors || []) {
@@ -109,13 +130,19 @@ const handleRequestConfig = async (
       finalConfig = await interceptor.onRequest(finalConfig);
     }
   }
-  
+
   // 提取 fetch 选项
-  const { params, useGlobalError, useGlobalLoading, skipAuth, ...fetchOptions } = finalConfig;
-  
+  const {
+    params,
+    useGlobalError,
+    useGlobalLoading,
+    skipAuth,
+    ...fetchOptions
+  } = finalConfig;
+
   return {
     url: fullUrl,
-    options: fetchOptions as RequestInit
+    options: fetchOptions as RequestInit,
   };
 };
 
@@ -129,23 +156,23 @@ const handleResponse = async (response: Response): Promise<any> => {
   if (!response.ok) {
     const error: any = new Error(`HTTP error! Status: ${response.status}`);
     error.response = response;
-    
+
     try {
       error.data = await response.json();
     } catch (e) {
       // 如果响应不是 JSON 格式，则使用文本内容
       error.data = await response.text();
     }
-    
+
     throw error;
   }
-  
+
   // 检查内容类型
-  const contentType = response.headers.get('content-type');
-  if (contentType && contentType.includes('application/json')) {
+  const contentType = response.headers.get("content-type");
+  if (contentType && contentType.includes("application/json")) {
     return response.json();
   }
-  
+
   return response.text();
 };
 
@@ -156,14 +183,14 @@ const handleResponse = async (response: Response): Promise<any> => {
  */
 const applyResponseInterceptors = async (response: any): Promise<any> => {
   let result = response;
-  
+
   // 应用响应拦截器
   for (const interceptor of globalConfig.responseInterceptors || []) {
     if (interceptor.onResponse) {
       result = await interceptor.onResponse(result);
     }
   }
-  
+
   return result;
 };
 
@@ -174,7 +201,7 @@ const applyResponseInterceptors = async (response: any): Promise<any> => {
  */
 const applyErrorInterceptors = async (error: any): Promise<any> => {
   let result = error;
-  
+
   // 应用错误拦截器
   for (const interceptor of globalConfig.responseInterceptors || []) {
     if (interceptor.onResponseError) {
@@ -189,7 +216,7 @@ const applyErrorInterceptors = async (error: any): Promise<any> => {
       }
     }
   }
-  
+
   throw result;
 };
 
@@ -214,8 +241,13 @@ export const useApiClient = () => {
   ) => {
     try {
       // 处理请求配置
-      const { url: fullUrl, options } = await handleRequestConfig(method, url, data, config);
-      
+      const { url: fullUrl, options } = await handleRequestConfig(
+        method,
+        url,
+        data,
+        config
+      );
+
       // 使用 useFetch 发送请求，确保 SSR 兼容性
       const { data: responseData, error } = await useFetch(fullUrl, {
         method: method as any,
@@ -224,24 +256,24 @@ export const useApiClient = () => {
         // 使用 key 确保请求缓存和去重
         key: `${method}-${fullUrl}-${JSON.stringify(data || {})}`,
         // 转换响应数据
-        transform: (response) => response
+        transform: (response) => response,
       });
-      
+
       // 处理错误
       if (error.value) {
         throw error.value;
       }
-      
+
       // 应用响应拦截器
       const result = await applyResponseInterceptors(responseData.value);
-      
+
       return result as T;
     } catch (error) {
       // 应用错误拦截器
       return applyErrorInterceptors(error);
     }
   };
-  
+
   /**
    * 发送 GET 请求
    * @param url 请求 URL
@@ -249,9 +281,9 @@ export const useApiClient = () => {
    * @returns 响应数据
    */
   const get = <T = any>(url: string, config?: ApiRequestConfig) => {
-    return request<T>('GET', url, undefined, config);
+    return request<T>("GET", url, undefined, config);
   };
-  
+
   /**
    * 发送 POST 请求
    * @param url 请求 URL
@@ -259,10 +291,14 @@ export const useApiClient = () => {
    * @param config 请求配置
    * @returns 响应数据
    */
-  const post = <T = any>(url: string, data?: any, config?: ApiRequestConfig) => {
-    return request<T>('POST', url, data, config);
+  const post = <T = any>(
+    url: string,
+    data?: any,
+    config?: ApiRequestConfig
+  ) => {
+    return request<T>("POST", url, data, config);
   };
-  
+
   /**
    * 发送 PUT 请求
    * @param url 请求 URL
@@ -271,9 +307,9 @@ export const useApiClient = () => {
    * @returns 响应数据
    */
   const put = <T = any>(url: string, data?: any, config?: ApiRequestConfig) => {
-    return request<T>('PUT', url, data, config);
+    return request<T>("PUT", url, data, config);
   };
-  
+
   /**
    * 发送 DELETE 请求
    * @param url 请求 URL
@@ -281,9 +317,9 @@ export const useApiClient = () => {
    * @returns 响应数据
    */
   const del = <T = any>(url: string, config?: ApiRequestConfig) => {
-    return request<T>('DELETE', url, undefined, config);
+    return request<T>("DELETE", url, undefined, config);
   };
-  
+
   /**
    * 发送 PATCH 请求
    * @param url 请求 URL
@@ -291,10 +327,14 @@ export const useApiClient = () => {
    * @param config 请求配置
    * @returns 响应数据
    */
-  const patch = <T = any>(url: string, data?: any, config?: ApiRequestConfig) => {
-    return request<T>('PATCH', url, data, config);
+  const patch = <T = any>(
+    url: string,
+    data?: any,
+    config?: ApiRequestConfig
+  ) => {
+    return request<T>("PATCH", url, data, config);
   };
-  
+
   /**
    * 上传文件
    * @param url 请求 URL
@@ -302,23 +342,27 @@ export const useApiClient = () => {
    * @param config 请求配置
    * @returns 响应数据
    */
-  const upload = <T = any>(url: string, formData: FormData, config?: ApiRequestConfig) => {
+  const upload = <T = any>(
+    url: string,
+    formData: FormData,
+    config?: ApiRequestConfig
+  ) => {
     // 上传文件时不设置 Content-Type，让浏览器自动设置
     const uploadConfig: ApiRequestConfig = {
       ...config,
       headers: {
-        ...config?.headers
-      }
+        ...config?.headers,
+      },
     };
-    
+
     // 删除 Content-Type 让浏览器自动设置
-    if (uploadConfig.headers && 'Content-Type' in uploadConfig.headers) {
-      delete uploadConfig.headers['Content-Type'];
+    if (uploadConfig.headers && "Content-Type" in uploadConfig.headers) {
+      delete uploadConfig.headers["Content-Type"];
     }
-    
-    return request<T>('POST', url, formData, uploadConfig);
+
+    return request<T>("POST", url, formData, uploadConfig);
   };
-  
+
   return {
     request,
     get,
@@ -326,6 +370,6 @@ export const useApiClient = () => {
     put,
     delete: del, // 'delete' 是 JavaScript 关键字，使用 'del' 作为方法名
     patch,
-    upload
+    upload,
   };
 };
