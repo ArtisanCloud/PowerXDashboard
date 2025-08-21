@@ -3,6 +3,11 @@ import tailwindcss from "@tailwindcss/vite";
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   ssr: false,
+  router: {
+    options: {
+      strict: true, // 将 strict 设为 false
+    },
+  },
   runtimeConfig: {
     // 仅服务端可见
     upstream: process.env.UPSTREAM || "http://127.0.0.1:8077", // 你的后端基础域名
@@ -16,7 +21,10 @@ export default defineNuxtConfig({
   // 添加开发服务器代理配置
   nitro: {
     routeRules: {
-      "/__up/_p/**": { proxy: "http://127.0.0.1:8077/_p/**" },
+      // "/__up/_p/**": { proxy: "http://127.0.0.1:8077/_p/**" },
+
+      // 这个是后端页面里请求的地址，所以需要套一层代理
+      "/_p/**": { proxy: "http://127.0.0.1:8077/_p/**" },
     },
     devProxy: {
       "/api/_nuxt_icon": {},
