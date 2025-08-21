@@ -4,7 +4,7 @@ import {
   type User,
   type UserFilters,
 } from "~/composables/api/services";
-import type { PaginatedResponse } from "~/composables/api/types";
+import type { PaginatedResponse } from "~/composables/api/types/types";
 
 /**
  * 用户管理 Composable

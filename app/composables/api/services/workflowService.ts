@@ -1,5 +1,9 @@
 import { useApiClient } from "../index";
-import type { ApiResponse, PaginatedResponse, PaginationParams } from "../types";
+import type {
+  ApiResponse,
+  PaginatedResponse,
+  PaginationParams,
+} from "../types/types";
 import type {
   KindSpec,
   PaletteItem,
@@ -347,10 +351,9 @@ export const useWorkflowService = () => {
      * 获取工作流列表
      */
     getWorkflows: (filters?: WorkflowFilters) => {
-      return apiClient.get<ApiResponse<PaginatedResponse<WorkflowListResponse>>>(
-        baseUrl,
-        { params: filters }
-      );
+      return apiClient.get<
+        ApiResponse<PaginatedResponse<WorkflowListResponse>>
+      >(baseUrl, { params: filters });
     },
 
     /**
@@ -385,9 +388,12 @@ export const useWorkflowService = () => {
      * 复制工作流
      */
     duplicateWorkflow: (id: string, name?: string) => {
-      return apiClient.post<ApiResponse<Workflow>>(`${baseUrl}/${id}/duplicate`, {
-        name,
-      });
+      return apiClient.post<ApiResponse<Workflow>>(
+        `${baseUrl}/${id}/duplicate`,
+        {
+          name,
+        }
+      );
     },
 
     /**
@@ -508,19 +514,18 @@ export const useWorkflowService = () => {
       query: string,
       filters?: Omit<WorkflowFilters, "search">
     ) => {
-      return apiClient.get<ApiResponse<PaginatedResponse<WorkflowListResponse>>>(
-        `${baseUrl}/search`,
-        { params: { search: query, ...filters } }
-      );
+      return apiClient.get<
+        ApiResponse<PaginatedResponse<WorkflowListResponse>>
+      >(`${baseUrl}/search`, { params: { search: query, ...filters } });
     },
 
     /**
      * 获取工作流分类
      */
     getCategories: () => {
-      return apiClient.get<
-        ApiResponse<Array<{ name: string; count: number }>>
-      >(`${baseUrl}/categories`);
+      return apiClient.get<ApiResponse<Array<{ name: string; count: number }>>>(
+        `${baseUrl}/categories`
+      );
     },
 
     /**

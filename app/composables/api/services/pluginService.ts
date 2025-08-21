@@ -3,7 +3,7 @@ import type {
   ApiResponse,
   PaginatedResponse,
   PaginationParams,
-} from "../types";
+} from "../types/types";
 
 /**
  * 插件相关类型定义

@@ -3,7 +3,7 @@ import type {
   ApiResponse,
   PaginatedResponse,
   PaginationParams,
-} from "../types";
+} from "../types/types";
 
 /**
  * 认证相关类型定义
@@ -179,7 +179,8 @@ export const useAuthService = () => {
     login: (data: LoginParams) => {
       return apiClient.post<ApiResponse<LoginResponse>>(
         `${baseUrl}/login`,
-        data
+        data,
+        { skipAuth: true }
       );
     },
 
@@ -189,7 +190,8 @@ export const useAuthService = () => {
     register: (data: RegisterParams) => {
       return apiClient.post<ApiResponse<RegisterResponse>>(
         `${baseUrl}/register`,
-        data
+        data,
+        { skipAuth: true }
       );
     },
 

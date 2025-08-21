@@ -3,7 +3,7 @@ import type {
   HttpMethod,
   RequestInterceptor,
   ResponseInterceptor,
-} from "./types";
+} from "./types/types";
 
 // API 客户端配置
 interface ApiClientConfig {

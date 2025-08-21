@@ -1,5 +1,5 @@
 import { useApiClient } from "../index";
-import type { ApiResponse } from "../types";
+import type { ApiResponse } from "../types/types";
 
 /**
  * 设置相关类型定义

@@ -1,5 +1,9 @@
-import { useApiClient } from '../index';
-import type { ApiResponse, PaginatedResponse, PaginationParams } from '../types';
+import { useApiClient } from "../index";
+import type {
+  ApiResponse,
+  PaginatedResponse,
+  PaginationParams,
+} from "../types/types";
 
 // 产品相关接口类型定义
 export interface Product {
@@ -44,14 +48,16 @@ export interface ProductSearchParams extends PaginationParams {
  */
 export const useProductService = () => {
   const apiClient = useApiClient();
-  const baseUrl = '/products';
+  const baseUrl = "/products";
 
   return {
     /**
      * 获取产品列表
      */
     getProducts: (params?: ProductSearchParams) => {
-      return apiClient.get<ApiResponse<PaginatedResponse<Product>>>(baseUrl, { params });
+      return apiClient.get<ApiResponse<PaginatedResponse<Product>>>(baseUrl, {
+        params,
+      });
     },
 
     /**
@@ -87,6 +93,6 @@ export const useProductService = () => {
      */
     getCategories: () => {
       return apiClient.get<ApiResponse<string[]>>(`${baseUrl}/categories`);
-    }
+    },
   };
 };

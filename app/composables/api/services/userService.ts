@@ -1,5 +1,9 @@
-import { useApiClient } from '../index';
-import type { ApiResponse, PaginatedResponse, PaginationParams } from '../types';
+import { useApiClient } from "../index";
+import type {
+  ApiResponse,
+  PaginatedResponse,
+  PaginationParams,
+} from "../types/types";
 
 // 用户相关接口类型定义
 export interface User {
@@ -35,42 +39,47 @@ export interface UserUpdateParams {
  */
 export const useUserService = () => {
   const apiClient = useApiClient();
-  const baseUrl = '/users';
+  const baseUrl = "/users";
 
   return {
     /**
      * 用户登录
      */
     login: (params: UserLoginParams) => {
-      return apiClient.post<ApiResponse<{ token: string; user: User }>>('/auth/login', params);
+      return apiClient.post<ApiResponse<{ token: string; user: User }>>(
+        "/auth/login",
+        params
+      );
     },
 
     /**
      * 用户注册
      */
     register: (params: UserRegisterParams) => {
-      return apiClient.post<ApiResponse<User>>('/auth/register', params);
+      return apiClient.post<ApiResponse<User>>("/auth/register", params);
     },
 
     /**
      * 获取当前用户信息
      */
     getCurrentUser: () => {
-      return apiClient.get<ApiResponse<User>>('/auth/me');
+      return apiClient.get<ApiResponse<User>>("/auth/me");
     },
 
     /**
      * 退出登录
      */
     logout: () => {
-      return apiClient.post<ApiResponse<null>>('/auth/logout');
+      return apiClient.post<ApiResponse<null>>("/auth/logout");
     },
 
     /**
      * 获取用户列表
      */
     getUsers: (params?: PaginationParams) => {
-      return apiClient.get<ApiResponse<PaginatedResponse<User>>>(baseUrl, { params });
+      return apiClient.get<ApiResponse<PaginatedResponse<User>>>(baseUrl, {
+        params,
+      });
     },
 
     /**
@@ -92,6 +101,6 @@ export const useUserService = () => {
      */
     deleteUser: (id: string) => {
       return apiClient.delete<ApiResponse<null>>(`${baseUrl}/${id}`);
-    }
+    },
   };
 };

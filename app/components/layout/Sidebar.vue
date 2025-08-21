@@ -21,7 +21,7 @@ const {
 });
 
 // 调试输出
-// console.log('菜单响应数据:', menuResponse.value)
+// console.log("菜单响应数据:", menuResponse.value);
 
 // 处理菜单数据，使用 i18n 翻译菜单标题
 const menuItems = computed<MenuItem[]>(() => {
