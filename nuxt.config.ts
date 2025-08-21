@@ -16,7 +16,8 @@ export default defineNuxtConfig({
   // 添加开发服务器代理配置
   nitro: {
     devProxy: {
-      "/api": {
+      "/api/_nuxt_icon": {},
+      "/api/": {
         target: "http://127.0.0.1:8077/api",
         changeOrigin: true,
         prependPath: true,
