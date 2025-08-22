@@ -1,72 +1,59 @@
 <script setup lang="ts">
-import { ref, reactive, computed, h, resolveComponent, watch } from "vue";
+import {
+  ref,
+  reactive,
+  computed,
+  h,
+  resolveComponent,
+  watch,
+  onMounted,
+} from "vue";
 import { useI18n } from "#imports";
+import {
+  useDepartmentService,
+  type Department,
+  type DepartmentCreateParams,
+  type DepartmentUpdateParams,
+} from "~/composables/api/services/departmentService";
+import { useMemberService } from "~/composables/api/services/memberService";
 
 const { t, locale } = useI18n();
+const UButton = resolveComponent("UButton");
 
-type Department = {
-  id: number;
-  name: string;
-  code: string;
-  leader: string;
-  memberCount: number;
-  description: string;
+/** ================== 状态 ================== */
+const deptService = useDepartmentService();
+
+const tree = ref<Department[]>([]); // 后端返回的树
+const flat = ref<Department[]>([]); // 扁平化，用于选择上级部门等
+const isLoadingTree = ref(false);
+const loadError = ref<string | null>(null);
+
+const activeNodeId = ref<number | null>(null); // UTree 当前选中部门 id
+const activeNode = computed(
+  () => flat.value.find((d) => d.id === activeNodeId.value) || null
+);
+
+const memberService = useMemberService();
+const members = ref<{ label: string; value: number }[]>([]);
+
+const loadMembers = async () => {
+  const list = await memberService.listAll(); // 你实际的 API
+  members.value = list.map((m: any) => ({ label: m.name, value: m.id }));
 };
-
-const departments = ref<Department[]>([
-  {
-    id: 1,
-    name: "技术部",
-    code: "tech",
-    leader: "张三",
-    memberCount: 12,
-    description: "负责产品研发和技术支持",
-  },
-  {
-    id: 2,
-    name: "市场部",
-    code: "marketing",
-    leader: "李四",
-    memberCount: 8,
-    description: "负责市场推广和品牌建设",
-  },
-  {
-    id: 3,
-    name: "销售部",
-    code: "sales",
-    leader: "王五",
-    memberCount: 15,
-    description: "负责产品销售和客户关系",
-  },
-  {
-    id: 4,
-    name: "人力资源部",
-    code: "hr",
-    leader: "赵六",
-    memberCount: 5,
-    description: "负责人员招聘和培训",
-  },
-  {
-    id: 5,
-    name: "财务部",
-    code: "finance",
-    leader: "钱七",
-    memberCount: 6,
-    description: "负责财务管理和预算控制",
-  },
-]);
+onMounted(() => {
+  fetchTree();
+  loadMembers().catch(() => {});
+});
 
 const searchQuery = ref("");
 
-/** ========= 分页状态 ========= */
+/** 分页 */
 const pagination = reactive({
   page: 1,
   pageSize: 10,
   total: 0,
   totalPages: 0,
 });
-
-// 分页大小选项
 const pageSizeOptions = [
   { label: "10", value: 10 },
   { label: "20", value: 20 },
@@ -74,25 +61,46 @@ const pageSizeOptions = [
   { label: "100", value: 100 },
 ];
 
-// 表单与弹窗
+/** 表单 & 弹窗 */
 const showForm = ref(false);
 const isEditing = ref(false);
 const editingId = ref<number | null>(null);
 
+const originalEditing = ref<
+  | (Department & {
+      key?: string | null;
+      sort?: number | null;
+      leader_member_id?: number | null;
+      status?: number | null;
+      meta?: any;
+    })
+  | null
+>(null);
+
+// 表单模型：新增 key / sort / leader_member_id / status / meta / new_parent_id
 const departmentForm = reactive({
   name: "",
-  code: "",
-  leader: "",
-  description: "",
+  key: "",
+  parent_id: undefined as number | undefined, // 仅用于创建 or 选择父级
+  new_parent_id: null as number | null, // 更新移动：不传=不移动，null=置空
+  sort: undefined as number | undefined,
+  leader_member_id: null as number | null,
+  status: 1 as number, // 1启用 / 0停用（示例）
+  metaText: "" as string, // 文本编辑区，保存时转 JSON
 });
 
 const resetForm = () => {
   departmentForm.name = "";
-  departmentForm.code = "";
-  departmentForm.leader = "";
-  departmentForm.description = "";
+  departmentForm.key = "";
+  departmentForm.parent_id = activeNodeId.value ?? undefined;
+  departmentForm.new_parent_id = null;
+  departmentForm.sort = undefined;
+  departmentForm.leader_member_id = null;
+  departmentForm.status = 1;
+  departmentForm.metaText = "";
   isEditing.value = false;
   editingId.value = null;
+  originalEditing.value = null;
 };
 
 const openAddForm = () => {
@@ -100,77 +108,126 @@ const openAddForm = () => {
   showForm.value = true;
 };
 
-const openEditForm = (dept: Department) => {
-  departmentForm.name = dept.name;
-  departmentForm.code = dept.code;
-  departmentForm.leader = dept.leader;
-  departmentForm.description = dept.description;
+const openEditForm = (dept: Department & any) => {
+  // 这里的 dept 建议从 flat 里取全量（你 trailing 里已传 parent_id）
+  const full = flat.value.find((d) => d.id === dept.id) || dept;
+  departmentForm.name = full.name ?? "";
+  departmentForm.key = full.key ?? "";
+  departmentForm.parent_id = full.parent_id; // 仅用于展示；实际移动用 new_parent_id
+  departmentForm.new_parent_id = null; // 默认不移动
+  departmentForm.sort = full.sort;
+  departmentForm.leader_member_id = full.leader_member_id ?? null;
+  departmentForm.status = full.status ?? 1;
+  departmentForm.metaText = full.meta ? JSON.stringify(full.meta, null, 2) : "";
+
   isEditing.value = true;
-  editingId.value = dept.id;
+  editingId.value = full.id;
+  originalEditing.value = JSON.parse(JSON.stringify(full));
   showForm.value = true;
 };
 
-const saveDepartment = () => {
-  if (isEditing.value) {
-    const index = departments.value.findIndex((d) => d.id === editingId.value);
-    if (index !== -1) {
-      departments.value[index] = {
-        ...departments.value[index],
-        name: departmentForm.name,
-        code: departmentForm.code,
-        leader: departmentForm.leader,
-        description: departmentForm.description,
-      };
+/** ================== 数据获取 & 工具 ================== */
+const fetchTree = async () => {
+  isLoadingTree.value = true;
+  loadError.value = null;
+  try {
+    const data = await deptService.getDepartmentTree();
+    tree.value = data;
+    flat.value = flattenDepartments(data);
+
+    // 默认选择第一个根节点
+    if (!activeNodeId.value) {
+      const firstRoot = flat.value.find((d) => !d.parent_id);
+      activeNodeId.value = firstRoot?.id ?? null;
     }
-  } else {
-    const newId = Math.max(0, ...departments.value.map((d) => d.id)) + 1;
-    departments.value.push({
-      id: newId,
-      name: departmentForm.name,
-      code: departmentForm.code,
-      leader: departmentForm.leader,
-      description: departmentForm.description,
-      memberCount: 0,
-    });
-  }
-  showForm.value = false;
-  resetForm();
-};
-
-const deleteDepartment = (id: number) => {
-  if (confirm("确定要删除此部门吗？")) {
-    departments.value = departments.value.filter((d) => d.id !== id);
+    selectedValue.value = activeNodeId.value
+      ? [String(activeNodeId.value)]
+      : [];
+  } catch (e: any) {
+    loadError.value = e?.message ?? "加载失败";
+  } finally {
+    isLoadingTree.value = false;
   }
 };
 
-/** ========= 过滤和分页 ========= */
+/** UTree 数据 */
+const treeItems = computed(() => tree.value.map((n) => toTreeItem(n)));
+
+function toTreeItem(n: Department): any {
+  const hasChildren = !!(n.children && n.children.length);
+  return {
+    // ✅ UTree 用 value 作为唯一标识（或 label）
+    value: String(n.id),
+    label: n.name,
+    id: n.id, // 额外带上，方便右侧编辑删除
+    hasChildren,
+    children: hasChildren ? n.children!.map(toTreeItem) : undefined,
+  };
+}
+
+const activeNodeActivePath = ref<string[]>([]);
+
+// 当树数据加载完，初始化一次（保持和 activeNodeId 同步）
+watch(
+  () => activeNodeId.value,
+  (id) => {
+    activeNodeActivePath.value = id ? [String(id)] : [];
+  },
+  { immediate: true }
+);
+
+// 新增：选中值 & 展开集合（字符串数组）
+const selectedValue = ref<string[]>([]);
+const expandedValues = ref<string[]>([]);
+
+// 同步：当选择变化时，更新 activeNodeId（右侧列表依赖它）
+watch(selectedValue, (vals) => {
+  const first = Array.isArray(vals) && vals.length ? vals[0] : null;
+  activeNodeId.value = first ? Number(first) : null;
+  pagination.page = 1;
+});
+
+onMounted(fetchTree);
+
+function flattenDepartments(nodes: Department[], result: Department[] = []) {
+  for (const n of nodes) {
+    result.push(n);
+    if (n.children?.length) flattenDepartments(n.children, result);
+  }
+  return result;
+}
+
+/** 右侧表格：显示当前选中节点的“直接子部门”，并支持搜索+分页 */
+const childrenOfActive = computed<Department[]>(() => {
+  if (!activeNodeId.value) return [];
+  const parent = flat.value.find((d) => d.id === activeNodeId.value);
+  return parent?.children ?? [];
+});
+
 const filteredDepartments = computed(() => {
   const q = searchQuery.value.trim().toLowerCase();
-  const filtered = q
-    ? departments.value.filter(
-        (dept) =>
-          (dept.name ?? "").toLowerCase().includes(q) ||
-          (dept.code ?? "").toLowerCase().includes(q) ||
-          (dept.leader ?? "").toLowerCase().includes(q) ||
-          (dept.description ?? "").toLowerCase().includes(q)
-      )
-    : departments.value;
-
-  // 更新分页信息
-  pagination.total = filtered.length;
-  pagination.totalPages = Math.ceil(filtered.length / pagination.pageSize);
-
-  return filtered;
+  const list = childrenOfActive.value;
+  return q
+    ? list.filter((d) => (d.name ?? "").toLowerCase().includes(q))
+    : list;
 });
 
-// 当前页显示的部门
+watch(
+  [filteredDepartments, () => pagination.pageSize],
+  () => {
+    pagination.total = filteredDepartments.value.length;
+    pagination.totalPages = Math.ceil(pagination.total / pagination.pageSize);
+    if (pagination.page > pagination.totalPages)
+      pagination.page = pagination.totalPages || 1;
+  },
+  { immediate: true }
+);
+
 const paginatedDepartments = computed(() => {
   const start = (pagination.page - 1) * pagination.pageSize;
-  const end = start + pagination.pageSize;
-  return filteredDepartments.value.slice(start, end);
+  return filteredDepartments.value.slice(start, start + pagination.pageSize);
 });
 
-// 分页信息
 const paginationInfo = computed(() => {
   const start = (pagination.page - 1) * pagination.pageSize + 1;
   const end = Math.min(pagination.page * pagination.pageSize, pagination.total);
@@ -183,60 +240,96 @@ const paginationInfo = computed(() => {
   };
 });
 
-// 分页控制
 const changePage = (page: number) => {
-  if (page >= 1 && page <= pagination.totalPages) {
-    pagination.page = page;
-  }
+  if (page >= 1 && page <= pagination.totalPages) pagination.page = page;
 };
-
-const changePageSize = (pageSize: number) => {
-  pagination.pageSize = pageSize;
-  pagination.page = 1; // 重置到第一页
+const changePageSize = (v: number | string) => {
+  pagination.pageSize = Number(v);
+  pagination.page = 1;
 };
-
 const hasNextPage = computed(() => pagination.page < pagination.totalPages);
 const hasPrevPage = computed(() => pagination.page > 1);
 
-// 监听搜索条件变化，重置到第一页
-watch(searchQuery, () => {
-  pagination.page = 1;
+/** 选择上级部门（下拉用） */
+const parentOptions = computed(() => {
+  const selfId = editingId.value;
+  return [
+    {
+      label: t("organization.department.form.noParent") as string,
+      value: null as any,
+    },
+    ...flat.value
+      .filter((d) => d.id !== selfId) // 🚫 不能把自己选为上级
+      .map((d) => ({ label: d.name, value: d.id })),
+  ];
 });
 
-// ====== ✅ Nuxt UI 3.3+：TanStack 列定义 ======
-const UButton = resolveComponent("UButton");
+/** ================== CRUD（走后端） ================== */
+const deleteDepartment = async (id: number) => {
+  if (!confirm(t("organization.department.confirmDelete") as string)) return;
+  const ok = await deptService.deleteDepartment(id);
+  if (ok) {
+    // 若删除的是当前选中节点，则切回父级或任一根
+    if (activeNodeId.value === id) {
+      const deleted = flat.value.find((d) => d.id === id);
+      activeNodeId.value =
+        deleted?.parent_id ?? flat.value.find((d) => !d.parent_id)?.id ?? null;
+    }
+    await fetchTree();
+  }
+};
 
+/** ============ TanStack 列定义（右侧“子部门列表”） ============ */
 const columns = computed(() => {
-  const _ = locale.value; // 显式依赖，切换语言时重算
+  const _ = locale.value; // 语言切换依赖
   return [
     {
       id: "name",
       accessorKey: "name",
-      header: t("organization.department.table.name").toString(),
+      header: t("organization.department.table.name"),
+      cell: ({ row }: any) => {
+        const d: Department = row.original;
+        // 高亮当前选择的节点的直接子项名称
+        return h("div", { class: "flex items-center gap-2" }, [
+          h("span", d.name),
+        ]);
+      },
     },
     {
-      id: "code",
-      accessorKey: "code",
-      header: t("organization.department.table.code").toString(),
+      id: "id",
+      accessorKey: "id",
+      header: "ID",
+    },
+    {
+      id: "parent",
+      header: t("organization.department.form.parent") || "上级部门",
+      cell: ({ row }: any) => {
+        const d: Department = row.original;
+        const parentName = d.parent_id
+          ? (flat.value.find((x) => x.id === d.parent_id)?.name ?? "-")
+          : "-";
+        return h("span", parentName);
+      },
+    },
+    {
+      id: "sort",
+      accessorKey: "sort",
+      header: t("organization.department.form.sort") || "排序",
     },
     {
       id: "leader",
-      accessorKey: "leader",
-      header: t("organization.department.table.leader").toString(),
-    },
-    {
-      id: "memberCount",
-      accessorKey: "memberCount",
-      header: t("organization.department.table.memberCount").toString(),
-    },
-    {
-      id: "description",
-      accessorKey: "description",
-      header: t("organization.department.table.description").toString(),
+      header: t("organization.department.form.leader") || "负责人",
+      cell: ({ row }: any) => {
+        const d: any = row.original;
+        const leaderName =
+          d.leader_name || d.leader?.name || d.leader_member_id || "-";
+        return h("span", String(leaderName));
+      },
     },
     {
       id: "actions",
-      header: t("organization.department.table.actions").toString(),
+      header: t("organization.department.table.actions"),
+      enableSorting: false,
       cell: ({ row }: any) => {
         const d: Department = row.original;
         return h("div", { class: "flex gap-2" }, [
@@ -245,10 +338,38 @@ const columns = computed(() => {
             {
               size: "xs",
               variant: "ghost",
+              icon: "i-heroicons-chevron-up",
+              onClick: async () => {
+                const cur = (d.sort ?? 0) - 1;
+                await deptService.updateDepartment(d.id, { sort: cur });
+                await fetchTree();
+              },
+            },
+            { default: () => t("organization.common.up") }
+          ),
+          h(
+            UButton,
+            {
+              size: "xs",
+              variant: "ghost",
+              icon: "i-heroicons-chevron-down",
+              onClick: async () => {
+                const cur = (d.sort ?? 0) + 1;
+                await deptService.updateDepartment(d.id, { sort: cur });
+                await fetchTree();
+              },
+            },
+            { default: () => t("organization.common.down") }
+          ),
+          h(
+            UButton,
+            {
+              size: "xs",
+              variant: "ghost",
               icon: "i-heroicons-pencil-square",
               onClick: () => openEditForm(d),
             },
-            { default: () => t("organization.common.edit").toString() }
+            { default: () => t("organization.common.edit") }
           ),
           h(
             UButton,
@@ -259,18 +380,126 @@ const columns = computed(() => {
               icon: "i-heroicons-trash",
               onClick: () => deleteDepartment(d.id),
             },
-            { default: () => t("organization.common.delete").toString() }
+            { default: () => t("organization.common.delete") }
           ),
         ]);
       },
     },
   ];
 });
+
+/** UTree 选择 */
+function onSelectNode(payload: any) {
+  // 统一把各种形态归一到 string[]
+  let arr: string[] = [];
+
+  if (Array.isArray(payload)) {
+    arr = payload.map(String);
+  } else if (payload && typeof payload === "object") {
+    if ("id" in payload) arr = [String((payload as any).id)];
+    else if ("value" in payload) arr = [String((payload as any).value)];
+  } else if (payload != null) {
+    arr = [String(payload)];
+  }
+
+  selectedValue.value = arr;
+  activeNodeId.value = arr.length ? Number(arr[0]) : null;
+  activeNodeActivePath.value = selectedValue.value.slice(0, 1);
+  pagination.page = 1;
+}
+
+const saveDepartment = async () => {
+  try {
+    if (isEditing.value && editingId.value) {
+      const payload = buildUpdatePayload();
+      // 如果确实没有任何变化，就不调接口
+      if (Object.keys(payload).length === 0) {
+        showForm.value = false;
+        return;
+      }
+      // 序列化 meta：如果你的 deptService 内没做
+      const reqBody: any = { ...payload };
+      if ("meta" in reqBody) {
+        // 有些后端直接收 JSON 对象即可；若必须字符串，可改成 JSON.stringify
+        // reqBody.meta = reqBody.meta === null ? null : JSON.stringify(reqBody.meta)
+      }
+      const ok = await deptService.updateDepartment(editingId.value, reqBody);
+      if (!ok) return;
+    } else {
+      // 创建：沿用你原有的 CreateParams（保持兼容）
+      const created = await deptService.createDepartment({
+        name: departmentForm.name,
+        parent_id: departmentForm.parent_id,
+        key: departmentForm.key || undefined,
+        sort: departmentForm.sort,
+        leader_member_id: departmentForm.leader_member_id ?? undefined,
+        status: departmentForm.status,
+        meta: departmentForm.metaText?.trim()
+          ? JSON.parse(departmentForm.metaText)
+          : undefined,
+      } as any);
+      if (!created) return;
+    }
+    showForm.value = false;
+    await fetchTree();
+    resetForm();
+  } catch (e: any) {
+    alert(e?.message || "保存失败");
+  }
+};
+
+function buildUpdatePayload(): DepartmentUpdateParams {
+  const orig = originalEditing.value || ({} as any);
+  const payload: DepartmentUpdateParams = {};
+
+  // name
+  if (departmentForm.name !== orig.name) payload.name = departmentForm.name;
+
+  // key
+  if ((departmentForm.key ?? "") !== (orig.key ?? ""))
+    payload.key = departmentForm.key || "";
+
+  // new_parent_id：只有当你明确选择了（包含置空）才发送；默认不移动不传
+  if (departmentForm.new_parent_id !== null) {
+    payload.new_parent_id = departmentForm.new_parent_id;
+  }
+
+  // sort
+  if (departmentForm.sort !== orig.sort) payload.sort = departmentForm.sort;
+
+  // leader
+  if (
+    (departmentForm.leader_member_id ?? null) !==
+    (orig.leader_member_id ?? null)
+  ) {
+    payload.leader_member_id = departmentForm.leader_member_id;
+  }
+
+  // status
+  if ((departmentForm.status ?? null) !== (orig.status ?? null)) {
+    payload.status = departmentForm.status;
+  }
+
+  // meta：由 metaText 解析
+  if (
+    departmentForm.metaText !== (orig.meta ? JSON.stringify(orig.meta) : "")
+  ) {
+    try {
+      const parsed = departmentForm.metaText?.trim()
+        ? JSON.parse(departmentForm.metaText)
+        : null;
+      payload.meta = parsed ?? null;
+    } catch (e) {
+      throw new Error("Meta JSON 非法，请检查 JSON 语法。");
+    }
+  }
+
+  return payload;
+}
 </script>
 
 <template>
-  <div>
-    <!-- 部门管理头部 -->
+  <div class="p-4">
     <div class="flex justify-between items-center mb-6">
       <div>
         <h2 class="text-xl font-semibold text-gray-800">
@@ -290,115 +519,197 @@ const columns = computed(() => {
       v-model="searchQuery"
       icon="i-heroicons-magnifying-glass"
       :placeholder="$t('organization.department.search')"
-      class="w-full md:w-80 mb-6"
+      class="w-full md:w-80 mb-4"
     />
 
-    <!-- 数据统计和分页大小选择 -->
-    <div class="mb-4 bg-white p-4 rounded-lg shadow-sm">
-      <div class="flex justify-between items-center">
-        <div class="text-sm text-gray-600">
-          显示第 {{ paginationInfo.start }} - {{ paginationInfo.end }} 条， 共
-          {{ paginationInfo.total }} 条记录
-        </div>
-        <div class="flex items-center gap-2">
-          <span class="text-sm text-gray-600">每页显示：</span>
-          <USelect
-            :model-value="pagination.pageSize"
-            :options="pageSizeOptions"
-            @update:model-value="changePageSize"
-            class="w-20"
-          />
-        </div>
-      </div>
-    </div>
-
-    <!-- ✅ Nuxt UI 3.3+ 用 :data 和 TanStack columns -->
-    <div class="bg-white rounded-lg shadow-sm">
-      <UTable :data="paginatedDepartments" :columns="columns" />
-
-      <!-- 分页控件 -->
-      <div
-        v-if="pagination.totalPages > 1"
-        class="px-6 py-4 border-t border-gray-200"
-      >
-        <div class="flex justify-between items-center">
-          <div class="text-sm text-gray-600">
-            第 {{ pagination.page }} 页，共 {{ pagination.totalPages }} 页
-          </div>
-          <div class="flex gap-2">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <!-- 左侧：组织树 -->
+      <UCard class="col-span-1">
+        <template #header>
+          <div class="flex justify-between items-center">
+            <h3 class="text-lg font-medium">
+              {{ $t("organization.department.title") }}
+            </h3>
             <UButton
-              :disabled="!hasPrevPage"
-              variant="outline"
+              icon="i-heroicons-plus-circle"
               size="sm"
-              icon="i-heroicons-chevron-left"
-              @click="changePage(pagination.page - 1)"
+              color="gray"
+              variant="ghost"
+              @click="openAddForm"
             >
-              上一页
+              {{ $t("organization.department.add") }}
             </UButton>
+          </div>
+        </template>
 
-            <!-- 页码按钮 -->
-            <template
-              v-for="page in Math.min(5, pagination.totalPages)"
-              :key="page"
-            >
-              <UButton
-                v-if="
-                  Math.abs(page - pagination.page) <= 2 ||
-                  page === 1 ||
-                  page === pagination.totalPages
+        <div v-if="isLoadingTree" class="flex justify-center py-4">
+          <UIcon name="i-heroicons-arrow-path" class="animate-spin h-6 w-6" />
+        </div>
+        <div v-else-if="loadError" class="text-center text-red-500 py-4">
+          {{ loadError }}
+        </div>
+        <div
+          v-else-if="treeItems.length === 0"
+          class="text-center py-4 text-gray-500"
+        >
+          {{ $t("organization.department.empty.title") }}
+        </div>
+        <div v-else class="department-tree">
+          <UTree
+            :items="treeItems"
+            v-model="selectedValue"
+            v-model:expanded="expandedValues"
+            expanded-icon="i-heroicons-folder-open"
+            collapsed-icon="i-heroicons-folder"
+            @update:model-value="onSelectNode"
+          >
+            <!-- 左侧图标：三态明确区分 -->
+            <template #item-leading="{ item, expanded }">
+              <UIcon
+                :name="
+                  item.hasChildren
+                    ? expanded
+                      ? 'i-heroicons-folder-open'
+                      : 'i-heroicons-folder'
+                    : 'i-heroicons-document'
                 "
-                :variant="page === pagination.page ? 'solid' : 'outline'"
-                size="sm"
-                @click="changePage(page)"
-              >
-                {{ page }}
-              </UButton>
+                :class="[
+                  'h-4 w-4',
+                  item.hasChildren ? 'text-amber-500' : 'text-gray-400',
+                ]"
+              />
             </template>
 
-            <UButton
-              :disabled="!hasNextPage"
-              variant="outline"
-              size="sm"
-              icon="i-heroicons-chevron-right"
-              @click="changePage(pagination.page + 1)"
-            >
-              下一页
-            </UButton>
+            <template #item-label="{ item }">
+              <span>{{ item.label }}</span>
+            </template>
+
+            <template #item-trailing="{ item }">
+              <div class="flex space-x-1">
+                <UButton
+                  icon="i-heroicons-pencil"
+                  size="xs"
+                  color="gray"
+                  variant="ghost"
+                  @click.stop="
+                    openEditForm({
+                      id: Number(item.id),
+                      name: item.label,
+                      parent_id: flat.find((x) => x.id === Number(item.id))
+                        ?.parent_id,
+                    } as any)
+                  "
+                />
+                <UButton
+                  icon="i-heroicons-trash"
+                  size="xs"
+                  color="red"
+                  variant="ghost"
+                  @click.stop="deleteDepartment(Number(item.id))"
+                />
+              </div>
+            </template>
+          </UTree>
+        </div>
+      </UCard>
+
+      <!-- 右侧：选中节点的直接子部门列表（表格） -->
+      <UCard class="col-span-1 md:col-span-2">
+        <template #header>
+          <div class="flex justify-between items-center">
+            <h3 class="text-lg font-medium">
+              {{
+                activeNode
+                  ? `${activeNode.name} - ${$t("organization.department.title")}`
+                  : $t("organization.department.title")
+              }}
+            </h3>
+            <div class="flex items-center gap-2">
+              <span class="text-sm text-gray-600">{{
+                $t("organization.department.table.name")
+              }}</span>
+            </div>
+          </div>
+        </template>
+
+        <div class="bg-white rounded-lg">
+          <UTable
+            :data="paginatedDepartments"
+            :columns="columns"
+            :row-key="(row) => row.id"
+          />
+
+          <div
+            v-if="pagination.totalPages > 1"
+            class="px-6 py-4 border-t border-gray-200"
+          >
+            <div class="flex justify-between items-center">
+              <div class="text-sm text-gray-600">
+                第 {{ pagination.page }} /
+                {{ pagination.totalPages }} 页；本级子部门
+                {{ pagination.total }} 个
+              </div>
+              <div class="flex items-center gap-4">
+                <div class="flex items-center gap-2">
+                  <span class="text-sm text-gray-600">每页：</span>
+                  <USelect
+                    :model-value="pagination.pageSize"
+                    :items="pageSizeOptions"
+                    option-attribute="label"
+                    value-attribute="value"
+                    @update:model-value="changePageSize"
+                    class="w-20"
+                  />
+                </div>
+                <div class="flex gap-2">
+                  <UButton
+                    :disabled="!hasPrevPage"
+                    variant="outline"
+                    size="sm"
+                    icon="i-heroicons-chevron-left"
+                    @click="changePage(pagination.page - 1)"
+                    >上一页</UButton
+                  >
+                  <UButton
+                    :disabled="!hasNextPage"
+                    variant="outline"
+                    size="sm"
+                    icon="i-heroicons-chevron-right"
+                    @click="changePage(pagination.page + 1)"
+                    >下一页</UButton
+                  >
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
+
+        <template #footer>
+          <div class="flex justify-between items-center text-sm text-gray-500">
+            <span
+              >显示第 {{ paginationInfo.start }} -
+              {{ paginationInfo.end }} 条，共
+              {{ paginationInfo.total }} 条</span
+            >
+          </div>
+        </template>
+      </UCard>
     </div>
 
-    <!-- 空状态 -->
+    <!-- 空状态（针对右侧列表） -->
     <div
-      v-if="filteredDepartments.length === 0"
-      class="text-center py-12 bg-gray-50 rounded-lg mt-4"
+      v-if="!isLoadingTree && filteredDepartments.length === 0"
+      class="text-center py-10 text-gray-500"
     >
-      <UIcon
-        name="i-heroicons-building-office"
-        class="w-12 h-12 text-gray-400 mx-auto mb-4"
-      />
-      <h3 class="text-lg font-medium text-gray-900 mb-2">
-        {{ $t("organization.department.empty.title") }}
-      </h3>
-      <p class="text-gray-500 mb-4">
-        {{
-          searchQuery
-            ? $t("organization.department.empty.noResults")
-            : $t("organization.department.empty.create")
-        }}
-      </p>
-      <UButton v-if="!searchQuery" color="primary" @click="openAddForm">
-        {{ $t("organization.department.add") }}
-      </UButton>
+      {{ $t("organization.department.empty.noResults") }}
     </div>
 
     <!-- 表单 -->
     <UModal
       v-model:open="showForm"
-      title="department-manager-title"
-      description="department-manager-desc"
-      :ui="{ content: 'sm:max-w-md' }"
+      title="department - title"
+      description="department - description"
+      :ui="{ content: 'sm:max-w-3xl' }"
     >
       <template #content>
         <UCard>
@@ -413,7 +724,7 @@ const columns = computed(() => {
           </template>
 
           <form @submit.prevent="saveDepartment">
-            <div class="space-y-4">
+            <div class="grid grid-cols-2 gap-4">
               <UFormField
                 :label="$t('organization.department.form.name')"
                 required
@@ -426,35 +737,130 @@ const columns = computed(() => {
                 />
               </UFormField>
 
+              <UFormField :label="$t('organization.department.form.parent')">
+                <USelect
+                  :model-value="departmentForm.parent_id"
+                  :items="parentOptions"
+                  option-attribute="label"
+                  value-attribute="value"
+                  :placeholder="$t('organization.department.form.noParent')"
+                  @update:model-value="
+                    (v) =>
+                      (departmentForm.parent_id =
+                        v === undefined || v === null || v === ''
+                          ? undefined
+                          : Number(v))
+                  "
+                />
+              </UFormField>
+              <!-- Key -->
               <UFormField
-                :label="$t('organization.department.form.code')"
-                required
+                :label="$t('organization.department.form.key') || '唯一键 Key'"
               >
                 <UInput
-                  v-model="departmentForm.code"
-                  :placeholder="
-                    $t('organization.department.form.codePlaceholder')
-                  "
+                  v-model="departmentForm.key"
+                  placeholder="英文/短横线/下划线"
                 />
               </UFormField>
 
-              <UFormField :label="$t('organization.department.form.leader')">
-                <UInput
-                  v-model="departmentForm.leader"
-                  :placeholder="
-                    $t('organization.department.form.leaderPlaceholder')
-                  "
-                />
-              </UFormField>
-
+              <!-- 变更父级（仅编辑时可见）：new_parent_id -->
               <UFormField
-                :label="$t('organization.department.form.description')"
+                v-if="isEditing"
+                :label="
+                  $t('organization.department.form.moveParent') ||
+                  '移动到新上级'
+                "
+              >
+                <USelect
+                  :model-value="departmentForm.new_parent_id"
+                  :items="[
+                    {
+                      label: $t('organization.department.form.noParent'),
+                      value: null,
+                    },
+                    ...parentOptions,
+                  ]"
+                  option-attribute="label"
+                  value-attribute="value"
+                  :placeholder="$t('organization.department.form.noParent')"
+                  @update:model-value="
+                    (v) =>
+                      (departmentForm.new_parent_id =
+                        v === '' ? null : v === null ? null : Number(v))
+                  "
+                />
+                <p class="text-xs text-gray-500 mt-1">
+                  不选择则不移动；选择“无上级”将把部门提升为根节点。
+                </p>
+              </UFormField>
+
+              <!-- 排序 -->
+              <UFormField
+                :label="$t('organization.department.form.sort') || '排序'"
+              >
+                <UInput
+                  type="number"
+                  :min="0"
+                  v-model.number="departmentForm.sort"
+                  placeholder="数字越小越靠前"
+                />
+              </UFormField>
+
+              <!-- 负责人 -->
+              <UFormField
+                :label="
+                  $t('organization.department.form.leader') || '部门负责人'
+                "
+              >
+                <USelect
+                  :model-value="departmentForm.leader_member_id"
+                  :items="[
+                    {
+                      label: $t('organization.common.none') || '无',
+                      value: null,
+                    },
+                    ...members,
+                  ]"
+                  option-attribute="label"
+                  value-attribute="value"
+                  @update:model-value="
+                    (v) =>
+                      (departmentForm.leader_member_id =
+                        v === '' ? null : v === null ? null : Number(v))
+                  "
+                />
+              </UFormField>
+
+              <!-- 状态 -->
+              <UFormField
+                :label="$t('organization.department.form.status') || '状态'"
+              >
+                <URadioGroup
+                  v-model="departmentForm.status"
+                  :items="[
+                    {
+                      label: $t('organization.common.enabled') || '启用',
+                      value: 1,
+                    },
+                    {
+                      label: $t('organization.common.disabled') || '停用',
+                      value: 0,
+                    },
+                  ]"
+                />
+              </UFormField>
+
+              <!-- Meta JSON -->
+              <UFormField
+                :label="
+                  $t('organization.department.form.meta') || '扩展 Meta(JSON)'
+                "
+                help="留空表示不修改；清空并保存表示置空。"
               >
                 <UTextarea
-                  v-model="departmentForm.description"
-                  :placeholder="
-                    $t('organization.department.form.descriptionPlaceholder')
-                  "
+                  v-model="departmentForm.metaText"
+                  :rows="6"
+                  placeholder='{"color":"#fff","bizTag":"x"}'
                 />
               </UFormField>
             </div>
@@ -477,3 +883,26 @@ const columns = computed(() => {
     </UModal>
   </div>
 </template>
+
+<style>
+.department-tree :deep(.u-tree-node) {
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+}
+.department-tree :deep(.u-tree-node-content) {
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.375rem;
+}
+.department-tree :deep(.u-tree-node-content:hover) {
+  background-color: #f3f4f6;
+}
+.dark .department-tree :deep(.u-tree-node-content:hover) {
+  background-color: #1f2937;
+}
+.department-tree :deep(.u-tree-node-selected) {
+  background-color: rgba(var(--color-primary-500), 0.1);
+}
+.dark .department-tree :deep(.u-tree-node-selected) {
+  background-color: rgba(var(--color-primary-500), 0.05);
+}
+</style>
