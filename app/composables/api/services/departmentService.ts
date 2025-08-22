@@ -5,7 +5,7 @@ import type { ApiResponse } from "../types/types";
 export interface Department {
   id: number;
   name: string;
-  parent_id?: number;
+  parent_id?: number | null;
   children?: Department[];
 }
 
@@ -18,7 +18,9 @@ export interface DepartmentCreateParams {
 // 部门更新参数
 export interface DepartmentUpdateParams {
   name?: string;
+  sort?: number;
   parent_id?: number;
+  status?: number;
 }
 
 /**

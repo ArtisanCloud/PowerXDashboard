@@ -270,6 +270,7 @@
         "code": "部门代码",
         "leader": "负责人",
         "parent": "上级部门",
+        "noParent": "无上级部门",
         "description": "描述",
         "namePlaceholder": "输入部门名称",
         "codePlaceholder": "输入部门代码",

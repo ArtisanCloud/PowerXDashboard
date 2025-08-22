@@ -210,7 +210,7 @@ const parentOptions = computed(() => {
   return [
     {
       label: t("organization.department.form.noParent") as string,
-      value: undefined as any,
+      value: null as any,
     },
     ...flat.value
       .filter((d) => d.id !== selfId) // 🚫 不能把自己选为上级
@@ -495,7 +495,7 @@ function onSelectNode(payload: any) {
                   <span class="text-sm text-gray-600">每页：</span>
                   <USelect
                     :model-value="pagination.pageSize"
-                    :options="pageSizeOptions"
+                    :items="pageSizeOptions"
                     option-attribute="label"
                     value-attribute="value"
                     @update:model-value="changePageSize"
@@ -576,9 +576,10 @@ function onSelectNode(payload: any) {
               <UFormField :label="$t('organization.department.form.parent')">
                 <USelect
                   :model-value="departmentForm.parent_id"
-                  :options="parentOptions"
+                  :items="parentOptions"
                   option-attribute="label"
                   value-attribute="value"
+                  :placeholder="$t('organization.department.form.noParent')"
                   @update:model-value="
                     (v) =>
                       (departmentForm.parent_id =
