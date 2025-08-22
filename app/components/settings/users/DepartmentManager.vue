@@ -1,72 +1,46 @@
 <script setup lang="ts">
-import { ref, reactive, computed, h, resolveComponent, watch } from "vue";
+import {
+  ref,
+  reactive,
+  computed,
+  h,
+  resolveComponent,
+  watch,
+  onMounted,
+} from "vue";
 import { useI18n } from "#imports";
+import {
+  useDepartmentService,
+  type Department,
+  type DepartmentCreateParams,
+  type DepartmentUpdateParams,
+} from "~/composables/api/services/departmentService";
 
 const { t, locale } = useI18n();
+const UButton = resolveComponent("UButton");
 
-type Department = {
-  id: number;
-  name: string;
-  code: string;
-  leader: string;
-  memberCount: number;
-  description: string;
-};
+/** ================== 状态 ================== */
+const deptService = useDepartmentService();
 
-const departments = ref<Department[]>([
-  {
-    id: 1,
-    name: "技术部",
-    code: "tech",
-    leader: "张三",
-    memberCount: 12,
-    description: "负责产品研发和技术支持",
-  },
-  {
-    id: 2,
-    name: "市场部",
-    code: "marketing",
-    leader: "李四",
-    memberCount: 8,
-    description: "负责市场推广和品牌建设",
-  },
-  {
-    id: 3,
-    name: "销售部",
-    code: "sales",
-    leader: "王五",
-    memberCount: 15,
-    description: "负责产品销售和客户关系",
-  },
-  {
-    id: 4,
-    name: "人力资源部",
-    code: "hr",
-    leader: "赵六",
-    memberCount: 5,
-    description: "负责人员招聘和培训",
-  },
-  {
-    id: 5,
-    name: "财务部",
-    code: "finance",
-    leader: "钱七",
-    memberCount: 6,
-    description: "负责财务管理和预算控制",
-  },
-]);
+const tree = ref<Department[]>([]); // 后端返回的树
+const flat = ref<Department[]>([]); // 扁平化，用于选择上级部门等
+const isLoadingTree = ref(false);
+const loadError = ref<string | null>(null);
+
+const activeNodeId = ref<number | null>(null); // UTree 当前选中部门 id
+const activeNode = computed(
+  () => flat.value.find((d) => d.id === activeNodeId.value) || null
+);
 
 const searchQuery = ref("");
 
-/** ========= 分页状态 ========= */
+/** 分页 */
 const pagination = reactive({
   page: 1,
   pageSize: 10,
   total: 0,
   totalPages: 0,
 });
-
-// 分页大小选项
 const pageSizeOptions = [
   { label: "10", value: 10 },
   { label: "20", value: 20 },
@@ -74,23 +48,21 @@ const pageSizeOptions = [
   { label: "100", value: 100 },
 ];
 
-// 表单与弹窗
+/** 表单 & 弹窗 */
 const showForm = ref(false);
 const isEditing = ref(false);
 const editingId = ref<number | null>(null);
 
-const departmentForm = reactive({
+const departmentForm = reactive<
+  DepartmentCreateParams & Required<Pick<DepartmentCreateParams, "name">>
+>({
   name: "",
-  code: "",
-  leader: "",
-  description: "",
+  parent_id: undefined,
 });
 
 const resetForm = () => {
   departmentForm.name = "";
-  departmentForm.code = "";
-  departmentForm.leader = "";
-  departmentForm.description = "";
+  departmentForm.parent_id = activeNodeId.value ?? undefined; // 默认选中节点为上级
   isEditing.value = false;
   editingId.value = null;
 };
@@ -102,75 +74,85 @@ const openAddForm = () => {
 
 const openEditForm = (dept: Department) => {
   departmentForm.name = dept.name;
-  departmentForm.code = dept.code;
-  departmentForm.leader = dept.leader;
-  departmentForm.description = dept.description;
+  departmentForm.parent_id = dept.parent_id;
   isEditing.value = true;
   editingId.value = dept.id;
   showForm.value = true;
 };
 
-const saveDepartment = () => {
-  if (isEditing.value) {
-    const index = departments.value.findIndex((d) => d.id === editingId.value);
-    if (index !== -1) {
-      departments.value[index] = {
-        ...departments.value[index],
-        name: departmentForm.name,
-        code: departmentForm.code,
-        leader: departmentForm.leader,
-        description: departmentForm.description,
-      };
+/** ================== 数据获取 & 工具 ================== */
+const fetchTree = async () => {
+  isLoadingTree.value = true;
+  loadError.value = null;
+  try {
+    const data = await deptService.getDepartmentTree();
+    console.log("fetch departments: ", data);
+    tree.value = data;
+    flat.value = flattenDepartments(data);
+    // 若当前没有选中节点，默认选第一个根
+    if (!activeNodeId.value) {
+      const firstRoot = flat.value.find((d) => !d.parent_id);
+      activeNodeId.value = firstRoot?.id ?? null;
     }
-  } else {
-    const newId = Math.max(0, ...departments.value.map((d) => d.id)) + 1;
-    departments.value.push({
-      id: newId,
-      name: departmentForm.name,
-      code: departmentForm.code,
-      leader: departmentForm.leader,
-      description: departmentForm.description,
-      memberCount: 0,
-    });
-  }
-  showForm.value = false;
-  resetForm();
-};
-
-const deleteDepartment = (id: number) => {
-  if (confirm("确定要删除此部门吗？")) {
-    departments.value = departments.value.filter((d) => d.id !== id);
+  } catch (e: any) {
+    loadError.value = e?.message ?? "加载失败";
+  } finally {
+    isLoadingTree.value = false;
   }
 };
 
-/** ========= 过滤和分页 ========= */
+onMounted(fetchTree);
+
+function flattenDepartments(nodes: Department[], result: Department[] = []) {
+  for (const n of nodes) {
+    result.push(n);
+    if (n.children?.length) flattenDepartments(n.children, result);
+  }
+  return result;
+}
+
+/** UTree 数据 */
+const treeItems = computed(() => tree.value.map((n) => toTreeItem(n)));
+
+function toTreeItem(n: Department): any {
+  return {
+    id: String(n.id),
+    label: n.name,
+    children: n.children?.length ? n.children.map(toTreeItem) : undefined,
+  };
+}
+
+/** 右侧表格：显示当前选中节点的“直接子部门”，并支持搜索+分页 */
+const childrenOfActive = computed<Department[]>(() => {
+  if (!activeNodeId.value) return [];
+  const parent = flat.value.find((d) => d.id === activeNodeId.value);
+  return parent?.children ?? [];
+});
+
 const filteredDepartments = computed(() => {
   const q = searchQuery.value.trim().toLowerCase();
-  const filtered = q
-    ? departments.value.filter(
-        (dept) =>
-          (dept.name ?? "").toLowerCase().includes(q) ||
-          (dept.code ?? "").toLowerCase().includes(q) ||
-          (dept.leader ?? "").toLowerCase().includes(q) ||
-          (dept.description ?? "").toLowerCase().includes(q)
-      )
-    : departments.value;
-
-  // 更新分页信息
-  pagination.total = filtered.length;
-  pagination.totalPages = Math.ceil(filtered.length / pagination.pageSize);
-
-  return filtered;
+  const list = childrenOfActive.value;
+  return q
+    ? list.filter((d) => (d.name ?? "").toLowerCase().includes(q))
+    : list;
 });
 
-// 当前页显示的部门
+watch(
+  [filteredDepartments, () => pagination.pageSize],
+  () => {
+    pagination.total = filteredDepartments.value.length;
+    pagination.totalPages = Math.ceil(pagination.total / pagination.pageSize);
+    if (pagination.page > pagination.totalPages)
+      pagination.page = pagination.totalPages || 1;
+  },
+  { immediate: true }
+);
+
 const paginatedDepartments = computed(() => {
   const start = (pagination.page - 1) * pagination.pageSize;
-  const end = start + pagination.pageSize;
-  return filteredDepartments.value.slice(start, end);
+  return filteredDepartments.value.slice(start, start + pagination.pageSize);
 });
 
-// 分页信息
 const paginationInfo = computed(() => {
   const start = (pagination.page - 1) * pagination.pageSize + 1;
   const end = Math.min(pagination.page * pagination.pageSize, pagination.total);
@@ -183,60 +165,97 @@ const paginationInfo = computed(() => {
   };
 });
 
-// 分页控制
 const changePage = (page: number) => {
-  if (page >= 1 && page <= pagination.totalPages) {
-    pagination.page = page;
-  }
+  if (page >= 1 && page <= pagination.totalPages) pagination.page = page;
 };
-
-const changePageSize = (pageSize: number) => {
-  pagination.pageSize = pageSize;
-  pagination.page = 1; // 重置到第一页
+const changePageSize = (v: number | string) => {
+  pagination.pageSize = Number(v);
+  pagination.page = 1;
 };
-
 const hasNextPage = computed(() => pagination.page < pagination.totalPages);
 const hasPrevPage = computed(() => pagination.page > 1);
 
-// 监听搜索条件变化，重置到第一页
-watch(searchQuery, () => {
-  pagination.page = 1;
+/** 选择上级部门（下拉用） */
+const parentOptions = computed(() => {
+  // 允许选择“无上级/成为根节点”
+  return [
+    {
+      label: t("organization.department.form.noParent") as string,
+      value: undefined as any,
+    },
+  ].concat(flat.value.map((d) => ({ label: d.name, value: d.id })));
 });
 
-// ====== ✅ Nuxt UI 3.3+：TanStack 列定义 ======
-const UButton = resolveComponent("UButton");
+/** ================== CRUD（走后端） ================== */
+const saveDepartment = async () => {
+  if (isEditing.value && editingId.value) {
+    const ok = await deptService.updateDepartment(editingId.value, {
+      name: departmentForm.name,
+      parent_id: departmentForm.parent_id,
+    } as DepartmentUpdateParams);
+    if (!ok) return;
+  } else {
+    const created = await deptService.createDepartment({
+      name: departmentForm.name,
+      parent_id: departmentForm.parent_id,
+    } as DepartmentCreateParams);
+    if (!created) return;
+  }
+  showForm.value = false;
+  await fetchTree();
+  resetForm();
+};
 
+const deleteDepartment = async (id: number) => {
+  if (!confirm(t("organization.department.confirmDelete") as string)) return;
+  const ok = await deptService.deleteDepartment(id);
+  if (ok) {
+    // 若删除的是当前选中节点，则切回父级或任一根
+    if (activeNodeId.value === id) {
+      const deleted = flat.value.find((d) => d.id === id);
+      activeNodeId.value =
+        deleted?.parent_id ?? flat.value.find((d) => !d.parent_id)?.id ?? null;
+    }
+    await fetchTree();
+  }
+};
+
+/** ============ TanStack 列定义（右侧“子部门列表”） ============ */
 const columns = computed(() => {
-  const _ = locale.value; // 显式依赖，切换语言时重算
+  const _ = locale.value; // 语言切换依赖
   return [
     {
       id: "name",
       accessorKey: "name",
-      header: t("organization.department.table.name").toString(),
+      header: t("organization.department.table.name"),
+      cell: ({ row }: any) => {
+        const d: Department = row.original;
+        // 高亮当前选择的节点的直接子项名称
+        return h("div", { class: "flex items-center gap-2" }, [
+          h("span", d.name),
+        ]);
+      },
     },
     {
-      id: "code",
-      accessorKey: "code",
-      header: t("organization.department.table.code").toString(),
+      id: "id",
+      accessorKey: "id",
+      header: "ID",
     },
     {
-      id: "leader",
-      accessorKey: "leader",
-      header: t("organization.department.table.leader").toString(),
-    },
-    {
-      id: "memberCount",
-      accessorKey: "memberCount",
-      header: t("organization.department.table.memberCount").toString(),
-    },
-    {
-      id: "description",
-      accessorKey: "description",
-      header: t("organization.department.table.description").toString(),
+      id: "parent",
+      header: t("organization.department.form.parent") || "上级部门",
+      cell: ({ row }: any) => {
+        const d: Department = row.original;
+        const parentName = d.parent_id
+          ? (flat.value.find((x) => x.id === d.parent_id)?.name ?? "-")
+          : "-";
+        return h("span", parentName);
+      },
     },
     {
       id: "actions",
-      header: t("organization.department.table.actions").toString(),
+      header: t("organization.department.table.actions"),
+      enableSorting: false,
       cell: ({ row }: any) => {
         const d: Department = row.original;
         return h("div", { class: "flex gap-2" }, [
@@ -248,7 +267,7 @@ const columns = computed(() => {
               icon: "i-heroicons-pencil-square",
               onClick: () => openEditForm(d),
             },
-            { default: () => t("organization.common.edit").toString() }
+            { default: () => t("organization.common.edit") }
           ),
           h(
             UButton,
@@ -259,18 +278,24 @@ const columns = computed(() => {
               icon: "i-heroicons-trash",
               onClick: () => deleteDepartment(d.id),
             },
-            { default: () => t("organization.common.delete").toString() }
+            { default: () => t("organization.common.delete") }
           ),
         ]);
       },
     },
   ];
 });
+
+/** UTree 选择 */
+function onSelectNode(item: any) {
+  activeNodeId.value = Number(item.id);
+  // 切换节点时回到第 1 页
+  pagination.page = 1;
+}
 </script>
 
 <template>
-  <div>
-    <!-- 部门管理头部 -->
+  <div class="p-4">
     <div class="flex justify-between items-center mb-6">
       <div>
         <h2 class="text-xl font-semibold text-gray-800">
@@ -290,116 +315,170 @@ const columns = computed(() => {
       v-model="searchQuery"
       icon="i-heroicons-magnifying-glass"
       :placeholder="$t('organization.department.search')"
-      class="w-full md:w-80 mb-6"
+      class="w-full md:w-80 mb-4"
     />
 
-    <!-- 数据统计和分页大小选择 -->
-    <div class="mb-4 bg-white p-4 rounded-lg shadow-sm">
-      <div class="flex justify-between items-center">
-        <div class="text-sm text-gray-600">
-          显示第 {{ paginationInfo.start }} - {{ paginationInfo.end }} 条， 共
-          {{ paginationInfo.total }} 条记录
-        </div>
-        <div class="flex items-center gap-2">
-          <span class="text-sm text-gray-600">每页显示：</span>
-          <USelect
-            :model-value="pagination.pageSize"
-            :options="pageSizeOptions"
-            @update:model-value="changePageSize"
-            class="w-20"
-          />
-        </div>
-      </div>
-    </div>
-
-    <!-- ✅ Nuxt UI 3.3+ 用 :data 和 TanStack columns -->
-    <div class="bg-white rounded-lg shadow-sm">
-      <UTable :data="paginatedDepartments" :columns="columns" />
-
-      <!-- 分页控件 -->
-      <div
-        v-if="pagination.totalPages > 1"
-        class="px-6 py-4 border-t border-gray-200"
-      >
-        <div class="flex justify-between items-center">
-          <div class="text-sm text-gray-600">
-            第 {{ pagination.page }} 页，共 {{ pagination.totalPages }} 页
-          </div>
-          <div class="flex gap-2">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <!-- 左侧：组织树 -->
+      <UCard class="col-span-1">
+        <template #header>
+          <div class="flex justify-between items-center">
+            <h3 class="text-lg font-medium">
+              {{ $t("organization.department.title") }}
+            </h3>
             <UButton
-              :disabled="!hasPrevPage"
-              variant="outline"
+              icon="i-heroicons-plus-circle"
               size="sm"
-              icon="i-heroicons-chevron-left"
-              @click="changePage(pagination.page - 1)"
+              color="gray"
+              variant="ghost"
+              @click="openAddForm"
             >
-              上一页
+              {{ $t("organization.department.add") }}
             </UButton>
+          </div>
+        </template>
 
-            <!-- 页码按钮 -->
-            <template
-              v-for="page in Math.min(5, pagination.totalPages)"
-              :key="page"
-            >
-              <UButton
-                v-if="
-                  Math.abs(page - pagination.page) <= 2 ||
-                  page === 1 ||
-                  page === pagination.totalPages
-                "
-                :variant="page === pagination.page ? 'solid' : 'outline'"
-                size="sm"
-                @click="changePage(page)"
-              >
-                {{ page }}
-              </UButton>
+        <div v-if="isLoadingTree" class="flex justify-center py-4">
+          <UIcon name="i-heroicons-arrow-path" class="animate-spin h-6 w-6" />
+        </div>
+        <div v-else-if="loadError" class="text-center text-red-500 py-4">
+          {{ loadError }}
+        </div>
+        <div
+          v-else-if="treeItems.length === 0"
+          class="text-center py-4 text-gray-500"
+        >
+          {{ $t("organization.department.empty.title") }}
+        </div>
+        <div v-else class="department-tree">
+          <UTree
+            :items="treeItems"
+            :active="activeNodeId ? [String(activeNodeId)] : []"
+            @select="onSelectNode"
+          >
+            <template #label="{ item }">
+              <div class="flex items-center justify-between w-full">
+                <span>{{ item.label }}</span>
+                <div class="flex space-x-1">
+                  <UButton
+                    icon="i-heroicons-pencil"
+                    size="xs"
+                    color="gray"
+                    variant="ghost"
+                    @click.stop="
+                      openEditForm({
+                        id: Number(item.id),
+                        name: item.label,
+                      } as any)
+                    "
+                  />
+                  <UButton
+                    icon="i-heroicons-trash"
+                    size="xs"
+                    color="red"
+                    variant="ghost"
+                    @click.stop="deleteDepartment(Number(item.id))"
+                  />
+                </div>
+              </div>
             </template>
+          </UTree>
+        </div>
+      </UCard>
 
-            <UButton
-              :disabled="!hasNextPage"
-              variant="outline"
-              size="sm"
-              icon="i-heroicons-chevron-right"
-              @click="changePage(pagination.page + 1)"
-            >
-              下一页
-            </UButton>
+      <!-- 右侧：选中节点的直接子部门列表（表格） -->
+      <UCard class="col-span-1 md:col-span-2">
+        <template #header>
+          <div class="flex justify-between items-center">
+            <h3 class="text-lg font-medium">
+              {{
+                activeNode
+                  ? `${activeNode.name} - ${$t("organization.department.title")}`
+                  : $t("organization.department.title")
+              }}
+            </h3>
+            <div class="flex items-center gap-2">
+              <span class="text-sm text-gray-600">{{
+                $t("organization.department.table.name")
+              }}</span>
+            </div>
+          </div>
+        </template>
+
+        <div class="bg-white rounded-lg">
+          <UTable
+            :data="paginatedDepartments"
+            :columns="columns"
+            :row-key="(row) => row.id"
+          />
+
+          <div
+            v-if="pagination.totalPages > 1"
+            class="px-6 py-4 border-t border-gray-200"
+          >
+            <div class="flex justify-between items-center">
+              <div class="text-sm text-gray-600">
+                第 {{ pagination.page }} /
+                {{ pagination.totalPages }} 页；本级子部门
+                {{ pagination.total }} 个
+              </div>
+              <div class="flex items-center gap-4">
+                <div class="flex items-center gap-2">
+                  <span class="text-sm text-gray-600">每页：</span>
+                  <USelect
+                    :model-value="pagination.pageSize"
+                    :options="pageSizeOptions"
+                    option-attribute="label"
+                    value-attribute="value"
+                    @update:model-value="changePageSize"
+                    class="w-20"
+                  />
+                </div>
+                <div class="flex gap-2">
+                  <UButton
+                    :disabled="!hasPrevPage"
+                    variant="outline"
+                    size="sm"
+                    icon="i-heroicons-chevron-left"
+                    @click="changePage(pagination.page - 1)"
+                    >上一页</UButton
+                  >
+                  <UButton
+                    :disabled="!hasNextPage"
+                    variant="outline"
+                    size="sm"
+                    icon="i-heroicons-chevron-right"
+                    @click="changePage(pagination.page + 1)"
+                    >下一页</UButton
+                  >
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
+
+        <template #footer>
+          <div class="flex justify-between items-center text-sm text-gray-500">
+            <span
+              >显示第 {{ paginationInfo.start }} -
+              {{ paginationInfo.end }} 条，共
+              {{ paginationInfo.total }} 条</span
+            >
+          </div>
+        </template>
+      </UCard>
     </div>
 
-    <!-- 空状态 -->
+    <!-- 空状态（针对右侧列表） -->
     <div
-      v-if="filteredDepartments.length === 0"
-      class="text-center py-12 bg-gray-50 rounded-lg mt-4"
+      v-if="!isLoadingTree && filteredDepartments.length === 0"
+      class="text-center py-10 text-gray-500"
     >
-      <UIcon
-        name="i-heroicons-building-office"
-        class="w-12 h-12 text-gray-400 mx-auto mb-4"
-      />
-      <h3 class="text-lg font-medium text-gray-900 mb-2">
-        {{ $t("organization.department.empty.title") }}
-      </h3>
-      <p class="text-gray-500 mb-4">
-        {{
-          searchQuery
-            ? $t("organization.department.empty.noResults")
-            : $t("organization.department.empty.create")
-        }}
-      </p>
-      <UButton v-if="!searchQuery" color="primary" @click="openAddForm">
-        {{ $t("organization.department.add") }}
-      </UButton>
+      {{ $t("organization.department.empty.noResults") }}
     </div>
 
     <!-- 表单 -->
-    <UModal
-      v-model:open="showForm"
-      title="department-manager-title"
-      description="department-manager-desc"
-      :ui="{ content: 'sm:max-w-md' }"
-    >
+    <UModal v-model:open="showForm" :ui="{ content: 'sm:max-w-md' }">
       <template #content>
         <UCard>
           <template #header>
@@ -426,34 +505,18 @@ const columns = computed(() => {
                 />
               </UFormField>
 
-              <UFormField
-                :label="$t('organization.department.form.code')"
-                required
-              >
-                <UInput
-                  v-model="departmentForm.code"
-                  :placeholder="
-                    $t('organization.department.form.codePlaceholder')
-                  "
-                />
-              </UFormField>
-
-              <UFormField :label="$t('organization.department.form.leader')">
-                <UInput
-                  v-model="departmentForm.leader"
-                  :placeholder="
-                    $t('organization.department.form.leaderPlaceholder')
-                  "
-                />
-              </UFormField>
-
-              <UFormField
-                :label="$t('organization.department.form.description')"
-              >
-                <UTextarea
-                  v-model="departmentForm.description"
-                  :placeholder="
-                    $t('organization.department.form.descriptionPlaceholder')
+              <UFormField :label="$t('organization.department.form.parent')">
+                <USelect
+                  :model-value="departmentForm.parent_id"
+                  :options="parentOptions"
+                  option-attribute="label"
+                  value-attribute="value"
+                  @update:model-value="
+                    (v) =>
+                      (departmentForm.parent_id =
+                        v === undefined || v === null || v === ''
+                          ? undefined
+                          : Number(v))
                   "
                 />
               </UFormField>
@@ -477,3 +540,26 @@ const columns = computed(() => {
     </UModal>
   </div>
 </template>
+
+<style>
+.department-tree :deep(.u-tree-node) {
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+}
+.department-tree :deep(.u-tree-node-content) {
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.375rem;
+}
+.department-tree :deep(.u-tree-node-content:hover) {
+  background-color: #f3f4f6;
+}
+.dark .department-tree :deep(.u-tree-node-content:hover) {
+  background-color: #1f2937;
+}
+.department-tree :deep(.u-tree-node-selected) {
+  background-color: rgba(var(--color-primary-500), 0.1);
+}
+.dark .department-tree :deep(.u-tree-node-selected) {
+  background-color: rgba(var(--color-primary-500), 0.05);
+}
+</style>

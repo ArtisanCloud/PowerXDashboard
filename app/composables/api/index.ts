@@ -5,7 +5,9 @@ import type {
   ResponseInterceptor,
 } from "./types/types";
 
-// API 客户端配置
+/** =========================
+ * API 客户端配置
+ * ======================== */
 interface ApiClientConfig {
   baseURL: string;
   timeout?: number;
@@ -14,7 +16,7 @@ interface ApiClientConfig {
   responseInterceptors?: ResponseInterceptor[];
 }
 
-// 全局 API 配置
+// 全局配置（可通过 setApiConfig 动态修改）
 let globalConfig: ApiClientConfig = {
   baseURL: "/api",
   timeout: 30000,
@@ -25,7 +27,7 @@ let globalConfig: ApiClientConfig = {
   requestInterceptors: [
     {
       onRequest: async (config) => {
-        // 自动添加认证头
+        // 自动添加认证头（仅客户端）
         if (process.client && !config.skipAuth) {
           const token = localStorage.getItem("access_token");
           const tokenType = localStorage.getItem("token_type") || "Bearer";
@@ -44,8 +46,7 @@ let globalConfig: ApiClientConfig = {
 };
 
 /**
- * 设置全局 API 配置
- * @param config API 客户端配置
+ * 设置全局 API 配置（浅合并 + headers 深合并）
  */
 export const setApiConfig = (config: Partial<ApiClientConfig>) => {
   globalConfig = {
@@ -58,17 +59,17 @@ export const setApiConfig = (config: Partial<ApiClientConfig>) => {
   };
 };
 
+/** =========================
+ * 工具函数
+ * ======================== */
+
 /**
- * 处理请求参数，将查询参数添加到 URL
- * @param url 请求 URL
- * @param params 查询参数
- * @returns 处理后的 URL
+ * 将 params 拼接到 URL
  */
 const handleUrl = (url: string, params?: Record<string, any>): string => {
   if (!params) return url;
-
   const queryString = Object.entries(params)
-    .filter(([_, value]) => value !== undefined && value !== null)
+    .filter(([, value]) => value !== undefined && value !== null)
     .map(([key, value]) => {
       if (Array.isArray(value)) {
         return value
@@ -78,160 +79,151 @@ const handleUrl = (url: string, params?: Record<string, any>): string => {
       return `${encodeURIComponent(key)}=${encodeURIComponent(value)}`;
     })
     .join("&");
-
   return queryString
     ? `${url}${url.includes("?") ? "&" : "?"}${queryString}`
     : url;
 };
 
 /**
- * 处理请求配置
- * @param method HTTP 方法
- * @param url 请求 URL
- * @param data 请求数据
- * @param config 请求配置
- * @returns 处理后的请求配置
+ * 判断是否为可直接作为 body 传递的“原生”类型（不要 JSON.stringify）
  */
-const handleRequestConfig = async (
-  method: HttpMethod,
-  url: string,
-  data?: any,
-  config: ApiRequestConfig = {}
-): Promise<{ url: string; options: RequestInit }> => {
-  // 合并全局配置和请求配置
-  const mergedConfig: ApiRequestConfig = {
-    ...config,
-    method,
-    headers: {
-      ...globalConfig.headers,
-      ...config.headers,
-    },
-  };
+const isNativeBody = (data: any) =>
+  (typeof FormData !== "undefined" && data instanceof FormData) ||
+  (typeof Blob !== "undefined" && data instanceof Blob) ||
+  (typeof ArrayBuffer !== "undefined" && data instanceof ArrayBuffer) ||
+  (typeof URLSearchParams !== "undefined" && data instanceof URLSearchParams) ||
+  // Node 端的 stream/Buffer 也让 $fetch 处理
+  (typeof ReadableStream !== "undefined" && data instanceof ReadableStream);
 
-  // 处理 URL
-  let fullUrl = url.startsWith("http") ? url : `${globalConfig.baseURL}${url}`;
-  fullUrl = handleUrl(fullUrl, config.params);
-
-  // 处理请求体
-  if (data !== undefined) {
-    if (method === "GET" || method === "DELETE") {
-      // GET 和 DELETE 请求通常不带请求体，将数据作为查询参数
-      fullUrl = handleUrl(fullUrl, data);
-    } else {
-      // POST, PUT, PATCH 请求将数据作为请求体
-      mergedConfig.body = JSON.stringify(data);
+/**
+ * 运行请求拦截器链
+ */
+const runRequestInterceptors = async (cfg: ApiRequestConfig) => {
+  let c = cfg;
+  for (const itc of globalConfig.requestInterceptors || []) {
+    if (itc.onRequest) {
+      c = await itc.onRequest(c);
     }
   }
-
-  // 应用请求拦截器
-  let finalConfig = mergedConfig;
-  for (const interceptor of globalConfig.requestInterceptors || []) {
-    if (interceptor.onRequest) {
-      finalConfig = await interceptor.onRequest(finalConfig);
-    }
-  }
-
-  // 提取 fetch 选项
-  const {
-    params,
-    useGlobalError,
-    useGlobalLoading,
-    skipAuth,
-    ...fetchOptions
-  } = finalConfig;
-
-  return {
-    url: fullUrl,
-    options: fetchOptions as RequestInit,
-  };
+  return c;
 };
 
 /**
- * 处理响应
- * @param response 响应对象
- * @returns 处理后的响应数据
- */
-const handleResponse = async (response: Response): Promise<any> => {
-  // 检查响应状态
-  if (!response.ok) {
-    const error: any = new Error(`HTTP error! Status: ${response.status}`);
-    error.response = response;
-
-    try {
-      error.data = await response.json();
-    } catch (e) {
-      // 如果响应不是 JSON 格式，则使用文本内容
-      error.data = await response.text();
-    }
-
-    throw error;
-  }
-
-  // 检查内容类型
-  const contentType = response.headers.get("content-type");
-  if (contentType && contentType.includes("application/json")) {
-    return response.json();
-  }
-
-  return response.text();
-};
-
-/**
- * 处理响应拦截器
- * @param response 响应数据
- * @returns 处理后的响应数据
+ * 运行响应拦截器链
  */
 const applyResponseInterceptors = async (response: any): Promise<any> => {
   let result = response;
-
-  // 应用响应拦截器
-  for (const interceptor of globalConfig.responseInterceptors || []) {
-    if (interceptor.onResponse) {
-      result = await interceptor.onResponse(result);
+  for (const itc of globalConfig.responseInterceptors || []) {
+    if (itc.onResponse) {
+      result = await itc.onResponse(result);
     }
   }
-
   return result;
 };
 
 /**
- * 处理错误拦截器
- * @param error 错误对象
- * @throws 处理后的错误
+ * 运行错误拦截器链（允许拦截器「吞错」或转换）
  */
 const applyErrorInterceptors = async (error: any): Promise<any> => {
   let result = error;
-
-  // 应用错误拦截器
-  for (const interceptor of globalConfig.responseInterceptors || []) {
-    if (interceptor.onResponseError) {
+  for (const itc of globalConfig.responseInterceptors || []) {
+    if (itc.onResponseError) {
       try {
-        result = await interceptor.onResponseError(result);
-        // 如果拦截器返回了非错误值，则中断错误链
-        if (result !== error) {
-          return result;
+        const maybeHandled = await itc.onResponseError(result);
+        // 如果返回值与入参不同，认为已处理，直接返回
+        if (maybeHandled !== result) {
+          return maybeHandled;
         }
       } catch (e) {
         result = e;
       }
     }
   }
-
   throw result;
 };
 
 /**
- * API 客户端
- * 提供基础的 HTTP 请求方法
+ * 组装请求：method/url/body/headers 等
  */
+const handleRequestConfig = async (
+  method: HttpMethod,
+  url: string,
+  data?: any,
+  config: ApiRequestConfig = {}
+): Promise<{
+  url: string;
+  fetchOptions: any;
+  finalConfig: ApiRequestConfig;
+}> => {
+  // 合并 headers
+  const headers: Record<string, string> = {
+    ...globalConfig.headers,
+    ...config.headers,
+  };
+
+  // 拼 URL（baseURL + params + GET/DELETE 数据上屏）
+  let fullUrl = url.startsWith("http") ? url : `${globalConfig.baseURL}${url}`;
+
+  // 先处理 config.params
+  if (config.params) {
+    fullUrl = handleUrl(fullUrl, config.params);
+  }
+
+  // 处理 data：GET/DELETE => query；其他 => body
+  let body: any = undefined;
+  if (data !== undefined) {
+    if (method === "GET" || method === "DELETE") {
+      fullUrl = handleUrl(fullUrl, data);
+    } else {
+      body = isNativeBody(data) ? data : JSON.stringify(data);
+      // 如果是原生体，移除 Content-Type，让浏览器/运行时自动设置
+      if (isNativeBody(data) && headers["Content-Type"]) {
+        delete headers["Content-Type"];
+      }
+    }
+  }
+
+  // 构造 ApiRequestConfig，进入拦截器
+  let mergedConfig: ApiRequestConfig = {
+    ...config,
+    method,
+    headers,
+    body,
+  };
+
+  // 请求拦截器
+  mergedConfig = await runRequestInterceptors(mergedConfig);
+
+  // 从 mergedConfig 提取给 $fetch 的 options
+  const {
+    params, // 已经处理
+    useGlobalError, // 仅透传，不在此实现
+    useGlobalLoading, // 仅透传，不在此实现
+    skipAuth, // 已被 onRequest 使用
+    // 其余透传字段不破坏
+    ...rest
+  } = mergedConfig;
+
+  const fetchOptions = {
+    method: method as any,
+    body: mergedConfig.body,
+    headers: mergedConfig.headers,
+    // 超时（ofetch 支持 timeout 毫秒）
+    timeout: globalConfig.timeout,
+    // 允许调用方透传 ofetch 其它可选项（如 responseType）
+    ...rest,
+  };
+
+  return { url: fullUrl, fetchOptions, finalConfig: mergedConfig };
+};
+
+/** =========================
+ * API 客户端（$fetch 版）
+ * ======================== */
+
 export const useApiClient = () => {
   /**
-   * 发送 HTTP 请求
-   * @param method HTTP 方法
-   * @param url 请求 URL
-   * @param data 请求数据
-   * @param config 请求配置
-   * @returns 响应数据
+   * 核心请求方法（统一使用 $fetch）
    */
   const request = async <T = any>(
     method: HttpMethod,
@@ -240,57 +232,36 @@ export const useApiClient = () => {
     config: ApiRequestConfig = {}
   ) => {
     try {
-      // 处理请求配置
-      const { url: fullUrl, options } = await handleRequestConfig(
+      const { url: fullUrl, fetchOptions } = await handleRequestConfig(
         method,
         url,
         data,
         config
       );
 
-      // 使用 useFetch 发送请求，确保 SSR 兼容性
-      const { data: responseData, error } = await useFetch(fullUrl, {
-        method: method as any,
-        body: options.body,
-        headers: options.headers,
-        // 使用 key 确保请求缓存和去重
-        key: `${method}-${fullUrl}-${JSON.stringify(data || {})}`,
-        // 转换响应数据
-        transform: (response) => response,
+      // 直接用 Nuxt 的全局 $fetch
+      // - 成功：返回已解析的数据（JSON 自动解析）
+      // - 失败：抛出 FetchError，内含 response/status 等
+      const responseData = await $fetch(fullUrl, {
+        ...fetchOptions,
+        // 这里也可以使用 ofetch 的 onResponse/onResponseError，
+        // 但我们已有自定义拦截器链，避免重复
       });
 
-      // 处理错误
-      if (error.value) {
-        throw error.value;
-      }
-
       // 应用响应拦截器
-      const result = await applyResponseInterceptors(responseData.value);
-
+      const result = await applyResponseInterceptors(responseData);
       return result as T;
-    } catch (error) {
-      // 应用错误拦截器
-      return applyErrorInterceptors(error);
+    } catch (err: any) {
+      // 统一交给错误拦截器处理/转换/抛出
+      return applyErrorInterceptors(err);
     }
   };
 
-  /**
-   * 发送 GET 请求
-   * @param url 请求 URL
-   * @param config 请求配置
-   * @returns 响应数据
-   */
+  /** 便捷方法族 */
   const get = <T = any>(url: string, config?: ApiRequestConfig) => {
     return request<T>("GET", url, undefined, config);
   };
 
-  /**
-   * 发送 POST 请求
-   * @param url 请求 URL
-   * @param data 请求数据
-   * @param config 请求配置
-   * @returns 响应数据
-   */
   const post = <T = any>(
     url: string,
     data?: any,
@@ -299,34 +270,14 @@ export const useApiClient = () => {
     return request<T>("POST", url, data, config);
   };
 
-  /**
-   * 发送 PUT 请求
-   * @param url 请求 URL
-   * @param data 请求数据
-   * @param config 请求配置
-   * @returns 响应数据
-   */
   const put = <T = any>(url: string, data?: any, config?: ApiRequestConfig) => {
     return request<T>("PUT", url, data, config);
   };
 
-  /**
-   * 发送 DELETE 请求
-   * @param url 请求 URL
-   * @param config 请求配置
-   * @returns 响应数据
-   */
   const del = <T = any>(url: string, config?: ApiRequestConfig) => {
     return request<T>("DELETE", url, undefined, config);
   };
 
-  /**
-   * 发送 PATCH 请求
-   * @param url 请求 URL
-   * @param data 请求数据
-   * @param config 请求配置
-   * @returns 响应数据
-   */
   const patch = <T = any>(
     url: string,
     data?: any,
@@ -336,30 +287,23 @@ export const useApiClient = () => {
   };
 
   /**
-   * 上传文件
-   * @param url 请求 URL
-   * @param formData 表单数据
-   * @param config 请求配置
-   * @returns 响应数据
+   * 上传文件（FormData/Blob 等）
+   * - 不主动设置 Content-Type，让运行时自动带上 multipart 边界
    */
   const upload = <T = any>(
     url: string,
     formData: FormData,
     config?: ApiRequestConfig
   ) => {
-    // 上传文件时不设置 Content-Type，让浏览器自动设置
     const uploadConfig: ApiRequestConfig = {
       ...config,
       headers: {
         ...config?.headers,
       },
     };
-
-    // 删除 Content-Type 让浏览器自动设置
     if (uploadConfig.headers && "Content-Type" in uploadConfig.headers) {
       delete uploadConfig.headers["Content-Type"];
     }
-
     return request<T>("POST", url, formData, uploadConfig);
   };
 
@@ -368,7 +312,7 @@ export const useApiClient = () => {
     get,
     post,
     put,
-    delete: del, // 'delete' 是 JavaScript 关键字，使用 'del' 作为方法名
+    delete: del,
     patch,
     upload,
   };
