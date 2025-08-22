@@ -21,7 +21,7 @@ export default defineNuxtConfig({
   // 添加开发服务器代理配置
   nitro: {
     routeRules: {
-      // "/__up/_p/**": { proxy: "http://127.0.0.1:8077/_p/**" },
+      "/__up/_p/**": { proxy: "http://127.0.0.1:8077/_p/**" },
 
       // 这个是后端页面里请求的地址，所以需要套一层代理
       "/_p/**": { proxy: "http://127.0.0.1:8077/_p/**" },

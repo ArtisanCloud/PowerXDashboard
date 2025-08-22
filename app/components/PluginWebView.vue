@@ -173,11 +173,11 @@ watch(
       {{ error }}
     </div>
 
+    <!-- :sandbox="sandbox" -->
     <iframe
       ref="iframeRef"
       :src="src"
       :title="title || 'Plugin WebView'"
-      :sandbox="sandbox"
       allow="clipboard-read *; clipboard-write *; fullscreen *"
       referrerpolicy="strict-origin-when-cross-origin"
       class="block w-full border-0 bg-transparent rounded-lg transition-[height] duration-300"
