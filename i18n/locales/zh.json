@@ -268,15 +268,30 @@
       "form": {
         "name": "部门名称",
         "code": "部门代码",
+        "key": "唯一键 Key",
+        "keyPlaceholder": "英文/短横线/下划线",
         "leader": "负责人",
         "parent": "上级部门",
         "noParent": "无上级部门",
+        "moveParent": "移动到新上级",
+        "sort": "排序",
+        "sortPlaceholder": "数字越小越靠前",
+        "status": "状态",
+        "meta": "扩展 Meta(JSON)",
         "description": "描述",
         "namePlaceholder": "输入部门名称",
         "codePlaceholder": "输入部门代码",
         "leaderPlaceholder": "输入负责人姓名",
         "parentPlaceholder": "选择上级部门",
         "descriptionPlaceholder": "输入部门描述"
+      },
+      "messages": {
+        "loadFailed": "加载失败",
+        "saveFailed": "保存失败",
+        "metaJsonError": "Meta JSON 非法，请检查 JSON 语法。"
+      },
+      "help": {
+        "metaField": "留空表示不修改；清空并保存表示置空。"
       },
       "table": {
         "name": "部门名称",
@@ -401,7 +416,12 @@
       "actions": "操作",
       "search": "搜索",
       "filter": "筛选",
-      "reset": "重置"
+      "reset": "重置",
+      "up": "上移",
+      "down": "下移",
+      "none": "无",
+      "enabled": "启用",
+      "disabled": "停用"
     }
   },
   "header": {

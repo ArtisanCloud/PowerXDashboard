@@ -15,6 +15,7 @@ import {
   type DepartmentCreateParams,
   type DepartmentUpdateParams,
 } from "~/composables/api/services/departmentService";
+import { useMemberService } from "~/composables/api/services/memberService";
 
 const { t, locale } = useI18n();
 const UButton = resolveComponent("UButton");
@@ -31,6 +32,18 @@ const activeNodeId = ref<number | null>(null); // UTree 当前选中部门 id
 const activeNode = computed(
   () => flat.value.find((d) => d.id === activeNodeId.value) || null
 );
+
+const memberService = useMemberService();
+const members = ref<{ label: string; value: number }[]>([]);
+
+const loadMembers = async () => {
+  const list = await memberService.listAll(); // 你实际的 API
+  members.value = list.map((m: any) => ({ label: m.name, value: m.id }));
+};
+onMounted(() => {
+  fetchTree();
+  loadMembers().catch(() => {});
+});
 
 const searchQuery = ref("");
 
@@ -53,18 +66,41 @@ const showForm = ref(false);
 const isEditing = ref(false);
 const editingId = ref<number | null>(null);
 
-const departmentForm = reactive<
-  DepartmentCreateParams & Required<Pick<DepartmentCreateParams, "name">>
->({
+const originalEditing = ref<
+  | (Department & {
+      key?: string | null;
+      sort?: number | null;
+      leader_member_id?: number | null;
+      status?: number | null;
+      meta?: any;
+    })
+  | null
+>(null);
+
+// 表单模型：新增 key / sort / leader_member_id / status / meta / new_parent_id
+const departmentForm = reactive({
   name: "",
-  parent_id: undefined,
+  key: "",
+  parent_id: undefined as number | undefined, // 仅用于创建 or 选择父级
+  new_parent_id: null as number | null, // 更新移动：不传=不移动，null=置空
+  sort: undefined as number | undefined,
+  leader_member_id: null as number | null,
+  status: 1 as number, // 1启用 / 0停用（示例）
+  metaText: "" as string, // 文本编辑区，保存时转 JSON
 });
 
 const resetForm = () => {
   departmentForm.name = "";
-  departmentForm.parent_id = activeNodeId.value ?? undefined; // 默认选中节点为上级
+  departmentForm.key = "";
+  departmentForm.parent_id = activeNodeId.value ?? undefined;
+  departmentForm.new_parent_id = null;
+  departmentForm.sort = undefined;
+  departmentForm.leader_member_id = null;
+  departmentForm.status = 1;
+  departmentForm.metaText = "";
   isEditing.value = false;
   editingId.value = null;
+  originalEditing.value = null;
 };
 
 const openAddForm = () => {
@@ -72,11 +108,21 @@ const openAddForm = () => {
   showForm.value = true;
 };
 
-const openEditForm = (dept: Department) => {
-  departmentForm.name = dept.name;
-  departmentForm.parent_id = dept.parent_id;
+const openEditForm = (dept: Department & any) => {
+  // 这里的 dept 建议从 flat 里取全量（你 trailing 里已传 parent_id）
+  const full = flat.value.find((d) => d.id === dept.id) || dept;
+  departmentForm.name = full.name ?? "";
+  departmentForm.key = full.key ?? "";
+  departmentForm.parent_id = full.parent_id; // 仅用于展示；实际移动用 new_parent_id
+  departmentForm.new_parent_id = null; // 默认不移动
+  departmentForm.sort = full.sort;
+  departmentForm.leader_member_id = full.leader_member_id ?? null;
+  departmentForm.status = full.status ?? 1;
+  departmentForm.metaText = full.meta ? JSON.stringify(full.meta, null, 2) : "";
+
   isEditing.value = true;
-  editingId.value = dept.id;
+  editingId.value = full.id;
+  originalEditing.value = JSON.parse(JSON.stringify(full));
   showForm.value = true;
 };
 
@@ -219,25 +265,6 @@ const parentOptions = computed(() => {
 });
 
 /** ================== CRUD（走后端） ================== */
-const saveDepartment = async () => {
-  if (isEditing.value && editingId.value) {
-    const ok = await deptService.updateDepartment(editingId.value, {
-      name: departmentForm.name,
-      parent_id: departmentForm.parent_id,
-    } as DepartmentUpdateParams);
-    if (!ok) return;
-  } else {
-    const created = await deptService.createDepartment({
-      name: departmentForm.name,
-      parent_id: departmentForm.parent_id,
-    } as DepartmentCreateParams);
-    if (!created) return;
-  }
-  showForm.value = false;
-  await fetchTree();
-  resetForm();
-};
-
 const deleteDepartment = async (id: number) => {
   if (!confirm(t("organization.department.confirmDelete") as string)) return;
   const ok = await deptService.deleteDepartment(id);
@@ -285,12 +312,55 @@ const columns = computed(() => {
       },
     },
     {
+      id: "sort",
+      accessorKey: "sort",
+      header: t("organization.department.form.sort") || "排序",
+    },
+    {
+      id: "leader",
+      header: t("organization.department.form.leader") || "负责人",
+      cell: ({ row }: any) => {
+        const d: any = row.original;
+        const leaderName =
+          d.leader_name || d.leader?.name || d.leader_member_id || "-";
+        return h("span", String(leaderName));
+      },
+    },
+    {
       id: "actions",
       header: t("organization.department.table.actions"),
       enableSorting: false,
       cell: ({ row }: any) => {
         const d: Department = row.original;
         return h("div", { class: "flex gap-2" }, [
+          h(
+            UButton,
+            {
+              size: "xs",
+              variant: "ghost",
+              icon: "i-heroicons-chevron-up",
+              onClick: async () => {
+                const cur = (d.sort ?? 0) - 1;
+                await deptService.updateDepartment(d.id, { sort: cur });
+                await fetchTree();
+              },
+            },
+            { default: () => t("organization.common.up") }
+          ),
+          h(
+            UButton,
+            {
+              size: "xs",
+              variant: "ghost",
+              icon: "i-heroicons-chevron-down",
+              onClick: async () => {
+                const cur = (d.sort ?? 0) + 1;
+                await deptService.updateDepartment(d.id, { sort: cur });
+                await fetchTree();
+              },
+            },
+            { default: () => t("organization.common.down") }
+          ),
           h(
             UButton,
             {
@@ -336,6 +406,95 @@ function onSelectNode(payload: any) {
   activeNodeId.value = arr.length ? Number(arr[0]) : null;
   activeNodeActivePath.value = selectedValue.value.slice(0, 1);
   pagination.page = 1;
+}
+
+const saveDepartment = async () => {
+  try {
+    if (isEditing.value && editingId.value) {
+      const payload = buildUpdatePayload();
+      // 如果确实没有任何变化，就不调接口
+      if (Object.keys(payload).length === 0) {
+        showForm.value = false;
+        return;
+      }
+      // 序列化 meta：如果你的 deptService 内没做
+      const reqBody: any = { ...payload };
+      if ("meta" in reqBody) {
+        // 有些后端直接收 JSON 对象即可；若必须字符串，可改成 JSON.stringify
+        // reqBody.meta = reqBody.meta === null ? null : JSON.stringify(reqBody.meta)
+      }
+      const ok = await deptService.updateDepartment(editingId.value, reqBody);
+      if (!ok) return;
+    } else {
+      // 创建：沿用你原有的 CreateParams（保持兼容）
+      const created = await deptService.createDepartment({
+        name: departmentForm.name,
+        parent_id: departmentForm.parent_id,
+        key: departmentForm.key || undefined,
+        sort: departmentForm.sort,
+        leader_member_id: departmentForm.leader_member_id ?? undefined,
+        status: departmentForm.status,
+        meta: departmentForm.metaText?.trim()
+          ? JSON.parse(departmentForm.metaText)
+          : undefined,
+      } as any);
+      if (!created) return;
+    }
+    showForm.value = false;
+    await fetchTree();
+    resetForm();
+  } catch (e: any) {
+    alert(e?.message || "保存失败");
+  }
+};
+
+function buildUpdatePayload(): DepartmentUpdateParams {
+  const orig = originalEditing.value || ({} as any);
+  const payload: DepartmentUpdateParams = {};
+
+  // name
+  if (departmentForm.name !== orig.name) payload.name = departmentForm.name;
+
+  // key
+  if ((departmentForm.key ?? "") !== (orig.key ?? ""))
+    payload.key = departmentForm.key || "";
+
+  // new_parent_id：只有当你明确选择了（包含置空）才发送；默认不移动不传
+  if (departmentForm.new_parent_id !== null) {
+    payload.new_parent_id = departmentForm.new_parent_id;
+  }
+
+  // sort
+  if (departmentForm.sort !== orig.sort) payload.sort = departmentForm.sort;
+
+  // leader
+  if (
+    (departmentForm.leader_member_id ?? null) !==
+    (orig.leader_member_id ?? null)
+  ) {
+    payload.leader_member_id = departmentForm.leader_member_id;
+  }
+
+  // status
+  if ((departmentForm.status ?? null) !== (orig.status ?? null)) {
+    payload.status = departmentForm.status;
+  }
+
+  // meta：由 metaText 解析
+  if (
+    departmentForm.metaText !== (orig.meta ? JSON.stringify(orig.meta) : "")
+  ) {
+    try {
+      const parsed = departmentForm.metaText?.trim()
+        ? JSON.parse(departmentForm.metaText)
+        : null;
+      payload.meta = parsed ?? null;
+    } catch (e) {
+      throw new Error("Meta JSON 非法，请检查 JSON 语法。");
+    }
+  }
+
+  return payload;
 }
 </script>
 
@@ -546,7 +705,12 @@ function onSelectNode(payload: any) {
     </div>
 
     <!-- 表单 -->
-    <UModal v-model:open="showForm" :ui="{ content: 'sm:max-w-md' }">
+    <UModal
+      v-model:open="showForm"
+      title="department - title"
+      description="department - description"
+      :ui="{ content: 'sm:max-w-3xl' }"
+    >
       <template #content>
         <UCard>
           <template #header>
@@ -560,7 +724,7 @@ function onSelectNode(payload: any) {
           </template>
 
           <form @submit.prevent="saveDepartment">
-            <div class="space-y-4">
+            <div class="grid grid-cols-2 gap-4">
               <UFormField
                 :label="$t('organization.department.form.name')"
                 required
@@ -587,6 +751,116 @@ function onSelectNode(payload: any) {
                           ? undefined
                           : Number(v))
                   "
+                />
+              </UFormField>
+              <!-- Key -->
+              <UFormField
+                :label="$t('organization.department.form.key') || '唯一键 Key'"
+              >
+                <UInput
+                  v-model="departmentForm.key"
+                  placeholder="英文/短横线/下划线"
+                />
+              </UFormField>
+
+              <!-- 变更父级（仅编辑时可见）：new_parent_id -->
+              <UFormField
+                v-if="isEditing"
+                :label="
+                  $t('organization.department.form.moveParent') ||
+                  '移动到新上级'
+                "
+              >
+                <USelect
+                  :model-value="departmentForm.new_parent_id"
+                  :items="[
+                    {
+                      label: $t('organization.department.form.noParent'),
+                      value: null,
+                    },
+                    ...parentOptions,
+                  ]"
+                  option-attribute="label"
+                  value-attribute="value"
+                  :placeholder="$t('organization.department.form.noParent')"
+                  @update:model-value="
+                    (v) =>
+                      (departmentForm.new_parent_id =
+                        v === '' ? null : v === null ? null : Number(v))
+                  "
+                />
+                <p class="text-xs text-gray-500 mt-1">
+                  不选择则不移动；选择“无上级”将把部门提升为根节点。
+                </p>
+              </UFormField>
+
+              <!-- 排序 -->
+              <UFormField
+                :label="$t('organization.department.form.sort') || '排序'"
+              >
+                <UInput
+                  type="number"
+                  :min="0"
+                  v-model.number="departmentForm.sort"
+                  placeholder="数字越小越靠前"
+                />
+              </UFormField>
+
+              <!-- 负责人 -->
+              <UFormField
+                :label="
+                  $t('organization.department.form.leader') || '部门负责人'
+                "
+              >
+                <USelect
+                  :model-value="departmentForm.leader_member_id"
+                  :items="[
+                    {
+                      label: $t('organization.common.none') || '无',
+                      value: null,
+                    },
+                    ...members,
+                  ]"
+                  option-attribute="label"
+                  value-attribute="value"
+                  @update:model-value="
+                    (v) =>
+                      (departmentForm.leader_member_id =
+                        v === '' ? null : v === null ? null : Number(v))
+                  "
+                />
+              </UFormField>
+
+              <!-- 状态 -->
+              <UFormField
+                :label="$t('organization.department.form.status') || '状态'"
+              >
+                <URadioGroup
+                  v-model="departmentForm.status"
+                  :items="[
+                    {
+                      label: $t('organization.common.enabled') || '启用',
+                      value: 1,
+                    },
+                    {
+                      label: $t('organization.common.disabled') || '停用',
+                      value: 0,
+                    },
+                  ]"
+                />
+              </UFormField>
+
+              <!-- Meta JSON -->
+              <UFormField
+                :label="
+                  $t('organization.department.form.meta') || '扩展 Meta(JSON)'
+                "
+                help="留空表示不修改；清空并保存表示置空。"
+              >
+                <UTextarea
+                  v-model="departmentForm.metaText"
+                  :rows="6"
+                  placeholder='{"color":"#fff","bizTag":"x"}'
                 />
               </UFormField>
             </div>

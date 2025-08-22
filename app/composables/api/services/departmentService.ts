@@ -5,6 +5,8 @@ import type { ApiResponse } from "../types/types";
 export interface Department {
   id: number;
   name: string;
+  sort?: number;
+  leader_member_id?: number | null;
   parent_id?: number | null;
   children?: Department[];
 }
@@ -16,12 +18,15 @@ export interface DepartmentCreateParams {
 }
 
 // 部门更新参数
-export interface DepartmentUpdateParams {
+export type DepartmentUpdateParams = {
   name?: string;
+  key?: string;
+  new_parent_id?: number | null; // 为空不移动（不传表示不改）
   sort?: number;
-  parent_id?: number;
-  status?: number;
-}
+  leader_member_id?: number | null;
+  status?: number; // int16 后端能接 number
+  meta?: any; // 将在请求时 JSON.stringify
+};
 
 /**
  * 从任意响应结构中解析出部门树形结构；取不到就返回 []，保证上层永远拿到数组
