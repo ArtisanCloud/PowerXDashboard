@@ -86,20 +86,60 @@ const fetchTree = async () => {
   loadError.value = null;
   try {
     const data = await deptService.getDepartmentTree();
-    console.log("fetch departments: ", data);
     tree.value = data;
     flat.value = flattenDepartments(data);
-    // 若当前没有选中节点，默认选第一个根
+
+    // 默认选择第一个根节点
     if (!activeNodeId.value) {
       const firstRoot = flat.value.find((d) => !d.parent_id);
       activeNodeId.value = firstRoot?.id ?? null;
     }
+    selectedValue.value = activeNodeId.value
+      ? [String(activeNodeId.value)]
+      : [];
   } catch (e: any) {
     loadError.value = e?.message ?? "加载失败";
   } finally {
     isLoadingTree.value = false;
   }
 };
+
+/** UTree 数据 */
+const treeItems = computed(() => tree.value.map((n) => toTreeItem(n)));
+
+function toTreeItem(n: Department): any {
+  const hasChildren = !!(n.children && n.children.length);
+  return {
+    // ✅ UTree 用 value 作为唯一标识（或 label）
+    value: String(n.id),
+    label: n.name,
+    id: n.id, // 额外带上，方便右侧编辑删除
+    hasChildren,
+    children: hasChildren ? n.children!.map(toTreeItem) : undefined,
+  };
+}
+
+const activeNodeActivePath = ref<string[]>([]);
+
+// 当树数据加载完，初始化一次（保持和 activeNodeId 同步）
+watch(
+  () => activeNodeId.value,
+  (id) => {
+    activeNodeActivePath.value = id ? [String(id)] : [];
+  },
+  { immediate: true }
+);
+
+// 新增：选中值 & 展开集合（字符串数组）
+const selectedValue = ref<string[]>([]);
+const expandedValues = ref<string[]>([]);
+
+// 同步：当选择变化时，更新 activeNodeId（右侧列表依赖它）
+watch(selectedValue, (vals) => {
+  const first = Array.isArray(vals) && vals.length ? vals[0] : null;
+  activeNodeId.value = first ? Number(first) : null;
+  pagination.page = 1;
+});
 
 onMounted(fetchTree);
 
@@ -109,17 +149,6 @@ function flattenDepartments(nodes: Department[], result: Department[] = []) {
     if (n.children?.length) flattenDepartments(n.children, result);
   }
   return result;
-}
-
-/** UTree 数据 */
-const treeItems = computed(() => tree.value.map((n) => toTreeItem(n)));
-
-function toTreeItem(n: Department): any {
-  return {
-    id: String(n.id),
-    label: n.name,
-    children: n.children?.length ? n.children.map(toTreeItem) : undefined,
-  };
 }
 
 /** 右侧表格：显示当前选中节点的“直接子部门”，并支持搜索+分页 */
@@ -177,13 +206,16 @@ const hasPrevPage = computed(() => pagination.page > 1);
 
 /** 选择上级部门（下拉用） */
 const parentOptions = computed(() => {
-  // 允许选择“无上级/成为根节点”
+  const selfId = editingId.value;
   return [
     {
       label: t("organization.department.form.noParent") as string,
       value: undefined as any,
     },
-  ].concat(flat.value.map((d) => ({ label: d.name, value: d.id })));
+    ...flat.value
+      .filter((d) => d.id !== selfId) // 🚫 不能把自己选为上级
+      .map((d) => ({ label: d.name, value: d.id })),
+  ];
 });
 
 /** ================== CRUD（走后端） ================== */
@@ -287,9 +319,22 @@ const columns = computed(() => {
 });
 
 /** UTree 选择 */
-function onSelectNode(item: any) {
-  activeNodeId.value = Number(item.id);
-  // 切换节点时回到第 1 页
+function onSelectNode(payload: any) {
+  // 统一把各种形态归一到 string[]
+  let arr: string[] = [];
+
+  if (Array.isArray(payload)) {
+    arr = payload.map(String);
+  } else if (payload && typeof payload === "object") {
+    if ("id" in payload) arr = [String((payload as any).id)];
+    else if ("value" in payload) arr = [String((payload as any).value)];
+  } else if (payload != null) {
+    arr = [String(payload)];
+  }
+
+  selectedValue.value = arr;
+  activeNodeId.value = arr.length ? Number(arr[0]) : null;
+  activeNodeActivePath.value = selectedValue.value.slice(0, 1);
   pagination.page = 1;
 }
 </script>
@@ -353,33 +398,56 @@ function onSelectNode(item: any) {
         <div v-else class="department-tree">
           <UTree
             :items="treeItems"
-            :active="activeNodeId ? [String(activeNodeId)] : []"
-            @select="onSelectNode"
+            v-model="selectedValue"
+            v-model:expanded="expandedValues"
+            expanded-icon="i-heroicons-folder-open"
+            collapsed-icon="i-heroicons-folder"
+            @update:model-value="onSelectNode"
           >
-            <template #label="{ item }">
-              <div class="flex items-center justify-between w-full">
-                <span>{{ item.label }}</span>
-                <div class="flex space-x-1">
-                  <UButton
-                    icon="i-heroicons-pencil"
-                    size="xs"
-                    color="gray"
-                    variant="ghost"
-                    @click.stop="
-                      openEditForm({
-                        id: Number(item.id),
-                        name: item.label,
-                      } as any)
-                    "
-                  />
-                  <UButton
-                    icon="i-heroicons-trash"
-                    size="xs"
-                    color="red"
-                    variant="ghost"
-                    @click.stop="deleteDepartment(Number(item.id))"
-                  />
-                </div>
+            <!-- 左侧图标：三态明确区分 -->
+            <template #item-leading="{ item, expanded }">
+              <UIcon
+                :name="
+                  item.hasChildren
+                    ? expanded
+                      ? 'i-heroicons-folder-open'
+                      : 'i-heroicons-folder'
+                    : 'i-heroicons-document'
+                "
+                :class="[
+                  'h-4 w-4',
+                  item.hasChildren ? 'text-amber-500' : 'text-gray-400',
+                ]"
+              />
+            </template>
+
+            <template #item-label="{ item }">
+              <span>{{ item.label }}</span>
+            </template>
+
+            <template #item-trailing="{ item }">
+              <div class="flex space-x-1">
+                <UButton
+                  icon="i-heroicons-pencil"
+                  size="xs"
+                  color="gray"
+                  variant="ghost"
+                  @click.stop="
+                    openEditForm({
+                      id: Number(item.id),
+                      name: item.label,
+                      parent_id: flat.find((x) => x.id === Number(item.id))
+                        ?.parent_id,
+                    } as any)
+                  "
+                />
+                <UButton
+                  icon="i-heroicons-trash"
+                  size="xs"
+                  color="red"
+                  variant="ghost"
+                  @click.stop="deleteDepartment(Number(item.id))"
+                />
               </div>
             </template>
           </UTree>
