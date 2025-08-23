@@ -238,23 +238,6 @@ const selectedAgent = computed(() => {
       @close="handleCloseConfig"
       @save="handleSaveAgent"
     />
-
-    <!-- 错误提示（只显示一次） -->
-    <UAlert
-      v-if="alertVisible"
-      :title="alertTitle || '实时连接失败'"
-      :description="alertDesc || 'SSE/WebSocket 连接建立失败，请稍后再试。'"
-      :color="'error'"
-      :variant="'solid'"
-      :icon="'i-heroicons-signal-slash-20-solid'"
-      close
-      @update:open="
-        (val) => {
-          hide();
-        }
-      "
-      class="fixed bottom-4 right-4 max-w-sm z-50"
-    />
   </div>
 </template>
 

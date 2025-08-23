@@ -1,5 +1,6 @@
 import { useApiClient } from "../index";
 import type { ApiResponse } from "../types/types";
+import { useOneShotAlert } from "../../useOneShotAlert";
 
 // 部门接口定义
 export interface Department {
@@ -8,6 +9,9 @@ export interface Department {
   sort?: number;
   leader_member_id?: number | null;
   parent_id?: number | null;
+  key?: string;
+  status?: number;
+  meta?: any;
   children?: Department[];
 }
 
@@ -99,7 +103,7 @@ export function useDepartmentService() {
           data
         );
         const serverResp = res?.data ?? res;
-        return serverResp.data;
+        return serverResp;
       } catch (error) {
         console.error("创建部门失败:", error);
         return null;
@@ -114,14 +118,16 @@ export function useDepartmentService() {
       data: DepartmentUpdateParams
     ): Promise<Department | null> => {
       try {
-        const res = await apiClient.put<ApiResponse<Department>>(
+        const res = await apiClient.patch<ApiResponse<Department>>(
           `${baseUrl}/${id}`,
           data
         );
         const serverResp = res?.data ?? res;
-        return serverResp.data;
+        // 成功提醒
+        return serverResp;
       } catch (error) {
         console.error("更新部门失败:", error);
+        // 失败提醒
         return null;
       }
     },

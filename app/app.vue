@@ -32,5 +32,7 @@ onMounted(() => {
     <NuxtLayout>
       <NuxtPage />
     </NuxtLayout>
+    <!-- 全局 Alert 通知组件 -->
+    <GlobalAlertNotification />
   </UApp>
 </template>
