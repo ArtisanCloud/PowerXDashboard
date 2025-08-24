@@ -355,6 +355,43 @@
       "reset": "リセット"
     }
   },
+  "auth": {
+    "backToHome": "ホームに戻る",
+    "welcomeBack": "おかえりなさい",
+    "loginSubtitle": "アカウントにサインインして続行",
+    "createAccount": "アカウント作成",
+    "registerSubtitle": "新しいアカウントを作成して開始",
+    "email": "メール",
+    "password": "パスワード",
+    "username": "ユーザー名",
+    "identifier": "ユーザー名/メール",
+    "confirmPassword": "パスワード確認",
+    "remember": "ログイン状態を保持",
+    "forgot": "パスワードを忘れましたか？",
+    "forgotPassword": "パスワードを忘れましたか？",
+    "signingIn": "サインイン中...",
+    "creatingAccount": "アカウント作成中...",
+    "noAccount": "アカウントをお持ちでないですか？",
+    "hasAccount": "すでにアカウントをお持ちですか？",
+    "signUpNow": "今すぐサインアップ",
+    "signInNow": "今すぐサインイン",
+    "required": "この項目は必須です",
+    "loginFailed": "ログインに失敗しました。認証情報を確認してください",
+    "registerFailed": "登録に失敗しました。もう一度お試しください",
+    "registerSuccess": "登録が成功しました！",
+    "redirectingToLogin": "ログインページにリダイレクトしています...",
+    "invalidEmail": "有効なメールアドレスを入力してください",
+    "passwordTooShort": "パスワードは少なくとも6文字である必要があります",
+    "passwordMismatch": "パスワードが一致しません",
+    "mustAgreeTerms": "登録するには利用規約に同意する必要があります",
+    "agreeTerms": "同意します",
+    "and": "と",
+    "passwordStrength": {
+      "weak": "弱い",
+      "medium": "普通",
+      "strong": "強い"
+    }
+  },
   "agent": {
     "selector": {
       "title": "AI エージェント",

@@ -37,7 +37,7 @@ interface User {
   username: string;
   email: string;
   department: string;
-  role: RoleType | string | null;
+  roles: RoleType[] | null;
   status: StatusType | string;
   avatar: string;
 }
@@ -347,22 +347,25 @@ const isEditing = ref(false);
 const editingId = ref<number | null>(null);
 
 const userForm = reactive({
-  name: "",
-  username: "",
-  email: "",
-  department: null as string | null,
-  role: null as RoleType | null,
-  password: "",
-  confirmPassword: "",
-  status: "active" as StatusType,
+  name: "", // 显示名 -> Member.display_name / User.display_name
+  username: "", // 必填 -> Member.username（租户内唯一）
+  email: "", // 可选 -> User.email（全局唯一）
+  phone: "", // 可选 -> User.phone（全局唯一）
+  departmentId: null as number | null, // 单选部门（也可改成 departmentIds: number[]）
+  roleIds: [] as number[], // 可选（如果后续开权限绑定）
+  avatarUrl: "", // 可选 -> Member/User.avatar_url
+  password: "", // 可选 -> 用于初始凭证
+  confirmPassword: "", // 可选 -> 前端/后端都校验一致
+  status: "active" as "active" | "disabled" | "locked",
+  meta: {} as Record<string, any>,
 });
 
 function resetForm() {
   userForm.name = "";
   userForm.username = "";
   userForm.email = "";
-  userForm.department = null;
-  userForm.role = null as any;
+  userForm.departmentId = null;
+  userForm.roleIds = null as any;
   userForm.password = "";
   userForm.confirmPassword = "";
   userForm.status = "active";
@@ -379,8 +382,8 @@ function openEditForm(user: User) {
   userForm.name = user.name;
   userForm.username = user.username;
   userForm.email = user.email;
-  userForm.department = user.department;
-  userForm.role = user.role as RoleType;
+  userForm.departmentId = user.departmentId;
+  userForm.roleIds = user.role as RoleType;
   userForm.status = (user.status as StatusType) ?? "active";
   userForm.password = "";
   userForm.confirmPassword = "";

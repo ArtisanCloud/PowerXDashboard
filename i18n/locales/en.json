@@ -373,6 +373,7 @@
     "email": "Email",
     "password": "Password",
     "username": "Username",
+    "identifier": "Username/Email",
     "confirmPassword": "Confirm Password",
     "remember": "Remember me",
     "forgot": "Forgot password?",

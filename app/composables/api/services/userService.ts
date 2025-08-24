@@ -11,7 +11,7 @@ export interface User {
   username: string;
   email: string;
   avatar?: string;
-  role: string;
+  roleIds: number[];
   createdAt: string;
   updatedAt: string;
 }

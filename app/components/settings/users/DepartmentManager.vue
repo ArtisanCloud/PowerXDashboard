@@ -20,10 +20,20 @@ import { useOneShotAlert } from "~/composables/useOneShotAlert";
 import * as v from "valibot";
 import type { FormSubmitEvent } from "@nuxt/ui";
 
+import { normalizeApiError } from "~/composables/api/normalizeApiError";
+const { notifyOnce, reset } = useOneShotAlert();
+
+// 字段/表单错误位
+const formError = ref<string | null>(null);
+const fieldErrors = reactive<Record<string, string>>({});
+const clearErrors = () => {
+  formError.value = null;
+  Object.keys(fieldErrors).forEach((k) => delete fieldErrors[k]);
+};
+
 /** ================== UI ================== */
 const { t, locale } = useI18n();
 const UButton = resolveComponent("UButton");
-const { notifyOnce } = useOneShotAlert();
 
 /** ================== 状态 ================== */
 const deptService = useDepartmentService();
@@ -197,6 +207,7 @@ onMounted(fetchTree);
 const onFormSubmit = async (
   _e: FormSubmitEvent<v.InferOutput<typeof schema>>
 ) => {
+  reset();
   await saveDepartment(); // 仍然走你已经改造过的 saveDepartment（带 notifyOnce）
 };
 
@@ -468,7 +479,7 @@ const saveDepartment = async () => {
 
       // 没有任何变化：不调接口，直接提示并返回
       if (Object.keys(payload).length === 0) {
-        notifyOnce("无变更", "没有检测到修改内容", "info", "solid");
+        notifyOnce("无变更", "没有检测到修改内容", "warning", "solid");
         return;
       }
 
@@ -491,22 +502,16 @@ const saveDepartment = async () => {
       success = !!created;
     }
   } catch (e: any) {
-    // 异常：给出失败提示
-    console.error(e);
-    notifyOnce(
-      "保存失败",
-      e?.message || "部门信息保存失败，请稍后重试",
-      "error",
-      "solid"
-    );
+    const { title, description } = normalizeApiError(e, { meta: "metaText" }); // ✨ 统一解析
+    reset(); // ✨ 先重置一次 one-shot
+    notifyOnce(title || "保存失败", description, "error", "solid"); // ✨ 弹全局 Alert（会在 Modal 之上）
   } finally {
-    console.log("saveDepartment", success);
     if (success) {
-      // 成功：给出成功提示并关闭弹窗
+      reset(); // 允许成功提示出现
       notifyOnce("保存成功", "部门信息已成功保存", "success", "solid");
-      showForm.value = false; // 关闭表单（注意不是 true）
-      await fetchTree(); // 刷新树
-      resetForm(); // 重置表单
+      showForm.value = false;
+      await fetchTree();
+      resetForm();
     }
   }
 };

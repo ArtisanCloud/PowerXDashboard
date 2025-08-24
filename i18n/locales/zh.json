@@ -136,6 +136,7 @@
     "email": "邮箱",
     "password": "密码",
     "username": "用户名",
+    "identifier": "用户名/邮箱",
     "confirmPassword": "确认密码",
     "remember": "记住我",
     "forgot": "忘记密码？",

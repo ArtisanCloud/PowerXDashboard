@@ -32,7 +32,13 @@ onMounted(() => {
     <NuxtLayout>
       <NuxtPage />
     </NuxtLayout>
-    <!-- 全局 Alert 通知组件 -->
-    <GlobalAlertNotification />
   </UApp>
+
+  <!-- ✨ Teleport 到 body，脱离任何局部叠层上下文 -->
+  <ClientOnly>
+    <Teleport to="body">
+      <!-- 全局 Alert 通知组件 -->
+      <GlobalAlertNotification />
+    </Teleport>
+  </ClientOnly>
 </template>

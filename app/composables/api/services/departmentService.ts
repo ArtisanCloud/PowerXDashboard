@@ -70,7 +70,7 @@ function normalizeDepartmentTree(departments: any[]): Department[] {
  */
 export function useDepartmentService() {
   const apiClient = useApiClient();
-  const baseUrl = "/admin/organization/departments";
+  const baseUrl = "/admin/iam/departments";
 
   return {
     /**
@@ -106,7 +106,7 @@ export function useDepartmentService() {
         return serverResp;
       } catch (error) {
         console.error("创建部门失败:", error);
-        return null;
+        throw error;
       }
     },
 
