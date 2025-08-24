@@ -1,10 +1,21 @@
 <!-- /components/settings/users/UsersTenantMember.vue -->
 <script setup lang="ts">
 import { ref, computed, h, resolveComponent, onMounted, watch } from "vue";
+import { storeToRefs } from "pinia";
 import { useI18n } from "#imports";
+import { useUserStore } from "~/stores/user";
 
 // Member不需要传入tenantId，而是自己选择所属的租户
 const { t, locale } = useI18n();
+
+// 使用用户 Store
+const userStore = useUserStore();
+const {
+  memberTenants,
+  currentTenantId,
+  isLoading: userLoading,
+  displayName,
+} = storeToRefs(userStore);
 
 // 租户相关
 interface UserTenant {
@@ -27,11 +38,20 @@ interface RowUser {
 }
 
 // 状态管理
-const myTenants = ref<UserTenant[]>([]);
-const selectedTenantId = ref<number | null>(null);
 const users = ref<RowUser[]>([]);
 const searchQuery = ref("");
 const isLoading = ref(false);
+
+// 转换租户数据格式
+const myTenants = computed(() =>
+  memberTenants.value.map((tenant) => ({
+    id: tenant.tenant_id,
+    name: tenant.tenant_name,
+    domain: `${tenant.tenant_name.toLowerCase()}.example.com`,
+  }))
+);
+
+const selectedTenantId = ref<number | null>(currentTenantId.value);
 
 // 计算属性
 const selectedTenant = computed(() =>
@@ -50,9 +70,10 @@ const filteredUsers = computed(() => {
   );
 });
 
-// 表格列定义（只读，无操作列）
+// 表格列定义
 const UAvatar = resolveComponent("UAvatar");
 const UBadge = resolveComponent("UBadge");
+
 const columns = computed(() => {
   const _ = locale.value;
   return [
@@ -114,84 +135,60 @@ const columns = computed(() => {
   ];
 });
 
-// 方法
-async function loadMyTenants() {
-  try {
-    // TODO: 替换为真实API调用
-    // const response = await $fetch('/api/v1/user/my-tenants');
-
-    // 模拟数据：Member通常只属于少数几个租户
-    myTenants.value = [
-      { id: 101, name: "科技有限公司", domain: "tech.example.com" },
-      { id: 102, name: "营销部门", domain: "marketing.example.com" },
-      { id: 103, name: "研发中心", domain: "rd.example.com" },
-    ];
-
-    // 默认选择第一个租户
-    if (myTenants.value.length > 0) {
-      selectedTenantId.value = myTenants.value[0].id;
-    }
-  } catch (error) {
-    console.error("加载我的租户列表失败:", error);
-  }
-}
-
-async function loadTenantUsers() {
-  if (!selectedTenantId.value) return;
-
+// 加载指定租户的用户数据
+async function loadUsersForTenant(tenantId: number) {
   isLoading.value = true;
   try {
     // TODO: 替换为真实API调用
-    // const response = await $fetch(`/api/v1/user/tenants/${selectedTenantId.value}/members`);
+    // const response = await $fetch(`/api/v1/admin/iam/members`, {
+    //   params: { tenant_id: tenantId, page: 1, page_size: 100 }
+    // });
+    // users.value = response.data || [];
 
-    // 模拟数据：根据数据权限范围，Member只能看到有权限看到的用户
-    await new Promise((resolve) => setTimeout(resolve, 300));
+    // 模拟不同租户的用户数据
+    const mockData: Record<number, RowUser[]> = {
+      1: [
+        {
+          id: 1,
+          name: "张三",
+          username: "zhangsan",
+          email: "zhangsan@tech.com",
+          department: "技术部",
+          phone: "138****1234",
+          status: "active",
+          avatar: "https://randomuser.me/api/portraits/men/1.jpg",
+          joinedAt: "2024-01-15",
+        },
+        {
+          id: 2,
+          name: "李四",
+          username: "lisi",
+          email: "lisi@tech.com",
+          department: "产品部",
+          phone: "139****5678",
+          status: "active",
+          avatar: "https://randomuser.me/api/portraits/women/2.jpg",
+          joinedAt: "2024-02-20",
+        },
+      ],
+      2: [
+        {
+          id: 3,
+          name: "王五",
+          username: "wangwu",
+          email: "wangwu@consulting.com",
+          department: "咨询部",
+          phone: "136****9012",
+          status: "active",
+          avatar: "https://randomuser.me/api/portraits/men/3.jpg",
+          joinedAt: "2024-03-10",
+        },
+      ],
+    };
 
-    const mockUsers = [
-      {
-        id: 1,
-        name: "张三",
-        username: "zhangsan",
-        email: "zhangsan@example.com",
-        department: "技术部",
-        phone: "138****1234",
-        status: "active" as const,
-        avatar: "https://randomuser.me/api/portraits/men/1.jpg",
-        joinedAt: "2024-01-15",
-      },
-      {
-        id: 2,
-        name: "李四",
-        username: "lisi",
-        email: "lisi@example.com",
-        department: "产品部",
-        phone: "139****5678",
-        status: "active" as const,
-        avatar: "https://randomuser.me/api/portraits/women/2.jpg",
-        joinedAt: "2024-02-20",
-      },
-      {
-        id: 3,
-        name: "王五",
-        username: "wangwu",
-        email: "wangwu@example.com",
-        department: "设计部",
-        phone: "136****9012",
-        status: "inactive" as const,
-        avatar: "https://randomuser.me/api/portraits/men/3.jpg",
-        joinedAt: "2024-03-10",
-      },
-    ];
-
-    // 根据不同租户返回不同的用户列表（模拟数据权限）
-    users.value = mockUsers.filter(
-      (_, index) =>
-        (selectedTenantId.value === 101 && index < 3) ||
-        (selectedTenantId.value === 102 && index < 2) ||
-        (selectedTenantId.value === 103 && index === 0)
-    );
+    users.value = mockData[tenantId] || [];
   } catch (error) {
-    console.error("加载租户用户失败:", error);
+    console.error("加载用户数据失败:", error);
     users.value = [];
   } finally {
     isLoading.value = false;
@@ -199,130 +196,152 @@ async function loadTenantUsers() {
 }
 
 // 监听租户切换
-watch(selectedTenantId, () => {
-  if (selectedTenantId.value) {
-    loadTenantUsers();
+watch(selectedTenantId, async (newTenantId) => {
+  if (newTenantId && newTenantId !== currentTenantId.value) {
+    try {
+      isLoading.value = true;
+      await userStore.switchTenant(newTenantId);
+      await loadUsersForTenant(newTenantId);
+    } catch (error: any) {
+      console.error("切换租户失败:", error);
+      // 切换失败时恢复到原来的租户
+      selectedTenantId.value = currentTenantId.value;
+    } finally {
+      isLoading.value = false;
+    }
+  } else if (newTenantId) {
+    await loadUsersForTenant(newTenantId);
   }
 });
 
+// 组件挂载时初始化
 onMounted(async () => {
-  await loadMyTenants();
+  try {
+    // 确保用户上下文已加载
+    if (!userStore.context) {
+      await userStore.fetchUserContext();
+    }
+
+    // 设置当前选中的租户
+    if (currentTenantId.value) {
+      selectedTenantId.value = currentTenantId.value;
+      await loadUsersForTenant(currentTenantId.value);
+    } else if (myTenants.value.length > 0) {
+      selectedTenantId.value = myTenants.value[0].id;
+      await loadUsersForTenant(myTenants.value[0].id);
+    }
+  } catch (error) {
+    console.error("初始化用户上下文失败:", error);
+  }
 });
 </script>
 
 <template>
   <div>
-    <!-- 顶部：租户选择 + 说明 -->
-    <div class="flex justify-between items-center mb-6">
-      <div>
-        <h2 class="text-xl font-semibold text-gray-800">
-          {{ $t("organization.user.title") }}
-        </h2>
-        <p class="text-sm text-gray-500 mt-1">
-          查看我所在租户的同事信息（只读权限）
-        </p>
+    <!-- 顶部：租户选择和用户信息 -->
+    <div class="mb-6">
+      <div class="flex justify-between items-start mb-4">
+        <div>
+          <h2 class="text-xl font-semibold text-gray-800">
+            {{ $t("organization.user.title") }}
+          </h2>
+          <p class="text-sm text-gray-500 mt-1">查看同事信息（只读权限）</p>
+        </div>
+        <div class="text-right">
+          <p class="text-sm text-gray-600">当前用户：{{ displayName }}</p>
+        </div>
       </div>
 
       <!-- 租户选择器 -->
-      <div class="flex items-center gap-3">
-        <UFormField label="选择租户" class="mb-0">
-          <USelect
-            v-model="selectedTenantId"
-            :options="myTenants.map((t) => ({ label: t.name, value: t.id }))"
-            class="w-48"
-            :disabled="myTenants.length === 0"
-          />
-        </UFormField>
-      </div>
-    </div>
+      <div class="bg-white p-4 rounded-lg shadow-sm">
+        <div class="flex items-center gap-4">
+          <UFormField label="选择租户" class="flex-shrink-0">
+            <USelect
+              v-model="selectedTenantId"
+              :options="myTenants"
+              option-attribute="name"
+              value-attribute="id"
+              class="w-64"
+              :loading="userLoading"
+            />
+          </UFormField>
 
-    <!-- 当前租户信息 -->
-    <div
-      v-if="selectedTenant"
-      class="mb-4 p-3 bg-blue-50 rounded-lg border border-blue-200"
-    >
-      <div class="flex items-center gap-3">
-        <div
-          class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center"
-        >
-          <UIcon
-            name="i-heroicons-building-office"
-            class="h-4 w-4 text-blue-600"
-          />
-        </div>
-        <div>
-          <h3 class="font-medium text-blue-900">{{ selectedTenant.name }}</h3>
-          <p class="text-sm text-blue-600">{{ selectedTenant.domain }}</p>
+          <!-- 当前租户信息 -->
+          <div v-if="selectedTenant" class="flex-1">
+            <div class="flex items-center gap-2">
+              <UBadge color="blue" variant="subtle">
+                {{ selectedTenant.name }}
+              </UBadge>
+              <span class="text-sm text-gray-500">
+                {{ selectedTenant.domain }}
+              </span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
 
     <!-- 搜索栏 -->
-    <div class="mb-4">
-      <UInput
-        v-model="searchQuery"
-        icon="i-heroicons-magnifying-glass"
-        placeholder="搜索同事姓名、用户名、邮箱或部门..."
-        class="max-w-md"
-      />
-    </div>
-
-    <!-- 用户列表 -->
-    <div class="bg-white rounded-lg shadow-sm">
-      <div v-if="isLoading" class="p-8 text-center">
-        <UIcon
-          name="i-heroicons-arrow-path"
-          class="animate-spin h-6 w-6 mx-auto mb-2"
-        />
-        <p class="text-gray-500">加载用户列表中...</p>
-      </div>
-
-      <div v-else-if="!selectedTenantId" class="p-8 text-center text-gray-500">
-        <UIcon
-          name="i-heroicons-building-office"
-          class="h-12 w-12 mx-auto mb-4 text-gray-300"
-        />
-        <p>请选择一个租户查看用户信息</p>
-      </div>
-
-      <div
-        v-else-if="filteredUsers.length === 0"
-        class="p-8 text-center text-gray-500"
-      >
-        <UIcon
-          name="i-heroicons-users"
-          class="h-12 w-12 mx-auto mb-4 text-gray-300"
-        />
-        <p>没有找到匹配的用户</p>
-      </div>
-
-      <div v-else>
-        <UTable :data="filteredUsers" :columns="columns" />
-
-        <!-- 统计信息 -->
-        <div class="px-6 py-3 border-t border-gray-200 bg-gray-50">
-          <p class="text-sm text-gray-600">
-            共 {{ filteredUsers.length }} 位同事
-            <span v-if="searchQuery.trim()" class="ml-2">
-              （搜索："{{ searchQuery.trim() }}"）
-            </span>
-          </p>
+    <div class="mb-6 bg-white p-4 rounded-lg shadow-sm">
+      <div class="flex items-center gap-4">
+        <div class="flex-1">
+          <UInput
+            v-model="searchQuery"
+            icon="i-heroicons-magnifying-glass"
+            placeholder="搜索同事姓名、用户名、邮箱或部门..."
+            class="w-full"
+          />
+        </div>
+        <div class="text-sm text-gray-500">
+          共 {{ filteredUsers.length }} 位同事
         </div>
       </div>
     </div>
 
+    <!-- 用户列表 -->
+    <div class="bg-white rounded-lg shadow-sm">
+      <!-- 加载状态 -->
+      <div v-if="isLoading" class="flex items-center justify-center py-12">
+        <UIcon
+          name="i-heroicons-arrow-path"
+          class="animate-spin h-6 w-6 text-blue-600"
+        />
+        <span class="ml-2 text-gray-600">加载中...</span>
+      </div>
+
+      <!-- 空状态 -->
+      <div
+        v-else-if="filteredUsers.length === 0"
+        class="text-center py-12 text-gray-500"
+      >
+        <UIcon name="i-heroicons-users" class="h-12 w-12 mx-auto mb-4" />
+        <p class="text-lg font-medium mb-2">暂无同事信息</p>
+        <p class="text-sm">
+          {{ searchQuery ? "没有找到匹配的同事" : "当前租户暂无其他成员" }}
+        </p>
+      </div>
+
+      <!-- 用户表格 -->
+      <div v-else>
+        <UTable :data="filteredUsers" :columns="columns" />
+      </div>
+    </div>
+
     <!-- 权限说明 -->
-    <div class="mt-4 p-3 bg-amber-50 rounded-lg border border-amber-200">
-      <div class="flex items-start gap-2">
+    <div class="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+      <div class="flex items-start">
         <UIcon
           name="i-heroicons-information-circle"
-          class="h-5 w-5 text-amber-600 mt-0.5"
+          class="h-5 w-5 text-blue-600 mt-0.5 mr-3 flex-shrink-0"
         />
-        <div class="text-sm text-amber-800">
-          <p class="font-medium">权限说明</p>
-          <p class="mt-1">
-            您只能查看有权限访问的同事信息，无法进行编辑、添加或删除操作。如需更多权限，请联系管理员。
-          </p>
+        <div class="text-sm">
+          <p class="font-medium text-blue-800 mb-1">权限说明</p>
+          <ul class="text-blue-700 space-y-1">
+            <li>• 您只能查看有权限访问的同事信息</li>
+            <li>• 无法编辑、添加或删除用户</li>
+            <li>• 可以在您所属的租户间切换查看</li>
+            <li>• 如需更多权限，请联系管理员</li>
+          </ul>
         </div>
       </div>
     </div>

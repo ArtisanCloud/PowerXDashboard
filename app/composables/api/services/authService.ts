@@ -169,8 +169,8 @@ export interface DepartmentFilters extends PaginationParams {
 
 export const useAuthService = () => {
   const apiClient = useApiClient();
-  const baseUrl = "/user/auth";
   const adminBaseUrl = "/admin"; // 添加管理员基础URL
+  const baseUrl = adminBaseUrl + "/user/auth";
 
   return {
     /**

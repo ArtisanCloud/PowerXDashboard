@@ -39,7 +39,7 @@ export interface UserUpdateParams {
  */
 export const useUserService = () => {
   const apiClient = useApiClient();
-  const baseUrl = "/users";
+  const baseUrl = "/admin/users";
 
   return {
     /**
