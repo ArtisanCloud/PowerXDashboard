@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import DepartmentManager from "@/components/settings/users/DepartmentManager.vue";
-import UserManager from "@/components/settings/users/UserManager.vue";
+// import UserManager from "@/components/settings/users/UserManager.vue";
+import UserShell from "@/components/settings/users/UsersShell.vue";
 import PermissionManager from "@/components/settings/users/PermissionManager.vue";
 
 definePageMeta({
@@ -70,7 +71,8 @@ const tabs = [
 
         <!-- 用户管理 -->
         <div v-if="activeTab === 'users'">
-          <UserManager />
+          <!-- <UserManager /> -->
+          <UserShell is-tenant-admin="false" />
         </div>
 
         <!-- 权限管理 -->
