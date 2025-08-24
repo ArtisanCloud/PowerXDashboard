@@ -289,15 +289,29 @@ const parentOptions = computed(() => {
 /** ================== CRUD（走后端） ================== */
 const deleteDepartment = async (id: number) => {
   if (!confirm(t("organization.department.confirmDelete") as string)) return;
-  const ok = await deptService.deleteDepartment(id);
-  if (ok) {
-    // 若删除的是当前选中节点，则切回父级或任一根
-    if (activeNodeId.value === id) {
-      const deleted = flat.value.find((d) => d.id === id);
-      activeNodeId.value =
-        deleted?.parent_id ?? flat.value.find((d) => !d.parent_id)?.id ?? null;
+  let ok = false;
+  try {
+    ok = await deptService.deleteDepartment(id);
+    if (ok) {
+      if (activeNodeId.value === id) {
+        const deleted = flat.value.find((d) => d.id === id);
+        activeNodeId.value =
+          deleted?.parent_id ??
+          flat.value.find((d) => !d.parent_id)?.id ??
+          null;
+      }
+      await fetchTree();
     }
-    await fetchTree();
+  } catch (e: any) {
+    const { title, description } = normalizeApiError(e, { meta: "metaText" }); // ✨ 统一解析
+    reset(); // ✨ 先重置一次 one-shot
+    notifyOnce(title || "删除失败", description, "error", "solid"); // ✨ 弹全局 Alert（会在 Modal 之上）
+  } finally {
+    if (ok) {
+      notifyOnce("删除成功", "", "success");
+    } else {
+      notifyOnce("删除失败", "", "error");
+    }
   }
 };
 
