@@ -8,6 +8,7 @@ import {
   watch,
   onMounted,
 } from "vue";
+import { storeToRefs } from "pinia";
 import { useI18n } from "#imports";
 import {
   useDepartmentService,
@@ -15,6 +16,7 @@ import {
   type DepartmentCreateParams,
   type DepartmentUpdateParams,
 } from "~/composables/api/services/departmentService";
+import { useDepartmentStore } from "~/stores/department";
 import { useMemberService } from "~/composables/api/services/memberService";
 import { useOneShotAlert } from "~/composables/useOneShotAlert";
 import * as v from "valibot";
@@ -37,11 +39,6 @@ const UButton = resolveComponent("UButton");
 
 /** ================== 状态 ================== */
 const deptService = useDepartmentService();
-
-const tree = ref<Department[]>([]); // 后端返回的树
-const flat = ref<Department[]>([]); // 扁平化，用于选择上级部门等
-const isLoadingTree = ref(false);
-const loadError = ref<string | null>(null);
 
 const activeNodeId = ref<number | null>(null); // UTree 当前选中部门 id
 const activeNode = computed(
@@ -142,13 +139,24 @@ const openEditForm = (dept: Department & any) => {
 };
 
 /** ================== 数据获取 & 工具 ================== */
+// 使用全局Store
+const deptStore = useDepartmentStore();
+const {
+  tree: storeTree,
+  flat: storeFlat,
+  status,
+  error,
+} = storeToRefs(deptStore);
+
+// 计算属性来兼容现有代码
+const tree = computed(() => storeTree.value);
+const flat = computed(() => storeFlat.value);
+const isLoadingTree = computed(() => status.value === "loading");
+const loadError = computed(() => error.value);
+
 const fetchTree = async () => {
-  isLoadingTree.value = true;
-  loadError.value = null;
   try {
-    const data = await deptService.getDepartmentTree();
-    tree.value = data;
-    flat.value = flattenDepartments(data);
+    await deptStore.fetchTree();
 
     // 默认选择第一个根节点
     if (!activeNodeId.value) {
@@ -159,9 +167,7 @@ const fetchTree = async () => {
       ? [String(activeNodeId.value)]
       : [];
   } catch (e: any) {
-    loadError.value = e?.message ?? "加载失败";
-  } finally {
-    isLoadingTree.value = false;
+    console.error("获取部门树失败:", e);
   }
 };
 
@@ -289,29 +295,18 @@ const parentOptions = computed(() => {
 /** ================== CRUD（走后端） ================== */
 const deleteDepartment = async (id: number) => {
   if (!confirm(t("organization.department.confirmDelete") as string)) return;
-  let ok = false;
   try {
-    ok = await deptService.deleteDepartment(id);
-    if (ok) {
-      if (activeNodeId.value === id) {
-        const deleted = flat.value.find((d) => d.id === id);
-        activeNodeId.value =
-          deleted?.parent_id ??
-          flat.value.find((d) => !d.parent_id)?.id ??
-          null;
-      }
-      await fetchTree();
+    await deptStore.deleteDepartment(id);
+    if (activeNodeId.value === id) {
+      const deleted = flat.value.find((d) => d.id === id);
+      activeNodeId.value =
+        deleted?.parent_id ?? flat.value.find((d) => !d.parent_id)?.id ?? null;
     }
+    notifyOnce("部门删除成功", "", "success", "solid");
   } catch (e: any) {
     const { title, description } = normalizeApiError(e, { meta: "metaText" }); // ✨ 统一解析
     reset(); // ✨ 先重置一次 one-shot
     notifyOnce(title || "删除失败", description, "error", "solid"); // ✨ 弹全局 Alert（会在 Modal 之上）
-  } finally {
-    if (ok) {
-      notifyOnce("删除成功", "", "success");
-    } else {
-      notifyOnce("删除失败", "", "error");
-    }
   }
 };
 
