@@ -72,7 +72,9 @@ const tabs = [
         <!-- 用户管理 -->
         <div v-if="activeTab === 'users'">
           <!-- <UserManager /> -->
-          <UserShell is-tenant-admin="false" />
+          <!-- <UserShell is-tenant-member="{false}" /> -->
+          <UserShell is-root="{true}" />
+          <!-- <UserShell is-tenant-admin="{true}" /> -->
         </div>
 
         <!-- 权限管理 -->
