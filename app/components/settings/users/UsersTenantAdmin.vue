@@ -10,10 +10,16 @@ import {
   watch,
 } from "vue";
 import { useI18n } from "#imports";
+import SelectTree from "~/components/ui/SelectTree.vue";
+import { useDepartmentStore } from "~/stores/department";
+import type { Department } from "~/composables/api/services/departmentService";
 
 // ==== 输入属性（Root 复用时传入 tenantId） ====
 const props = defineProps<{ tenantId: number }>();
 const { t, locale } = useI18n();
+
+// ==== 部门store ====
+const departmentStore = useDepartmentStore();
 
 // ===== 类型与数据（沿用你现有的定义，略微规范字段） =====
 type StatusType = "active" | "inactive";
@@ -44,11 +50,18 @@ const filters = reactive({
 
 const pagination = reactive({ page: 1, pageSize: 10, total: 0, totalPages: 0 });
 
-const departments = ref<{ label: string; value: string | null }[]>([
-  { label: t("organization.user.form.selectDepartment"), value: null },
-  { label: "技术部", value: "技术部" },
-  { label: "市场部", value: "市场部" },
-]);
+// 将部门数据转换为SelectTree需要的TreeNode格式
+const departmentTreeItems = computed(() => {
+  const convertDepartmentToTreeNode = (dept: Department) => ({
+    label: dept.name || "未命名部门",
+    value: String(dept.id),
+    icon: "i-heroicons-building-office-2",
+    children: dept.children?.map(convertDepartmentToTreeNode) || [],
+    disabled: dept.status === 0, // 假设status为0表示禁用
+  });
+
+  return departmentStore.tree.map(convertDepartmentToTreeNode);
+});
 const roles = ref([
   { label: t("organization.user.form.selectRole"), value: null },
   { label: "管理员", value: "管理员" },
@@ -431,6 +444,13 @@ const columns = computed(() => {
 
 // ===== 模拟加载（替换为实际接口） =====
 onMounted(async () => {
+  // 初始化部门数据
+  try {
+    await departmentStore.fetchTree();
+  } catch (error) {
+    console.error("加载部门数据失败:", error);
+  }
+
   // 例：const res = await $fetch(`/api/v1/admin/iam/members`, { params: {...} })
   users.value = [
     {
@@ -496,11 +516,13 @@ onMounted(async () => {
           />
         </div>
         <UFormField :label="$t('organization.user.form.department')">
-          <USelect
+          <SelectTree
             v-model="filters.department"
-            :items="departments"
+            :items="departmentTreeItems"
+            placeholder="选择部门"
+            searchable
+            clearable
             class="w-full sm:min-w-[12rem]"
-            option-attribute="label"
           />
         </UFormField>
         <UFormField :label="$t('organization.user.form.role')">
@@ -508,6 +530,7 @@ onMounted(async () => {
             v-model="filters.role"
             :items="roles"
             class="w-full sm:min-w-[12rem]"
+            :placeholder="$t('organization.user.form.selectRole')"
             option-attribute="label"
           />
         </UFormField>
@@ -523,6 +546,7 @@ onMounted(async () => {
               },
             ]"
             class="w-full sm:w-40"
+            :placeholder="$t('organization.user.filter.allStatus')"
           />
         </UFormField>
         <UButton
