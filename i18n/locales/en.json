@@ -6,283 +6,134 @@
     "language": "Language",
     "reload": "Reload",
     "scrollToBottom": "Scroll to Bottom",
-    "newMessages": "New Messages"
+    "save": "Save",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "delete": "Delete",
+    "edit": "Edit",
+    "add": "Add",
+    "search": "Search",
+    "reset": "Reset",
+    "submit": "Submit",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "loading": "Loading...",
+    "noData": "No data",
+    "error": "Error",
+    "success": "Success",
+    "warning": "Warning",
+    "info": "Info",
+    "yes": "Yes",
+    "no": "No",
+    "ok": "OK",
+    "close": "Close",
+    "view": "View",
+    "create": "Create",
+    "update": "Update",
+    "actions": "Actions",
+    "status": "Status",
+    "name": "Name",
+    "description": "Description",
+    "createdAt": "Created At",
+    "updatedAt": "Updated At",
+    "filter": "Filter",
+    "sort": "Sort",
+    "up": "Move Up",
+    "down": "Move Down",
+    "none": "None",
+    "enabled": "Enabled",
+    "disabled": "Disabled"
   },
-  "user": {
-    "admin": "Administrator"
-  },
-  "dashboard": {
-    "title": "Dashboard",
-    "description": "System overview and key metrics",
-    "stats": {
-      "totalUsers": "Total Users",
-      "todayVisits": "Today's Visits",
-      "totalRevenue": "Total Revenue",
-      "activeUsers": "Active Users",
-      "vsLastMonth": "vs Last Month"
-    },
-    "charts": {
-      "visitTrend": "Visit Trend",
-      "chartArea": "Chart Area",
-      "integration": "You can integrate Chart.js or other chart libraries here"
-    },
-    "activities": {
-      "title": "Recent Activities",
-      "viewAll": "View All Activities",
-      "users": {
-        "zhangsan": "Zhang San",
-        "lisi": "Li Si",
-        "wangwu": "Wang Wu"
-      },
-      "actions": {
-        "createArticle": "created a new article",
-        "updateProfile": "updated user profile",
-        "deleteComment": "deleted a comment"
-      },
-      "targets": {
-        "vueBestPractices": "'Vue 3 Best Practices'",
-        "onTechShare": "on 'Tech Share'"
-      },
-      "times": {
-        "minutesAgo": "{minutes} minutes ago"
-      }
-    },
-    "quickActions": {
-      "title": "Quick Actions",
-      "addUser": "Add User",
-      "createArticle": "Create Article",
-      "viewAnalytics": "View Analytics",
-      "systemSettings": "System Settings"
-    },
-    "common": {
-      "viewDetails": "View Details"
-    }
-  },
-  "home": {
-    "subtitle": "Modern enterprise management system to help your business soar",
-    "learnMore": "Learn More",
-    "getStarted": "Get Started",
-    "dashboardDesc": "Modern management interface",
-    "footer": "All rights reserved"
-  },
-  "menu": {
-    "agent": "AI Chat",
-    "workflow": "Workflow",
+  "navigation": {
     "dashboard": "Dashboard",
-    "customers": "Customer Management",
-    "customerList": "Customer List",
+    "users": "Users",
+    "settings": "Settings",
+    "profile": "Profile",
+    "logout": "Logout",
+    "home": "Home",
+    "about": "About",
+    "contact": "Contact",
+    "analytics": "Analytics",
+    "content": "Content",
+    "customers": "Customers",
     "customerGroups": "Customer Groups",
-    "products": "Product Management",
-    "productList": "Product List",
+    "ecommerce": "E-commerce",
+    "marketing": "Marketing",
+    "notifications": "Notifications",
+    "orders": "Orders",
+    "plugins": "Plugins",
     "productCategories": "Product Categories",
-    "orders": "Order Management",
-    "settings": "System Settings",
-    "userManagement": "User Management",
-    "roleManagement": "Role Management",
-    "systemConfig": "System Configuration",
-    "loadFailed": "Menu Loading Failed",
-    "loadFailedDesc": "Unable to load menu data, please check your network connection.",
-    "itemCount": "Menu Item Count",
-    "noItemsWarning": "Warning: No menu items to display",
-    "badge": {
-      "new": "New"
-    },
-    "aiSettings": "Model Settings",
+    "products": "Products",
     "workflow": "Workflow",
-    "pluginMarketplace": "Plugin Marketplace"
+    "agent": "Agent"
   },
   "header": {
     "profile": "Profile",
     "settings": "Settings",
     "logout": "Logout",
-    "searchPlaceholder": "Search users, content...",
+    "searchPlaceholder": "Search users, content, products...",
     "searchSuggestions": "Search Suggestions"
   },
-  "intro": {
-    "nav": {
-      "features": "Features",
-      "products": "Products",
-      "about": "About"
+  "auth": {
+    "login": {
+      "title": "Login",
+      "username": "Username",
+      "password": "Password",
+      "rememberMe": "Remember me",
+      "forgotPassword": "Forgot password?",
+      "loginButton": "Login",
+      "noAccount": "Don't have an account?",
+      "signUp": "Sign up"
     },
-    "hero": {
-      "welcomeTo": "Welcome to",
-      "dashboardPreview": "Modern management interface"
+    "register": {
+      "title": "Register",
+      "username": "Username",
+      "email": "Email",
+      "password": "Password",
+      "confirmPassword": "Confirm Password",
+      "registerButton": "Register",
+      "haveAccount": "Already have an account?",
+      "signIn": "Sign in"
     },
-    "features": {
-      "title": "Core Features",
-      "subtitle": "We provide comprehensive enterprise solutions to help your business grow",
-      "performance": {
-        "title": "High Performance",
-        "description": "Built on Nuxt 4, providing ultimate performance experience"
-      },
-      "design": {
-        "title": "Modern Design",
-        "description": "Adopting the latest UI design concepts, clean and beautiful interface"
-      },
-      "usability": {
-        "title": "Easy to Use",
-        "description": "Intuitive interface makes management simpler"
-      },
-      "security": {
-        "title": "Secure & Reliable",
-        "description": "Enterprise-level security guarantee, data safety assured"
-      }
-    },
-    "products": {
-      "title": "Product Suite",
-      "subtitle": "Complete enterprise product ecosystem to meet different business needs",
-      "learnMore": "Learn More",
-      "admin": {
-        "description": "Powerful backend management system for enterprise digital transformation",
-        "features": {
-          "userManagement": "User Management",
-          "permissionControl": "Permission Control",
-          "dataAnalysis": "Data Analysis",
-          "systemMonitoring": "System Monitoring"
-        }
-      },
-      "analytics": {
-        "description": "Intelligent data analysis platform to discover business growth opportunities",
-        "features": {
-          "realTimeAnalysis": "Real-time Analysis",
-          "visualReports": "Visual Reports",
-          "predictiveModels": "Predictive Models",
-          "customDashboard": "Custom Dashboard"
-        }
-      },
-      "cloud": {
-        "description": "Cloud solution, access your data anytime, anywhere",
-        "features": {
-          "cloudStorage": "Cloud Storage",
-          "multiDeviceSync": "Multi-device Sync",
-          "elasticScaling": "Elastic Scaling",
-          "support247": "24/7 Support"
-        }
-      }
-    },
-    "about": {
-      "title": "About Us",
-      "subtitle": "We are committed to providing the best digital solutions for enterprises",
-      "mission": {
-        "title": "Our Mission",
-        "paragraph1": "PowerX is dedicated to providing the most advanced digital management solutions for enterprises. We believe in the power of technology to transform how businesses operate, improve efficiency, and create value.",
-        "paragraph2": "Through continuous innovation and optimization, we provide stable, secure, and user-friendly product experiences for our customers. Our team consists of experienced engineers and designers focused on creating world-class enterprise software.",
-        "paragraph3": "We always adhere to a customer-centric philosophy, listening to customer needs, continuously improving our products, and working hard for our customers' success."
-      },
-      "stats": {
-        "companies": "Enterprise Clients",
-        "users": "Active Users",
-        "uptime": "System Availability"
-      },
-      "enterprise": {
-        "title": "Enterprise Solutions",
-        "description": "Professional solutions tailored for large enterprises"
-      },
-      "values": {
-        "title": "Our Values",
-        "innovation": {
-          "title": "Continuous Innovation",
-          "description": "Constantly exploring new technologies to provide cutting-edge solutions"
-        },
-        "userFirst": {
-          "title": "User First",
-          "description": "Always user-oriented, providing the best product experience"
-        },
-        "excellence": {
-          "title": "Pursuit of Excellence",
-          "description": "Never compromise on product quality and service level, pursuing perfection"
-        }
-      }
-    },
-    "cta": {
-      "title": "Ready to Get Started?",
-      "subtitle": "Experience the power of PowerX today and begin your digital transformation journey",
-      "getStarted": "Get Started",
-      "signIn": "Sign In"
-    },
-    "footer": {
-      "aboutUs": "About Us",
-      "contactUs": "Contact Us",
-      "copyright": "© 2024 PowerX. All rights reserved."
+    "forgotPassword": {
+      "title": "Forgot Password",
+      "email": "Email",
+      "sendButton": "Send Reset Link",
+      "backToLogin": "Back to login"
     }
   },
-  "privacyPolicy": "Privacy Policy",
-  "termsOfService": "Terms of Service",
-  "error": {
-    "tip": "Something went wrong with this page",
-    "goBack": "Go Back",
-    "goHome": "Go Home"
+  "dashboard": {
+    "title": "Dashboard",
+    "welcome": "Welcome back!",
+    "stats": {
+      "totalUsers": "Total Users",
+      "activeUsers": "Active Users",
+      "totalOrders": "Total Orders",
+      "revenue": "Revenue"
+    }
   },
   "organization": {
-    "title": "Organization Structure",
+    "description": "Manage organizational structure, users, and permissions",
     "tabs": {
       "departments": "Departments",
       "users": "Users",
       "permissions": "Permissions"
     },
-    "description": "Manage system users, departments and permissions",
-    "department": {
-      "title": "Department Management",
-      "description": "Manage company department structure",
-      "add": "Add Department",
-      "edit": "Edit Department",
-      "delete": "Delete Department",
-      "confirmDelete": "Are you sure you want to delete this department?",
-      "form": {
-        "name": "Department Name",
-        "code": "Department Code",
-        "leader": "Leader",
-        "description": "Description",
-        "namePlaceholder": "Enter department name",
-        "codePlaceholder": "Enter department code",
-        "leaderPlaceholder": "Enter leader name",
-        "descriptionPlaceholder": "Enter department description"
-      },
-      "table": {
-        "name": "Department Name",
-        "code": "Department Code",
-        "leader": "Leader",
-        "memberCount": "Member Count",
-        "description": "Description",
-        "actions": "Actions"
-      },
-      "empty": {
-        "title": "No Departments",
-        "noResults": "No matching departments found, try another search term",
-        "create": "Click 'Add Department' button to create your first department"
-      },
-      "search": "Search department name, code or leader..."
-    },
     "user": {
       "title": "User Management",
-      "description": "Manage system user accounts and permissions",
-      "add": "Add User",
-      "edit": "Edit User",
-      "delete": "Delete User",
-      "disable": "Disable",
-      "enable": "Enable",
-      "confirmDelete": "Are you sure you want to delete this user?",
-      "importExport": "Import/Export",
-      "import": {
-        "title": "Import User Data",
-        "button": "Import User Data",
-        "success": "Successfully imported {count} users",
-        "error": "Import failed: {message}",
-        "invalidFormat": "Invalid user data format",
-        "missingFields": "Imported data is missing required fields (name, username, or email)"
-      },
-      "export": {
-        "csv": "Export User Data (CSV)",
-        "json": "Export User Data (JSON)"
-      },
+      "description": "Manage system users and their permissions",
+      "addUser": "Add User",
+      "editUser": "Edit User",
+      "deleteUser": "Delete User",
+      "userList": "User List",
+      "userDetails": "User Details",
       "form": {
         "name": "Name",
         "username": "Username",
         "email": "Email",
-        "department": "Department",
-        "role": "Role",
         "password": "Password",
-        "newPassword": "New Password (leave empty to keep unchanged)",
+        "newPassword": "New Password (leave blank to keep unchanged)",
         "confirmPassword": "Confirm Password",
         "confirmNewPassword": "Confirm New Password",
         "status": "Status",
@@ -292,8 +143,8 @@
         "usernamePlaceholder": "Enter username",
         "emailPlaceholder": "Enter email address",
         "passwordPlaceholder": "Enter password",
-        "selectDepartment": "Select department",
-        "selectRole": "Select role"
+        "selectDepartment": "Select Department",
+        "selectRole": "Select Role"
       },
       "table": {
         "avatar": "",
@@ -303,33 +154,131 @@
         "department": "Department",
         "role": "Role",
         "status": "Status",
+        "createdAt": "Created At",
         "actions": "Actions"
       },
       "filter": {
         "allDepartments": "All Departments",
         "allRoles": "All Roles",
         "allStatus": "All Status",
+        "allPlans": "All Plans",
+        "status": "Filter by Status",
+        "plan": "Filter by Plan",
         "active": "Active",
         "inactive": "Inactive",
         "reset": "Reset"
       },
-      "empty": {
-        "title": "No Users",
-        "noResults": "No matching users found, try adjusting your filters",
-        "create": "Click 'Add User' button to create your first user"
+      "plan": {
+        "free": "Free",
+        "pro": "Pro",
+        "enterprise": "Enterprise"
+      },
+      "status": {
+        "active": "Active",
+        "inactive": "Inactive",
+        "suspended": "Suspended"
+      },
+      "messages": {
+        "deleteConfirm": "Are you sure you want to delete this user?",
+        "deleteSuccess": "User deleted successfully",
+        "createSuccess": "User created successfully",
+        "updateSuccess": "User updated successfully",
+        "loadFailed": "Failed to load user list"
       },
       "search": "Search username, email...",
       "validation": {
         "requiredFields": "Please fill in required fields",
         "passwordMismatch": "Passwords do not match"
+      },
+      "rootManagement": "Root Management",
+      "selectTenantDesc": "Select a tenant to manage and view its user information",
+      "searchTenants": "Search tenant name or domain...",
+      "loadFailed": "Failed to load tenant list",
+      "noTenantsFound": "No matching tenants found",
+      "noDomain": "No domain",
+      "userCount": "Users",
+      "createdAt": "Created",
+      "backToTenantList": "Back to Tenant List",
+      "userCountText": "{count} users",
+      "empty": {
+        "title": "No user data",
+        "noResults": "No matching users found, please try adjusting the filter conditions",
+        "create": "Click the 'Add User' button to create the first user"
+      }
+    },
+    "tenant": {
+      "filter": {
+        "status": "Filter by Status",
+        "plan": "Filter by Plan",
+        "allPlans": "All Plans",
+        "suspended": "Suspended"
+      },
+      "status": {
+        "active": "Active",
+        "inactive": "Inactive",
+        "suspended": "Suspended"
+      },
+      "plan": {
+        "free": "Free",
+        "pro": "Pro",
+        "enterprise": "Enterprise"
+      },
+      "pagination": {
+        "showing": "Showing {start} - {end} of {total} tenants",
+        "previous": "Previous",
+        "next": "Next"
+      }
+    },
+    "department": {
+      "title": "Department Management",
+      "description": "Manage organizational departments and structure",
+      "add": "Add Department",
+      "edit": "Edit Department",
+      "delete": "Delete Department",
+      "search": "Search departments...",
+      "form": {
+        "name": "Department Name",
+        "code": "Department Code",
+        "parent": "Parent Department",
+        "leader": "Department Leader",
+        "sort": "Sort Order",
+        "status": "Status",
+        "description": "Description",
+        "namePlaceholder": "Enter department name",
+        "codePlaceholder": "Enter department code",
+        "parentPlaceholder": "Select parent department",
+        "leaderPlaceholder": "Enter leader name",
+        "sortPlaceholder": "Enter sort order",
+        "descriptionPlaceholder": "Enter department description"
+      },
+      "table": {
+        "name": "Department Name",
+        "description": "Description",
+        "parentDepartment": "Parent Department",
+        "memberCount": "Members",
+        "createdAt": "Created At",
+        "actions": "Actions"
+      },
+      "empty": {
+        "title": "No department data",
+        "noResults": "No matching departments found, please try adjusting the filter conditions",
+        "create": "Click the 'Add Department' button to create the first department"
+      },
+      "pagination": {
+        "showing": "Showing {start} - {end} of {total} departments"
       }
     },
     "permission": {
       "title": "Permission Management",
       "description": "Manage system roles and permissions",
       "roleList": "Role List",
+      "addRole": "Add Role",
+      "editRole": "Edit Role",
+      "deleteRole": "Delete Role",
+      "permissions": "Permissions",
+      "assignPermissions": "Assign Permissions",
       "roleConfig": "Permission Configuration",
-      "configDesc": "Configure the features and operations this role can access",
+      "configDesc": "Configure the functions and operations that this role can access",
       "add": "Add Role",
       "edit": "Edit Role",
       "delete": "Delete Role",
@@ -347,9 +296,9 @@
         "descriptionPlaceholder": "Enter role description"
       },
       "empty": {
-        "title": "No Roles",
-        "noResults": "No matching roles found, try another search term",
-        "create": "Click 'Add Role' button to create your first role"
+        "title": "No role data",
+        "noResults": "No matching roles found, please try other search terms",
+        "create": "Click the [Add Role] button to create the first role"
       },
       "search": "Search roles..."
     },
@@ -361,158 +310,189 @@
       "actions": "Actions",
       "search": "Search",
       "filter": "Filter",
-      "reset": "Reset"
+      "reset": "Reset",
+      "up": "Move Up",
+      "down": "Move Down",
+      "none": "None",
+      "enabled": "Enabled",
+      "disabled": "Disabled"
     }
   },
-  "auth": {
-    "backToHome": "Back to Home",
-    "welcomeBack": "Welcome Back",
-    "loginSubtitle": "Sign in to your account to continue",
-    "createAccount": "Create Account",
-    "registerSubtitle": "Create a new account to get started",
-    "email": "Email",
-    "password": "Password",
-    "username": "Username",
-    "identifier": "Username/Email",
-    "confirmPassword": "Confirm Password",
-    "remember": "Remember me",
-    "forgot": "Forgot password?",
-    "forgotPassword": "Forgot password?",
-    "signingIn": "Signing in...",
-    "creatingAccount": "Creating account...",
-    "noAccount": "Don't have an account?",
-    "hasAccount": "Already have an account?",
-    "signUpNow": "Sign up now",
-    "signInNow": "Sign in now",
-    "required": "This field is required",
-    "loginFailed": "Login failed, please check your credentials",
-    "registerFailed": "Registration failed, please try again",
-    "registerSuccess": "Registration successful!",
-    "redirectingToLogin": "Redirecting to login page...",
-    "invalidEmail": "Please enter a valid email address",
-    "passwordTooShort": "Password must be at least 6 characters",
-    "passwordMismatch": "Passwords do not match",
-    "mustAgreeTerms": "You must agree to the terms of service to register",
-    "agreeTerms": "I agree to the",
-    "and": "and",
-    "passwordStrength": {
-      "weak": "Weak",
-      "medium": "Medium",
-      "strong": "Strong"
-    }
-  },
-  "agent": {
-    "selector": {
-      "title": "AI Agents",
-      "create": "Create",
-      "searchPlaceholder": "Search agents...",
-      "noResults": "No matching agents found",
-      "noAgents": "No agents yet, click create to add your first one",
-      "active": "Active",
-      "inactive": "Inactive",
-      "current": "Current",
-      "available": "Available",
-      "capabilities": "capabilities",
-      "edit": "Edit",
-      "delete": "Delete",
-      "totalCount": "{count} agents total"
+  "search": {
+    "title": "Search Center",
+    "subtitle": "Search anything in the system",
+    "description": "Powerful global search functionality",
+    "placeholder": "Enter search keywords...",
+    "searchButton": "Search",
+    "suggestions": "Search Suggestions",
+    "history": "Search History",
+    "clearHistory": "Clear History",
+    "filters": "Filters",
+    "resetFilters": "Reset Filters",
+    "resultType": "Result Type",
+    "category": "Category",
+    "sortBy": "Sort By",
+    "sortRelevance": "Relevance",
+    "sortDate": "Date",
+    "sortTitle": "Title",
+    "sortDesc": "Descending",
+    "sortAsc": "Ascending",
+    "applyFilters": "Apply Filters",
+    "searching": "Searching...",
+    "resultsCount": "Found {total} results for \"{query}\"",
+    "noResults": "No results found",
+    "noResultsDesc": "Try adjusting your search terms or filters",
+    "tryAgain": "Try Again",
+    "categories": {
+      "all": "All Categories",
+      "users": "Users",
+      "content": "Content",
+      "products": "Products",
+      "orders": "Orders",
+      "customers": "Customers"
     },
-    "message": {
+    "types": {
+      "all": "All Types",
+      "exact": "Exact Match",
+      "fuzzy": "Fuzzy Match",
+      "partial": "Partial Match"
+    }
+  },
+  "notifications": {
+    "title": "Notifications",
+    "markAsRead": "Mark as Read",
+    "markAllAsRead": "Mark All as Read",
+    "noNotifications": "No notifications",
+    "allNotifications": "All Notifications",
+    "unreadOnly": "Unread Only",
+    "importantOnly": "Important Only",
+    "noMessages": "No message notifications",
+    "loading": "Loading...",
+    "loadError": "Load failed",
+    "retry": "Retry",
+    "categories": {
+      "all": "All Categories",
+      "system": "System Notifications",
+      "agent": "Agent Notifications",
+      "workflow": "Workflow Notifications",
+      "user": "User Notifications",
+      "order": "Order Notifications",
+      "plugin": "Plugin Notifications"
+    },
+    "types": {
+      "all": "All Types",
+      "info": "Info",
+      "success": "Success",
+      "warning": "Warning",
+      "error": "Error",
+      "system": "System"
+    },
+    "status": {
+      "all": "All Status",
+      "unread": "Unread",
+      "read": "Read"
+    },
+    "filters": {
+      "importantOnly": "Important Only",
+      "clear": "Clear"
+    },
+    "detail": {
+      "title": "Message Details",
+      "back": "Back",
+      "close": "Close",
+      "relatedInfo": "Related Information",
+      "resourceId": "Related Resource ID",
+      "resourceType": "Resource Type",
+      "userId": "User ID",
+      "availableActions": "Available Actions",
+      "createdAt": "Created At",
+      "updatedAt": "Updated At",
+      "selectMessage": "Please select a notification to view details"
+    },
+    "badges": {
+      "important": "Important",
+      "unread": "Unread"
+    },
+    "timeAgo": {
       "justNow": "Just now",
       "minutesAgo": "{minutes} minutes ago",
       "hoursAgo": "{hours} hours ago",
-      "you": "You",
-      "assistant": "Assistant",
-      "system": "System",
-      "typing": "Typing...",
-      "thinking": "Thinking...",
-      "metadata": "Metadata",
-      "sendFailed": "Send failed",
-      "retry": "Retry",
-      "copy": "Copy",
-      "delete": "Delete"
-    },
-    "chat": {
-      "defaultAgent": "Default Assistant",
-      "disconnected": "Disconnected",
-      "connected": "Connected",
-      "responding": "Responding",
-      "typing": "Typing",
-      "generating": "Generating",
-      "clear": "Clear",
-      "realtimeFailed": "Realtime Connection Failed",
-      "welcomeTitle": "Start Conversation",
-      "welcomeMessage": "Select an agent to start an intelligent conversation and experience the power of AI assistance.",
-      "agentTyping": "Agent is typing...",
-      "inputPlaceholder": "Type a message...",
-      "disconnectedPlaceholder": "Connection lost, cannot send messages",
-      "enterToSend": "Enter to send",
-      "shiftEnterNewLine": "Shift+Enter for new line",
-      "model": "Model",
-      "temperature": "Temperature"
-    },
-    "config": {
-      "editTitle": "Edit Agent",
-      "createTitle": "Create Agent",
-      "basicInfo": "Basic Information",
-      "name": "Name",
-      "namePlaceholder": "Enter agent name",
-      "description": "Description",
-      "descriptionPlaceholder": "Describe the agent's functionality and characteristics",
-      "avatar": "Avatar",
-      "avatarPlaceholder": "Enter avatar image URL",
-      "status": "Status",
-      "active": "Active",
-      "inactive": "Inactive",
-      "modelConfig": "Model Configuration",
-      "model": "Model",
-      "selectModel": "Select model",
-      "temperature": "Temperature",
-      "conservative": "Conservative",
-      "creative": "Creative",
-      "maxTokens": "Max Tokens",
-      "maxTokensPlaceholder": "Enter maximum tokens",
-      "systemPrompt": "System Prompt",
-      "systemPromptPlaceholder": "Enter system prompt to define agent behavior and role",
-      "usePreset": "Use Preset",
-      "capability": "Capability",
-      "advancedSettings": "Advanced Settings",
-      "contextWindow": "Context Window",
-      "contextWindowPlaceholder": "Enter context window size",
-      "responseFormat": "Response Format",
-      "selectFormat": "Select format",
-      "streaming": "Streaming",
-      "streamingEnabled": "Enabled",
-      "streamingDisabled": "Disabled",
-      "reset": "Reset",
-      "cancel": "Cancel",
-      "save": "Save",
-      "capabilities": {
-        "textGeneration": "Text Generation",
-        "codeGeneration": "Code Generation",
-        "imageAnalysis": "Image Analysis",
-        "webSearch": "Web Search",
-        "fileProcessing": "File Processing",
-        "dataAnalysis": "Data Analysis",
-        "translation": "Translation",
-        "summarization": "Summarization"
-      },
-      "presets": {
-        "assistant": "General Assistant",
-        "assistantPrompt": "You are a helpful, harmless, and honest AI assistant. Please answer user questions in a friendly and professional manner.",
-        "coder": "Programming Assistant",
-        "coderPrompt": "You are a professional programming assistant skilled in multiple programming languages and technologies. Please provide clear, executable code solutions.",
-        "translator": "Translation Assistant",
-        "translatorPrompt": "You are a professional translation assistant capable of accurately translating multiple languages. Please maintain the tone and meaning of the original text.",
-        "analyst": "Data Analyst",
-        "analystPrompt": "You are a data analysis expert skilled at extracting insights from data. Please provide detailed analysis and recommendations."
-      },
-      "formats": {
-        "text": "Plain Text",
-        "markdown": "Markdown",
-        "json": "JSON"
-      }
-    },
-    "confirmDelete": "Are you sure you want to delete this agent? This action cannot be undone."
-  }
+      "daysAgo": "{days} days ago",
+      "weeksAgo": "{weeks} weeks ago",
+      "monthsAgo": "{months} months ago"
+    }
+  },
+  "settings": {
+    "title": "Settings",
+    "general": "General",
+    "security": "Security",
+    "notifications": "Notifications",
+    "appearance": "Appearance",
+    "language": "Language",
+    "theme": "Theme",
+    "ai": {
+      "title": "AI Settings",
+      "providers": "AI Providers",
+      "models": "Models",
+      "testPanel": "Test Panel"
+    }
+  },
+  "plugins": {
+    "title": "Plugins",
+    "installed": "Installed",
+    "available": "Available",
+    "install": "Install",
+    "uninstall": "Uninstall",
+    "enable": "Enable",
+    "disable": "Disable",
+    "settings": "Settings"
+  },
+  "workflow": {
+    "title": "Workflow",
+    "editor": "Workflow Editor",
+    "nodes": "Nodes",
+    "connections": "Connections",
+    "save": "Save Workflow",
+    "run": "Run Workflow"
+  },
+  "agent": {
+    "title": "AI Agent",
+    "chat": "Chat",
+    "config": "Configuration",
+    "models": "Models",
+    "history": "Chat History"
+  },
+  "profile": {
+    "title": "Profile",
+    "personalInfo": "Personal Information",
+    "changePassword": "Change Password",
+    "preferences": "Preferences"
+  },
+  "errors": {
+    "404": "Page not found",
+    "500": "Internal server error",
+    "networkError": "Network error",
+    "unauthorized": "Unauthorized access",
+    "forbidden": "Access forbidden"
+  },
+  "intro": {
+    "footer": {
+      "aboutUs": "About Us",
+      "contactUs": "Contact Us"
+    }
+  },
+  "home": {
+    "footer": "© 2024 PowerX. All rights reserved."
+  },
+  "menu": {
+    "dashboard": "Dashboard",
+    "pluginMarketplace": "Plugin Marketplace",
+    "settings": "Settings",
+    "userManagement": "User Management",
+    "roleManagement": "Role Management",
+    "systemConfig": "System Configuration",
+    "aiSettings": "AI Settings",
+    "itemCount": "{count} items"
+  },
+  "privacyPolicy": "Privacy Policy"
 }

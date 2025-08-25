@@ -763,11 +763,15 @@ function buildUpdatePayload(): DepartmentUpdateParams {
 
         <template #footer>
           <div class="flex justify-between items-center text-sm text-gray-500">
-            <span
-              >显示第 {{ paginationInfo.start }} -
-              {{ paginationInfo.end }} 条，共
-              {{ paginationInfo.total }} 条</span
-            >
+            <span>
+              {{
+                t("organization.department.pagination.showing", {
+                  start: paginationInfo.start,
+                  end: paginationInfo.end,
+                  total: paginationInfo.total,
+                })
+              }}
+            </span>
           </div>
         </template>
       </UCard>

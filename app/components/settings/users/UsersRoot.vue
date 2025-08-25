@@ -8,21 +8,20 @@ import {
   type Tenant,
 } from "~/composables/api/services/tenantService";
 
-const { t } = useI18n();
+import {
+  TenantStatus,
+  getTenantStatusColor,
+  getTenantStatusDisplayKey,
+} from "~/composables/api/types/tenant";
 
-// 租户状态映射
-const statusMap = {
-  1: "active",
-  0: "inactive",
-  2: "suspended",
-} as const;
+const { t } = useI18n();
 
 // 转换后的租户数据结构
 interface DisplayTenant {
   id: number;
   name: string;
   domain: string;
-  status: "active" | "inactive" | "suspended";
+  status: TenantStatus;
   userCount: number;
   createdAt: string;
   plan: string;
@@ -42,24 +41,30 @@ const pagination = reactive({
 });
 
 const filters = reactive({
-  status: null as number | null,
+  status: null as TenantStatus | null,
   plan: null as string | null,
 });
 
 // 筛选选项
-const statusOptions = [
-  { label: "全部状态", value: null },
-  { label: "活跃", value: 1 },
-  { label: "停用", value: 0 },
-  { label: "暂停", value: 2 },
-];
+const statusOptions = computed(() => [
+  { label: t("organization.user.filter.allStatus"), value: null },
+  { label: t("organization.user.status.active"), value: TenantStatus.Active },
+  {
+    label: t("organization.user.status.inactive"),
+    value: TenantStatus.Inactive,
+  },
+  {
+    label: t("organization.user.status.suspended"),
+    value: TenantStatus.Suspended,
+  },
+]);
 
-const planOptions = [
-  { label: "全部套餐", value: null },
-  { label: "免费版", value: "free" },
-  { label: "专业版", value: "pro" },
-  { label: "企业版", value: "enterprise" },
-];
+const planOptions = computed(() => [
+  { label: t("organization.user.filter.allPlans"), value: null },
+  { label: t("organization.user.plan.free"), value: "free" },
+  { label: t("organization.user.plan.pro"), value: "pro" },
+  { label: t("organization.user.plan.enterprise"), value: "enterprise" },
+]);
 
 // 计算属性 - 使用服务端分页，不需要客户端过滤
 const paginatedTenants = computed(() => tenants.value);
@@ -82,8 +87,7 @@ async function loadTenants() {
           id: tenant.id,
           name: tenant.name,
           domain: tenant.domain,
-          status:
-            statusMap[tenant.status as keyof typeof statusMap] || "inactive",
+          status: tenant.status as TenantStatus,
           userCount: tenant.user_count,
           createdAt: new Date(tenant.createdAt).toLocaleDateString("zh-CN"),
           plan: tenant.plan,
@@ -95,7 +99,7 @@ async function loadTenants() {
       pagination.totalPages = response.data.pagination.pages;
     }
   } catch (error) {
-    console.error("加载租户列表失败:", error);
+    console.error(t("organization.user.loadFailed"), error);
     // 错误提示已在tenantService中处理
   }
 }
@@ -123,45 +127,18 @@ function changePage(page: number) {
   }
 }
 
-// 状态显示
-function getStatusColor(status: string) {
-  switch (status) {
-    case "active":
-      return "success";
-    case "inactive":
-      return "neutral";
-    case "suspended":
-      return "warning";
-    default:
-      return "neutral";
-  }
-}
+// 状态显示 - 使用导入的工具函数
+// getStatusColor 已从 user.ts 导入
 
-function getStatusText(status: string) {
-  switch (status) {
-    case "active":
-      return "活跃";
-    case "inactive":
-      return "停用";
-    case "suspended":
-      return "暂停";
-    default:
-      return status;
-  }
-}
+const getStatusText = (status: TenantStatus) => {
+  const statusKey = getTenantStatusDisplayKey(status);
+  const translationStatus = `organization.user.status.${statusKey}`;
+  return t(translationStatus);
+};
 
-function getPlanText(plan: string) {
-  switch (plan) {
-    case "free":
-      return "免费版";
-    case "pro":
-      return "专业版";
-    case "enterprise":
-      return "企业版";
-    default:
-      return plan;
-  }
-}
+const getPlanText = (plan: string) => {
+  return t(`organization.user.plan.${plan}`);
+};
 
 // 防抖定时器
 let searchDebounceTimer: ReturnType<typeof setTimeout> | null = null;
@@ -196,10 +173,11 @@ onMounted(() => {
       <div class="flex items-center justify-between mb-6">
         <div>
           <h2 class="text-xl font-semibold">
-            {{ t("organization.user.title") }} · Root 管理
+            {{ t("organization.user.title") }} ·
+            {{ t("organization.user.rootManagement") }}
           </h2>
           <p class="text-sm text-gray-500">
-            选择要管理的租户，查看和管理其用户信息
+            {{ t("organization.user.selectTenantDesc") }}
           </p>
         </div>
         <UButton
@@ -207,7 +185,7 @@ onMounted(() => {
           variant="outline"
           @click="loadTenants"
         >
-          刷新
+          {{ t("common.reload") }}
         </UButton>
       </div>
 
@@ -218,26 +196,31 @@ onMounted(() => {
             <UInput
               v-model="searchQuery"
               icon="i-heroicons-magnifying-glass"
-              placeholder="搜索租户名称或域名..."
+              :placeholder="t('organization.user.searchTenants')"
             />
           </div>
-          <UFormField label="状态筛选">
+          <UFormField :label="t('organization.user.filter.status')">
             <USelect
               v-model="filters.status"
               :items="statusOptions"
-              placeholder=""
+              :placeholder="t('organization.user.filter.allStatus')"
               class="w-32"
             />
           </UFormField>
-          <UFormField label="套餐筛选">
-            <USelect v-model="filters.plan" :items="planOptions" class="w-32" />
+          <UFormField :label="t('organization.user.filter.plan')">
+            <USelect
+              v-model="filters.plan"
+              :items="planOptions"
+              :placeholder="t('organization.user.filter.allPlans')"
+              class="w-32"
+            />
           </UFormField>
           <UButton
             icon="i-heroicons-arrow-path"
             variant="ghost"
             @click="resetFilters"
           >
-            重置
+            {{ t("organization.common.reset") }}
           </UButton>
         </div>
       </div>
@@ -252,7 +235,7 @@ onMounted(() => {
             name="i-heroicons-building-office"
             class="h-12 w-12 mx-auto mb-4 text-gray-300"
           />
-          <p>没有找到匹配的租户</p>
+          <p>{{ t("organization.user.noTenantsFound") }}</p>
         </div>
 
         <div v-else class="divide-y divide-gray-200">
@@ -276,7 +259,7 @@ onMounted(() => {
                   <div>
                     <h3 class="font-medium text-gray-900">{{ tenant.name }}</h3>
                     <p class="text-sm text-gray-500">
-                      {{ tenant.domain || "无域名" }}
+                      {{ tenant.domain || t("organization.user.noDomain") }}
                     </p>
                   </div>
                 </div>
@@ -287,12 +270,14 @@ onMounted(() => {
                   <p class="font-medium text-gray-900">
                     {{ tenant.userCount }}
                   </p>
-                  <p class="text-gray-500">用户数</p>
+                  <p class="text-gray-500">
+                    {{ t("organization.user.userCount") }}
+                  </p>
                 </div>
 
                 <div class="text-center">
                   <UBadge
-                    :color="getStatusColor(tenant.status)"
+                    :color="getTenantStatusColor(tenant.status)"
                     variant="subtle"
                   >
                     {{ getStatusText(tenant.status) }}
@@ -304,7 +289,9 @@ onMounted(() => {
 
                 <div class="text-center">
                   <p class="text-gray-500">{{ tenant.createdAt }}</p>
-                  <p class="text-gray-400 text-xs">创建时间</p>
+                  <p class="text-gray-400 text-xs">
+                    {{ t("organization.user.createdAt") }}
+                  </p>
                 </div>
 
                 <UIcon
@@ -323,14 +310,16 @@ onMounted(() => {
         >
           <div class="flex justify-between items-center">
             <div class="text-sm text-gray-600">
-              显示第 {{ (pagination.page - 1) * pagination.pageSize + 1 }} -
               {{
-                Math.min(
-                  pagination.page * pagination.pageSize,
-                  pagination.total
-                )
+                t("organization.user.pagination.showing", {
+                  start: (pagination.page - 1) * pagination.pageSize + 1,
+                  end: Math.min(
+                    pagination.page * pagination.pageSize,
+                    pagination.total
+                  ),
+                  total: pagination.total,
+                })
               }}
-              条， 共 {{ pagination.total }} 个租户
             </div>
             <div class="flex gap-2">
               <UButton
@@ -340,7 +329,7 @@ onMounted(() => {
                 icon="i-heroicons-chevron-left"
                 @click="changePage(pagination.page - 1)"
               >
-                上一页
+                {{ t("organization.user.pagination.previous") }}
               </UButton>
               <UButton
                 :disabled="pagination.page >= pagination.totalPages"
@@ -349,7 +338,7 @@ onMounted(() => {
                 icon="i-heroicons-chevron-right"
                 @click="changePage(pagination.page + 1)"
               >
-                下一页
+                {{ t("organization.user.pagination.next") }}
               </UButton>
             </div>
           </div>
@@ -365,7 +354,7 @@ onMounted(() => {
           variant="ghost"
           @click="backToTenantList"
         >
-          返回租户列表
+          {{ t("organization.user.backToTenantList") }}
         </UButton>
         <div class="h-6 w-px bg-gray-300"></div>
         <div class="flex items-center gap-3">
@@ -380,8 +369,12 @@ onMounted(() => {
           <div>
             <h2 class="text-xl font-semibold">{{ selectedTenant.name }}</h2>
             <p class="text-sm text-gray-500">
-              {{ selectedTenant.domain || "无域名" }} ·
-              {{ selectedTenant.userCount }} 个用户
+              {{ selectedTenant.domain || t("organization.user.noDomain") }} ·
+              {{
+                t("organization.user.userCountText", {
+                  count: selectedTenant.userCount,
+                })
+              }}
             </p>
           </div>
         </div>

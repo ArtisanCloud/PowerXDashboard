@@ -23,7 +23,7 @@ const departmentStore = useDepartmentStore();
 
 // ===== 类型与数据（沿用你现有的定义，略微规范字段） =====
 type StatusType = "active" | "inactive";
-type RoleType = "管理员" | "编辑" | "用户";
+type RoleType = "admin" | "editor" | "user";
 
 interface RowUser {
   id: number;
@@ -64,9 +64,9 @@ const departmentTreeItems = computed(() => {
 });
 const roles = ref([
   { label: t("organization.user.form.selectRole"), value: null },
-  { label: "管理员", value: "管理员" },
-  { label: "编辑", value: "编辑" },
-  { label: "用户", value: "用户" },
+  { label: t("organization.user.role.admin"), value: "admin" },
+  { label: t("organization.user.role.editor"), value: "editor" },
+  { label: t("organization.user.role.user"), value: "user" },
 ]);
 
 // ====== 导入导出 ======
@@ -263,7 +263,7 @@ async function saveUser() {
         username: userForm.username,
         email: userForm.email.toLowerCase(),
         department: "",
-        roles: ["用户"],
+        roles: ["user"],
         status: "active",
         avatar: `https://i.pravatar.cc/150?u=${encodeURIComponent(userForm.email)}`,
       } as RowUser);
@@ -519,7 +519,7 @@ onMounted(async () => {
           <SelectTree
             v-model="filters.department"
             :items="departmentTreeItems"
-            placeholder="选择部门"
+            :placeholder="$t('organization.user.form.selectDepartment')"
             searchable
             clearable
             class="w-full sm:min-w-[12rem]"
@@ -595,8 +595,16 @@ onMounted(async () => {
     <!-- 表单弹窗（新增/编辑） -->
     <UModal
       v-model:open="showForm"
-      :title="isEditing ? '编辑用户' : '添加用户'"
-      :description="isEditing ? '修改用户信息' : '创建新用户'"
+      :title="
+        isEditing
+          ? t('organization.user.form.editUser')
+          : t('organization.user.form.addUser')
+      "
+      :description="
+        isEditing
+          ? t('organization.user.form.editUserDesc')
+          : t('organization.user.form.addUserDesc')
+      "
     >
       <template #content>
         <div class="py-8 px-8">

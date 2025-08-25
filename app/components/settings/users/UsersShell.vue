@@ -44,7 +44,7 @@ onMounted(async () => {
         name="i-heroicons-arrow-path"
         class="animate-spin h-8 w-8 text-blue-600"
       />
-      <span class="ml-3 text-gray-600">加载用户信息中...</span>
+      <span class="ml-3 text-gray-600">{{ $t("common.loading") }}</span>
     </div>
 
     <!-- 错误状态 -->
@@ -57,17 +57,19 @@ onMounted(async () => {
           name="i-heroicons-exclamation-triangle"
           class="h-5 w-5 text-red-600"
         />
-        <span class="ml-2 text-red-800 font-medium">加载失败</span>
+        <span class="ml-2 text-red-800 font-medium">{{
+          $t("common.error")
+        }}</span>
       </div>
       <p class="mt-2 text-red-700">{{ error }}</p>
       <UButton
         class="mt-3"
-        color="red"
+        color="primary"
         variant="outline"
         size="sm"
-        @click="loadUserContext"
+        @click="userStore.fetchUserContext"
       >
-        重试
+        {{ $t("common.retry") }}
       </UButton>
     </div>
 
