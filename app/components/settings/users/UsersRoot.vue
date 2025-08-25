@@ -3,11 +3,22 @@
 import { ref, reactive, computed, watch, onMounted } from "vue";
 import UsersTenantAdmin from "./UsersTenantAdmin.vue";
 import { useI18n } from "#imports";
+import {
+  tenantService,
+  type Tenant,
+} from "~/composables/api/services/tenantService";
 
 const { t } = useI18n();
 
-// 租户数据结构
-interface Tenant {
+// 租户状态映射
+const statusMap = {
+  1: "active",
+  0: "inactive",
+  2: "suspended",
+} as const;
+
+// 转换后的租户数据结构
+interface DisplayTenant {
   id: number;
   name: string;
   domain: string;
@@ -18,30 +29,29 @@ interface Tenant {
 }
 
 // 状态管理
-const tenants = ref<Tenant[]>([]);
-const selectedTenant = ref<Tenant | null>(null);
+const tenants = ref<DisplayTenant[]>([]);
+const selectedTenant = ref<DisplayTenant | null>(null);
 const searchQuery = ref("");
-const isLoading = ref(false);
 
 // 分页和筛选
 const pagination = reactive({
   page: 1,
-  pageSize: 20,
+  pageSize: 10,
   total: 0,
   totalPages: 0,
 });
 
 const filters = reactive({
-  status: null as string | null,
+  status: null as number | null,
   plan: null as string | null,
 });
 
 // 筛选选项
 const statusOptions = [
   { label: "全部状态", value: null },
-  { label: "活跃", value: "active" },
-  { label: "停用", value: "inactive" },
-  { label: "暂停", value: "suspended" },
+  { label: "活跃", value: 1 },
+  { label: "停用", value: 0 },
+  { label: "暂停", value: 2 },
 ];
 
 const planOptions = [
@@ -51,62 +61,46 @@ const planOptions = [
   { label: "企业版", value: "enterprise" },
 ];
 
-// 计算属性
-const filteredTenants = computed(() => {
-  const q = searchQuery.value.trim().toLowerCase();
-  return tenants.value.filter((tenant) => {
-    const matchSearch =
-      !q ||
-      tenant.name.toLowerCase().includes(q) ||
-      tenant.domain.toLowerCase().includes(q);
-    const matchStatus = !filters.status || tenant.status === filters.status;
-    const matchPlan = !filters.plan || tenant.plan === filters.plan;
-    return matchSearch && matchStatus && matchPlan;
-  });
-});
-
-const paginatedTenants = computed(() => {
-  const start = (pagination.page - 1) * pagination.pageSize;
-  const filtered = filteredTenants.value;
-  pagination.total = filtered.length;
-  pagination.totalPages = Math.ceil(filtered.length / pagination.pageSize);
-  return filtered.slice(start, start + pagination.pageSize);
-});
+// 计算属性 - 使用服务端分页，不需要客户端过滤
+const paginatedTenants = computed(() => tenants.value);
 
 // 方法
 async function loadTenants() {
-  isLoading.value = true;
   try {
-    // TODO: 替换为真实API调用
-    // const response = await $fetch('/api/v1/admin/tenants', {
-    //   params: { page: pagination.page, size: pagination.pageSize, ...filters }
-    // });
+    const response = await tenantService.getTenants({
+      page: pagination.page,
+      page_size: pagination.pageSize,
+      status: filters.status ?? undefined,
+      plan: filters.plan ?? undefined,
+      search: searchQuery.value.trim() || undefined,
+    });
 
-    // 模拟数据
-    await new Promise((resolve) => setTimeout(resolve, 500));
-    tenants.value = Array.from({ length: 150 }, (_, i) => ({
-      id: i + 1,
-      name: `租户公司 ${i + 1}`,
-      domain: `tenant${i + 1}.example.com`,
-      status: ["active", "inactive", "suspended"][
-        Math.floor(Math.random() * 3)
-      ] as any,
-      userCount: Math.floor(Math.random() * 500) + 10,
-      createdAt: new Date(
-        Date.now() - Math.random() * 365 * 24 * 60 * 60 * 1000
-      )
-        .toISOString()
-        .split("T")[0],
-      plan: ["free", "pro", "enterprise"][Math.floor(Math.random() * 3)],
-    }));
+    if (response.code === 200) {
+      // 转换API数据为显示格式
+      tenants.value = response.data.items.map(
+        (tenant: Tenant): DisplayTenant => ({
+          id: tenant.id,
+          name: tenant.name,
+          domain: tenant.domain,
+          status:
+            statusMap[tenant.status as keyof typeof statusMap] || "inactive",
+          userCount: tenant.user_count,
+          createdAt: new Date(tenant.createdAt).toLocaleDateString("zh-CN"),
+          plan: tenant.plan,
+        })
+      );
+
+      // 更新分页信息
+      pagination.total = response.data.pagination.total;
+      pagination.totalPages = response.data.pagination.pages;
+    }
   } catch (error) {
     console.error("加载租户列表失败:", error);
-  } finally {
-    isLoading.value = false;
+    // 错误提示已在tenantService中处理
   }
 }
 
-function selectTenant(tenant: Tenant) {
+function selectTenant(tenant: DisplayTenant) {
   selectedTenant.value = tenant;
 }
 
@@ -119,11 +113,13 @@ function resetFilters() {
   filters.status = null;
   filters.plan = null;
   pagination.page = 1;
+  loadTenants();
 }
 
 function changePage(page: number) {
   if (page >= 1 && page <= pagination.totalPages) {
     pagination.page = page;
+    loadTenants();
   }
 }
 
@@ -167,9 +163,25 @@ function getPlanText(plan: string) {
   }
 }
 
-// 监听搜索和筛选变化
-watch([searchQuery, () => filters.status, () => filters.plan], () => {
+// 防抖定时器
+let searchDebounceTimer: ReturnType<typeof setTimeout> | null = null;
+
+// 监听筛选变化，立即触发重新加载
+watch([() => filters.status, () => filters.plan], () => {
   pagination.page = 1;
+  loadTenants();
+});
+
+// 监听搜索变化，使用防抖延迟触发
+watch(searchQuery, () => {
+  if (searchDebounceTimer) {
+    clearTimeout(searchDebounceTimer);
+  }
+
+  searchDebounceTimer = setTimeout(() => {
+    pagination.page = 1;
+    loadTenants();
+  }, 800);
 });
 
 onMounted(() => {
@@ -194,7 +206,6 @@ onMounted(() => {
           icon="i-heroicons-arrow-path"
           variant="outline"
           @click="loadTenants"
-          :loading="isLoading"
         >
           刷新
         </UButton>
@@ -213,16 +224,12 @@ onMounted(() => {
           <UFormField label="状态筛选">
             <USelect
               v-model="filters.status"
-              :options="statusOptions"
+              :items="statusOptions"
               class="w-32"
             />
           </UFormField>
           <UFormField label="套餐筛选">
-            <USelect
-              v-model="filters.plan"
-              :options="planOptions"
-              class="w-32"
-            />
+            <USelect v-model="filters.plan" :items="planOptions" class="w-32" />
           </UFormField>
           <UButton
             icon="i-heroicons-arrow-path"
@@ -236,16 +243,8 @@ onMounted(() => {
 
       <!-- 租户列表 -->
       <div class="bg-white rounded-lg shadow-sm">
-        <div v-if="isLoading" class="p-8 text-center">
-          <UIcon
-            name="i-heroicons-arrow-path"
-            class="animate-spin h-6 w-6 mx-auto mb-2"
-          />
-          <p class="text-gray-500">加载租户列表中...</p>
-        </div>
-
         <div
-          v-else-if="paginatedTenants.length === 0"
+          v-if="paginatedTenants.length === 0"
           class="p-8 text-center text-gray-500"
         >
           <UIcon
@@ -275,7 +274,9 @@ onMounted(() => {
                   </div>
                   <div>
                     <h3 class="font-medium text-gray-900">{{ tenant.name }}</h3>
-                    <p class="text-sm text-gray-500">{{ tenant.domain }}</p>
+                    <p class="text-sm text-gray-500">
+                      {{ tenant.domain || "无域名" }}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -378,7 +379,7 @@ onMounted(() => {
           <div>
             <h2 class="text-xl font-semibold">{{ selectedTenant.name }}</h2>
             <p class="text-sm text-gray-500">
-              {{ selectedTenant.domain }} ·
+              {{ selectedTenant.domain || "无域名" }} ·
               {{ selectedTenant.userCount }} 个用户
             </p>
           </div>

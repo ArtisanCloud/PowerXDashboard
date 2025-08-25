@@ -470,7 +470,7 @@ onMounted(async () => {
         </p>
       </div>
       <div class="flex space-x-2">
-        <UDropdown :items="importExportItems">
+        <UDropdownMenu :items="importExportItems">
           <UButton
             color="neutral"
             variant="outline"
@@ -478,7 +478,7 @@ onMounted(async () => {
           >
             {{ $t("organization.user.importExport") }}
           </UButton>
-        </UDropdown>
+        </UDropdownMenu>
         <UButton color="primary" icon="i-heroicons-plus" @click="openAddForm">
           {{ $t("organization.user.add") }}
         </UButton>
@@ -498,7 +498,7 @@ onMounted(async () => {
         <UFormField :label="$t('organization.user.form.department')">
           <USelect
             v-model="filters.department"
-            :options="departments"
+            :items="departments"
             class="w-full sm:min-w-[12rem]"
             option-attribute="label"
           />
@@ -506,7 +506,7 @@ onMounted(async () => {
         <UFormField :label="$t('organization.user.form.role')">
           <USelect
             v-model="filters.role"
-            :options="roles"
+            :items="roles"
             class="w-full sm:min-w-[12rem]"
             option-attribute="label"
           />
@@ -514,7 +514,7 @@ onMounted(async () => {
         <UFormField :label="$t('organization.user.form.status')" class="mb-0">
           <USelect
             v-model="filters.status"
-            :options="[
+            :items="[
               { label: $t('organization.user.filter.allStatus'), value: null },
               { label: $t('organization.user.filter.active'), value: 'active' },
               {
