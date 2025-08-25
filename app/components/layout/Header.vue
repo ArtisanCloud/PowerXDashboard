@@ -1,14 +1,9 @@
 <script setup lang="ts">
-import ThemeSwitcher from "../ThemeSwitcher.vue";
 import { useDebounceFn } from "@vueuse/core";
-const { t } = useI18n();
+import { useUserStore } from "~/stores/user";
 
-// 用户信息
-const user = ref({
-  name: "管理员",
-  email: "admin@powerx.com",
-  avatar: null,
-});
+const { t } = useI18n();
+const userStore = useUserStore();
 
 // 使用通知系统
 const { getStats, notifications, fetchNotifications } = useNotifications();
@@ -17,9 +12,16 @@ const { getStats, notifications, fetchNotifications } = useNotifications();
 const notificationStats = computed(() => getStats());
 const unreadCount = computed(() => notificationStats.value.unread);
 
-// 初始化通知数据
-onMounted(() => {
+// 初始化通知数据和用户数据
+onMounted(async () => {
   fetchNotifications();
+
+  // 初始化用户数据
+  try {
+    await userStore.fetchUserContext();
+  } catch (error) {
+    console.error("初始化用户数据失败:", error);
+  }
 });
 
 // 用户菜单项
@@ -69,6 +71,8 @@ const notificationItems = computed(() => {
         label: "查看所有通知",
         icon: "i-heroicons-eye",
         to: "/notifications",
+        description: "",
+        badge: unreadCount.value,
       },
     ]);
   } else {
@@ -76,6 +80,8 @@ const notificationItems = computed(() => {
       {
         label: "暂无通知",
         icon: "i-heroicons-bell-slash",
+        description: "",
+        badge: unreadCount.value,
       },
     ]);
   }
@@ -103,9 +109,16 @@ const getNotificationIcon = (type: string) => {
 
 // 退出登录
 const handleLogout = async () => {
-  // 这里添加退出登录逻辑
-  const localePath = useLocalePath();
-  await navigateTo(localePath("/users/login"));
+  try {
+    // 清除用户状态
+    userStore.clearUserState();
+
+    // 跳转到登录页面
+    const localePath = useLocalePath();
+    await navigateTo(localePath("/users/login"));
+  } catch (error) {
+    console.error("退出登录失败:", error);
+  }
 };
 
 // 搜索功能
@@ -308,7 +321,19 @@ const getSearchResultTypeIcon = (type: string) => {
       <!-- 用户菜单 -->
       <UDropdownMenu :items="userMenuItems">
         <UButton variant="ghost" class="flex items-center space-x-2">
+          <!-- 用户头像 -->
           <div
+            v-if="userStore.avatarUrl"
+            class="w-8 h-8 rounded-full overflow-hidden bg-gray-300"
+          >
+            <img
+              :src="userStore.avatarUrl"
+              :alt="userStore.displayName"
+              class="w-full h-full object-cover"
+            />
+          </div>
+          <div
+            v-else
             class="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center"
           >
             <span class="w-5 h-5 text-gray-600 inline-block">
@@ -318,10 +343,17 @@ const getSearchResultTypeIcon = (type: string) => {
               />
             </span>
           </div>
+
+          <!-- 用户信息 -->
           <div class="hidden md:block text-left">
-            <div class="text-sm font-medium text-gray-900">{{ user.name }}</div>
-            <div class="text-xs text-gray-500">{{ user.email }}</div>
+            <div class="text-sm font-medium text-gray-900 dark:text-gray-100">
+              {{ userStore.displayName || "管理员" }}
+            </div>
+            <div class="text-xs text-gray-500 dark:text-gray-400">
+              {{ userStore.user?.email || "admin@powerx.com" }}
+            </div>
           </div>
+
           <span class="w-4 h-4 text-gray-400 inline-block">
             <UIcon
               class="w-4 h-4 text-gray-400 inline-block"

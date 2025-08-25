@@ -122,6 +122,10 @@
 import InstallDialog from "~/components/plugins/InstallDialog.vue";
 import type { MarketplacePlugin } from "~/components/plugins/PluginCard.vue";
 
+definePageMeta({
+  layout: "default",
+});
+
 const route = useRoute();
 
 const db: Record<string, MarketplacePlugin> = {

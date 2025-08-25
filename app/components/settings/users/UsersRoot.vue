@@ -225,6 +225,7 @@ onMounted(() => {
             <USelect
               v-model="filters.status"
               :items="statusOptions"
+              placeholder=""
               class="w-32"
             />
           </UFormField>

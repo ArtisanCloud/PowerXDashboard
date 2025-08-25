@@ -118,6 +118,10 @@ import PluginCard, {
 } from "~/components/plugins/PluginCard.vue";
 import InstallDialog from "~/components/plugins/InstallDialog.vue";
 
+definePageMeta({
+  layout: "default",
+});
+
 const q = ref("");
 const category = ref("全部分类");
 const sort = ref("默认排序");

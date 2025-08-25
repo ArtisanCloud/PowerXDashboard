@@ -3,10 +3,12 @@ import {
   useMenuService,
   type MenuItem,
 } from "~/composables/api/services/menuService";
+import { useUserStore } from "~/stores/user";
 
 // 使用 i18n 进行菜单标题翻译
 const route = useRoute();
 const menuService = useMenuService();
+const userStore = useUserStore();
 
 const { locale, t } = useI18n();
 
@@ -116,12 +118,20 @@ const resolveIcon = (name?: string) =>
   name?.startsWith("i-") ? name : "i-heroicons-puzzle-piece";
 
 // 初始化展开状态（如果有子项处于激活状态，则展开父项）
-onMounted(() => {
+onMounted(async () => {
+  // 初始化菜单展开状态
   menuItems.value.forEach((item) => {
     if (item.children && hasActiveChild(item.children)) {
       expandedItems.value.add(item.id);
     }
   });
+
+  // 初始化用户数据
+  try {
+    await userStore.fetchUserContext();
+  } catch (error) {
+    console.error("初始化用户数据失败:", error);
+  }
 });
 </script>
 
@@ -309,7 +319,19 @@ onMounted(() => {
       class="mt-auto border-t border-gray-200/60 dark:border-gray-700/60 bg-gradient-to-r from-gray-50 to-blue-50 dark:from-gray-800/50 dark:to-blue-900/30 px-4 py-4 h-[73px] flex items-center"
     >
       <div class="flex items-center space-x-3">
+        <!-- 用户头像 -->
         <div
+          v-if="userStore.avatarUrl"
+          class="w-8 h-8 rounded-full overflow-hidden bg-gray-300"
+        >
+          <img
+            :src="userStore.avatarUrl"
+            :alt="userStore.displayName"
+            class="w-full h-full object-cover"
+          />
+        </div>
+        <div
+          v-else
           class="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center"
         >
           <span class="w-5 h-5 text-gray-600 inline-block">
@@ -319,11 +341,17 @@ onMounted(() => {
             />
           </span>
         </div>
+
+        <!-- 用户信息 -->
         <div class="flex-1 min-w-0">
-          <p class="text-sm font-medium text-gray-900 truncate">
-            {{ $t("user.admin") }}
+          <p
+            class="text-sm font-medium text-gray-900 dark:text-gray-100 truncate"
+          >
+            {{ userStore.displayName || $t("user.admin") }}
           </p>
-          <p class="text-xs text-gray-500 truncate">admin@powerx.com</p>
+          <p class="text-xs text-gray-500 dark:text-gray-400 truncate">
+            {{ userStore.user?.email || "admin@powerx.com" }}
+          </p>
         </div>
       </div>
     </div>
