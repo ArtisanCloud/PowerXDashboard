@@ -8,19 +8,42 @@ import type {
 // 用户相关接口类型定义
 export interface User {
   id: number;
+  uuid: string;
+  createdAt: string;
+  updatedAt: string;
+  DeletedAt?: string | null;
   email?: string;
   phone?: string;
   display_name: string;
   avatar_url?: string;
   status: number;
-  last_login_at?: number | null;
   meta?: any;
-  member_id?: number | null;
-  username?: string | null;
+}
+
+export interface Member {
+  id: number;
+  uuid: string;
+  createdAt: string;
+  updatedAt: string;
+  DeletedAt?: string | null;
+  tenant_id: number;
+  user_id: number;
+  username: string;
+  display_name: string;
+  avatar_url?: string;
+  status: number;
+  meta?: any;
+}
+
+export interface MemberWithProfile {
+  Member: Member;
+  User: User;
+  DeptIDs: number[] | null;
 }
 
 export interface UserListParams extends PaginationParams {
   q?: string; // 关键词搜索
+  tenant_id?: number; // 租户筛选
   status?: number; // 状态筛选
   sort_by?: string;
   sort_order?: string;
@@ -87,9 +110,12 @@ export const useUserService = () => {
      * GET /api/admin/system/users
      */
     getUsers: (params?: UserListParams) => {
-      return apiClient.get<ApiResponse<PaginatedResponse<User>>>(baseUrl, {
-        params,
-      });
+      return apiClient.get<ApiResponse<PaginatedResponse<MemberWithProfile>>>(
+        baseUrl,
+        {
+          params,
+        }
+      );
     },
 
     /**
@@ -97,7 +123,7 @@ export const useUserService = () => {
      * GET /api/admin/system/users/:id
      */
     getUser: (id: number) => {
-      return apiClient.get<ApiResponse<User>>(`${baseUrl}/${id}`);
+      return apiClient.get<ApiResponse<MemberWithProfile>>(`${baseUrl}/${id}`);
     },
 
     /**
@@ -175,14 +201,17 @@ export const useUserService = () => {
      * @deprecated 使用 createSystemUser 替代
      */
     createUser: (data: CreateSystemUserParams) => {
-      return this.createSystemUser(data);
+      return apiClient.post<ApiResponse<{ id: number }>>(baseUrl, data);
     },
 
     /**
      * @deprecated 使用 setUserStatus 替代
      */
     updateUserStatus: (id: number, status: number) => {
-      return this.setUserStatus(id, { status });
+      return apiClient.put<ApiResponse<{ ok: boolean }>>(
+        `${baseUrl}/${id}/status`,
+        { status }
+      );
     },
   };
 };

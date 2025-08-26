@@ -14,7 +14,7 @@ import SelectTree from "~/components/ui/SelectTree.vue";
 import { useDepartmentStore } from "~/stores/department";
 import {
   useUserService,
-  type User,
+  type MemberWithProfile,
 } from "~/composables/api/services/userService";
 import type { Department } from "~/composables/api/services/departmentService";
 
@@ -31,7 +31,8 @@ type StatusType = "active" | "inactive";
 type RoleType = "admin" | "editor" | "user";
 
 interface RowUser {
-  id: number;
+  id: number; // Member ID
+  userId?: number; // User ID
   name: string;
   username?: string;
   email?: string;
@@ -210,7 +211,7 @@ function openAddForm() {
 function openEditForm(row: RowUser) {
   resetForm();
   isEditing.value = true;
-  editingId.value = row.id;
+  editingId.value = row.id; // 这里使用的是Member的ID
 
   // 将行数据映射回表单
   userForm.name = row.name;
@@ -272,6 +273,8 @@ async function saveUser() {
 async function deleteUser(id: number) {
   if (!confirm(t("organization.user.confirmDelete"))) return;
   try {
+    // 注意：这里的id是Member的ID，但API可能需要User的ID
+    // 根据后端实现调整
     await userService.deleteUser(id);
     await loadUsers(); // 重新加载数据
   } catch (e: any) {
@@ -282,6 +285,8 @@ async function deleteUser(id: number) {
 async function toggleUserStatus(row: RowUser) {
   try {
     const newStatus = row.status === "active" ? 0 : 1;
+    // 注意：这里的row.id是Member的ID，但API可能需要User的ID
+    // 根据后端实现调整
     await userService.setUserStatus(row.id, { status: newStatus });
     await loadUsers(); // 重新加载数据
   } catch (e: any) {
@@ -370,9 +375,13 @@ const columns = computed(() => {
       header: t("organization.user.table.email").toString(),
     },
     {
-      id: "department",
-      accessorKey: "department",
-      header: t("organization.user.table.department").toString(),
+      id: "phone",
+      accessorKey: "phone",
+      header: t("organization.user.table.phone").toString(),
+      cell: ({ row }: any) => {
+        const u = row.original as RowUser;
+        return maskPhone(u.phone || "");
+      },
     },
     {
       id: "status",
@@ -444,21 +453,31 @@ const columns = computed(() => {
   ];
 });
 
+// 手机号脱敏函数
+function maskPhone(phone: string): string {
+  if (!phone) return "";
+  if (phone.length <= 7) return phone;
+  return phone.slice(0, 3) + "****" + phone.slice(-4);
+}
+
 // 转换API数据为组件需要的格式
-function transformUserData(apiUser: User): RowUser {
+function transformUserData(memberWithProfile: MemberWithProfile): RowUser {
+  const { Member, User } = memberWithProfile;
   return {
-    id: apiUser.id,
-    name: apiUser.display_name,
-    username: apiUser.username || apiUser.email?.split("@")[0] || "",
-    email: apiUser.email || "",
-    phone: apiUser.phone || "",
-    department: apiUser.meta?.title || apiUser.meta?.department || "",
+    id: Member.id, // 使用Member的ID作为主要ID
+    userId: User.id, // 保存User的ID以备后用
+    name: Member.display_name || User.display_name,
+    username: Member.username,
+    email: User.email || "",
+    phone: User.phone || "",
+    department: Member.meta?.title || Member.meta?.department || "",
     roles: null,
-    status: apiUser.status === 1 ? "active" : "inactive",
+    status: Member.status === 1 ? "active" : "inactive",
     avatar:
-      apiUser.avatar_url ||
-      `https://i.pravatar.cc/150?u=${encodeURIComponent(apiUser.email || apiUser.display_name)}`,
-    meta: apiUser.meta,
+      Member.avatar_url ||
+      User.avatar_url ||
+      `https://i.pravatar.cc/150?u=${encodeURIComponent(User.email || Member.display_name)}`,
+    meta: { ...User.meta, ...Member.meta }, // 合并User和Member的meta
   };
 }
 
@@ -469,6 +488,7 @@ async function loadUsers() {
     const params: any = {
       page: pagination.page,
       page_size: pagination.pageSize,
+      tenant_id: props.tenantId,
       status: filters.status
         ? filters.status === "active"
           ? 1
@@ -673,7 +693,11 @@ onMounted(async () => {
               <UInput v-model="userForm.email" type="email" />
             </UFormField>
             <UFormField :label="$t('organization.user.form.phone')">
-              <UInput v-model="userForm.phone" type="tel" />
+              <UInput
+                v-model="userForm.phone"
+                type="tel"
+                :placeholder="$t('organization.user.form.phonePlaceholder')"
+              />
             </UFormField>
             <UFormField
               :label="$t('organization.user.form.password')"
