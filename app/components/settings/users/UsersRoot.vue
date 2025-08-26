@@ -4,7 +4,7 @@ import { ref, reactive, computed, watch, onMounted } from "vue";
 import UsersTenantAdmin from "./UsersTenantAdmin.vue";
 import { useI18n } from "#imports";
 import {
-  tenantService,
+  useTenantService,
   type Tenant,
 } from "~/composables/api/services/tenantService";
 
@@ -15,6 +15,9 @@ import {
 } from "~/composables/api/types/tenant";
 
 const { t } = useI18n();
+
+// 依赖注入的服务
+const tenantService = useTenantService();
 
 // 转换后的租户数据结构
 interface DisplayTenant {

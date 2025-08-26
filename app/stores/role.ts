@@ -134,7 +134,7 @@ export const useRoleStore = defineStore("role", () => {
       }
     } catch (err) {
       error.value = err instanceof Error ? err.message : "更新角色失败";
-      console.error("更新角色失败:", err);
+
       throw err;
     } finally {
       loading.value = false;

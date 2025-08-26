@@ -1,15 +1,11 @@
 <script setup lang="ts">
-import {
-  ref,
-  reactive,
-  computed,
-  h,
-  resolveComponent,
-  watch,
-  onMounted,
-} from "vue";
+import { ref, reactive, computed, h, resolveComponent, onMounted } from "vue";
+import { watchDebounced } from "@vueuse/core";
 import { useI18n } from "#imports";
 import { useRoleStore } from "~/stores/role";
+import { useTenantService } from "~/composables/api/services/tenantService";
+import type { Tenant } from "~/composables/api/services/tenantService";
+import { useOneShotAlert } from "~/composables/useOneShotAlert";
 import type {
   Role,
   RoleCreateParams,
@@ -18,19 +14,89 @@ import type {
 
 const { t, locale } = useI18n();
 const roleStore = useRoleStore();
+const tenantService = useTenantService();
+const { notifyOnce, visible, title, description, color, variant, hide } =
+  useOneShotAlert();
 
-// 响应式状态
+/* ================= 租户相关 ================= */
+type Option = { label: string; value: number; description?: string };
+
+const tenants = ref<Tenant[]>([]);
+const loadingTenants = ref(false);
+const isRootUser = ref(true);
+
+// ✅ 对象当值（不再是 number）
+const selectedTenant = ref<Option | null>(null);
+
+// 搜索关键词（受控）
+const tenantKeyword = ref("");
+
+// ✅ 从后端映射 + 并入当前已选项，避免异步时丢失回显
+const tenantOptions = computed<Option[]>(() => {
+  const list = tenants.value.map((t) => ({
+    label: t.name,
+    value: t.id,
+    description: t.domain || `租户 ID: ${t.id}`,
+  }));
+  if (
+    selectedTenant.value &&
+    !list.some((o) => o.value === selectedTenant.value!.value)
+  ) {
+    list.unshift(selectedTenant.value);
+  }
+  return list;
+});
+
+/* —— 缓冲同步选中值到表单（对象 → id） —— */
+watchDebounced(
+  selectedTenant,
+  (opt) => {
+    roleForm.tenant_id = opt?.value ?? undefined;
+  },
+  { debounce: 300 }
+);
+
+/* —— 远程搜索（防抖） —— */
+watchDebounced(
+  tenantKeyword,
+  (q) => {
+    const s = (q ?? "").trim();
+    if (!s) {
+      // 推荐：拉默认一页（若后端允许）
+      loadTenants();
+      return;
+    }
+    loadTenants(s);
+  },
+  { debounce: 400 }
+);
+
+/* —— 远程搜索（防抖） —— */
+watchDebounced(
+  tenantKeyword,
+  (q) => {
+    const s = (q ?? "").trim();
+    if (!s) {
+      // ✅ 推荐：拉一页默认（如果后端允许）
+      loadTenants();
+      return;
+    }
+    loadTenants(s);
+  },
+  { debounce: 400 }
+);
+
+/* ================= 角色相关/状态 ================= */
 const roles = computed(() => roleStore.roles);
 const loading = computed(() => roleStore.loading);
 const error = computed(() => roleStore.error);
 const storePagination = computed(() => roleStore.pagination);
 
-// 搜索和筛选
 const searchQuery = ref("");
 const selectedScope = ref<string>("");
 const selectedBuiltin = ref<boolean | undefined>(undefined);
 
-/** ========= 分页状态 ========= */
+/* ================= 分页 ================= */
 const pagination = reactive({
   page: 1,
   pageSize: 20,
@@ -38,7 +104,6 @@ const pagination = reactive({
   totalPages: 0,
 });
 
-// 分页大小选项
 const pageSizeOptions = [
   { label: "10", value: 10 },
   { label: "20", value: 20 },
@@ -46,36 +111,82 @@ const pageSizeOptions = [
   { label: "100", value: 100 },
 ];
 
-// 表单状态
+/* ================= 表单 ================= */
 const showForm = ref(false);
 const isEditing = ref(false);
 const editingId = ref<number | null>(null);
 
 const roleForm = reactive<RoleCreateParams & { id?: number }>({
   scope: "tenant",
+  tenant_id: undefined,
   code: "",
   name: "",
   description: "",
 });
 
-// 重置表单
+/* ================= API ================= */
+const loadTenants = async (keyword?: string) => {
+  if (!isRootUser.value) return;
+  loadingTenants.value = true;
+  try {
+    // 参数清洗：只在有值时传 q，避免后端解析 undefined/null
+    const params: Record<string, any> = { page: 1, page_size: 10 };
+    const q = (keyword ?? "").trim();
+    if (q) params.q = q;
+
+    const response = await tenantService.getTenants(params);
+    if (response?.code === 200 && response.data) {
+      tenants.value = response.data.items;
+    } else {
+      // 可选：对非 200 的后端返回做兜底
+      // console.warn("getTenants 非 200：", response);
+    }
+  } catch (err) {
+    console.error("加载租户列表失败:", err);
+  } finally {
+    loadingTenants.value = false;
+  }
+};
+
+const loadRoles = async () => {
+  try {
+    const params: Record<string, any> = {
+      page: pagination.page,
+      page_size: pagination.pageSize,
+    };
+    const kw = (searchQuery.value ?? "").trim();
+    if (kw) params.keyword = kw;
+    if (selectedScope.value) params.scope = selectedScope.value;
+    if (typeof selectedBuiltin.value === "boolean")
+      params.builtin = selectedBuiltin.value;
+
+    await roleStore.fetchRoles(params);
+
+    pagination.total = storePagination.value.total;
+    pagination.totalPages = storePagination.value.pages;
+  } catch (err) {
+    console.error("加载角色列表失败:", err);
+  }
+};
+
+/* ================= 动作 ================= */
 const resetForm = () => {
   roleForm.scope = "tenant";
+  roleForm.tenant_id = undefined;
   roleForm.code = "";
   roleForm.name = "";
   roleForm.description = "";
   delete roleForm.id;
+  selectedTenant.value = null;
   isEditing.value = false;
   editingId.value = null;
 };
 
-// 打开新增表单
 const openAddForm = () => {
   resetForm();
   showForm.value = true;
 };
 
-// 打开编辑表单
 const openEditForm = (role: Role) => {
   roleForm.name = role.name;
   roleForm.code = role.code;
@@ -87,90 +198,74 @@ const openEditForm = (role: Role) => {
   showForm.value = true;
 };
 
-// 保存角色
 const saveRole = async () => {
   if (!roleForm.name || !roleForm.code) {
-    alert("请填写必填字段");
+    notifyOnce("请填写必填字段", "角色名称和代码为必填项", "warning");
     return;
   }
-
   try {
     if (isEditing.value && editingId.value !== null) {
-      // 编辑现有角色
       const updateData: RoleUpdateParams = {
         name: roleForm.name,
         description: roleForm.description,
       };
       await roleStore.updateRole(editingId.value, updateData);
     } else {
-      // 添加新角色
       const createData: RoleCreateParams = {
         scope: roleForm.scope,
+        tenant_id: roleForm.tenant_id,
         code: roleForm.code,
         name: roleForm.name,
         description: roleForm.description,
       };
       await roleStore.createRole(createData);
     }
-
     showForm.value = false;
     resetForm();
     await loadRoles();
+
+    const action = isEditing.value ? "更新" : "创建";
+    notifyOnce(
+      `${action}角色成功`,
+      `角色 "${roleForm.name}" 已${action}成功`,
+      "success"
+    );
   } catch (err) {
     console.error("保存角色失败:", err);
-    alert("保存角色失败，请重试");
+    notifyOnce("保存角色失败", "请检查网络连接或联系管理员", "error");
   }
 };
 
-// 删除角色
 const deleteRole = async (id: number) => {
-  if (confirm("确定要删除此角色吗？")) {
-    try {
-      await roleStore.deleteRole(id);
-      await loadRoles();
-    } catch (err) {
-      console.error("删除角色失败:", err);
-      alert("删除角色失败，请重试");
-    }
-  }
-};
-
-// 加载角色列表
-const loadRoles = async () => {
+  if (!confirm("确定要删除此角色吗？")) return;
   try {
-    await roleStore.fetchRoles({
-      page: pagination.page,
-      page_size: pagination.pageSize,
-      keyword: searchQuery.value || undefined,
-      scope: selectedScope.value || undefined,
-      builtin: selectedBuiltin.value,
-    });
-
-    // 更新本地分页信息
-    pagination.total = storePagination.value.total;
-    pagination.totalPages = storePagination.value.pages;
+    await roleStore.deleteRole(id);
+    await loadRoles();
+    notifyOnce("删除角色成功", "角色已成功删除", "success");
   } catch (err) {
-    console.error("加载角色列表失败:", err);
+    console.error("删除角色失败:", err);
+    notifyOnce("删除角色失败", "请检查网络连接或联系管理员", "error");
   }
 };
 
-// 搜索处理
+/* ================= 列表/分页/搜索 ================= */
 const handleSearch = async () => {
   pagination.page = 1;
   await loadRoles();
 };
 
-/** ========= 过滤和分页 ========= */
-const filteredRoles = computed(() => {
-  return roles.value;
-});
+// 给搜索也做点缓冲，省接口
+watchDebounced(
+  searchQuery,
+  () => {
+    handleSearch();
+  },
+  { debounce: 300 }
+);
 
-// 当前页显示的角色
-const paginatedRoles = computed(() => {
-  return roles.value;
-});
+const filteredRoles = computed(() => roles.value);
+const paginatedRoles = computed(() => roles.value);
 
-// 分页信息
 const paginationInfo = computed(() => {
   const start = (pagination.page - 1) * pagination.pageSize + 1;
   const end = Math.min(pagination.page * pagination.pageSize, pagination.total);
@@ -183,7 +278,6 @@ const paginationInfo = computed(() => {
   };
 });
 
-// 分页控制
 const changePage = async (page: number) => {
   if (page >= 1 && page <= pagination.totalPages) {
     pagination.page = page;
@@ -200,22 +294,14 @@ const changePageSize = async (pageSize: number) => {
 const hasNextPage = computed(() => pagination.page < pagination.totalPages);
 const hasPrevPage = computed(() => pagination.page > 1);
 
-// 监听搜索条件变化
-watch(searchQuery, () => {
-  handleSearch();
-});
+const clearError = () => roleStore.clearError();
 
-// 清除错误
-const clearError = () => {
-  roleStore.clearError();
-};
-
-// ====== ✅ Nuxt UI 3.3+：TanStack 列定义 ======
+/* ================= 表格列定义 ================= */
 const UButton = resolveComponent("UButton");
 const UBadge = resolveComponent("UBadge");
 
 const columns = computed(() => {
-  const _ = locale.value; // 显式依赖，切换语言时重算
+  const _ = locale.value; // 显式依赖
   return [
     {
       id: "name",
@@ -328,14 +414,20 @@ const columns = computed(() => {
   ];
 });
 
+/* ================= 生命周期 ================= */
 onMounted(() => {
   loadRoles();
+  if (isRootUser.value) {
+    // 若你的后端允许无关键字的默认列表，这里可以直接 loadTenants()
+    // 否则保持空，等待用户输入搜索词
+    // loadTenants();
+  }
 });
 </script>
 
 <template>
   <div>
-    <!-- 角色管理头部 -->
+    <!-- 头部 -->
     <div class="flex justify-between items-center mb-6">
       <div>
         <h2 class="text-xl font-semibold text-gray-800">角色管理</h2>
@@ -348,23 +440,7 @@ onMounted(() => {
       </UButton>
     </div>
 
-    <!-- 错误提示 -->
-    <UAlert
-      v-if="error"
-      color="error"
-      variant="subtle"
-      :title="error"
-      :close-button="{
-        icon: 'i-heroicons-x-mark-20-solid',
-        color: 'gray',
-        variant: 'link',
-        padded: false,
-      }"
-      @close="clearError"
-      class="mb-4"
-    />
-
-    <!-- 搜索和筛选 -->
+    <!-- 过滤 -->
     <div class="flex flex-col md:flex-row gap-4 mb-6">
       <UInput
         v-model="searchQuery"
@@ -394,32 +470,13 @@ onMounted(() => {
       />
     </div>
 
-    <!-- 数据统计和分页大小选择 -->
-    <div class="mb-4 bg-white p-4 rounded-lg shadow-sm">
-      <div class="flex justify-between items-center">
-        <div class="text-sm text-gray-600">
-          显示第 {{ paginationInfo.start }} - {{ paginationInfo.end }} 条， 共
-          {{ paginationInfo.total }} 条记录
-        </div>
-        <div class="flex items-center gap-2">
-          <span class="text-sm text-gray-600">每页显示：</span>
-          <USelect
-            :model-value="pagination.pageSize"
-            :options="pageSizeOptions"
-            @update:model-value="changePageSize"
-            class="w-20"
-          />
-        </div>
-      </div>
-    </div>
-
     <!-- 加载状态 -->
     <div v-if="loading" class="flex justify-center py-8">
       <UIcon name="i-heroicons-arrow-path" class="w-6 h-6 animate-spin" />
       <span class="ml-2">加载中...</span>
     </div>
 
-    <!-- ✅ Nuxt UI 3.3+ 用 :data 和 TanStack columns -->
+    <!-- 表格 -->
     <div v-else class="bg-white rounded-lg shadow-sm">
       <UTable :data="paginatedRoles" :columns="columns" />
 
@@ -443,7 +500,6 @@ onMounted(() => {
               上一页
             </UButton>
 
-            <!-- 页码按钮 -->
             <template
               v-for="page in Math.min(5, pagination.totalPages)"
               :key="page"
@@ -544,6 +600,31 @@ onMounted(() => {
                     { label: '系统角色', value: 'system' },
                   ]"
                 />
+              </UFormField>
+
+              <UFormField
+                v-if="!isEditing && isRootUser && roleForm.scope === 'tenant'"
+                label="选择租户"
+                required
+              >
+                <USelectMenu
+                  v-model="selectedTenant"
+                  :items="tenantOptions"
+                  :loading="loadingTenants"
+                  searchable
+                  v-model:search-term="tenantKeyword"
+                  placeholder="选择租户"
+                  class="w-full"
+                >
+                  <template #option="{ option }">
+                    <div class="flex flex-col">
+                      <span class="font-medium">{{ option.label }}</span>
+                      <span class="text-xs text-gray-500">{{
+                        option.description
+                      }}</span>
+                    </div>
+                  </template>
+                </USelectMenu>
               </UFormField>
 
               <UFormField label="角色描述">

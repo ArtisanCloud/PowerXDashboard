@@ -44,7 +44,9 @@
     "down": "下移",
     "none": "无",
     "enabled": "已启用",
-    "disabled": "已禁用"
+    "disabled": "已禁用",
+    "collapse": "收起",
+    "toggleDensity": "切换密度"
   },
   "menu": {
     "dashboard": "仪表板",

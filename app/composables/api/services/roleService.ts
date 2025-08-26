@@ -101,7 +101,7 @@ export const useRoleService = () => {
      * 更新角色
      */
     updateRole: (id: number, data: RoleUpdateParams) => {
-      return apiClient.put<ApiResponse<{ updated: boolean }>>(
+      return apiClient.patch<ApiResponse<{ updated: boolean }>>(
         `${baseUrl}/${id}`,
         data
       );
