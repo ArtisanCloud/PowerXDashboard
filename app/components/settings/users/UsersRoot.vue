@@ -183,13 +183,20 @@ onMounted(() => {
             {{ t("organization.user.selectTenantDesc") }}
           </p>
         </div>
-        <UButton
-          icon="i-heroicons-arrow-path"
-          variant="outline"
-          @click="loadTenants"
-        >
-          {{ t("common.reload") }}
-        </UButton>
+        <div class="flex gap-2">
+          <UTooltip text="SaaS版本支持添加租户">
+            <UButton icon="i-lucide-plus" variant="outline" disabled>
+              添加租户
+            </UButton>
+          </UTooltip>
+          <UButton
+            icon="i-heroicons-arrow-path"
+            variant="outline"
+            @click="loadTenants"
+          >
+            {{ t("common.reload") }}
+          </UButton>
+        </div>
       </div>
 
       <!-- 搜索和筛选 -->

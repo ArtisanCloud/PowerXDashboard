@@ -16,6 +16,8 @@ export const useRoleStore = defineStore("role", () => {
   const currentRole = ref<Role | null>(null);
   const loading = ref(false);
   const error = ref<string | null>(null);
+  const initialized = ref(false);
+  const lastFetchTime = ref<number | null>(null);
 
   // 分页信息
   const pagination = ref({
@@ -42,8 +44,23 @@ export const useRoleStore = defineStore("role", () => {
     roles.value.filter((role) => !role.builtin)
   );
 
+  const isInitialized = computed(() => initialized.value);
+
+  const needsRefresh = computed(() => {
+    if (!initialized.value) return true;
+    // 可以添加基于时间的缓存策略，比如5分钟后需要刷新
+    // const fiveMinutes = 5 * 60 * 1000;
+    // return lastFetchTime.value && (Date.now() - lastFetchTime.value) > fiveMinutes;
+    return false;
+  });
+
   // 操作方法
-  const fetchRoles = async (params?: RoleListParams) => {
+  const fetchRoles = async (params?: RoleListParams, force = false) => {
+    // 如果已经初始化且不强制刷新，则跳过
+    if (initialized.value && !force && !needsRefresh.value) {
+      return;
+    }
+
     loading.value = true;
     error.value = null;
 
@@ -53,6 +70,8 @@ export const useRoleStore = defineStore("role", () => {
       if (response.code === 200 && response.data) {
         roles.value = response.data.items;
         pagination.value = response.data.pagination;
+        initialized.value = true;
+        lastFetchTime.value = Date.now();
       } else {
         throw new Error(response.message || "获取角色列表失败");
       }
@@ -176,12 +195,26 @@ export const useRoleStore = defineStore("role", () => {
     }
   };
 
+  // 确保已初始化（如果没有则自动加载）
+  const ensureInitialized = async (params?: RoleListParams) => {
+    if (!initialized.value) {
+      await fetchRoles(params);
+    }
+  };
+
+  // 强制刷新数据
+  const forceRefresh = async (params?: RoleListParams) => {
+    await fetchRoles(params, true);
+  };
+
   // 重置状态
   const resetState = () => {
     roles.value = [];
     currentRole.value = null;
     loading.value = false;
     error.value = null;
+    initialized.value = false;
+    lastFetchTime.value = null;
     pagination.value = {
       total: 0,
       page: 1,
@@ -202,12 +235,16 @@ export const useRoleStore = defineStore("role", () => {
     loading,
     error,
     pagination,
+    initialized,
+    lastFetchTime,
 
     // 计算属性
     systemRoles,
     tenantRoles,
     builtinRoles,
     customRoles,
+    isInitialized,
+    needsRefresh,
 
     // 方法
     fetchRoles,
@@ -215,6 +252,8 @@ export const useRoleStore = defineStore("role", () => {
     createRole,
     updateRole,
     deleteRole,
+    ensureInitialized,
+    forceRefresh,
     resetState,
     clearError,
   };

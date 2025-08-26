@@ -225,6 +225,7 @@ const saveRole = async () => {
     await loadRoles();
 
     const action = isEditing.value ? "更新" : "创建";
+
     notifyOnce(
       `${action}角色成功`,
       `角色 "${roleForm.name}" 已${action}成功`,
@@ -450,22 +451,22 @@ onMounted(() => {
       />
       <USelect
         v-model="selectedScope"
-        :options="[
-          { label: '全部作用域', value: '' },
+        :items="[
+          { label: '全部作用域', value: null },
           { label: '系统角色', value: 'system' },
           { label: '租户角色', value: 'tenant' },
         ]"
-        placeholder="选择作用域"
+        placeholder="全部作用域"
         class="w-full md:w-40"
       />
       <USelect
         v-model="selectedBuiltin"
-        :options="[
-          { label: '全部类型', value: undefined },
+        :items="[
+          { label: '全部类型', value: null },
           { label: '系统内置', value: true },
           { label: '自定义', value: false },
         ]"
-        placeholder="选择类型"
+        placeholder="全部类型"
         class="w-full md:w-40"
       />
     </div>
@@ -592,7 +593,7 @@ onMounted(() => {
                 />
               </UFormField>
 
-              <UFormField v-if="!isEditing" label="作用域">
+              <!-- <UFormField v-if="!isEditing" label="作用域">
                 <USelect
                   v-model="roleForm.scope"
                   :options="[
@@ -600,7 +601,7 @@ onMounted(() => {
                     { label: '系统角色', value: 'system' },
                   ]"
                 />
-              </UFormField>
+              </UFormField> -->
 
               <UFormField
                 v-if="!isEditing && isRootUser && roleForm.scope === 'tenant'"
