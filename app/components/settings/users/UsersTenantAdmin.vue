@@ -12,6 +12,10 @@ import {
 import { useI18n } from "#imports";
 import SelectTree from "~/components/ui/SelectTree.vue";
 import { useDepartmentStore } from "~/stores/department";
+import {
+  useUserService,
+  type User,
+} from "~/composables/api/services/userService";
 import type { Department } from "~/composables/api/services/departmentService";
 
 // ==== 输入属性（Root 复用时传入 tenantId） ====
@@ -20,25 +24,28 @@ const { t, locale } = useI18n();
 
 // ==== 部门store ====
 const departmentStore = useDepartmentStore();
+const userService = useUserService();
 
-// ===== 类型与数据（沿用你现有的定义，略微规范字段） =====
+// ===== 类型与数据 =====
 type StatusType = "active" | "inactive";
 type RoleType = "admin" | "editor" | "user";
 
 interface RowUser {
   id: number;
   name: string;
-  username: string;
-  email: string;
+  username?: string;
+  email?: string;
+  phone?: string;
   department?: string;
   roles?: RoleType[] | null;
   status: StatusType | string;
   avatar: string;
-  // 你也可以加 memberId/userId 等后端需要的标识
+  meta?: Record<string, any> | null;
 }
 
-// 表格数据（TODO: 替换为接口加载）
+// 表格数据和加载状态
 const users = ref<RowUser[]>([]);
+const loading = ref(false);
 
 // ====== 过滤/分页（与你现有一致） ======
 const searchQuery = ref("");
@@ -205,126 +212,118 @@ function openEditForm(row: RowUser) {
   isEditing.value = true;
   editingId.value = row.id;
 
-  // 将行数据映射回表单（如果你后端返回 departmentId/roleIds，按需填充）
+  // 将行数据映射回表单
   userForm.name = row.name;
-  userForm.username = row.username;
-  userForm.email = row.email;
+  userForm.username = row.username || "";
+  userForm.email = row.email || "";
+  userForm.phone = row.phone || "";
   userForm.avatarUrl = row.avatar;
-  userForm.status = (row.status as any) === "active" ? "active" : "disabled";
+  userForm.status = row.status === "active" ? "active" : "disabled";
+  userForm.meta = row.meta || {};
   showForm.value = true;
 }
 
 async function saveUser() {
   // 基础校验
-  if (!userForm.name || !userForm.username || !userForm.email) {
+  if (!userForm.name || !userForm.email) {
     return alert(t("organization.user.validation.requiredFields"));
+  }
+  if (!isEditing.value && !userForm.username) {
+    return alert("用户名为必填项");
   }
   if (!isEditing.value && userForm.password !== userForm.confirmPassword) {
     return alert(t("organization.user.validation.passwordMismatch"));
   }
 
-  const payload = {
-    // 与后端统一的扁平创建结构（我们已在 handler 里支持）
-    name: userForm.name,
-    username: userForm.username,
-    email: userForm.email,
-    phone: userForm.phone,
-    avatar_url: userForm.avatarUrl,
-    status: userForm.status,
-    department_id: userForm.departmentId ?? undefined,
-    department_ids: undefined, // 如需多部门，改成数组
-    role_ids: userForm.roleIds ?? [],
-    password: userForm.password || undefined,
-    confirm_password: userForm.confirmPassword || undefined,
-    meta: userForm.meta ?? {},
-  };
-
   try {
-    if (isEditing.value) {
-      // PATCH /api/v1/admin/iam/members/:id
-      // await $fetch(`/api/v1/admin/iam/members/${editingId.value}`, { method:"PATCH", body: payload })
-      // Demo：本地更新
-      const idx = users.value.findIndex((u) => u.id === editingId.value);
-      if (idx >= 0)
-        users.value[idx] = {
-          ...users.value[idx],
-          name: userForm.name,
-          email: userForm.email,
-          username: userForm.username,
-        };
+    if (isEditing.value && editingId.value) {
+      // 更新用户
+      const updatePayload = {
+        display_name: userForm.name,
+        email: userForm.email,
+        phone: userForm.phone,
+        avatar_url: userForm.avatarUrl,
+        status: userForm.status === "active" ? 1 : 0,
+      };
+      await userService.updateUser(editingId.value, updatePayload);
     } else {
-      // POST /api/v1/admin/iam/members
-      // await $fetch(`/api/v1/admin/iam/members`, { method:"POST", body: payload })
-      // Demo：本地插入
-      const id = Math.max(0, ...users.value.map((u) => u.id)) + 1;
-      users.value.unshift({
-        id,
-        name: userForm.name,
-        username: userForm.username,
-        email: userForm.email.toLowerCase(),
-        department: "",
-        roles: ["user"],
-        status: "active",
-        avatar: `https://i.pravatar.cc/150?u=${encodeURIComponent(userForm.email)}`,
-      } as RowUser);
+      // 创建系统用户
+      const createPayload = {
+        display_name: userForm.name,
+        email: userForm.email,
+        phone: userForm.phone,
+        avatar_url: userForm.avatarUrl,
+        status: userForm.status === "active" ? 1 : 0,
+        meta: userForm.meta ?? {},
+        username: userForm.username || userForm.email.split("@")[0],
+        tenant_id: props.tenantId,
+        initial_password: userForm.password,
+        dept_ids: userForm.departmentId ? [userForm.departmentId] : [],
+      };
+      await userService.createSystemUser(createPayload);
     }
     showForm.value = false;
+    await loadUsers(); // 重新加载数据
   } catch (e: any) {
     alert(e?.message || "保存失败");
   }
 }
 
-function deleteUser(id: number) {
+async function deleteUser(id: number) {
   if (!confirm(t("organization.user.confirmDelete"))) return;
-  // await $fetch(`/api/v1/admin/iam/members/${id}`, { method:"DELETE" })
-  users.value = users.value.filter((u) => u.id !== id);
+  try {
+    await userService.deleteUser(id);
+    await loadUsers(); // 重新加载数据
+  } catch (e: any) {
+    alert(e?.message || "删除失败");
+  }
 }
 
-function toggleUserStatus(row: RowUser) {
-  const idx = users.value.findIndex((u) => u.id === row.id);
-  if (idx < 0) return;
-  users.value[idx].status =
-    users.value[idx].status === "active" ? "inactive" : "active";
-  // 你也可以调用 PUT /status
+async function toggleUserStatus(row: RowUser) {
+  try {
+    const newStatus = row.status === "active" ? 0 : 1;
+    await userService.setUserStatus(row.id, { status: newStatus });
+    await loadUsers(); // 重新加载数据
+  } catch (e: any) {
+    alert(e?.message || "状态更新失败");
+  }
 }
 
-// ===== 过滤/分页与你现有一致（略写） =====
+// ===== 过滤/分页逻辑 =====
 const filteredUsers = computed(() => {
-  const q = searchQuery.value.trim().toLowerCase();
-  const filtered = users.value.filter((u) => {
-    const hit =
-      !q ||
-      u.name.toLowerCase().includes(q) ||
-      u.username.toLowerCase().includes(q) ||
-      u.email.toLowerCase().includes(q);
-    const dep = !filters.department || u.department === filters.department;
-    const role = !filters.role || (u.roles || []).includes(filters.role as any);
-    const st = !filters.status || u.status === filters.status;
-    return hit && dep && role && st;
-  });
-  pagination.total = filtered.length;
-  pagination.totalPages = Math.ceil(filtered.length / pagination.pageSize);
-  return filtered;
+  // 由于使用API分页，直接返回当前用户数据
+  return users.value;
 });
+
 const paginatedUsers = computed(() => {
-  const start = (pagination.page - 1) * pagination.pageSize;
-  return filteredUsers.value.slice(start, start + pagination.pageSize);
+  // API已经返回分页数据，直接使用
+  return users.value;
 });
+
 const hasNextPage = computed(() => pagination.page < pagination.totalPages);
 const hasPrevPage = computed(() => pagination.page > 1);
-function changePage(p: number) {
-  if (p >= 1 && p <= pagination.totalPages) pagination.page = p;
+
+async function changePage(p: number) {
+  if (p >= 1 && p <= pagination.totalPages) {
+    pagination.page = p;
+    await loadUsers();
+  }
 }
-function changePageSize(size: number) {
+
+async function changePageSize(size: number) {
   pagination.pageSize = size;
   pagination.page = 1;
+  await loadUsers();
 }
+
 function resetFilters() {
   filters.department = filters.role = filters.status = null;
   searchQuery.value = "";
   pagination.page = 1;
+  loadUsers();
 }
 
+// 监听搜索和过滤条件变化
 watch(
   [
     searchQuery,
@@ -332,7 +331,10 @@ watch(
     () => filters.role,
     () => filters.status,
   ],
-  () => (pagination.page = 1)
+  () => {
+    pagination.page = 1;
+    loadUsers();
+  }
 );
 
 // ===== 列定义：含"编辑/禁用/删除"操作 =====
@@ -442,7 +444,58 @@ const columns = computed(() => {
   ];
 });
 
-// ===== 模拟加载（替换为实际接口） =====
+// 转换API数据为组件需要的格式
+function transformUserData(apiUser: User): RowUser {
+  return {
+    id: apiUser.id,
+    name: apiUser.display_name,
+    username: apiUser.username || apiUser.email?.split("@")[0] || "",
+    email: apiUser.email || "",
+    phone: apiUser.phone || "",
+    department: apiUser.meta?.title || apiUser.meta?.department || "",
+    roles: null,
+    status: apiUser.status === 1 ? "active" : "inactive",
+    avatar:
+      apiUser.avatar_url ||
+      `https://i.pravatar.cc/150?u=${encodeURIComponent(apiUser.email || apiUser.display_name)}`,
+    meta: apiUser.meta,
+  };
+}
+
+// 加载用户数据
+async function loadUsers() {
+  try {
+    loading.value = true;
+    const params: any = {
+      page: pagination.page,
+      page_size: pagination.pageSize,
+      status: filters.status
+        ? filters.status === "active"
+          ? 1
+          : 0
+        : undefined, // 不传status则显示所有状态
+    };
+
+    // 添加搜索参数
+    if (searchQuery.value.trim()) {
+      params.q = searchQuery.value.trim(); // 后端使用q参数
+    }
+
+    const response = await userService.getUsers(params);
+
+    if (response.data) {
+      users.value = response.data.items.map(transformUserData);
+      pagination.total = response.data.pagination.total;
+      pagination.totalPages = response.data.pagination.pages;
+    }
+  } catch (error) {
+    console.error("加载用户数据失败:", error);
+  } finally {
+    loading.value = false;
+  }
+}
+
+// 初始化数据
 onMounted(async () => {
   // 初始化部门数据
   try {
@@ -451,29 +504,8 @@ onMounted(async () => {
     console.error("加载部门数据失败:", error);
   }
 
-  // 例：const res = await $fetch(`/api/v1/admin/iam/members`, { params: {...} })
-  users.value = [
-    {
-      id: 1,
-      name: "张三",
-      username: "zhangsan",
-      email: "zhangsan@example.com",
-      department: "技术部",
-      roles: ["管理员"],
-      status: "active",
-      avatar: "https://randomuser.me/api/portraits/men/1.jpg",
-    },
-    {
-      id: 2,
-      name: "李四",
-      username: "lisi",
-      email: "lisi@example.com",
-      department: "市场部",
-      roles: ["编辑"],
-      status: "active",
-      avatar: "https://randomuser.me/api/portraits/women/2.jpg",
-    },
-  ];
+  // 加载用户数据
+  await loadUsers();
 });
 </script>
 
@@ -562,7 +594,16 @@ onMounted(async () => {
 
     <!-- 表格 + 分页 -->
     <div class="bg-white rounded-lg shadow-sm">
-      <UTable :data="paginatedUsers" :columns="columns" />
+      <UTable
+        :data="paginatedUsers"
+        :columns="columns"
+        :loading="loading"
+        :empty-state="{
+          icon: 'i-heroicons-circle-stack-20-solid',
+          label: '暂无用户数据',
+          description: '当前没有找到任何用户信息',
+        }"
+      />
       <div
         v-if="pagination.totalPages > 1"
         class="px-6 py-4 border-t border-gray-200 flex justify-between items-center"
@@ -573,7 +614,7 @@ onMounted(async () => {
         </div>
         <div class="flex gap-2">
           <UButton
-            :disabled="!hasPrevPage"
+            :disabled="!hasPrevPage || loading"
             variant="outline"
             size="sm"
             icon="i-heroicons-chevron-left"
@@ -581,7 +622,7 @@ onMounted(async () => {
             >上一页</UButton
           >
           <UButton
-            :disabled="!hasNextPage"
+            :disabled="!hasNextPage || loading"
             variant="outline"
             size="sm"
             icon="i-heroicons-chevron-right"
@@ -612,18 +653,28 @@ onMounted(async () => {
             @submit.prevent="saveUser"
             class="grid grid-cols-1 md:grid-cols-2 gap-4"
           >
-            <UFormField :label="$t('organization.user.form.name')" required
-              ><UInput v-model="userForm.name"
-            /></UFormField>
-            <UFormField :label="$t('organization.user.form.username')" required
-              ><UInput v-model="userForm.username"
-            /></UFormField>
+            <UFormField :label="$t('organization.user.form.name')" required>
+              <UInput v-model="userForm.name" />
+            </UFormField>
+            <UFormField
+              :label="$t('organization.user.form.username')"
+              :required="!isEditing"
+            >
+              <UInput
+                v-model="userForm.username"
+                :placeholder="isEditing ? '编辑时可选' : '必填，用于租户内登录'"
+              />
+            </UFormField>
             <UFormField
               :label="$t('organization.user.form.email')"
               required
               class="md:col-span-2"
-              ><UInput v-model="userForm.email" type="email"
-            /></UFormField>
+            >
+              <UInput v-model="userForm.email" type="email" />
+            </UFormField>
+            <UFormField :label="$t('organization.user.form.phone')">
+              <UInput v-model="userForm.phone" type="tel" />
+            </UFormField>
             <UFormField
               :label="$t('organization.user.form.password')"
               :required="!isEditing"

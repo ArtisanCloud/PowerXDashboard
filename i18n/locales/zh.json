@@ -327,6 +327,11 @@
         "csv": "导出用户数据 (CSV)",
         "json": "导出用户数据 (JSON)"
       },
+      "role": {
+        "admin": "管理员",
+        "editor": "编辑者",
+        "user": "普通用户"
+      },
       "form": {
         "name": "姓名",
         "username": "用户名",
@@ -345,7 +350,11 @@
         "emailPlaceholder": "输入邮箱地址",
         "passwordPlaceholder": "输入密码",
         "selectDepartment": "选择部门",
-        "selectRole": "选择角色"
+        "selectRole": "选择角色",
+        "addUser": "添加用户",
+        "addUserDesc": "创建新的用户账号",
+        "editUser": "编辑用户",
+        "editUserDesc": "修改用户信息"
       },
       "table": {
         "avatar": "",
