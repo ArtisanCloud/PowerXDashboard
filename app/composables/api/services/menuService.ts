@@ -1,13 +1,19 @@
 import { useApiClient } from "../index";
 import type { ApiResponse } from "../types/types";
 
-type MenusPayload = { menus: MenuItem[] };
+/** ===== Types ===== */
+export interface MenuCategory {
+  id: string;
+  title: string;
+  order: number;
+  origin: string;
+  children: MenuItem[];
+}
 
-// 菜单项接口定义
 export interface MenuItem {
   id: string;
   title: string;
-  icon: string;
+  icon?: string;
   path?: string;
   children?: MenuItem[];
   badge?: string | number;
@@ -16,9 +22,15 @@ export interface MenuItem {
   origin: string;
   permissions?: string[];
   parentId?: string;
+  slot?: string;
 }
 
-// 菜单创建参数
+type MenusResponse = {
+  /** 后端将来若提供“已排好序的扁平顶层菜单” */
+  menus?: unknown[];
+  categories?: unknown[];
+};
+
 export interface MenuCreateParams {
   title: string;
   icon: string;
@@ -30,7 +42,6 @@ export interface MenuCreateParams {
   badge?: string | number;
 }
 
-// 菜单更新参数
 export interface MenuUpdateParams {
   title?: string;
   icon?: string;
@@ -42,218 +53,169 @@ export interface MenuUpdateParams {
   badge?: string | number;
 }
 
-/**
- * 菜单服务 API
- */
+/** ===== Utils ===== */
 
-/** 安全取深路径：默认取 resp.data.menus */
-function getMenusArray(resp: any): any[] {
-  const data = resp?.data ?? resp;
-  const arr = data?.menus;
-  return Array.isArray(arr) ? arr : [];
+const SLOT_ROOT = "group.root" as const;
+
+/** DEV 下冻结，帮助发现谁在改顺序 */
+function deepFreezeDev<T>(obj: T): T {
+  if (process.dev && obj && typeof obj === "object") {
+    Object.freeze(obj as any);
+    for (const k of Object.keys(obj as any)) {
+      const v = (obj as any)[k];
+      if (v && typeof v === "object" && !Object.isFrozen(v)) deepFreezeDev(v);
+    }
+  }
+  return obj;
 }
 
-/** 保证 children 是数组并递归规范化，顺便排序（order->title->id） */
-function normalizeTree(list: any[]): MenuItem[] {
-  const asArray = (v: any) => (Array.isArray(v) ? v : []);
-  const walk = (nodes: any[]): MenuItem[] =>
-    nodes
-      .filter((n) => n && typeof n === "object")
-      .map((n) => {
-        const children = walk(asArray(n.children));
-        const item: MenuItem = {
-          id: String(n.id ?? ""),
-          title: String(n.title ?? ""),
-          icon: String(n.icon ?? ""),
-          path: typeof n.path === "string" ? n.path : undefined,
-          order: Number.isFinite(n.order) ? Number(n.order) : 0,
-          visible: typeof n.visible === "boolean" ? n.visible : true,
-          permissions: Array.isArray(n.permissions) ? n.permissions : undefined,
-          parentId: typeof n.parentId === "string" ? n.parentId : undefined,
-          children,
-          // 透传其它字段（如 origin、badge、slot 等）
-          ...n,
-        };
-        return item;
-      });
+/** 将 unknown 规范化为 MenuItem（递归处理 children；不排序） */
+function normalizeMenuItem(raw: unknown): MenuItem {
+  const n = (raw ?? {}) as Record<string, unknown>;
+  const childrenRaw = Array.isArray(n.children) ? n.children : undefined;
 
-  return walk(list);
+  return {
+    id: String(n.id ?? ""),
+    title: String(n.title ?? ""),
+    icon: typeof n.icon === "string" ? n.icon : undefined,
+    path: typeof n.path === "string" ? n.path : undefined,
+    // 默认 Infinity，避免其他地方“按 order 排”时把无序项顶到前面
+    order: Number.isFinite(n.order as number)
+      ? Number(n.order)
+      : Number.POSITIVE_INFINITY,
+    visible: typeof n.visible === "boolean" ? (n.visible as boolean) : true,
+    origin: String(n.origin ?? ""),
+    permissions: Array.isArray(n.permissions)
+      ? (n.permissions as string[])
+      : undefined,
+    parentId:
+      typeof n.parentId === "string" ? (n.parentId as string) : undefined,
+    slot: typeof n.slot === "string" ? (n.slot as string) : undefined,
+    children: childrenRaw?.map(normalizeMenuItem),
+    // badge 保留到页面层处理（翻译等），这里不处理
+    badge: ((): MenuItem["badge"] => {
+      const b = n.badge;
+      if (typeof b === "string" || typeof b === "number") return b;
+      return undefined;
+    })(),
+  };
 }
 
-/** 从任意响应结构中解析出 MenuItem[]；取不到就返回 []，保证上层永远拿到数组 */
-function parseMenusFromResponse(resp: any): MenuItem[] {
-  const raw = getMenusArray(resp);
-  return normalizeTree(raw);
+/** 后端顶层排序规则的稳定比较器（仅用于顶层） */
+function compareTopLevel(
+  a: MenuItem & { _i: number },
+  b: MenuItem & { _i: number }
+): number {
+  const pa = a.slot === SLOT_ROOT ? 0 : 1;
+  const pb = b.slot === SLOT_ROOT ? 0 : 1;
+  if (pa !== pb) return pa - pb;
+
+  if (a.order !== b.order) return a.order - b.order;
+
+  // title、id 都可能为空字符串；localeCompare 保持一致性
+  const ta = a.title ?? "";
+  const tb = b.title ?? "";
+  if (ta !== tb) return ta.localeCompare(tb);
+
+  const ia = a.id ?? "";
+  const ib = b.id ?? "";
+  if (ia !== ib) return ia.localeCompare(ib);
+
+  return a._i - b._i; // 兜底：保持稳定
 }
 
-// ===================== Service =====================
+/** 优先使用 data.menus（若存在），否则从 categories 恢复顶层 */
+function parseMenusFromResponse(resp: unknown): MenuItem[] {
+  const data = (resp as any)?.data ?? resp ?? {};
+  const menusRaw = Array.isArray((data as any).menus)
+    ? ((data as any).menus as unknown[])
+    : null;
+  if (menusRaw) {
+    // 后端已拍好序：仅 normalize，不再排序
+    return menusRaw.map(normalizeMenuItem);
+  }
+
+  const catsRaw = Array.isArray((data as any).categories)
+    ? ((data as any).categories as unknown[])
+    : [];
+
+  return toTopLevelMenusFromCategories(catsRaw);
+}
+
+/** 从 categories 恢复顶层菜单并按后端规则稳定排序（子级不排序） */
+function toTopLevelMenusFromCategories(categories: unknown[]): MenuItem[] {
+  if (!Array.isArray(categories)) return [];
+
+  // 扁平化顶层：保持“分类内的相对顺序”，再统一按规则排序
+  let seq = 0;
+  const flat: (MenuItem & { _i: number })[] = [];
+
+  for (let ci = 0; ci < categories.length; ci++) {
+    const cat = (categories[ci] ?? {}) as Record<string, unknown>;
+    const children = Array.isArray(cat.children)
+      ? (cat.children as unknown[])
+      : [];
+    for (let j = 0; j < children.length; j++) {
+      const item = normalizeMenuItem(children[j]);
+      (item as any)._i = seq++;
+      flat.push(item as MenuItem & { _i: number });
+    }
+  }
+
+  flat.sort(compareTopLevel);
+  // 移除 _i
+  return flat.map(({ _i, ...rest }) => rest);
+}
+
+/** ===== Service ===== */
 
 export const useMenuService = () => {
   const apiClient = useApiClient();
   const baseUrl = "/admin/menus";
 
   return {
-    /**
-     * 获取用户菜单（根据权限过滤）
-     * 统一返回 ApiResponse<MenuItem[]>
-     */
+    /** 获取用户菜单（根据权限过滤）——只返回顶层扁平 MenuItem[]，顺序符合后端规则 */
     getUserMenus: async () => {
-      // 如果你现在是“纯前端/本地 JSON”，这里也可以换成 Promise.resolve(本地对象)
-      const res = await apiClient.get<ApiResponse<MenusPayload>>(baseUrl);
-
-      // 注意：很多 http 客户端（如 axios）把服务端响应包在 res.data 里
-      // 这里先取“外层 data”，再取“内层 data.menus”
-      const serverResp = res?.data ?? res; // 兼容不同 http 包
+      const res = await apiClient.get<ApiResponse<MenusResponse>>(baseUrl);
+      const serverResp = (res?.data ?? res) as ApiResponse<MenusResponse>;
       const menus = parseMenusFromResponse(serverResp);
+
+      deepFreezeDev(menus);
 
       const normalized: ApiResponse<MenuItem[]> = {
         code: serverResp.code ?? 200,
         message: serverResp.message ?? "success",
         data: menus,
+        timestamp: serverResp.timestamp,
       };
       return normalized;
     },
 
-    /**
-     * 获取所有菜单（管理员用）
-     * 统一返回 ApiResponse<MenuItem[]>
-     */
+    /** 获取所有菜单（管理员） */
     getAllMenus: async () => {
-      const res = await apiClient.get<ApiResponse<MenusPayload>>(baseUrl);
-      const serverResp = res?.data ?? res;
+      const res = await apiClient.get<ApiResponse<MenusResponse>>(baseUrl);
+      const serverResp = (res?.data ?? res) as ApiResponse<MenusResponse>;
       const menus = parseMenusFromResponse(serverResp);
 
       const normalized: ApiResponse<MenuItem[]> = {
         code: serverResp.code ?? 200,
         message: serverResp.message ?? "success",
         data: menus,
+        timestamp: serverResp.timestamp,
       };
       return normalized;
     },
 
-    /**
-     * 获取指定菜单信息（保持直通）
-     */
-    getMenu: (id: string) => {
-      return apiClient.get<ApiResponse<MenuItem>>(`${baseUrl}/${id}`);
-    },
-
-    /**
-     * 创建菜单（直通）
-     */
-    createMenu: (data: MenuCreateParams) => {
-      return apiClient.post<ApiResponse<MenuItem>>(baseUrl, data);
-    },
-
-    /**
-     * 更新菜单（直通）
-     */
-    updateMenu: (id: string, data: MenuUpdateParams) => {
-      return apiClient.put<ApiResponse<MenuItem>>(`${baseUrl}/${id}`, data);
-    },
-
-    /**
-     * 删除菜单（直通）
-     */
-    deleteMenu: (id: string) => {
-      return apiClient.delete<ApiResponse<null>>(`${baseUrl}/${id}`);
-    },
-
-    /**
-     * 更新菜单排序（直通）
-     */
-    updateMenuOrder: (menuOrders: { id: string; order: number }[]) => {
-      return apiClient.post<ApiResponse<null>>(`${baseUrl}/order`, {
-        menuOrders,
-      });
-    },
+    /** 其余 CRUD 直通 */
+    getMenu: (id: string) =>
+      apiClient.get<ApiResponse<MenuItem>>(`${baseUrl}/${id}`),
+    createMenu: (data: MenuCreateParams) =>
+      apiClient.post<ApiResponse<MenuItem>>(baseUrl, data),
+    updateMenu: (id: string, data: MenuUpdateParams) =>
+      apiClient.put<ApiResponse<MenuItem>>(`${baseUrl}/${id}`, data),
+    deleteMenu: (id: string) =>
+      apiClient.delete<ApiResponse<null>>(`${baseUrl}/${id}`),
+    updateMenuOrder: (menuOrders: { id: string; order: number }[]) =>
+      apiClient.post<ApiResponse<null>>(`${baseUrl}/order`, { menuOrders }),
   };
 };
-
-// 模拟菜单数据，使用翻译键而不是直接的中文文本
-// const mockMenuData: MenuItem[] = [
-//   {
-//     id: "agent",
-//     title: "menu.agent",
-//     icon: "i-heroicons-chat-bubble-left-right",
-//     path: "/agent",
-//     order: 1,
-//     visible: true,
-//   },
-//   {
-//     id: "workflow",
-//     title: "menu.workflow",
-//     icon: "i-heroicons-squares-2x2",
-//     path: "/workflow",
-//     order: 2,
-//     visible: true,
-//   },
-//   {
-//     id: "plugins",
-//     title: "menu.pluginMarketplace",
-//     icon: "i-heroicons-puzzle-piece",
-//     path: "/plugins",
-//     order: 4,
-//     visible: true,
-//   },
-//   {
-//     id: "dashboard",
-//     title: "menu.dashboard",
-//     icon: "i-heroicons-home",
-//     path: "/dashboard",
-//     order: 3,
-//     visible: true,
-//   },
-//   {
-//     id: "settings",
-//     title: "menu.settings",
-//     icon: "i-heroicons-cog-6-tooth",
-//     order: 6,
-//     visible: true,
-//     children: [
-//       {
-//         id: "user-management",
-//         title: "menu.userManagement",
-//         icon: "i-heroicons-user",
-//         path: "/settings/users",
-//         order: 1,
-//         visible: true,
-//         parentId: "settings",
-//       },
-//       {
-//         id: "role-management",
-//         title: "menu.roleManagement",
-//         icon: "i-heroicons-shield-check",
-//         path: "/settings/roles",
-//         order: 2,
-//         visible: true,
-//         parentId: "settings",
-//       },
-//       {
-//         id: "system-config",
-//         title: "menu.systemConfig",
-//         icon: "i-heroicons-wrench-screwdriver",
-//         path: "/settings/config",
-//         order: 3,
-//         visible: true,
-//         parentId: "settings",
-//       },
-//       {
-//         id: "ai-settings",
-//         title: "menu.aiSettings",
-//         icon: "i-heroicons-cpu-chip",
-//         path: "/settings/ai",
-//         order: 4,
-//         visible: true,
-//         parentId: "settings",
-//       },
-//     ],
-//   },
-// ];
-
-// 返回模拟数据
-// return Promise.resolve({
-//   code: 0,
-//   message: "success",
-//   data: mockMenuData,
-// });

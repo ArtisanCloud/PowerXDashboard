@@ -5,32 +5,49 @@ import {
 } from "~/composables/api/services/menuService";
 import { useUserStore } from "~/stores/user";
 
-// 使用 i18n 进行菜单标题翻译
 const route = useRoute();
 const menuService = useMenuService();
 const userStore = useUserStore();
+const { t } = useI18n();
+const localePath = useLocalePath() as (p: string) => string;
 
-const { locale, t } = useI18n();
-
+/* ---------- helpers ---------- */
 const isPluginPath = (p?: string) => !!p && p.startsWith("/_p/");
 
-// 对插件路径，直接返回原始 path；其它仍走 localePath
 const linkFor = (p?: string) => {
   if (!p) return "";
-  return isPluginPath(p) ? p : (useLocalePath() as any)(p);
+  return isPluginPath(p) ? p : localePath(p);
 };
 
-// 活跃判断也要兼容 /_p/
 const isActive = (path?: string) => {
   if (!path) return false;
-  if (isPluginPath(path)) {
+  if (isPluginPath(path))
     return route.path === path || route.path.startsWith(path);
-  }
-  const localized = (useLocalePath() as any)(path);
+  const localized = localePath(path);
   return route.path === localized || route.path.startsWith(localized + "/");
 };
 
-// 从 API 获取菜单数据
+const translateTitle = (title?: string) =>
+  title?.startsWith?.("menu.")
+    ? t(title)
+    : title || t("menu.untitled", "未命名菜单");
+
+const resolveIcon = (name?: string) => {
+  if (!name) return "i-heroicons-puzzle-piece";
+  if (name.startsWith("i-")) return name;
+  const iconMap: Record<string, string> = {
+    Smile: "i-heroicons-face-smile",
+    Settings: "i-heroicons-cog-6-tooth",
+    User: "i-heroicons-user",
+    Home: "i-heroicons-home",
+    Plugin: "i-heroicons-puzzle-piece",
+  };
+  return iconMap[name] || "i-heroicons-puzzle-piece";
+};
+
+const isVisible = (it: MenuItem) => it.visible !== false;
+
+/* ---------- fetch ---------- */
 const {
   data: menuResponse,
   pending: menuLoading,
@@ -41,105 +58,81 @@ const {
   transform: (response) => response || { data: [] },
 });
 
-// 调试输出
-// console.log("菜单响应数据:", menuResponse.value);
+/* ---------- computed: menuItems ---------- */
+/** 子级排序（顶层不排序）：order(缺省∞) -> title -> id */
+const sortChildren = (a: MenuItem, b: MenuItem) => {
+  const ao = Number.isFinite(a.order) ? a.order : Number.POSITIVE_INFINITY;
+  const bo = Number.isFinite(b.order) ? b.order : Number.POSITIVE_INFINITY;
+  if (ao !== bo) return ao - bo;
+  const at = a.title ?? "";
+  const bt = b.title ?? "";
+  if (at !== bt) return at.localeCompare(bt);
+  return (a.id ?? "").localeCompare(b.id ?? "");
+};
 
-// 处理菜单数据，使用 i18n 翻译菜单标题
-const menuItems = computed<MenuItem[]>(() => {
-  // console.log("计算菜单项，原始数据:", menuResponse.value);
+const processMenuItems = (items: MenuItem[], level = 0): MenuItem[] => {
+  const mapped = items.filter(isVisible).map((item) => ({
+    ...item,
+    title: translateTitle(item.title),
+    badge:
+      typeof item.badge === "string" && item.badge.startsWith("menu.")
+        ? t(item.badge)
+        : item.badge,
+    children: item.children?.length
+      ? processMenuItems(item.children, level + 1)
+      : undefined,
+  }));
 
-  if (!menuResponse.value?.data) {
-    console.log("菜单数据为空");
-    return [];
-  }
-  // console.log("处理后的菜单数据:", menuResponse.value);
+  // 顶层：严格沿用后端顺序，不排序
+  if (level === 0) return mapped;
+  // 子级：可选排序
+  return mapped.sort(sortChildren);
+};
 
-  const processMenuItems = (items: MenuItem[]): MenuItem[] => {
-    return items
-      .filter((item) => item.visible !== false) // 确保即使 visible 未定义也会显示
-      .map((item) => {
-        // console.log("处理菜单项:", item);
-        // 处理菜单项，翻译标题和 badge
-        const processedItem = {
-          ...item,
-          // 使用 i18n 翻译菜单标题
-          title: translateTitle(item.title),
-          // 如果 badge 是翻译键（以 menu. 开头），则翻译它
-          badge:
-            item.badge &&
-            typeof item.badge === "string" &&
-            item.badge.startsWith("menu.")
-              ? t(item.badge)
-              : item.badge,
-          children:
-            item.children && item.children.length > 0
-              ? processMenuItems(item.children)
-              : undefined,
-        };
+const menuItems = computed<MenuItem[]>(() =>
+  menuResponse.value?.data ? processMenuItems(menuResponse.value.data, 0) : []
+);
 
-        // console.log("处理后的菜单项:", item.title, "→", processedItem.title);
-        if (item.badge) {
-          console.log("处理后的 badge:", item.badge, "→", processedItem.badge);
-        }
-
-        return processedItem;
-      });
-  };
-
-  const processed = processMenuItems(menuResponse.value.data);
-  // console.log("处理后的菜单项:", processed);
-  return processed;
-});
-
-// 展开状态管理
+/* ---------- expand state ---------- */
 const expandedItems = ref<Set<string>>(new Set());
 
-// 切换展开状态
-const toggleExpanded = (itemId: string) => {
-  if (expandedItems.value.has(itemId)) {
-    expandedItems.value.delete(itemId);
-  } else {
-    expandedItems.value.add(itemId);
-  }
+const toggleExpanded = (id: string) => {
+  const s = expandedItems.value;
+  s.has(id) ? s.delete(id) : s.add(id);
 };
 
-// 检查是否有子项处于激活状态
-const hasActiveChild = (children?: MenuItem[]) => {
-  if (!children) return false;
-  return children.some((child) => isActive(child.path));
-};
+const hasActiveChild = (children?: MenuItem[]) =>
+  !!children?.some((child) => isActive(child.path));
 
-// 仅翻译以 "menu." 开头的 key；插件返回纯文案时不去查 i18n
-const translateTitle = (title?: string) =>
-  title?.startsWith("menu.") ? t(title) : title || "未命名菜单";
-
-// 图标兜底：插件可能传 "Smile" 这类非 i- 前缀，统一回退为拼图图标
-const resolveIcon = (name?: string) =>
-  name?.startsWith("i-") ? name : "i-heroicons-puzzle-piece";
-
-// 初始化展开状态（如果有子项处于激活状态，则展开父项）
-onMounted(async () => {
-  // 初始化菜单展开状态
+// 初始化 & 路由变化：自动展开包含当前路由的父级
+const expandByRoute = () => {
+  const set = new Set<string>();
   menuItems.value.forEach((item) => {
-    if (item.children && hasActiveChild(item.children)) {
-      expandedItems.value.add(item.id);
-    }
+    if (item.children && hasActiveChild(item.children)) set.add(item.id);
   });
+  expandedItems.value = set;
+};
 
-  // 初始化用户数据
+onMounted(async () => {
+  expandByRoute();
   try {
     await userStore.fetchUserContext();
-  } catch (error) {
-    console.error("初始化用户数据失败:", error);
+  } catch (e) {
+    console.error("初始化用户数据失败:", e);
   }
 });
+
+watch(
+  () => route.path,
+  () => expandByRoute()
+);
 </script>
 
 <template>
   <aside
     class="w-64 bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm border-r border-gray-200/60 dark:border-gray-700/60 shadow-lg flex flex-col h-screen relative z-30"
   >
-    <!-- Logo 区域 -->
+    <!-- Logo -->
     <div
       class="flex items-center justify-center h-16 border-b border-gray-200/60 dark:border-gray-700/60 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/30 dark:to-purple-900/30"
     >
@@ -160,9 +153,9 @@ onMounted(async () => {
       </NuxtLink>
     </div>
 
-    <!-- 菜单区域 -->
+    <!-- 菜单 -->
     <nav class="flex-1 overflow-y-auto py-4">
-      <!-- 加载状态 -->
+      <!-- 加载 -->
       <div v-if="menuLoading" class="px-3">
         <div class="space-y-2">
           <div v-for="i in 5" :key="i" class="animate-pulse">
@@ -174,7 +167,7 @@ onMounted(async () => {
         </div>
       </div>
 
-      <!-- 错误状态 -->
+      <!-- 错误 -->
       <div v-else-if="menuError" class="px-3">
         <div class="bg-red-50 border border-red-200 rounded-lg p-4">
           <div class="flex items-center space-x-2 text-red-700 mb-2">
@@ -198,24 +191,19 @@ onMounted(async () => {
         </div>
       </div>
 
-      <!-- 菜单列表 -->
-      <ul v-else class="space-y-1 px-3">
-        <!-- 调试信息 -->
+      <!-- 列表 -->
+      <ul v-else class="space-y-1 px-3" role="tree">
         <li
-          class="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-700 p-2 mb-2 rounded text-xs"
+          v-if="menuItems.length === 0"
+          class="bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 p-4 rounded-lg text-center"
         >
-          <div class="text-yellow-800 dark:text-yellow-200">
-            {{ $t("menu.itemCount") }}: {{ menuItems.length }}
-          </div>
-          <div
-            v-if="menuItems.length === 0"
-            class="text-red-600 dark:text-red-400"
-          >
-            {{ $t("menu.noItemsWarning") }}
+          <div class="text-gray-500 dark:text-gray-400 text-sm">
+            {{ $t("menu.noItemsFound") }}
           </div>
         </li>
+
         <li v-for="item in menuItems" :key="item.id">
-          <!-- 有子菜单的项目 -->
+          <!-- 可展开 -->
           <div v-if="item.children">
             <button
               @click="toggleExpanded(item.id)"
@@ -225,6 +213,8 @@ onMounted(async () => {
                   ? 'bg-blue-600/10 dark:bg-blue-400/10 text-blue-700 dark:text-blue-200 ring-1 ring-blue-500/20 dark:ring-blue-400/20'
                   : 'text-slate-700 dark:text-slate-200 hover:bg-slate-900/5 dark:hover:bg-white/5'
               "
+              :aria-expanded="expandedItems.has(item.id)"
+              :aria-controls="`submenu-${item.id}`"
             >
               <div class="flex items-center space-x-3">
                 <span class="w-5 h-5 inline-block">
@@ -249,7 +239,6 @@ onMounted(async () => {
               </div>
             </button>
 
-            <!-- 子菜单 -->
             <Transition
               enter-active-class="transition-all duration-200 ease-out"
               enter-from-class="opacity-0 max-h-0"
@@ -260,7 +249,9 @@ onMounted(async () => {
             >
               <ul
                 v-show="expandedItems.has(item.id)"
+                :id="`submenu-${item.id}`"
                 class="mt-1 ml-6 space-y-1 overflow-hidden"
+                role="group"
               >
                 <li v-for="child in item.children" :key="child.id">
                   <NuxtLink
@@ -281,12 +272,26 @@ onMounted(async () => {
                     </span>
                     <span>{{ child.title }}</span>
                   </NuxtLink>
+
+                  <!-- 没有 path 的子项（占位） -->
+                  <div
+                    v-else
+                    class="flex items-center space-x-3 px-3 py-2 text-sm text-slate-500"
+                  >
+                    <span class="w-4 h-4 inline-block">
+                      <UIcon
+                        class="w-4 h-4 inline-block"
+                        :name="resolveIcon(child.icon)"
+                      />
+                    </span>
+                    <span>{{ child.title }}</span>
+                  </div>
                 </li>
               </ul>
             </Transition>
           </div>
 
-          <!-- 无子菜单的项目 -->
+          <!-- 顶层无子菜单 -->
           <NuxtLink
             v-else-if="item.path"
             :to="linkFor(item.path)"
@@ -310,6 +315,20 @@ onMounted(async () => {
               item.badge
             }}</UBadge>
           </NuxtLink>
+
+          <!-- 顶层占位（无 path） -->
+          <div
+            v-else
+            class="flex items-center space-x-3 px-3 py-2 text-sm text-slate-700 dark:text-slate-200"
+          >
+            <span class="w-5 h-5 inline-block">
+              <UIcon
+                class="w-5 h-5 inline-block"
+                :name="resolveIcon(item.icon)"
+              />
+            </span>
+            <span>{{ item.title }}</span>
+          </div>
         </li>
       </ul>
     </nav>
@@ -319,7 +338,6 @@ onMounted(async () => {
       class="mt-auto border-t border-gray-200/60 dark:border-gray-700/60 bg-gradient-to-r from-gray-50 to-blue-50 dark:from-gray-800/50 dark:to-blue-900/30 px-4 py-4 h-[73px] flex items-center"
     >
       <div class="flex items-center space-x-3">
-        <!-- 用户头像 -->
         <div
           v-if="userStore.avatarUrl"
           class="w-8 h-8 rounded-full overflow-hidden bg-gray-300"
@@ -341,8 +359,6 @@ onMounted(async () => {
             />
           </span>
         </div>
-
-        <!-- 用户信息 -->
         <div class="flex-1 min-w-0">
           <p
             class="text-sm font-medium text-gray-900 dark:text-gray-100 truncate"

@@ -46,6 +46,23 @@
     "enabled": "已启用",
     "disabled": "已禁用"
   },
+  "menu": {
+    "dashboard": "仪表板",
+    "agent": "智能助手",
+    "workflow": "工作流",
+    "pluginMarketplace": "插件市场",
+    "plugins": "插件",
+    "settings": "设置",
+    "userManagement": "用户管理",
+    "roleManagement": "角色管理",
+    "systemConfig": "系统配置",
+    "aiSettings": "AI设置",
+    "loadFailed": "菜单加载失败",
+    "loadFailedDesc": "无法加载菜单数据，请检查网络连接或联系管理员",
+    "noItemsFound": "暂无菜单项",
+    "itemCount": "菜单项数量",
+    "noItemsWarning": "警告：没有找到菜单项"
+  },
   "navigation": {
     "dashboard": "仪表板",
     "users": "用户",
