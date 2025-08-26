@@ -1,235 +1,39 @@
 <script setup lang="ts">
-import { ref, reactive, computed, h, resolveComponent, watch } from "vue";
+import {
+  ref,
+  reactive,
+  computed,
+  h,
+  resolveComponent,
+  watch,
+  onMounted,
+} from "vue";
 import { useI18n } from "#imports";
+import { useRoleStore } from "~/stores/role";
+import type {
+  Role,
+  RoleCreateParams,
+  RoleUpdateParams,
+} from "~/composables/api/services/roleService";
 
 const { t, locale } = useI18n();
+const roleStore = useRoleStore();
 
-// RBAC 角色模型类型定义
-type Role = {
-  id: number;
-  name: string;
-  code: string;
-  description: string;
-  level: number; // 角色层级，数字越小权限越高
-  isSystem: boolean; // 是否为系统内置角色
-  userCount: number;
-  permissions: string[]; // 权限代码数组
-  createdAt: string;
-  updatedAt: string;
-  status: "active" | "inactive";
-};
-
-type Permission = {
-  id: number;
-  name: string;
-  code: string;
-  module: string;
-  description: string;
-  type: "menu" | "action" | "data"; // 权限类型：菜单、操作、数据
-  parentId?: number;
-  children?: Permission[];
-};
-
-// 模拟角色数据
-const roles = ref<Role[]>([
-  {
-    id: 1,
-    name: "超级管理员",
-    code: "super_admin",
-    description: "系统最高权限，拥有所有功能访问权限",
-    level: 1,
-    isSystem: true,
-    userCount: 2,
-    permissions: ["*"], // 通配符表示所有权限
-    createdAt: "2024-01-01T00:00:00Z",
-    updatedAt: "2024-01-01T00:00:00Z",
-    status: "active",
-  },
-  {
-    id: 2,
-    name: "系统管理员",
-    code: "system_admin",
-    description: "系统管理权限，可管理用户、角色和系统配置",
-    level: 2,
-    isSystem: true,
-    userCount: 5,
-    permissions: [
-      "user:*",
-      "role:*",
-      "department:*",
-      "system:config",
-      "system:monitor",
-    ],
-    createdAt: "2024-01-01T00:00:00Z",
-    updatedAt: "2024-01-01T00:00:00Z",
-    status: "active",
-  },
-  {
-    id: 3,
-    name: "业务管理员",
-    code: "business_admin",
-    description: "业务管理权限，可管理客户、订单、产品等业务数据",
-    level: 3,
-    isSystem: false,
-    userCount: 8,
-    permissions: [
-      "customer:*",
-      "order:*",
-      "product:*",
-      "content:*",
-      "dashboard:view",
-    ],
-    createdAt: "2024-01-01T00:00:00Z",
-    updatedAt: "2024-01-01T00:00:00Z",
-    status: "active",
-  },
-  {
-    id: 4,
-    name: "销售经理",
-    code: "sales_manager",
-    description: "销售管理权限，可管理客户和订单",
-    level: 4,
-    isSystem: false,
-    userCount: 12,
-    permissions: [
-      "customer:view",
-      "customer:create",
-      "customer:edit",
-      "order:view",
-      "order:create",
-      "order:edit",
-      "product:view",
-      "dashboard:view",
-    ],
-    createdAt: "2024-01-01T00:00:00Z",
-    updatedAt: "2024-01-01T00:00:00Z",
-    status: "active",
-  },
-  {
-    id: 5,
-    name: "销售员",
-    code: "sales_staff",
-    description: "销售人员权限，可查看和创建订单",
-    level: 5,
-    isSystem: false,
-    userCount: 25,
-    permissions: [
-      "customer:view",
-      "customer:create",
-      "order:view",
-      "order:create",
-      "product:view",
-      "dashboard:view",
-    ],
-    createdAt: "2024-01-01T00:00:00Z",
-    updatedAt: "2024-01-01T00:00:00Z",
-    status: "active",
-  },
-]);
-
-// 权限树结构
-const permissions = ref<Permission[]>([
-  {
-    id: 1,
-    name: "用户管理",
-    code: "user",
-    module: "用户管理",
-    description: "用户相关功能",
-    type: "menu",
-    children: [
-      {
-        id: 11,
-        name: "查看用户",
-        code: "user:view",
-        module: "用户管理",
-        description: "查看用户列表",
-        type: "action",
-        parentId: 1,
-      },
-      {
-        id: 12,
-        name: "创建用户",
-        code: "user:create",
-        module: "用户管理",
-        description: "创建新用户",
-        type: "action",
-        parentId: 1,
-      },
-      {
-        id: 13,
-        name: "编辑用户",
-        code: "user:edit",
-        module: "用户管理",
-        description: "编辑用户信息",
-        type: "action",
-        parentId: 1,
-      },
-      {
-        id: 14,
-        name: "删除用户",
-        code: "user:delete",
-        module: "用户管理",
-        description: "删除用户",
-        type: "action",
-        parentId: 1,
-      },
-    ],
-  },
-  {
-    id: 2,
-    name: "角色管理",
-    code: "role",
-    module: "权限管理",
-    description: "角色相关功能",
-    type: "menu",
-    children: [
-      {
-        id: 21,
-        name: "查看角色",
-        code: "role:view",
-        module: "权限管理",
-        description: "查看角色列表",
-        type: "action",
-        parentId: 2,
-      },
-      {
-        id: 22,
-        name: "创建角色",
-        code: "role:create",
-        module: "权限管理",
-        description: "创建新角色",
-        type: "action",
-        parentId: 2,
-      },
-      {
-        id: 23,
-        name: "编辑角色",
-        code: "role:edit",
-        module: "权限管理",
-        description: "编辑角色信息",
-        type: "action",
-        parentId: 2,
-      },
-      {
-        id: 24,
-        name: "删除角色",
-        code: "role:delete",
-        module: "权限管理",
-        description: "删除角色",
-        type: "action",
-        parentId: 2,
-      },
-    ],
-  },
-]);
+// 响应式状态
+const roles = computed(() => roleStore.roles);
+const loading = computed(() => roleStore.loading);
+const error = computed(() => roleStore.error);
+const storePagination = computed(() => roleStore.pagination);
 
 // 搜索和筛选
 const searchQuery = ref("");
+const selectedScope = ref<string>("");
+const selectedBuiltin = ref<boolean | undefined>(undefined);
 
 /** ========= 分页状态 ========= */
 const pagination = reactive({
   page: 1,
-  pageSize: 10,
+  pageSize: 20,
   total: 0,
   totalPages: 0,
 });
@@ -247,23 +51,20 @@ const showForm = ref(false);
 const isEditing = ref(false);
 const editingId = ref<number | null>(null);
 
-const roleForm = reactive({
-  name: "",
+const roleForm = reactive<RoleCreateParams & { id?: number }>({
+  scope: "tenant",
   code: "",
+  name: "",
   description: "",
-  level: 5,
-  permissions: [] as string[],
-  status: "active" as "active" | "inactive",
 });
 
 // 重置表单
 const resetForm = () => {
-  roleForm.name = "";
+  roleForm.scope = "tenant";
   roleForm.code = "";
+  roleForm.name = "";
   roleForm.description = "";
-  roleForm.level = 5;
-  roleForm.permissions = [];
-  roleForm.status = "active";
+  delete roleForm.id;
   isEditing.value = false;
   editingId.value = null;
 };
@@ -278,106 +79,95 @@ const openAddForm = () => {
 const openEditForm = (role: Role) => {
   roleForm.name = role.name;
   roleForm.code = role.code;
-  roleForm.description = role.description;
-  roleForm.level = role.level;
-  roleForm.permissions = [...role.permissions];
-  roleForm.status = role.status;
+  roleForm.description = role.description || "";
+  roleForm.scope = role.scope;
+  roleForm.id = role.id;
   isEditing.value = true;
   editingId.value = role.id;
   showForm.value = true;
 };
 
 // 保存角色
-const saveRole = () => {
+const saveRole = async () => {
   if (!roleForm.name || !roleForm.code) {
     alert("请填写必填字段");
     return;
   }
 
-  const now = new Date().toISOString();
-
-  if (isEditing.value && editingId.value !== null) {
-    // 编辑现有角色
-    const index = roles.value.findIndex((r) => r.id === editingId.value);
-    if (index !== -1) {
-      roles.value[index] = {
-        id: roles.value[index].id,
+  try {
+    if (isEditing.value && editingId.value !== null) {
+      // 编辑现有角色
+      const updateData: RoleUpdateParams = {
         name: roleForm.name,
-        code: roleForm.code,
         description: roleForm.description,
-        level: roleForm.level,
-        isSystem: roles.value[index].isSystem,
-        userCount: roles.value[index].userCount,
-        permissions: [...roleForm.permissions],
-        status: roleForm.status,
-        createdAt: roles.value[index].createdAt,
-        updatedAt: now,
       };
+      await roleStore.updateRole(editingId.value, updateData);
+    } else {
+      // 添加新角色
+      const createData: RoleCreateParams = {
+        scope: roleForm.scope,
+        code: roleForm.code,
+        name: roleForm.name,
+        description: roleForm.description,
+      };
+      await roleStore.createRole(createData);
     }
-  } else {
-    // 添加新角色
-    const newId = Math.max(0, ...roles.value.map((r) => r.id)) + 1;
-    roles.value.push({
-      id: newId,
-      name: roleForm.name,
-      code: roleForm.code,
-      description: roleForm.description,
-      level: roleForm.level,
-      isSystem: false,
-      userCount: 0,
-      permissions: [...roleForm.permissions],
-      status: roleForm.status,
-      createdAt: now,
-      updatedAt: now,
-    });
-  }
 
-  showForm.value = false;
-  resetForm();
+    showForm.value = false;
+    resetForm();
+    await loadRoles();
+  } catch (err) {
+    console.error("保存角色失败:", err);
+    alert("保存角色失败，请重试");
+  }
 };
 
 // 删除角色
-const deleteRole = (id: number) => {
-  const role = roles.value.find((r) => r.id === id);
-  if (role && role.isSystem) {
-    alert("系统角色不能删除");
-    return;
-  }
-
-  if (role && role.userCount > 0) {
-    alert(`该角色下还有 ${role.userCount} 个用户，请先移除用户后再删除角色`);
-    return;
-  }
-
+const deleteRole = async (id: number) => {
   if (confirm("确定要删除此角色吗？")) {
-    roles.value = roles.value.filter((r) => r.id !== id);
+    try {
+      await roleStore.deleteRole(id);
+      await loadRoles();
+    } catch (err) {
+      console.error("删除角色失败:", err);
+      alert("删除角色失败，请重试");
+    }
   }
+};
+
+// 加载角色列表
+const loadRoles = async () => {
+  try {
+    await roleStore.fetchRoles({
+      page: pagination.page,
+      page_size: pagination.pageSize,
+      keyword: searchQuery.value || undefined,
+      scope: selectedScope.value || undefined,
+      builtin: selectedBuiltin.value,
+    });
+
+    // 更新本地分页信息
+    pagination.total = storePagination.value.total;
+    pagination.totalPages = storePagination.value.pages;
+  } catch (err) {
+    console.error("加载角色列表失败:", err);
+  }
+};
+
+// 搜索处理
+const handleSearch = async () => {
+  pagination.page = 1;
+  await loadRoles();
 };
 
 /** ========= 过滤和分页 ========= */
 const filteredRoles = computed(() => {
-  const q = searchQuery.value.trim().toLowerCase();
-  const filtered = q
-    ? roles.value.filter(
-        (role) =>
-          role.name.toLowerCase().includes(q) ||
-          role.code.toLowerCase().includes(q) ||
-          role.description.toLowerCase().includes(q)
-      )
-    : roles.value;
-
-  // 更新分页信息
-  pagination.total = filtered.length;
-  pagination.totalPages = Math.ceil(filtered.length / pagination.pageSize);
-
-  return filtered.sort((a, b) => a.level - b.level);
+  return roles.value;
 });
 
 // 当前页显示的角色
 const paginatedRoles = computed(() => {
-  const start = (pagination.page - 1) * pagination.pageSize;
-  const end = start + pagination.pageSize;
-  return filteredRoles.value.slice(start, end);
+  return roles.value;
 });
 
 // 分页信息
@@ -394,24 +184,31 @@ const paginationInfo = computed(() => {
 });
 
 // 分页控制
-const changePage = (page: number) => {
+const changePage = async (page: number) => {
   if (page >= 1 && page <= pagination.totalPages) {
     pagination.page = page;
+    await loadRoles();
   }
 };
 
-const changePageSize = (pageSize: number) => {
+const changePageSize = async (pageSize: number) => {
   pagination.pageSize = pageSize;
-  pagination.page = 1; // 重置到第一页
+  pagination.page = 1;
+  await loadRoles();
 };
 
 const hasNextPage = computed(() => pagination.page < pagination.totalPages);
 const hasPrevPage = computed(() => pagination.page > 1);
 
-// 监听搜索条件变化，重置到第一页
+// 监听搜索条件变化
 watch(searchQuery, () => {
-  pagination.page = 1;
+  handleSearch();
 });
+
+// 清除错误
+const clearError = () => {
+  roleStore.clearError();
+};
 
 // ====== ✅ Nuxt UI 3.3+：TanStack 列定义 ======
 const UButton = resolveComponent("UButton");
@@ -428,7 +225,7 @@ const columns = computed(() => {
         const role = row.original as Role;
         return h("div", { class: "flex items-center gap-2" }, [
           h("span", { class: "font-medium" }, role.name),
-          role.isSystem &&
+          role.builtin &&
             h(
               UBadge,
               { color: "blue", variant: "subtle", size: "xs" },
@@ -451,64 +248,45 @@ const columns = computed(() => {
       },
     },
     {
-      id: "level",
-      accessorKey: "level",
-      header: "权限层级",
+      id: "scope",
+      accessorKey: "scope",
+      header: "作用域",
       cell: ({ row }: any) => {
         const role = row.original as Role;
         return h(
           UBadge,
           {
-            color:
-              role.level <= 2 ? "red" : role.level <= 4 ? "yellow" : "gray",
+            color: role.scope === "system" ? "red" : "green",
             variant: "subtle",
             size: "sm",
           },
-          { default: () => `级别 ${role.level}` }
+          { default: () => (role.scope === "system" ? "系统" : "租户") }
         );
       },
     },
     {
-      id: "userCount",
-      accessorKey: "userCount",
-      header: "用户数量",
+      id: "description",
+      accessorKey: "description",
+      header: "描述",
       cell: ({ row }: any) => {
         const role = row.original as Role;
-        return h("span", { class: "text-center" }, role.userCount.toString());
-      },
-    },
-    {
-      id: "permissions",
-      accessorKey: "permissions",
-      header: "权限数量",
-      cell: ({ row }: any) => {
-        const role = row.original as Role;
-        const count = role.permissions.includes("*")
-          ? "全部"
-          : role.permissions.length.toString();
         return h(
-          UBadge,
-          { color: "green", variant: "subtle", size: "sm" },
-          { default: () => count }
+          "span",
+          { class: "text-sm text-gray-600" },
+          role.description || "-"
         );
       },
     },
     {
-      id: "status",
-      accessorKey: "status",
-      header: "状态",
+      id: "createdAt",
+      accessorKey: "createdAt",
+      header: "创建时间",
       cell: ({ row }: any) => {
         const role = row.original as Role;
         return h(
-          UBadge,
-          {
-            color: role.status === "active" ? "success" : "neutral",
-            variant: "subtle",
-            size: "sm",
-          },
-          {
-            default: () => (role.status === "active" ? "启用" : "禁用"),
-          }
+          "span",
+          { class: "text-sm text-gray-500" },
+          new Date(role.createdAt).toLocaleDateString()
         );
       },
     },
@@ -531,8 +309,7 @@ const columns = computed(() => {
               },
               { default: () => "编辑" }
             ),
-            !role.isSystem &&
-              role.userCount === 0 &&
+            !role.builtin &&
               h(
                 UButton,
                 {
@@ -549,6 +326,10 @@ const columns = computed(() => {
       },
     },
   ];
+});
+
+onMounted(() => {
+  loadRoles();
 });
 </script>
 
@@ -567,13 +348,51 @@ const columns = computed(() => {
       </UButton>
     </div>
 
-    <!-- 搜索 -->
-    <UInput
-      v-model="searchQuery"
-      icon="i-heroicons-magnifying-glass"
-      placeholder="搜索角色名称、代码或描述..."
-      class="w-full md:w-80 mb-6"
+    <!-- 错误提示 -->
+    <UAlert
+      v-if="error"
+      color="error"
+      variant="subtle"
+      :title="error"
+      :close-button="{
+        icon: 'i-heroicons-x-mark-20-solid',
+        color: 'gray',
+        variant: 'link',
+        padded: false,
+      }"
+      @close="clearError"
+      class="mb-4"
     />
+
+    <!-- 搜索和筛选 -->
+    <div class="flex flex-col md:flex-row gap-4 mb-6">
+      <UInput
+        v-model="searchQuery"
+        icon="i-heroicons-magnifying-glass"
+        placeholder="搜索角色名称、代码..."
+        class="flex-1"
+      />
+      <USelect
+        v-model="selectedScope"
+        :options="[
+          { label: '全部作用域', value: '' },
+          { label: '系统角色', value: 'system' },
+          { label: '租户角色', value: 'tenant' },
+        ]"
+        placeholder="选择作用域"
+        class="w-full md:w-40"
+      />
+      <USelect
+        v-model="selectedBuiltin"
+        :options="[
+          { label: '全部类型', value: undefined },
+          { label: '系统内置', value: true },
+          { label: '自定义', value: false },
+        ]"
+        placeholder="选择类型"
+        class="w-full md:w-40"
+      />
+    </div>
 
     <!-- 数据统计和分页大小选择 -->
     <div class="mb-4 bg-white p-4 rounded-lg shadow-sm">
@@ -594,8 +413,14 @@ const columns = computed(() => {
       </div>
     </div>
 
+    <!-- 加载状态 -->
+    <div v-if="loading" class="flex justify-center py-8">
+      <UIcon name="i-heroicons-arrow-path" class="w-6 h-6 animate-spin" />
+      <span class="ml-2">加载中...</span>
+    </div>
+
     <!-- ✅ Nuxt UI 3.3+ 用 :data 和 TanStack columns -->
-    <div class="bg-white rounded-lg shadow-sm">
+    <div v-else class="bg-white rounded-lg shadow-sm">
       <UTable :data="paginatedRoles" :columns="columns" />
 
       <!-- 分页控件 -->
@@ -653,7 +478,7 @@ const columns = computed(() => {
 
     <!-- 空状态 -->
     <div
-      v-if="filteredRoles.length === 0"
+      v-if="!loading && filteredRoles.length === 0"
       class="text-center py-12 bg-gray-50 rounded-lg mt-4"
     >
       <UIcon
@@ -704,10 +529,20 @@ const columns = computed(() => {
                 <UInput v-model="roleForm.name" placeholder="输入角色名称" />
               </UFormField>
 
-              <UFormField label="角色代码" required>
+              <UFormField v-if="!isEditing" label="角色代码" required>
                 <UInput
                   v-model="roleForm.code"
                   placeholder="输入角色代码（英文，如：sales_manager）"
+                />
+              </UFormField>
+
+              <UFormField v-if="!isEditing" label="作用域">
+                <USelect
+                  v-model="roleForm.scope"
+                  :options="[
+                    { label: '租户角色', value: 'tenant' },
+                    { label: '系统角色', value: 'system' },
+                  ]"
                 />
               </UFormField>
 
@@ -716,32 +551,6 @@ const columns = computed(() => {
                   v-model="roleForm.description"
                   placeholder="输入角色描述"
                   :rows="3"
-                />
-              </UFormField>
-
-              <UFormField label="权限层级">
-                <USelect
-                  v-model="roleForm.level"
-                  :options="[
-                    { label: '1 - 最高级（系统管理员）', value: 1 },
-                    { label: '2 - 高级（部门管理员）', value: 2 },
-                    { label: '3 - 中级（业务管理员）', value: 3 },
-                    { label: '4 - 普通（团队负责人）', value: 4 },
-                    { label: '5 - 基础（普通员工）', value: 5 },
-                    { label: '6 - 受限（实习生/临时工）', value: 6 },
-                    { label: '10 - 访客（只读权限）', value: 10 },
-                  ]"
-                />
-              </UFormField>
-
-              <UFormField label="状态">
-                <URadioGroup
-                  v-model="roleForm.status"
-                  :options="[
-                    { value: 'active', label: '启用' },
-                    { value: 'inactive', label: '禁用' },
-                  ]"
-                  class="flex space-x-4"
                 />
               </UFormField>
             </div>

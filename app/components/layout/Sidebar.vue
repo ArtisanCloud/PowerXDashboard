@@ -5,6 +5,7 @@ import {
 } from "~/composables/api/services/menuService";
 import { useUserStore } from "~/stores/user";
 
+/* ---------- stores / utils ---------- */
 const route = useRoute();
 const menuService = useMenuService();
 const userStore = useUserStore();
@@ -12,7 +13,7 @@ const { t } = useI18n();
 const localePath = useLocalePath() as (p: string) => string;
 
 /* ---------- helpers ---------- */
-const isPluginPath = (p?: string) => !!p && p.startsWith("/_p/");
+const isPluginPath = (p?: string) => !!p && p.startsWith("//_p/");
 
 const linkFor = (p?: string) => {
   if (!p) return "";
@@ -47,7 +48,7 @@ const resolveIcon = (name?: string) => {
 
 const isVisible = (it: MenuItem) => it.visible !== false;
 
-/* ---------- fetch ---------- */
+/* ---------- 拉取菜单 ---------- */
 const {
   data: menuResponse,
   pending: menuLoading,
@@ -58,8 +59,7 @@ const {
   transform: (response) => response || { data: [] },
 });
 
-/* ---------- computed: menuItems ---------- */
-/** 子级排序（顶层不排序）：order(缺省∞) -> title -> id */
+/* ---------- 子级排序（顶层不排序） ---------- */
 const sortChildren = (a: MenuItem, b: MenuItem) => {
   const ao = Number.isFinite(a.order) ? a.order : Number.POSITIVE_INFINITY;
   const bo = Number.isFinite(b.order) ? b.order : Number.POSITIVE_INFINITY;
@@ -70,6 +70,7 @@ const sortChildren = (a: MenuItem, b: MenuItem) => {
   return (a.id ?? "").localeCompare(b.id ?? "");
 };
 
+/* ---------- 递归处理：翻译标题、处理子级；顶层不排序 ---------- */
 const processMenuItems = (items: MenuItem[], level = 0): MenuItem[] => {
   const mapped = items.filter(isVisible).map((item) => ({
     ...item,
@@ -83,17 +84,90 @@ const processMenuItems = (items: MenuItem[], level = 0): MenuItem[] => {
       : undefined,
   }));
 
-  // 顶层：严格沿用后端顺序，不排序
-  if (level === 0) return mapped;
-  // 子级：可选排序
-  return mapped.sort(sortChildren);
+  if (level === 0) return mapped; // 顶层：不排序，尊重后端顺序
+  return mapped.sort(sortChildren); // 子级：可选排序
 };
 
-const menuItems = computed<MenuItem[]>(() =>
+/* ---------- 分组类型 ---------- */
+type MenuGroup = { id: string; title: string; items: MenuItem[] };
+
+/* ---------- categories → 分组（优先） ---------- */
+function categoriesToGroups(resp: any): MenuGroup[] | null {
+  const data = resp?.data ?? resp;
+  const cats: any[] | undefined = Array.isArray(data?.categories)
+    ? data.categories
+    : undefined;
+  if (!cats) return null;
+
+  const groups: MenuGroup[] = [];
+  for (const cat of cats) {
+    const items = Array.isArray(cat?.children)
+      ? (cat.children as MenuItem[])
+      : [];
+    if (!items.length) continue;
+    groups.push({
+      id: String(cat.id ?? ""),
+      title: typeof cat.title === "string" ? cat.title : "",
+      items,
+    });
+  }
+  return groups.length ? groups : null;
+}
+
+/* ---------- 兜底：按 origin/slot 分桶 ---------- */
+function fallbackBucketByOrigin(menus: MenuItem[]): MenuGroup[] {
+  const rootPlugins: MenuItem[] = [];
+  const system: MenuItem[] = [];
+  const others: MenuItem[] = [];
+
+  for (const m of menus) {
+    if (m.origin === "system") {
+      system.push(m);
+      continue;
+    }
+    if (m.slot === "group.root") {
+      rootPlugins.push(m);
+      continue;
+    }
+    others.push(m);
+  }
+
+  const groups: MenuGroup[] = [];
+  if (rootPlugins.length)
+    groups.push({ id: "root", title: "置顶", items: rootPlugins });
+  if (system.length)
+    groups.push({ id: "system", title: "系统功能", items: system });
+  if (others.length)
+    groups.push({ id: "plugins", title: "插件", items: others });
+  return groups;
+}
+
+/* ---------- 现有扁平顶层：用于兜底分桶 ---------- */
+const flatTopMenus = computed<MenuItem[]>(() =>
   menuResponse.value?.data ? processMenuItems(menuResponse.value.data, 0) : []
 );
 
-/* ---------- expand state ---------- */
+/* ---------- 计算分组视图数据 ---------- */
+const viewGroups = computed<MenuGroup[]>(() => {
+  const catGroups = categoriesToGroups(menuResponse.value);
+  if (catGroups) {
+    // 对每组里的 items 做翻译/子级排序（顶层不排序）
+    return catGroups.map((g) => ({
+      id: g.id,
+      title: translateTitle(g.title),
+      items: processMenuItems(g.items, 0),
+    }));
+  }
+  // 兜底：把已按后端顺序处理过的顶层扁平 menus 再分桶
+  const flatTop = flatTopMenus.value;
+  return fallbackBucketByOrigin(flatTop).map((g) => ({
+    id: g.id,
+    title: translateTitle(g.title),
+    items: processMenuItems(g.items, 0),
+  }));
+});
+
+/* ---------- 展开状态：根据当前路由自动展开父级 ---------- */
 const expandedItems = ref<Set<string>>(new Set());
 
 const toggleExpanded = (id: string) => {
@@ -104,12 +178,13 @@ const toggleExpanded = (id: string) => {
 const hasActiveChild = (children?: MenuItem[]) =>
   !!children?.some((child) => isActive(child.path));
 
-// 初始化 & 路由变化：自动展开包含当前路由的父级
 const expandByRoute = () => {
   const set = new Set<string>();
-  menuItems.value.forEach((item) => {
-    if (item.children && hasActiveChild(item.children)) set.add(item.id);
-  });
+  for (const group of viewGroups.value) {
+    for (const item of group.items) {
+      if (item.children && hasActiveChild(item.children)) set.add(item.id);
+    }
+  }
   expandedItems.value = set;
 };
 
@@ -191,10 +266,10 @@ watch(
         </div>
       </div>
 
-      <!-- 列表 -->
+      <!-- 列表（分组渲染） -->
       <ul v-else class="space-y-1 px-3" role="tree">
         <li
-          v-if="menuItems.length === 0"
+          v-if="viewGroups.length === 0"
           class="bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 p-4 rounded-lg text-center"
         >
           <div class="text-gray-500 dark:text-gray-400 text-sm">
@@ -202,19 +277,118 @@ watch(
           </div>
         </li>
 
-        <li v-for="item in menuItems" :key="item.id">
-          <!-- 可展开 -->
-          <div v-if="item.children">
-            <button
-              @click="toggleExpanded(item.id)"
-              class="w-full flex items-center justify-between transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400/40 dark:focus-visible:ring-white/20 px-3 py-2 text-sm font-medium rounded-md"
+        <template v-for="group in viewGroups" :key="group.id">
+          <!-- 分组 Header（可改 sticky：在 li 上加 -mx-3 px-3 sticky top-0 bg-white/95 ...） -->
+          <li class="mt-4 first:mt-2 mb-1 px-2">
+            <div
+              class="text-xs font-semibold tracking-wide text-gray-500 dark:text-gray-400 flex items-center justify-between"
+            >
+              <span class="uppercase">{{ group.title }}</span>
+              <!-- 可选：组内数量 -->
+              <!-- <UBadge size="xs" variant="soft" color="gray">{{ group.items.length }}</UBadge> -->
+            </div>
+            <div class="mt-2 h-px bg-gray-200/70 dark:bg-gray-700/70"></div>
+          </li>
+
+          <!-- 组内顶层项 -->
+          <li v-for="item in group.items" :key="group.id + ':' + item.id">
+            <!-- 有子菜单 -->
+            <div v-if="item.children">
+              <button
+                @click="toggleExpanded(item.id)"
+                class="w-full flex items-center justify-between transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400/40 dark:focus-visible:ring-white/20 px-3 py-2 text-sm font-medium rounded-md"
+                :class="
+                  hasActiveChild(item.children)
+                    ? 'bg-blue-600/10 dark:bg-blue-400/10 text-blue-700 dark:text-blue-200 ring-1 ring-blue-500/20 dark:ring-blue-400/20'
+                    : 'text-slate-700 dark:text-slate-200 hover:bg-slate-900/5 dark:hover:bg-white/5'
+                "
+                :aria-expanded="expandedItems.has(item.id)"
+                :aria-controls="`submenu-${item.id}`"
+              >
+                <div class="flex items-center space-x-3">
+                  <span class="w-5 h-5 inline-block">
+                    <UIcon
+                      class="w-5 h-5 inline-block"
+                      :name="resolveIcon(item.icon)"
+                    />
+                  </span>
+                  <span>{{ item.title }}</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                  <UBadge v-if="item.badge" size="xs" color="primary">{{
+                    item.badge
+                  }}</UBadge>
+                  <span class="w-4 h-4 transition-transform inline-block">
+                    <UIcon
+                      name="i-heroicons-chevron-right"
+                      :class="{ 'rotate-90': expandedItems.has(item.id) }"
+                      class="w-4 h-4 transition-transform inline-block"
+                    />
+                  </span>
+                </div>
+              </button>
+
+              <Transition
+                enter-active-class="transition-all duration-200 ease-out"
+                enter-from-class="opacity-0 max-h-0"
+                enter-to-class="opacity-100 max-h-96"
+                leave-active-class="transition-all duration-200 ease-in"
+                leave-from-class="opacity-100 max-h-96"
+                leave-to-class="opacity-0 max-h-0"
+              >
+                <ul
+                  v-show="expandedItems.has(item.id)"
+                  :id="`submenu-${item.id}`"
+                  class="mt-1 ml-6 space-y-1 overflow-hidden"
+                  role="group"
+                >
+                  <li v-for="child in item.children" :key="child.id">
+                    <NuxtLink
+                      v-if="child.path"
+                      :to="linkFor(child.path)"
+                      class="flex items-center space-x-3 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400/40 dark:focus-visible:ring-white/20 px-3 py-2 text-sm rounded-md"
+                      :class="
+                        isActive(child.path)
+                          ? 'bg-blue-600/10 dark:bg-blue-400/10 text-blue-700 dark:text-blue-200 ring-1 ring-blue-500/20 dark:ring-blue-400/20'
+                          : 'text-slate-600 dark:text-slate-300 hover:bg-slate-900/5 dark:hover:bg-white/5 hover:text-slate-900 dark:hover:text-white'
+                      "
+                    >
+                      <span class="w-4 h-4 inline-block">
+                        <UIcon
+                          class="w-4 h-4 inline-block"
+                          :name="resolveIcon(child.icon)"
+                        />
+                      </span>
+                      <span>{{ child.title }}</span>
+                    </NuxtLink>
+
+                    <div
+                      v-else
+                      class="flex items-center space-x-3 px-3 py-2 text-sm text-slate-500"
+                    >
+                      <span class="w-4 h-4 inline-block">
+                        <UIcon
+                          class="w-4 h-4 inline-block"
+                          :name="resolveIcon(child.icon)"
+                        />
+                      </span>
+                      <span>{{ child.title }}</span>
+                    </div>
+                  </li>
+                </ul>
+              </Transition>
+            </div>
+
+            <!-- 顶层无子菜单 -->
+            <NuxtLink
+              v-else-if="item.path"
+              :to="linkFor(item.path)"
+              class="flex items-center justify-between transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400/40 dark:focus-visible:ring-white/20 px-3 py-2 text-sm font-medium rounded-md"
               :class="
-                hasActiveChild(item.children)
+                isActive(item.path)
                   ? 'bg-blue-600/10 dark:bg-blue-400/10 text-blue-700 dark:text-blue-200 ring-1 ring-blue-500/20 dark:ring-blue-400/20'
                   : 'text-slate-700 dark:text-slate-200 hover:bg-slate-900/5 dark:hover:bg-white/5'
               "
-              :aria-expanded="expandedItems.has(item.id)"
-              :aria-controls="`submenu-${item.id}`"
             >
               <div class="flex items-center space-x-3">
                 <span class="w-5 h-5 inline-block">
@@ -225,84 +399,16 @@ watch(
                 </span>
                 <span>{{ item.title }}</span>
               </div>
-              <div class="flex items-center space-x-2">
-                <UBadge v-if="item.badge" size="xs" color="primary">{{
-                  item.badge
-                }}</UBadge>
-                <span class="w-4 h-4 transition-transform inline-block">
-                  <UIcon
-                    name="i-heroicons-chevron-right"
-                    :class="{ 'rotate-90': expandedItems.has(item.id) }"
-                    class="w-4 h-4 transition-transform inline-block"
-                  />
-                </span>
-              </div>
-            </button>
+              <UBadge v-if="item.badge" size="xs" color="primary">{{
+                item.badge
+              }}</UBadge>
+            </NuxtLink>
 
-            <Transition
-              enter-active-class="transition-all duration-200 ease-out"
-              enter-from-class="opacity-0 max-h-0"
-              enter-to-class="opacity-100 max-h-96"
-              leave-active-class="transition-all duration-200 ease-in"
-              leave-from-class="opacity-100 max-h-96"
-              leave-to-class="opacity-0 max-h-0"
+            <!-- 顶层占位（无 path） -->
+            <div
+              v-else
+              class="flex items-center space-x-3 px-3 py-2 text-sm text-slate-700 dark:text-slate-200"
             >
-              <ul
-                v-show="expandedItems.has(item.id)"
-                :id="`submenu-${item.id}`"
-                class="mt-1 ml-6 space-y-1 overflow-hidden"
-                role="group"
-              >
-                <li v-for="child in item.children" :key="child.id">
-                  <NuxtLink
-                    v-if="child.path"
-                    :to="linkFor(child.path)"
-                    class="flex items-center space-x-3 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400/40 dark:focus-visible:ring-white/20 px-3 py-2 text-sm rounded-md"
-                    :class="
-                      isActive(child.path)
-                        ? 'bg-blue-600/10 dark:bg-blue-400/10 text-blue-700 dark:text-blue-200 ring-1 ring-blue-500/20 dark:ring-blue-400/20'
-                        : 'text-slate-600 dark:text-slate-300 hover:bg-slate-900/5 dark:hover:bg-white/5 hover:text-slate-900 dark:hover:text-white'
-                    "
-                  >
-                    <span class="w-4 h-4 inline-block">
-                      <UIcon
-                        class="w-4 h-4 inline-block"
-                        :name="resolveIcon(child.icon)"
-                      />
-                    </span>
-                    <span>{{ child.title }}</span>
-                  </NuxtLink>
-
-                  <!-- 没有 path 的子项（占位） -->
-                  <div
-                    v-else
-                    class="flex items-center space-x-3 px-3 py-2 text-sm text-slate-500"
-                  >
-                    <span class="w-4 h-4 inline-block">
-                      <UIcon
-                        class="w-4 h-4 inline-block"
-                        :name="resolveIcon(child.icon)"
-                      />
-                    </span>
-                    <span>{{ child.title }}</span>
-                  </div>
-                </li>
-              </ul>
-            </Transition>
-          </div>
-
-          <!-- 顶层无子菜单 -->
-          <NuxtLink
-            v-else-if="item.path"
-            :to="linkFor(item.path)"
-            class="flex items-center justify-between transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400/40 dark:focus-visible:ring-white/20 px-3 py-2 text-sm font-medium rounded-md"
-            :class="
-              isActive(item.path)
-                ? 'bg-blue-600/10 dark:bg-blue-400/10 text-blue-700 dark:text-blue-200 ring-1 ring-blue-500/20 dark:ring-blue-400/20'
-                : 'text-slate-700 dark:text-slate-200 hover:bg-slate-900/5 dark:hover:bg-white/5'
-            "
-          >
-            <div class="flex items-center space-x-3">
               <span class="w-5 h-5 inline-block">
                 <UIcon
                   class="w-5 h-5 inline-block"
@@ -311,25 +417,8 @@ watch(
               </span>
               <span>{{ item.title }}</span>
             </div>
-            <UBadge v-if="item.badge" size="xs" color="primary">{{
-              item.badge
-            }}</UBadge>
-          </NuxtLink>
-
-          <!-- 顶层占位（无 path） -->
-          <div
-            v-else
-            class="flex items-center space-x-3 px-3 py-2 text-sm text-slate-700 dark:text-slate-200"
-          >
-            <span class="w-5 h-5 inline-block">
-              <UIcon
-                class="w-5 h-5 inline-block"
-                :name="resolveIcon(item.icon)"
-              />
-            </span>
-            <span>{{ item.title }}</span>
-          </div>
-        </li>
+          </li>
+        </template>
       </ul>
     </nav>
 
