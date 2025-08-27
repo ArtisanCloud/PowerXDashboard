@@ -1,8 +1,10 @@
 <script setup lang="ts">
+import { computed, onMounted } from "vue";
+import { storeToRefs } from "pinia";
 import DepartmentManager from "@/components/settings/users/DepartmentManager.vue";
-// import UserManager from "@/components/settings/users/UserManager.vue";
 import UserShell from "@/components/settings/users/UsersShell.vue";
-import PermissionManager from "@/components/settings/users/PermissionManager.vue";
+import PermissionShell from "@/components/settings/users/PermissionShell.vue";
+import { useUserStore } from "~/stores/user";
 
 definePageMeta({
   title: "用户管理",
@@ -13,23 +15,46 @@ definePageMeta({
 const { t } = useI18n();
 const activeTab = ref("departments");
 
-const tabs = [
-  {
-    id: "departments",
-    name: t("organization.tabs.departments"),
-    icon: "i-heroicons-building-office",
-  },
-  {
-    id: "users",
-    name: t("organization.tabs.users"),
-    icon: "i-heroicons-users",
-  },
-  {
-    id: "permissions",
-    name: t("organization.tabs.permissions"),
-    icon: "i-heroicons-lock-closed",
-  },
-];
+// 使用用户状态 Store
+const userStore = useUserStore();
+const { isRoot, isCurrentTenantAdmin, isLoading, error } =
+  storeToRefs(userStore);
+
+// 根据用户角色动态生成选项卡
+const tabs = computed(() => {
+  const baseTabs = [
+    {
+      id: "departments",
+      name: t("organization.tabs.departments"),
+      icon: "i-heroicons-building-office",
+    },
+    {
+      id: "users",
+      name: t("organization.tabs.users"),
+      icon: "i-heroicons-users",
+    },
+  ];
+
+  // 只有 root 用户或租户管理员才能看到权限管理
+  if (isRoot.value || isCurrentTenantAdmin.value) {
+    baseTabs.push({
+      id: "permissions",
+      name: t("organization.tabs.permissions"),
+      icon: "i-heroicons-lock-closed",
+    });
+  }
+
+  return baseTabs;
+});
+
+// 组件挂载时加载用户上下文
+onMounted(async () => {
+  try {
+    await userStore.fetchUserContext();
+  } catch (error) {
+    console.error("加载用户上下文失败:", error);
+  }
+});
 </script>
 
 <template>
@@ -70,16 +95,14 @@ const tabs = [
         </div>
 
         <!-- 用户管理 -->
+        <!-- 用户管理 -->
         <div v-if="activeTab === 'users'">
-          <!-- <UserManager /> -->
-          <!-- <UserShell is-tenant-member="{false}" /> -->
-          <UserShell is-root="{true}" />
-          <!-- <UserShell is-tenant-admin="{true}" /> -->
+          <UserShell />
         </div>
 
         <!-- 权限管理 -->
         <div v-if="activeTab === 'permissions'">
-          <PermissionManager />
+          <PermissionShell />
         </div>
       </div>
     </div>
