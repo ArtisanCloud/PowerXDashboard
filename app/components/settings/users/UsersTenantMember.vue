@@ -140,7 +140,7 @@ async function loadUsersForTenant(tenantId: number) {
   isLoading.value = true;
   try {
     // TODO: 替换为真实API调用
-    // const response = await $fetch(`/api/v1/admin/iam/members`, {
+    // const response = await $fetch(`/api/admin/iam/members`, {
     //   params: { tenant_id: tenantId, page: 1, page_size: 100 }
     // });
     // users.value = response.data || [];

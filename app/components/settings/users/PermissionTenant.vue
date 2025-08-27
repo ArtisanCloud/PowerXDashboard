@@ -147,7 +147,7 @@ const batchDisable = async () => {
 // 组件挂载时加载数据
 onMounted(async () => {
   await Promise.all([
-    permissionStore.fetchPermissions(),
+    permissionStore.fetchList(),
     permissionStore.fetchTenantPermissions(props.tenantId),
   ]);
 });
