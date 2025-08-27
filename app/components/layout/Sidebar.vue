@@ -238,7 +238,7 @@ function onTreeKeydown(e: KeyboardEvent) {
         </span>
       </NuxtLink>
       <button
-        class="p-1.5 rounded-md hover:bg-slate-900/5 dark:hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400/40 dark:focus-visible:ring-white/20"
+        class="p-2 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40 transition-colors"
         @click="collapsed = !collapsed"
         :aria-label="
           collapsed
@@ -252,7 +252,7 @@ function onTreeKeydown(e: KeyboardEvent) {
               ? 'i-heroicons-chevron-double-right'
               : 'i-heroicons-chevron-double-left'
           "
-          class="w-5 h-5"
+          class="w-4 h-4 text-gray-600 dark:text-gray-300"
         />
       </button>
     </div>
@@ -333,37 +333,37 @@ function onTreeKeydown(e: KeyboardEvent) {
             >
               <button
                 @click="toggleExpanded(item.id)"
-                class="w-full flex items-center justify-between px-3 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40"
                 :class="[
+                  'w-full flex items-center rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40',
+                  collapsed ? 'justify-center px-2' : 'justify-between px-3',
                   densityClass,
                   hasActiveChild(item.children)
                     ? 'text-blue-700 dark:text-blue-100 bg-blue-500/10 ring-1 ring-blue-500/10'
                     : 'text-slate-700 dark:text-slate-200 hover:bg-slate-900/5 dark:hover:bg-white/5',
                 ]"
               >
-                <div class="flex items-center gap-3 w-full">
-                  <span
-                    :class="collapsed ? 'w-6 h-6' : 'w-5 h-5'"
-                    class="inline-block"
-                  >
-                    <UIcon
-                      class="w-full h-full"
-                      :name="resolveIcon(item.icon)"
-                    />
+                <div v-if="collapsed" class="flex items-center justify-center">
+                  <span class="inline-block w-5 h-5">
+                    <UIcon class="w-5 h-5" :name="resolveIcon(item.icon)" />
                   </span>
-                  <span v-if="!collapsed" class="truncate">{{
-                    item.title
-                  }}</span>
                 </div>
-                <div v-if="!collapsed" class="flex items-center gap-2">
-                  <UBadge v-if="item.badge" size="xs" color="primary">{{
-                    item.badge
-                  }}</UBadge>
-                  <UIcon
-                    name="i-heroicons-chevron-right"
-                    class="w-4 h-4 transition-transform"
-                    :class="{ 'rotate-90': expandedItems.has(item.id) }"
-                  />
+                <div v-else class="flex items-center justify-between w-full">
+                  <div class="flex items-center gap-3">
+                    <span class="inline-block w-5 h-5 flex-shrink-0">
+                      <UIcon class="w-5 h-5" :name="resolveIcon(item.icon)" />
+                    </span>
+                    <span class="truncate">{{ item.title }}</span>
+                  </div>
+                  <div class="flex items-center gap-2 flex-shrink-0">
+                    <UBadge v-if="item.badge" size="xs" color="primary">{{
+                      item.badge
+                    }}</UBadge>
+                    <UIcon
+                      name="i-heroicons-chevron-right"
+                      class="w-4 h-4 transition-transform"
+                      :class="{ 'rotate-90': expandedItems.has(item.id) }"
+                    />
+                  </div>
                 </div>
               </button>
 
@@ -427,8 +427,9 @@ function onTreeKeydown(e: KeyboardEvent) {
             <template v-else-if="item.path">
               <NuxtLink
                 :to="linkFor(item.path)"
-                class="menu-item group relative flex items-center justify-between px-3 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40"
                 :class="[
+                  'menu-item group relative flex items-center rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40',
+                  collapsed ? 'justify-center px-2' : 'justify-between px-3',
                   densityClass,
                   isActive(item.path)
                     ? 'text-blue-700 dark:text-blue-100 bg-blue-500/10 ring-1 ring-blue-500/20'
@@ -443,41 +444,37 @@ function onTreeKeydown(e: KeyboardEvent) {
                   class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 rounded-r bg-blue-500 dark:bg-blue-400"
                   aria-hidden="true"
                 />
-                <div class="flex items-center gap-3">
-                  <span
-                    :class="collapsed ? 'w-6 h-6' : 'w-5 h-5'"
-                    class="inline-block"
-                  >
-                    <UIcon
-                      class="w-full h-full"
-                      :name="resolveIcon(item.icon)"
-                    />
+                <div v-if="collapsed" class="flex items-center justify-center">
+                  <span class="inline-block w-5 h-5">
+                    <UIcon class="w-5 h-5" :name="resolveIcon(item.icon)" />
                   </span>
-                  <span v-if="!collapsed" class="truncate">{{
-                    item.title
-                  }}</span>
                 </div>
-                <UBadge
-                  v-if="item.badge && !collapsed"
-                  size="xs"
-                  color="primary"
-                  >{{ item.badge }}</UBadge
-                >
+                <div v-else class="flex items-center justify-between w-full">
+                  <div class="flex items-center gap-3">
+                    <span class="inline-block w-5 h-5 flex-shrink-0">
+                      <UIcon class="w-5 h-5" :name="resolveIcon(item.icon)" />
+                    </span>
+                    <span class="truncate">{{ item.title }}</span>
+                  </div>
+                  <UBadge v-if="item.badge" size="xs" color="primary">{{
+                    item.badge
+                  }}</UBadge>
+                </div>
               </NuxtLink>
             </template>
 
             <!-- 3) 顶层占位（无 path） -->
             <div
               v-else
-              class="flex items-center gap-3 px-3 text-slate-700 dark:text-slate-200 rounded-md"
-              :class="densityClass"
+              :class="[
+                'flex items-center text-slate-700 dark:text-slate-200 rounded-md',
+                collapsed ? 'justify-center px-2' : 'gap-3 px-3',
+                densityClass,
+              ]"
               role="treeitem"
             >
-              <span
-                :class="collapsed ? 'w-6 h-6' : 'w-5 h-5'"
-                class="inline-block"
-              >
-                <UIcon class="w-full h-full" :name="resolveIcon(item.icon)" />
+              <span class="inline-block w-5 h-5 flex-shrink-0">
+                <UIcon class="w-5 h-5" :name="resolveIcon(item.icon)" />
               </span>
               <span v-if="!collapsed" class="truncate">{{ item.title }}</span>
             </div>
@@ -535,7 +532,7 @@ function onTreeKeydown(e: KeyboardEvent) {
             />
           </button>
           <button
-            class="p-1.5 rounded-md hover:bg-slate-900/5 dark:hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400/40"
+            class="p-1.5 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40 transition-colors"
             @click="collapsed = !collapsed"
             :aria-label="
               collapsed
@@ -554,7 +551,7 @@ function onTreeKeydown(e: KeyboardEvent) {
                   ? 'i-heroicons-chevron-double-right'
                   : 'i-heroicons-chevron-double-left'
               "
-              class="w-5 h-5"
+              class="w-4 h-4 text-gray-600 dark:text-gray-300"
             />
           </button>
         </div>
