@@ -1,11 +1,13 @@
 import { defineStore } from "pinia";
 import { ref, computed } from "vue";
+
 import {
   useRoleService,
   type Role,
   type RoleListParams,
   type RoleCreateParams,
   type RoleUpdateParams,
+  type CreateRoleWithPermsResponse,
 } from "~/composables/api/services/roleService";
 
 export const useRoleStore = defineStore("role", () => {
@@ -105,7 +107,10 @@ export const useRoleStore = defineStore("role", () => {
     }
   };
 
-  const createRole = async (data: RoleCreateParams) => {
+  // ✅ 修正：只保留一个 createRole 定义，并带返回类型
+  const createRole = async (
+    data: RoleCreateParams
+  ): Promise<CreateRoleWithPermsResponse> => {
     loading.value = true;
     error.value = null;
 
@@ -113,9 +118,18 @@ export const useRoleStore = defineStore("role", () => {
       const response = await roleService.createRole(data);
 
       if (response.code === 200 && response.data) {
+        // 新的响应格式：{ role: Role, perm?: SetIDsResult }
+        const roleData = response.data.role || response.data;
+        const permResult = response.data.perm;
+
         // 添加到本地状态
-        roles.value.push(response.data);
-        return response.data;
+        roles.value.push(roleData);
+
+        // 返回完整的创建结果（包含角色和权限信息）
+        return {
+          role: roleData,
+          perm: permResult,
+        };
       } else {
         throw new Error(response.message || "创建角色失败");
       }
@@ -153,7 +167,6 @@ export const useRoleStore = defineStore("role", () => {
       }
     } catch (err) {
       error.value = err instanceof Error ? err.message : "更新角色失败";
-
       throw err;
     } finally {
       loading.value = false;

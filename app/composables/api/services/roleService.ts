@@ -27,18 +27,36 @@ export interface RoleListParams {
 }
 
 // 角色创建参数
+// 角色创建参数
 export interface RoleCreateParams {
   scope: "system" | "tenant";
-  tenant_id?: number;
+  tenant_id?: number; // 可选，系统角色不需要
   code: string;
   name: string;
   description?: string;
+  perm_ids?: number[]; // 新增：创建时直接分配权限
 }
 
 // 角色更新参数
+// 角色更新参数
 export interface RoleUpdateParams {
   name: string;
+  code?: string; // 添加 code 字段
   description?: string;
+}
+
+// 权限设置结果
+export interface SetIDsResult {
+  added: number[] | null;
+  removed: number[] | null;
+  now: number[];
+  skipped_deprecated: number[] | null;
+}
+
+// 创建角色响应（带权限）
+export interface CreateRoleWithPermsResponse {
+  role: Role;
+  perm?: SetIDsResult;
 }
 
 // 分页响应

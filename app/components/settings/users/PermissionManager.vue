@@ -9,12 +9,21 @@ import {
   onMounted,
   watch,
 } from "vue";
+import { watchDebounced } from "@vueuse/core";
 import { useI18n } from "#imports";
 import { storeToRefs } from "pinia";
 import { useRoleStore } from "~/stores/role";
 import { usePermissionStore } from "~/stores/permission"; // ✅ 权限 store
+import SelectTree from "~/components/ui/SelectTree.vue";
+import { useOneShotAlert } from "~/composables/useOneShotAlert";
+import { useTenantService } from "~/composables/api/services/tenantService";
+import { normalizeApiError } from "~/composables/api/normalizeApiError";
 
 const { t, locale } = useI18n();
+const { notifyOnce, visible, title, description, color, variant, hide } =
+  useOneShotAlert();
+
+const tenantService = useTenantService();
 
 /** ====== 类型 ====== */
 type Role = {
@@ -48,6 +57,35 @@ roleStore.ensureInitialized?.();
 
 const permissionStore = usePermissionStore();
 const { normalizedList, roleSelection } = storeToRefs(permissionStore);
+
+// 租户相关状态
+interface TreeNode {
+  label: string;
+  value: string;
+  children?: TreeNode[];
+  disabled?: boolean;
+  icon?: string;
+}
+
+const selectedTenant = ref<string | null>(null);
+const tenants = ref<any[]>([]);
+const loadingTenants = ref(false);
+const isRootUser = ref(true); // 假设当前是 root 用户，实际应该从用户状态获取
+
+// 租户树形选项计算属性
+const tenantTreeItems = computed<TreeNode[]>(() => {
+  return tenants.value.map((t) => ({
+    label: t.name,
+    value: String(t.id),
+    icon: "i-heroicons-building-office",
+    disabled: t.status === 0, // 假设 status 为 0 表示禁用
+  }));
+});
+
+// 监听租户选择变化，同步到表单
+watch(selectedTenant, (tenantId) => {
+  roleForm.tenant_id = tenantId ? parseInt(tenantId) : undefined;
+});
 
 /** 页面展示用权限数组 */
 const getPermissionDisplayName = (perm: Permission) => {
@@ -102,6 +140,8 @@ const roleForm = reactive({
   name: "",
   code: "",
   description: "",
+  scope: "tenant" as "system" | "tenant",
+  tenant_id: undefined as number | undefined,
   permissions: [] as number[],
 });
 
@@ -131,14 +171,38 @@ const resetRoleForm = () => {
   roleForm.name = "";
   roleForm.code = "";
   roleForm.description = "";
+  roleForm.scope = "tenant";
+  roleForm.tenant_id = undefined;
   roleForm.permissions = [];
+  selectedTenant.value = null;
   isEditing.value = false;
   editingId.value = null;
 };
 
 const openAddRoleForm = () => {
   resetRoleForm();
+  loadTenantOptions(); // 加载租户选项
   showRoleForm.value = true;
+};
+
+// 加载租户选项
+const loadTenantOptions = async () => {
+  if (!isRootUser.value) return;
+  loadingTenants.value = true;
+  try {
+    // 这里应该调用实际的租户 API
+    const response = await tenantService.getTenants({
+      page: 1,
+      page_size: 100,
+    });
+    if (response?.code === 200 && response.data) {
+      tenants.value = response.data.items;
+    }
+  } catch (err) {
+    console.error("加载租户列表失败:", err);
+  } finally {
+    loadingTenants.value = false;
+  }
 };
 
 const openEditRoleForm = (role: Role) => {
@@ -153,7 +217,7 @@ const openEditRoleForm = (role: Role) => {
 
 const saveRole = async () => {
   if (!roleForm.name || !roleForm.code) {
-    alert("请填写必填字段");
+    notifyOnce("请填写必填字段", "角色名称和代码为必填项", "warning" as const);
     return;
   }
   try {
@@ -171,34 +235,50 @@ const saveRole = async () => {
         roleForm.permissions
       );
     } else {
-      // 创建角色
-      const newRole: Role | undefined = await roleStore.createRole({
+      // 创建角色（直接带权限）
+      const result = await roleStore.createRole({
         name: roleForm.name,
         code: roleForm.code,
         description: roleForm.description,
-        scope: "tenant",
+        scope: roleForm.scope,
+        tenant_id: roleForm.tenant_id, // 添加租户ID
+        perm_ids: roleForm.permissions, // 直接传递权限ID
       });
-      // 设置权限
-      if ((newRole as any)?.id) {
-        roleSelection.value[(newRole as any).id] = [...roleForm.permissions];
-        await permissionStore.setRolePermissionIDs(
-          (newRole as any).id,
-          roleForm.permissions
-        );
+
+      // 更新本地权限选择状态
+      if (result.role?.id) {
+        const finalPermIds = result.perm?.now || roleForm.permissions;
+        roleSelection.value[result.role.id] = [...finalPermIds];
+        // 同时更新初始态
+        permissionStore.roleInitialSelection[result.role.id] = [
+          ...finalPermIds,
+        ];
       }
     }
     showRoleForm.value = false;
     resetRoleForm();
   } catch (error) {
     console.error("保存角色失败:", error);
-    alert("保存失败，请重试");
+    const { title, description } = normalizeApiError(error, {
+      meta: "metaText",
+    });
+    notifyOnce(
+      title || "保存角色失败",
+      description,
+      "error" as const,
+      "solid" as const
+    );
   }
 };
 
 const deleteRole = async (id: number) => {
   const role = roles.value.find((r: any) => r.id === id) as Role | undefined;
   if (role && role.builtin) {
-    alert("系统角色不能删除");
+    notifyOnce(
+      "系统角色不能删除",
+      "内置角色受系统保护，无法删除",
+      "warning" as const
+    );
     return;
   }
   if (confirm("确定要删除此角色吗？")) {
@@ -210,7 +290,15 @@ const deleteRole = async (id: number) => {
       }
     } catch (error) {
       console.error("删除角色失败:", error);
-      alert("删除失败，请重试");
+      const { title, description } = normalizeApiError(error, {
+        meta: "metaText",
+      }); // ✨ 统一解析
+      notifyOnce(
+        title || "删除失败",
+        description,
+        "error" as const,
+        "solid" as const
+      );
     }
   }
 };
@@ -303,7 +391,15 @@ const saveRolePermissions = async () => {
     await permissionStore.setRolePermissionIDs(roleId, ids);
   } catch (e) {
     console.error(e);
-    alert("保存失败，请重试");
+    const { title, description } = normalizeApiError(e, {
+      meta: "metaText",
+    });
+    notifyOnce(
+      title || "保存权限失败",
+      description,
+      "error" as const,
+      "solid" as const
+    );
   } finally {
     saving.value = false;
   }
@@ -722,6 +818,17 @@ const isFormModulePartiallySelected = (module: string) => {
                   :placeholder="
                     $t('organization.permission.form.descriptionPlaceholder')
                   "
+                />
+              </UFormField>
+
+              <UFormField label="租户" required>
+                <SelectTree
+                  v-model="selectedTenant"
+                  :items="tenantTreeItems"
+                  placeholder="选择租户"
+                  searchable
+                  clearable
+                  class="w-full"
                 />
               </UFormField>
 
