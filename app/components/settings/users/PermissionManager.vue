@@ -799,6 +799,7 @@ const isFormModulePartiallySelected = (module: string) => {
               </UFormField>
 
               <UFormField
+                v-if="!isEditing"
                 :label="$t('organization.permission.form.code')"
                 required
               >
@@ -821,7 +822,7 @@ const isFormModulePartiallySelected = (module: string) => {
                 />
               </UFormField>
 
-              <UFormField label="租户" required>
+              <UFormField v-if="!isEditing" label="租户" required>
                 <SelectTree
                   v-model="selectedTenant"
                   :items="tenantTreeItems"

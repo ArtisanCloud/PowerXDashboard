@@ -1,8 +1,4 @@
 <script setup lang="ts">
-import { useI18n } from "vue-i18n";
-
-const { t } = useI18n();
-
 const props = defineProps<{
   message?: string;
   progress?: number; // 0-100 的百分比，如果提供则显示进度条，否则显示跳动点
@@ -21,7 +17,7 @@ const progressValue = computed(() =>
 
 <template>
   <UModal
-    :title="t('common.loading')"
+    title="..."
     description="..."
     :close="false"
     :dismissible="false"
