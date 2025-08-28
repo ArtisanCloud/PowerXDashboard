@@ -132,11 +132,23 @@ function fallbackBucketByOrigin(menus: MenuItem[]): MenuGroup[] {
   }
   const groups: MenuGroup[] = [];
   if (rootPlugins.length)
-    groups.push({ id: "root", title: "置顶", items: rootPlugins });
+    groups.push({
+      id: "root",
+      title: $t("menu.groups.pinned"),
+      items: rootPlugins,
+    });
   if (system.length)
-    groups.push({ id: "system", title: "系统功能", items: system });
+    groups.push({
+      id: "system",
+      title: $t("menu.groups.system"),
+      items: system,
+    });
   if (others.length)
-    groups.push({ id: "plugins", title: "插件", items: others });
+    groups.push({
+      id: "plugins",
+      title: $t("menu.groups.plugins"),
+      items: others,
+    });
   return groups;
 }
 

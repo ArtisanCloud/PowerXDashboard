@@ -51,6 +51,11 @@
   },
   "menu": {
     "dashboard": "仪表板",
+    "groups": {
+      "pinned": "置顶",
+      "system": "系统功能",
+      "plugins": "插件"
+    },
     "agent": "智能助手",
     "workflow": "工作流",
     "pluginMarketplace": "插件市场",
@@ -432,6 +437,10 @@
       }
     },
     "tenant": {
+      "add": "添加租户",
+      "tooltips": {
+        "saasSupport": "SaaS版本支持添加租户"
+      },
       "filter": {
         "status": "按状态筛选",
         "plan": "按计划筛选",
@@ -912,5 +921,12 @@
     "networkError": "网络错误",
     "unauthorized": "未授权访问",
     "forbidden": "访问被禁止"
+  },
+  "theme": {
+    "title": "主题",
+    "settings": "主题设置",
+    "light": "浅色",
+    "dark": "深色",
+    "auto": "自动"
   }
 }

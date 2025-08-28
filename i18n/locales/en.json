@@ -51,6 +51,11 @@
   },
   "menu": {
     "dashboard": "Dashboard",
+    "groups": {
+      "pinned": "Pinned",
+      "system": "System Functions",
+      "plugins": "Plugins"
+    },
     "agent": "AI Agent",
     "workflow": "Workflow",
     "pluginMarketplace": "Plugin Marketplace",
@@ -432,6 +437,10 @@
       }
     },
     "tenant": {
+      "add": "Add Tenant",
+      "tooltips": {
+        "saasSupport": "SaaS version supports adding tenants"
+      },
       "filter": {
         "status": "Filter by Status",
         "plan": "Filter by Plan",
@@ -912,5 +921,12 @@
     "networkError": "Network error",
     "unauthorized": "Unauthorized access",
     "forbidden": "Access forbidden"
+  },
+  "theme": {
+    "title": "Theme",
+    "settings": "Theme Settings",
+    "light": "Light",
+    "dark": "Dark",
+    "auto": "Auto"
   }
 }

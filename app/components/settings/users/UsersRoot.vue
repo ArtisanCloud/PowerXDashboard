@@ -184,9 +184,9 @@ onMounted(() => {
           </p>
         </div>
         <div class="flex gap-2">
-          <UTooltip text="SaaS版本支持添加租户">
+          <UTooltip :text="$t('tenant.tooltips.saasSupport')">
             <UButton icon="i-lucide-plus" variant="outline" disabled>
-              添加租户
+              {{ $t("tenant.add") }}
             </UButton>
           </UTooltip>
           <UButton
