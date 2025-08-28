@@ -237,11 +237,7 @@ function onTreeKeydown(e: KeyboardEvent) {
         :to="$localePath('/dashboard')"
         class="flex items-center space-x-2 px-2"
       >
-        <div
-          class="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center"
-        >
-          <span class="text-white font-bold text-sm">P</span>
-        </div>
+        <img src="/images/logo-m.png" alt="Logo" class="w-8 h-8 rounded-lg" />
         <span
           v-if="!collapsed"
           class="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent"

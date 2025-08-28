@@ -194,7 +194,8 @@ onMounted(() => {
       <!-- 顶部Logo区域 -->
       <div class="flex justify-between items-center p-6 animate-fade-in">
         <!-- Logo -->
-        <div class="flex items-center">
+        <div class="flex items-center space-x-3">
+          <img src="/images/logo-m.png" alt="PowerX Logo" class="w-10 h-10" />
           <h1
             class="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent"
           >

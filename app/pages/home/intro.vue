@@ -223,11 +223,18 @@ const products = computed(() => [
             <div class="flex items-center">
               <div class="flex-shrink-0">
                 <NuxtLink :to="$localePath('/')">
-                  <h1
-                    class="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent"
-                  >
-                    PowerX
-                  </h1>
+                  <div class="flex items-center space-x-3">
+                    <img
+                      src="/images/logo-m.png"
+                      alt="PowerX Logo"
+                      class="w-10 h-10"
+                    />
+                    <h1
+                      class="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent"
+                    >
+                      PowerX
+                    </h1>
+                  </div>
                 </NuxtLink>
               </div>
             </div>

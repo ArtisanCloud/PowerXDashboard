@@ -1,4 +1,8 @@
 <script setup lang="ts">
+import { useI18n } from "vue-i18n";
+
+const { t } = useI18n();
+
 const props = defineProps<{
   message?: string;
   progress?: number; // 0-100 的百分比，如果提供则显示进度条，否则显示跳动点
@@ -17,8 +21,8 @@ const progressValue = computed(() =>
 
 <template>
   <UModal
-    title="loading - title"
-    description="loading - description"
+    :title="t('common.loading')"
+    description="..."
     :close="false"
     :dismissible="false"
     :overlay="true"
@@ -88,59 +92,11 @@ const progressValue = computed(() =>
         <div
           class="relative z-10 h-full flex flex-col items-center justify-center"
         >
-          <!-- Logo 容器 -->
-          <div class="relative mb-12">
-            <!-- 外层光环 -->
-            <div
-              class="absolute inset-0 w-32 h-32 rounded-full animate-spin-slow opacity-60"
-              :class="[
-                isDark
-                  ? 'bg-gradient-to-r from-purple-500/50 via-blue-500/50 to-cyan-500/50'
-                  : 'bg-gradient-to-r from-blue-500/20 via-purple-500/20 to-indigo-500/20',
-              ]"
-              style="filter: blur(8px)"
-            ></div>
-
-            <!-- Logo 主体 -->
-            <div
-              class="relative w-24 h-24 rounded-2xl shadow-2xl backdrop-blur-sm border animate-float"
-              :class="[
-                isDark
-                  ? 'bg-gradient-to-br from-slate-800/90 to-slate-900/90 border-white/20 shadow-2xl shadow-purple-500/20'
-                  : 'bg-gradient-to-br from-white/80 to-gray-50/80 border-gray-200/50',
-              ]"
-            >
-              <div
-                class="absolute inset-0 rounded-2xl bg-gradient-to-br from-primary-500/20 to-primary-600/20"
-              ></div>
-              <div
-                class="relative w-full h-full flex items-center justify-center"
-              >
-                <svg
-                  class="w-12 h-12 animate-pulse-gentle"
-                  :class="[
-                    isDark ? 'text-white drop-shadow-lg' : 'text-primary-600',
-                  ]"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M13 10V3L4 14h7v7l9-11h-7z"
-                  ></path>
-                </svg>
-              </div>
-            </div>
-          </div>
-
           <!-- 多层加载动画 -->
-          <div class="relative w-20 h-20 mb-8">
+          <div class="relative w-32 h-32 mb-12">
             <!-- 最外层旋转环 -->
             <div
-              class="absolute inset-0 w-20 h-20 border-2 border-transparent rounded-full animate-spin-slow"
+              class="absolute inset-0 w-32 h-32 border-3 border-transparent rounded-full animate-spin-slow"
               :class="[
                 isDark
                   ? 'border-t-purple-400/80 border-r-blue-400/60'
@@ -148,35 +104,26 @@ const progressValue = computed(() =>
               ]"
             ></div>
 
-            <!-- 中层反向旋转环 -->
+            <!-- 中层旋转环 -->
             <div
-              class="absolute inset-2 w-16 h-16 border-2 border-transparent rounded-full animate-spin-reverse"
+              class="absolute inset-3 w-26 h-26 border-2 border-transparent rounded-full animate-spin-reverse"
               :class="[
                 isDark
-                  ? 'border-l-cyan-400/80 border-b-indigo-400/60'
-                  : 'border-l-indigo-500/60 border-b-cyan-500/40',
+                  ? 'border-l-cyan-400/70 border-b-indigo-400/50'
+                  : 'border-l-indigo-500/50 border-b-cyan-500/30',
               ]"
             ></div>
 
-            <!-- 内层快速旋转环 -->
+            <!-- 中心 Logo -->
             <div
-              class="absolute inset-4 w-12 h-12 border-2 border-transparent rounded-full animate-spin"
-              :class="[
-                isDark
-                  ? 'border-t-pink-400/90 border-r-purple-400/80'
-                  : 'border-t-purple-500/80 border-r-pink-500/60',
-              ]"
-            ></div>
-
-            <!-- 中心脉冲点 -->
-            <div
-              class="absolute inset-6 w-8 h-8 rounded-full animate-pulse-fast"
-              :class="[
-                isDark
-                  ? 'bg-gradient-to-r from-purple-400 to-cyan-400 shadow-lg shadow-purple-400/50'
-                  : 'bg-gradient-to-r from-blue-500 to-purple-500',
-              ]"
-            ></div>
+              class="absolute inset-3 w-26 h-26 flex items-center justify-center"
+            >
+              <img
+                src="/images/logo-m.png"
+                alt="PowerX Logo"
+                class="w-22 h-22 drop-shadow-2xl animate-pulse-gentle"
+              />
+            </div>
           </div>
 
           <!-- 消息文本 -->
