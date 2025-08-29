@@ -10,7 +10,8 @@
           v-model="state.provider"
           :items="providerOptions"
           icon="i-heroicons-building-library"
-          @change="emit('providerChanged', state.provider)"
+          placeholder="请选择供应商"
+          @update:model-value="emit('providerChanged', $event)"
         />
       </div>
       <div>
@@ -21,6 +22,8 @@
           v-model="state.model"
           :items="modelOptions"
           icon="i-heroicons-cpu-chip"
+          placeholder="请选择模型"
+          :loading="!modelOptions?.length"
         />
       </div>
     </div>
@@ -70,19 +73,25 @@
 </template>
 
 <script setup lang="ts">
-const props = defineProps<{
-  providerOptions: string[];
-  modelOptions: string[];
-  state: {
-    provider: string;
-    model: string;
-    apiKey: string;
-    baseURL: string;
-    region: string;
-    organization: string;
-    azureDeployment?: string;
-  };
-}>();
+const props = withDefaults(
+  defineProps<{
+    providerOptions?: string[];
+    modelOptions?: string[];
+    state: {
+      provider: string;
+      model: string;
+      apiKey: string;
+      baseURL: string;
+      region: string;
+      organization: string;
+      azureDeployment?: string;
+    };
+  }>(),
+  {
+    providerOptions: () => [],
+    modelOptions: () => [],
+  }
+);
 
 const emit = defineEmits<{
   (e: "providerChanged", provider: string): void;
