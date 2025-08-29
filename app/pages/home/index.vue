@@ -343,135 +343,286 @@ onMounted(() => {
                   </div>
                 </div>
 
-                <!-- 右侧：3D科技可视化 -->
+                <!-- 右侧：黑客科技可视化 -->
                 <div class="relative animate-slide-in-right">
                   <!-- 主显示屏 -->
                   <div
-                    class="bg-white/20 dark:bg-slate-800/40 rounded-2xl border border-gray-300/20 dark:border-white/10 p-6 relative overflow-hidden backdrop-blur-sm transition-all duration-500"
+                    class="bg-black/80 dark:bg-black/90 rounded-2xl border border-green-400/30 p-6 relative overflow-hidden backdrop-blur-sm transition-all duration-500 shadow-2xl shadow-green-500/20"
                   >
-                    <!-- 屏幕扫描线 -->
+                    <!-- 黑客扫描线 -->
                     <div
-                      class="absolute inset-0 bg-gradient-to-b from-transparent via-gray-400/10 dark:via-white/3 to-transparent animate-scan-line transition-all duration-500"
+                      class="absolute inset-0 bg-gradient-to-b from-transparent via-green-400/20 to-transparent animate-scan-line transition-all duration-500"
                     ></div>
 
-                    <!-- 中央全息投影效果 -->
-                    <div class="h-80 flex items-center justify-center relative">
-                      <!-- 3D立方体框架 -->
-                      <div class="relative w-48 h-48 animate-rotate-3d">
-                        <!-- 立方体边框 -->
-                        <div
-                          class="absolute inset-0 border-2 border-blue-400/40 rounded-lg transform rotate-12 animate-pulse shadow-sm shadow-blue-400/20"
-                        ></div>
-                        <div
-                          class="absolute inset-2 border-2 border-purple-400/40 rounded-lg transform -rotate-12 animate-pulse delay-500 shadow-sm shadow-purple-400/20"
-                        ></div>
-                        <div
-                          class="absolute inset-4 border-2 border-emerald-400/40 rounded-lg transform rotate-6 animate-pulse delay-1000 shadow-sm shadow-emerald-400/20"
-                        ></div>
-
-                        <!-- 中心图标 -->
-                        <div
-                          class="absolute inset-0 flex items-center justify-center"
-                        >
-                          <div
-                            class="text-6xl animate-float-gentle filter drop-shadow-lg"
-                          >
-                            ⚡
-                          </div>
-                        </div>
-
-                        <!-- 环绕粒子 -->
-                        <div class="absolute -inset-8">
-                          <div
-                            class="absolute top-0 left-1/2 w-2 h-2 bg-blue-400 rounded-full animate-orbit shadow-sm shadow-blue-400/50"
-                          ></div>
-                          <div
-                            class="absolute top-1/2 right-0 w-2 h-2 bg-purple-400 rounded-full animate-orbit-reverse shadow-sm shadow-purple-400/50"
-                          ></div>
-                          <div
-                            class="absolute bottom-0 left-1/2 w-2 h-2 bg-emerald-400 rounded-full animate-orbit delay-1000 shadow-sm shadow-emerald-400/50"
-                          ></div>
-                          <div
-                            class="absolute top-1/2 left-0 w-2 h-2 bg-pink-400 rounded-full animate-orbit-reverse delay-1500 shadow-sm shadow-pink-400/50"
-                          ></div>
-                        </div>
+                    <!-- 终端头部 -->
+                    <div
+                      class="flex items-center justify-between mb-4 relative z-10"
+                    >
+                      <div class="flex items-center space-x-2">
+                        <div class="w-3 h-3 bg-red-500 rounded-full"></div>
+                        <div class="w-3 h-3 bg-yellow-500 rounded-full"></div>
+                        <div class="w-3 h-3 bg-green-500 rounded-full"></div>
                       </div>
-
-                      <!-- 数据流效果 -->
-                      <div class="absolute inset-0">
-                        <div
-                          class="absolute top-1/4 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-blue-400/60 to-transparent animate-data-flow"
-                        ></div>
-                        <div
-                          class="absolute top-2/4 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-purple-400/60 to-transparent animate-data-flow delay-500"
-                        ></div>
-                        <div
-                          class="absolute top-3/4 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-emerald-400/60 to-transparent animate-data-flow delay-1000"
-                        ></div>
+                      <div class="text-green-400 font-mono text-sm">
+                        root@powerx:~$
                       </div>
                     </div>
 
-                    <!-- 底部状态信息 -->
+                    <!-- 中央黑客机器人全息投影 -->
+                    <div class="h-80 flex items-center justify-center relative">
+                      <!-- 全息投影基座 -->
+                      <div class="relative w-56 h-56">
+                        <!-- 外层全息环 -->
+                        <div
+                          class="absolute inset-0 border-2 border-green-400/40 rounded-full animate-spin-slow shadow-lg shadow-green-400/30"
+                        ></div>
+                        <div
+                          class="absolute inset-4 border border-cyan-400/30 rounded-full animate-spin-reverse shadow-md shadow-cyan-400/20"
+                        ></div>
+                        <div
+                          class="absolute inset-8 border border-blue-400/20 rounded-full animate-spin-slow delay-1000 shadow-sm shadow-blue-400/10"
+                        ></div>
+
+                        <!-- 中央AI智能体核心 -->
+                        <div
+                          class="absolute inset-0 flex items-center justify-center"
+                        >
+                          <div class="relative">
+                            <!-- 现代AI神经网络核心 -->
+                            <div class="w-40 h-40 relative">
+                              <!-- 主要神经网络节点 -->
+                              <div
+                                class="absolute inset-0 flex items-center justify-center"
+                              >
+                                <!-- 中央核心节点 -->
+                                <div class="relative">
+                                  <!-- 核心处理单元 -->
+                                  <div class="w-40 h-40 relative">
+                                    <!-- 中央Logo -->
+                                    <div
+                                      class="absolute inset-0 flex items-center justify-center"
+                                    >
+                                      <img
+                                        src="/images/logo-m.png"
+                                        alt="PowerX Logo"
+                                        class="w-40 h-40 drop-shadow-2xl filter brightness-110 hover:brightness-125 transition-all duration-300 animate-float-gentle"
+                                      />
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+
+                            <!-- AI状态信息浮窗 -->
+                            <div
+                              class="absolute -top-12 -left-16 text-xs text-green-400 font-mono animate-float-data"
+                            >
+                              <div
+                                class="bg-black/90 border border-green-400/40 px-3 py-1 rounded-lg shadow-lg shadow-green-400/20"
+                              >
+                                🧠 THINKING...
+                              </div>
+                            </div>
+                            <div
+                              class="absolute -top-8 -right-20 text-xs text-cyan-400 font-mono animate-float-data delay-1000"
+                            >
+                              <div
+                                class="bg-black/90 border border-cyan-400/40 px-3 py-1 rounded-lg shadow-lg shadow-cyan-400/20"
+                              >
+                                ⚡ PROCESSING
+                              </div>
+                            </div>
+                            <div
+                              class="absolute -bottom-12 left-4 text-xs text-blue-400 font-mono animate-float-data delay-2000"
+                            >
+                              <div
+                                class="bg-black/90 border border-blue-400/40 px-3 py-1 rounded-lg shadow-lg shadow-blue-400/20"
+                              >
+                                🤖 AGENT_READY
+                              </div>
+                            </div>
+                            <div
+                              class="absolute -bottom-8 -right-16 text-xs text-purple-400 font-mono animate-float-data delay-3000"
+                            >
+                              <div
+                                class="bg-black/90 border border-purple-400/40 px-3 py-1 rounded-lg shadow-lg shadow-purple-400/20"
+                              >
+                                🎯 LEARNING
+                              </div>
+                            </div>
+
+                            <!-- 智能体决策树可视化 -->
+                            <div class="absolute -inset-16 pointer-events-none">
+                              <!-- 决策分支线 -->
+                              <svg class="w-full h-full" viewBox="0 0 200 200">
+                                <defs>
+                                  <linearGradient
+                                    id="branchGradient"
+                                    x1="0%"
+                                    y1="0%"
+                                    x2="100%"
+                                    y2="100%"
+                                  >
+                                    <stop
+                                      offset="0%"
+                                      style="
+                                        stop-color: #10b981;
+                                        stop-opacity: 0.6;
+                                      "
+                                    />
+                                    <stop
+                                      offset="50%"
+                                      style="
+                                        stop-color: #06d6a0;
+                                        stop-opacity: 0.8;
+                                      "
+                                    />
+                                    <stop
+                                      offset="100%"
+                                      style="
+                                        stop-color: #0891b2;
+                                        stop-opacity: 0.6;
+                                      "
+                                    />
+                                  </linearGradient>
+                                </defs>
+                                <!-- 决策分支 -->
+                                <path
+                                  d="M100,100 L60,60 M100,100 L140,60 M100,100 L60,140 M100,100 L140,140"
+                                  stroke="url(#branchGradient)"
+                                  stroke-width="2"
+                                  fill="none"
+                                  class="animate-draw-line opacity-60"
+                                />
+                                <path
+                                  d="M100,100 L80,40 M100,100 L120,40 M100,100 L40,80 M100,100 L160,80 M100,100 L80,160 M100,100 L120,160"
+                                  stroke="url(#branchGradient)"
+                                  stroke-width="1"
+                                  fill="none"
+                                  class="animate-draw-line delay-500 opacity-40"
+                                />
+                              </svg>
+                            </div>
+                          </div>
+                        </div>
+
+                        <!-- 环绕数据粒子 -->
+                        <div class="absolute -inset-12">
+                          <div
+                            class="absolute top-0 left-1/2 w-2 h-2 bg-green-400 rounded-full animate-orbit shadow-lg shadow-green-400/50"
+                          ></div>
+                          <div
+                            class="absolute top-1/2 right-0 w-2 h-2 bg-red-400 rounded-full animate-orbit-reverse shadow-lg shadow-red-400/50"
+                          ></div>
+                          <div
+                            class="absolute bottom-0 left-1/2 w-2 h-2 bg-cyan-400 rounded-full animate-orbit delay-1000 shadow-lg shadow-cyan-400/50"
+                          ></div>
+                          <div
+                            class="absolute top-1/2 left-0 w-2 h-2 bg-blue-400 rounded-full animate-orbit-reverse delay-1500 shadow-lg shadow-blue-400/50"
+                          ></div>
+                          <div
+                            class="absolute top-1/4 right-1/4 w-1 h-1 bg-yellow-400 rounded-full animate-orbit delay-2000 shadow-sm shadow-yellow-400/50"
+                          ></div>
+                          <div
+                            class="absolute bottom-1/4 left-1/4 w-1 h-1 bg-purple-400 rounded-full animate-orbit-reverse delay-2500 shadow-sm shadow-purple-400/50"
+                          ></div>
+                        </div>
+                      </div>
+
+                      <!-- 黑客数据流 -->
+                      <div class="absolute inset-0">
+                        <div
+                          class="absolute top-1/4 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-green-400/80 to-transparent animate-data-flow"
+                        ></div>
+                        <div
+                          class="absolute top-2/4 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-red-400/60 to-transparent animate-data-flow delay-500"
+                        ></div>
+                        <div
+                          class="absolute top-3/4 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-cyan-400/60 to-transparent animate-data-flow delay-1000"
+                        ></div>
+                      </div>
+
+                      <!-- 矩阵雨效果 -->
+                      <div class="absolute inset-0 pointer-events-none">
+                        <div
+                          class="absolute top-0 left-8 text-green-400 font-mono text-xs animate-matrix-rain opacity-30"
+                        >
+                          1
+                        </div>
+                        <div
+                          class="absolute top-0 left-16 text-green-400 font-mono text-xs animate-matrix-rain delay-300 opacity-20"
+                        >
+                          0
+                        </div>
+                        <div
+                          class="absolute top-0 left-24 text-green-400 font-mono text-xs animate-matrix-rain delay-600 opacity-25"
+                        >
+                          1
+                        </div>
+                        <div
+                          class="absolute top-0 right-8 text-green-400 font-mono text-xs animate-matrix-rain delay-900 opacity-30"
+                        >
+                          0
+                        </div>
+                        <div
+                          class="absolute top-0 right-16 text-green-400 font-mono text-xs animate-matrix-rain delay-1200 opacity-20"
+                        >
+                          1
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- 底部黑客状态面板 -->
                     <div class="mt-6 grid grid-cols-3 gap-4 text-center">
                       <div
-                        class="bg-cyan-500/10 rounded-lg p-3 border border-cyan-400/20 backdrop-blur-sm transition-all duration-500"
+                        class="bg-green-500/10 rounded-lg p-3 border border-green-400/30 backdrop-blur-sm transition-all duration-500"
                       >
-                        <div
-                          class="text-cyan-600 dark:text-cyan-400 font-mono text-xs transition-colors duration-500"
-                        >
-                          CPU
-                        </div>
-                        <div
-                          class="text-gray-800 dark:text-white font-bold transition-colors duration-500"
-                        >
-                          98%
+                        <div class="text-green-400 font-mono text-xs">HACK</div>
+                        <div class="text-green-300 font-bold font-mono">
+                          100%
                         </div>
                       </div>
                       <div
-                        class="bg-teal-500/10 rounded-lg p-3 border border-teal-400/20 backdrop-blur-sm transition-all duration-500"
+                        class="bg-red-500/10 rounded-lg p-3 border border-red-400/30 backdrop-blur-sm transition-all duration-500"
                       >
-                        <div
-                          class="text-teal-600 dark:text-teal-400 font-mono text-xs transition-colors duration-500"
-                        >
-                          RAM
-                        </div>
-                        <div
-                          class="text-gray-800 dark:text-white font-bold transition-colors duration-500"
-                        >
-                          16GB
+                        <div class="text-red-400 font-mono text-xs">BREACH</div>
+                        <div class="text-red-300 font-bold font-mono">
+                          READY
                         </div>
                       </div>
                       <div
-                        class="bg-emerald-500/10 rounded-lg p-3 border border-emerald-400/20 backdrop-blur-sm transition-all duration-500"
+                        class="bg-cyan-500/10 rounded-lg p-3 border border-cyan-400/30 backdrop-blur-sm transition-all duration-500"
                       >
-                        <div
-                          class="text-emerald-600 dark:text-emerald-400 font-mono text-xs transition-colors duration-500"
-                        >
-                          NET
+                        <div class="text-cyan-400 font-mono text-xs">
+                          STEALTH
                         </div>
-                        <div
-                          class="text-gray-800 dark:text-white font-bold transition-colors duration-500"
-                        >
-                          1Gb/s
+                        <div class="text-cyan-300 font-bold font-mono">
+                          ACTIVE
                         </div>
                       </div>
                     </div>
                   </div>
 
-                  <!-- 外围装饰 -->
+                  <!-- 外围黑客装饰 -->
                   <div
-                    class="absolute -top-4 -right-4 w-8 h-8 border border-white/20 rounded-full animate-ping"
+                    class="absolute -top-4 -right-4 w-8 h-8 border border-green-400/40 rounded-full animate-ping"
                   ></div>
                   <div
-                    class="absolute -bottom-4 -left-4 w-6 h-6 border border-white/20 rounded-full animate-ping delay-1000"
+                    class="absolute -bottom-4 -left-4 w-6 h-6 border border-red-400/40 rounded-full animate-ping delay-1000"
+                  ></div>
+                  <div
+                    class="absolute top-1/4 -right-6 w-4 h-4 border border-cyan-400/40 animate-ping delay-2000"
                   ></div>
 
-                  <!-- 连接线 -->
+                  <!-- 黑客连接线 -->
                   <div
-                    class="absolute top-1/2 -right-8 w-16 h-0.5 bg-gradient-to-r from-white/30 to-transparent animate-pulse"
+                    class="absolute top-1/2 -right-8 w-16 h-0.5 bg-gradient-to-r from-green-400/50 to-transparent animate-pulse"
                   ></div>
                   <div
-                    class="absolute top-1/3 -left-8 w-12 h-0.5 bg-gradient-to-l from-white/30 to-transparent animate-pulse delay-500"
+                    class="absolute top-1/3 -left-8 w-12 h-0.5 bg-gradient-to-l from-red-400/50 to-transparent animate-pulse delay-500"
+                  ></div>
+                  <div
+                    class="absolute bottom-1/3 -right-6 w-10 h-0.5 bg-gradient-to-r from-cyan-400/50 to-transparent animate-pulse delay-1000"
                   ></div>
                 </div>
               </div>
@@ -581,15 +732,6 @@ onMounted(() => {
   }
 }
 
-@keyframes draw-line {
-  0% {
-    stroke-dasharray: 0 1000;
-  }
-  100% {
-    stroke-dasharray: 1000 0;
-  }
-}
-
 @keyframes rotate-3d {
   0% {
     transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg);
@@ -643,6 +785,65 @@ onMounted(() => {
   }
   100% {
     transform: translateY(100vh);
+  }
+}
+
+@keyframes spin-slow {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes spin-reverse {
+  0% {
+    transform: rotate(360deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+@keyframes float-data {
+  0%,
+  100% {
+    transform: translateY(0px);
+    opacity: 0.8;
+  }
+  50% {
+    transform: translateY(-10px);
+    opacity: 1;
+  }
+}
+
+@keyframes matrix-rain {
+  0% {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(300px);
+    opacity: 0;
+  }
+}
+
+@keyframes neural-flow {
+  0% {
+    transform: scale(0.8);
+    opacity: 0.3;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(0.8);
+    opacity: 0.3;
   }
 }
 
@@ -709,11 +910,6 @@ onMounted(() => {
   animation: grid-move 20s linear infinite;
 }
 
-.animate-draw-line {
-  animation: draw-line 3s ease-in-out infinite;
-  stroke-dasharray: 1000;
-}
-
 .animate-fade-in {
   animation: fade-in 1s ease-out;
 }
@@ -747,9 +943,81 @@ onMounted(() => {
   animation: scan-line 4s linear infinite;
 }
 
+.animate-spin-slow {
+  animation: spin-slow 8s linear infinite;
+}
+
+.animate-spin-reverse {
+  animation: spin-reverse 6s linear infinite;
+}
+
+.animate-float-data {
+  animation: float-data 3s ease-in-out infinite;
+}
+
+.animate-matrix-rain {
+  animation: matrix-rain 4s linear infinite;
+}
+
+.animate-neural-flow {
+  animation: neural-flow 3s ease-in-out infinite;
+}
+
+.clip-hexagon {
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+}
+
 /* 延迟动画 */
+.delay-100 {
+  animation-delay: 0.1s;
+}
+
+.delay-1200 {
+  animation-delay: 1.2s;
+}
+
+.delay-1500 {
+  animation-delay: 1.5s;
+}
+
+.delay-1800 {
+  animation-delay: 1.8s;
+}
+
+.delay-2100 {
+  animation-delay: 2.1s;
+}
+
+.delay-3000 {
+  animation-delay: 3s;
+}
+
+.delay-200 {
+  animation-delay: 0.2s;
+}
+
+.delay-300 {
+  animation-delay: 0.3s;
+}
+
+.delay-400 {
+  animation-delay: 0.4s;
+}
+
 .delay-500 {
   animation-delay: 0.5s;
+}
+
+.delay-600 {
+  animation-delay: 0.6s;
+}
+
+.delay-900 {
+  animation-delay: 0.9s;
+}
+
+.delay-1200 {
+  animation-delay: 1.2s;
 }
 
 .delay-1000 {
