@@ -4,6 +4,8 @@ import { useWindowSize } from "../composables/useWindowSize";
 import Sidebar from "../components/layout/Sidebar.vue";
 import Header from "../components/layout/Header.vue";
 import FooterBar from "../components/layout/FooterBar.vue";
+import WelcomeGuide from "~/components/onboarding/WelcomeGuide.vue";
+import GuideButton from "~/components/ui/GuideButton.vue";
 
 // 获取当前路由
 const route = useRoute();
@@ -99,6 +101,12 @@ const closeMobileSidebar = () => {
       <!-- 页脚 -->
       <FooterBar v-if="!shouldHideFooter" />
     </div>
+
+    <!-- 欢迎引导组件 -->
+    <WelcomeGuide />
+
+    <!-- 测试按钮 -->
+    <GuideButton />
   </div>
 </template>
 

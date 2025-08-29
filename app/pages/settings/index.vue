@@ -1,8 +1,13 @@
 <template>
   <div class="p-6">
-    <div class="mb-6">
-      <h1 class="text-2xl font-bold text-gray-900 dark:text-white">系统设置</h1>
-      <p class="text-gray-600 dark:text-gray-400">管理系统配置和偏好设置</p>
+    <div class="mb-6 flex justify-between items-start">
+      <div>
+        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
+          系统设置
+        </h1>
+        <p class="text-gray-600 dark:text-gray-400">管理系统配置和偏好设置</p>
+      </div>
+      <ShowGuideButton />
     </div>
 
     <!-- 设置导航 -->
@@ -189,6 +194,8 @@
 </template>
 
 <script setup lang="ts">
+import ShowGuideButton from "~/components/ui/ShowGuideButton.vue";
+
 // 页面元数据
 definePageMeta({
   title: "系统设置",
