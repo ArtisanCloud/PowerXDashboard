@@ -1,23 +1,19 @@
 import { useApiClient } from "../index";
 import { ApiEndpoints } from "../config";
-
-const { get, post } = useApiClient();
+import { reactive, toRefs } from "vue";
+import type { ApiResponse } from "../types/types";
+import type { PowerModel } from "../types";
 
 export interface Provider {
-  name: string;
-  displayName: string;
+  ID: string;
+  Name: string;
+  auth?: {
+    scheme?: string;
+    fields?: string[];
+  };
 }
 
-export interface Model {
-  name: string;
-  provider: string;
-}
-
-export interface AgentProfile {
-  id: number;
-  createdAt: string;
-  updatedAt: string;
-  DeletedAt?: string;
+export interface AgentProfile extends PowerModel {
   modality: string;
   provider: string;
   model: string;
@@ -32,11 +28,7 @@ export interface AgentProfile {
   tags: string[];
 }
 
-export interface AgentCredential {
-  id: number;
-  createdAt: string;
-  updatedAt: string;
-  DeletedAt?: string;
+export interface AgentCredential extends PowerModel {
   name: string;
   provider: string;
   authScheme: string;
@@ -100,11 +92,12 @@ export class AISettingService {
   /**
    * 获取可用的供应商列表
    */
-  static async getProviders(): Promise<string[]> {
-    const response = await get<{ providers: string[] }>(
+  static async getProviders(): Promise<Provider[]> {
+    const { get } = useApiClient();
+    const response = await get<ApiResponse<Provider[]>>(
       ApiEndpoints.ADMIN_AGENTS.PROVIDERS
     );
-    return response.providers;
+    return response.data.providers || [];
   }
 
   /**
@@ -114,6 +107,7 @@ export class AISettingService {
     provider?: string,
     modality?: string
   ): Promise<string[]> {
+    const { get } = useApiClient();
     const params = new URLSearchParams();
     if (provider) params.append("provider", provider);
     if (modality) params.append("modality", modality);
@@ -122,8 +116,8 @@ export class AISettingService {
       ? `${ApiEndpoints.ADMIN_AGENTS.MODELS}?${params.toString()}`
       : ApiEndpoints.ADMIN_AGENTS.MODELS;
 
-    const response = await get<{ models: string[] }>(url);
-    return response.models;
+    const response = await get<ApiResponse<string[]>>(url);
+    return response.data || [];
   }
 
   /**
@@ -132,24 +126,36 @@ export class AISettingService {
   static async saveSettings(
     payload: SaveSettingsPayload
   ): Promise<{ ok: boolean }> {
-    return await post<{ ok: boolean }>(
+    const { post } = useApiClient();
+    const response = await post<ApiResponse<{ ok: boolean }>>(
       ApiEndpoints.ADMIN_AGENTS.SETTINGS_SAVE,
       payload
     );
+    return response.data || { ok: false };
   }
 
   /**
    * 测试连接
    */
   static async testConnection(payload: TestConnectionPayload): Promise<any> {
-    return await post(ApiEndpoints.ADMIN_AGENTS.TEST_CONNECTION, payload);
+    const { post } = useApiClient();
+    const response = await post<ApiResponse<any>>(
+      ApiEndpoints.ADMIN_AGENTS.TEST_CONNECTION,
+      payload
+    );
+    return response.data;
   }
 
   /**
    * 测试快速调用
    */
   static async testQuickCall(payload: TestQuickCallPayload): Promise<any> {
-    return await post(ApiEndpoints.ADMIN_AGENTS.TEST_CALL, payload);
+    const { post } = useApiClient();
+    const response = await post<ApiResponse<any>>(
+      ApiEndpoints.ADMIN_AGENTS.TEST_CALL,
+      payload
+    );
+    return response.data;
   }
 
   /**
@@ -159,9 +165,11 @@ export class AISettingService {
     env: string;
     profiles: AgentProfile[];
   }> {
-    return await get<{ env: string; profiles: AgentProfile[] }>(
-      ApiEndpoints.ADMIN_AGENTS.PROFILES
-    );
+    const { get } = useApiClient();
+    const response = await get<
+      ApiResponse<{ env: string; profiles: AgentProfile[] }>
+    >(ApiEndpoints.ADMIN_AGENTS.PROFILES);
+    return response.data || { env: "default", profiles: [] };
   }
 
   /**
@@ -171,8 +179,39 @@ export class AISettingService {
     env: string;
     credentials: AgentCredential[];
   }> {
-    return await get<{ env: string; credentials: AgentCredential[] }>(
-      ApiEndpoints.ADMIN_AGENTS.CREDENTIALS
-    );
+    const { get } = useApiClient();
+    const response = await get<
+      ApiResponse<{ env: string; credentials: AgentCredential[] }>
+    >(ApiEndpoints.ADMIN_AGENTS.CREDENTIALS);
+    return response.data || { env: "default", credentials: [] };
+  }
+
+  /**
+   * 获取当前激活的配置
+   */
+  static async getActiveProfile(
+    env: string = "default",
+    modality: string = "llm"
+  ): Promise<
+    ApiResponse<{
+      env: string;
+      modality: string;
+      profile: AgentProfile;
+    }>
+  > {
+    const { get } = useApiClient();
+    const params = new URLSearchParams();
+    params.append("env", env);
+    params.append("modality", modality);
+
+    const url = `${ApiEndpoints.ADMIN_AGENTS.SETTINGS_ACTIVE}?${params.toString()}`;
+
+    return await get<
+      ApiResponse<{
+        env: string;
+        modality: string;
+        profile: AgentProfile;
+      }>
+    >(url);
   }
 }

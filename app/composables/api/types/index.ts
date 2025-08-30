@@ -25,9 +25,13 @@ export interface ApiError {
   timestamp?: number;
 }
 
+export interface PowerModel {
+  id?: number;
+  uuid?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  deletedAt?: string;
+}
+
 // 导出租户相关类型
-export type {
-  Tenant,
-  TenantUpsertRequest,
-  TenantListParams,
-} from "../services/tenantService";
+export type { Tenant, TenantListParams } from "../services/tenantService";

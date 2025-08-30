@@ -4,18 +4,21 @@ import {
   type AgentProfile,
   type AgentCredential,
   type SaveSettingsPayload,
+  type Provider,
 } from "~/composables/api/services/AISettingService";
 
 export interface AISettingsState {
-  providers: string[];
+  providers: Provider[];
   models: string[];
   profiles: AgentProfile[];
+  activeProfile: AgentProfile | null;
   credentials: AgentCredential[];
   currentEnv: string;
   loading: boolean;
   saving: boolean;
   testing: boolean;
   lastTestMessage: string;
+  initialized: boolean;
 }
 
 export const useAISettingsStore = defineStore("aiSettings", {
@@ -23,12 +26,14 @@ export const useAISettingsStore = defineStore("aiSettings", {
     providers: [],
     models: [],
     profiles: [],
+    activeProfile: null,
     credentials: [],
     currentEnv: "default",
     loading: false,
     saving: false,
     testing: false,
     lastTestMessage: "",
+    initialized: false,
   }),
 
   getters: {
@@ -76,6 +81,12 @@ export const useAISettingsStore = defineStore("aiSettings", {
      * 初始化数据
      */
     async initialize() {
+      // 防止重复初始化
+      if (this.initialized) {
+        console.log("AI Settings Store 已经初始化过，跳过");
+        return;
+      }
+
       this.loading = true;
       try {
         const [providers, profiles, credentials] = await Promise.all([
@@ -85,10 +96,39 @@ export const useAISettingsStore = defineStore("aiSettings", {
         ]);
 
         // 确保数据结构正确，添加兜底
-        this.providers = providers ?? [];
+        this.providers = providers ?? <Provider[]>[];
         this.profiles = profiles?.profiles ?? [];
         this.credentials = credentials?.credentials ?? [];
         this.currentEnv = profiles?.env || credentials?.env || "default";
+
+        // console.log("AI store设置初始化成功", {
+        //   providers: this.providers.length,
+        //   profiles: this.profiles.length,
+        //   credentials: this.credentials.length,
+        // });
+
+        // 添加调试日志
+        console.log(
+          "providers after init in store",
+          JSON.stringify(this.providers)
+        );
+
+        // 可选：获取默认的激活配置（LLM 模态）
+        try {
+          const resActiveProfile = await this.fetchActiveProfile(
+            "default",
+            "llm"
+          );
+          if (resActiveProfile) {
+            this.activeProfile = resActiveProfile.profile;
+            // console.log("默认激活配置加载成功", resActiveProfile);
+          }
+        } catch (error) {
+          console.warn("获取默认激活配置失败，将使用现有配置", error);
+        }
+
+        // 标记为已初始化
+        this.initialized = true;
       } catch (error) {
         console.error("初始化AI设置失败:", error);
         // 保底：保证是数组，避免后续 .find/.length 崩掉
@@ -106,7 +146,8 @@ export const useAISettingsStore = defineStore("aiSettings", {
      */
     async fetchProviders() {
       try {
-        this.providers = await AISettingService.getProviders();
+        const providers = await AISettingService.getProviders();
+        this.providers = providers;
       } catch (error) {
         console.error("获取供应商列表失败:", error);
         throw error;
@@ -117,23 +158,63 @@ export const useAISettingsStore = defineStore("aiSettings", {
      * 获取模型列表
      */
     async fetchModels(provider?: string, modality?: string, env?: string) {
-      // 关键：参数不全就短路
+      // 关键：参数不全就短路，但不清空 models
       if (!provider || !modality) {
-        this.models = [];
+        console.log("fetchModels -> 参数不全，跳过:", { provider, modality });
         return;
       }
 
       try {
+        // ✅ 参数规范化
+        const normProvider = provider.trim().toLowerCase(); // "OpenAI" -> "openai"
+        const normModality = this.mapModality(modality);
+        // const normEnv = env === "default" ? undefined : env; // 不传 default
+
         const res = await AISettingService.getModels(
-          provider,
-          modality,
-          env ?? this.currentEnv
+          normProvider,
+          normModality
         );
-        this.models = res ?? [];
+
+        // ✅ 打印原始响应
+        // console.log("raw models response", JSON.stringify(res));
+
+        // ✅ 容错取值
+        if (Array.isArray(res)) {
+          this.models = res;
+        } else {
+          const data = res as any;
+          this.models = data?.models ?? data?.items ?? [];
+        }
+        // console.log("store.models set to", this.models);
       } catch (error) {
         console.error("获取模型列表失败:", error);
+        // 发生错误时才清空 models
         this.models = [];
         throw error;
+      }
+    },
+
+    /**
+     * 模态映射
+     */
+    mapModality(modality: string): string {
+      switch (modality) {
+        case "llm":
+          return "chat"; // 或 'text' / 'completion'
+        case "image":
+          return "image";
+        case "embedding":
+          return "embedding";
+        case "audio_tts":
+          return "tts";
+        case "audio_asr":
+          return "asr";
+        case "video":
+          return "video";
+        case "rerank":
+          return "rerank";
+        default:
+          return modality;
       }
     },
 
@@ -243,6 +324,33 @@ export const useAISettingsStore = defineStore("aiSettings", {
      */
     clearTestMessage() {
       this.lastTestMessage = "";
+    },
+
+    /**
+     * 获取当前激活的配置
+     */
+    async fetchActiveProfile(
+      env: string = "default",
+      modality: string = "llm"
+    ) {
+      // console.log("AI Settings Store: 获取激活配置", { env, modality });
+      try {
+        const response = await AISettingService.getActiveProfile(env, modality);
+        // console.log("AI Settings Store: 激活配置响应", response);
+
+        if (response.code === 200 && response.data) {
+          return response.data;
+        } else {
+          console.error(
+            "AI Settings Store: 获取激活配置失败",
+            response.message
+          );
+          return null;
+        }
+      } catch (error) {
+        console.error("AI Settings Store: 获取激活配置异常", error);
+        return null;
+      }
     },
   },
 });

@@ -26,6 +26,7 @@ export class ApiEndpoints {
     PROVIDERS: `${API_CONFIG.ADMIN_AGENTS}/providers`,
     MODELS: `${API_CONFIG.ADMIN_AGENTS}/models`,
     SETTINGS_SAVE: `${API_CONFIG.ADMIN_AGENTS}/settings/save`,
+    SETTINGS_ACTIVE: `${API_CONFIG.ADMIN_AGENTS}/settings/active`,
     TEST_CONNECTION: `${API_CONFIG.ADMIN_AGENTS}/test/connection`,
     TEST_CALL: `${API_CONFIG.ADMIN_AGENTS}/test/call`,
     PROFILES: `${API_CONFIG.ADMIN_AGENTS}/settings/profiles`,

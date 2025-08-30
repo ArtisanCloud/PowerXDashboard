@@ -87,6 +87,8 @@
             {{ currentTitle }} - 通用
           </div>
           <ProviderModelForm
+            :provider="activeProvider"
+            :model="activeModel"
             :provider-options="providerOptions"
             :model-options="modelOptions"
             :state="currentState"
@@ -144,7 +146,10 @@ import ProviderModelForm from "~/components/settings/ai/ProviderModelForm.vue";
 import ModalityParamsForm from "~/components/settings/ai/ModalityParamsForm.vue";
 import TestPanel from "~/components/settings/ai/TestPanel.vue";
 import { useAISettingsStore } from "~/stores/aiSettings";
-import type { SaveSettingsPayload } from "~/composables/api/services/AISettingService";
+import type {
+  Provider,
+  SaveSettingsPayload,
+} from "~/composables/api/services/AISettingService";
 
 type Modality =
   | "llm"
@@ -182,7 +187,36 @@ const env = ref<"default" | "staging" | "production">("default");
 /**
  * Provider 列表与模型目录（从 store 获取）
  */
-const providerOptions = computed(() => aiSettingsStore.providers ?? []);
+const providerOptions = computed(() => {
+  const providers = aiSettingsStore.providers;
+  // console.log("providers from store", providers, typeof providers);
+
+  // 确保 providers 是数组
+  if (!Array.isArray(providers)) {
+    console.warn("providers 不是数组:", providers);
+    return [];
+  }
+
+  // 返回 {label, value} 格式，基于后端的 id 和 name 字段
+  return providers.map((p: Provider) => {
+    // console.log(p);
+    const item = {
+      label: p.Name,
+      value: p.ID!,
+    };
+    // console.log(item);
+    return item;
+  });
+});
+
+// 当前选中的 Provider
+const activeProvider = computed(
+  () => aiSettingsStore.activeProfile?.provider || null
+);
+
+const activeModel = computed(
+  () => aiSettingsStore.activeProfile?.model || null
+);
 
 /**
  * 各模态的 state（包含 Provider/Model/凭证 + 模态参数）
@@ -382,27 +416,42 @@ const currentState = computed<any>({
 /**
  * ProviderModelForm 的 Model 下拉选项：从后端获取
  */
-const modelOptions = computed(() => aiSettingsStore.models ?? []);
+const modelOptions = computed(() => {
+  const models = aiSettingsStore.models;
+  // console.log("models from store", models, typeof models);
+
+  // 确保 models 是数组
+  if (!Array.isArray(models)) {
+    console.warn("models 不是数组:", models);
+    return [];
+  }
+
+  // 返回 {label, value} 格式
+  return models.map((model) => ({
+    label: model,
+    value: model,
+  }));
+});
 
 async function onProviderChanged(nextProvider?: string) {
-  const provider = nextProvider ?? currentState.value.provider;
+  const rawProvider = nextProvider ?? currentState.value.provider;
   const currentModality = modality.value;
 
-  // 关键：参数不全就短路，避免 400 错误
-  if (!provider || !currentModality) {
-    aiSettingsStore.models = [];
+  // 关键：参数不全就短路，但不清空 models
+  if (!rawProvider || !currentModality) {
     return;
   }
 
   try {
-    await aiSettingsStore.fetchModels(provider, currentModality, env.value);
+    // ✅ 直接传原始值，让 store 内部处理规范化
+    await aiSettingsStore.fetchModels(rawProvider, currentModality, env.value);
     const models = aiSettingsStore.models ?? [];
     if (models.length && !models.includes(currentState.value.model)) {
       currentState.value.model = models[0];
     }
   } catch (error) {
     console.error("获取模型列表失败:", error);
-    aiSettingsStore.models = [];
+    // 这里不清空，保持上一次成功值
   }
 }
 
@@ -522,9 +571,25 @@ async function testQuickCall() {
 // 页面初始化
 onMounted(async () => {
   try {
-    await aiSettingsStore.initialize(); // 保证 profiles/credentials 有值（至少是 []）
-    loadExistingConfiguration();
-    await onProviderChanged(); // 这里内部已做短路
+    // 等待全局初始化完成（如果还没完成的话）
+    if (aiSettingsStore.loading) {
+      console.log("等待全局初始化完成...");
+      // 简单的轮询等待，也可以用 watch 监听
+      while (aiSettingsStore.loading) {
+        await new Promise((resolve) => setTimeout(resolve, 100));
+      }
+    }
+
+    // 优先加载激活配置，如果没有则加载现有配置
+    await loadActiveConfiguration();
+    if (!currentState.value.provider) {
+      loadExistingConfiguration(); // 再把 provider / model 写回表单
+    }
+
+    if (currentState.value.provider) {
+      // 最后拉模型
+      await onProviderChanged(currentState.value.provider);
+    }
   } catch (error) {
     console.error("初始化AI设置页面失败:", error);
   }
@@ -540,36 +605,80 @@ function loadExistingConfiguration() {
 
   if (!profile || !credential) return; // 数据不齐就直接返回
 
-  const config = currentState.value;
-
   // profile.defaults 可能不存在，全部兜底
   const d = profile.defaults ?? {};
-  config.provider = profile.provider ?? config.provider;
-  config.model = profile.model ?? config.model;
-  config.maxTokens = d.maxTokens ?? config.maxTokens ?? 4096;
-  config.stream = d.stream ?? config.stream ?? true;
-  config.temperature = d.temperature ?? config.temperature ?? 0.7;
-  config.topP = d.topP ?? config.topP ?? 1;
+  currentState.value.provider = profile.provider ?? currentState.value.provider;
+  currentState.value.model = profile.model ?? currentState.value.model;
+  currentState.value.maxTokens =
+    d.maxTokens ?? currentState.value.maxTokens ?? 4096;
+  currentState.value.stream = d.stream ?? currentState.value.stream ?? true;
+  currentState.value.temperature =
+    d.temperature ?? currentState.value.temperature ?? 0.7;
+  currentState.value.topP = d.topP ?? currentState.value.topP ?? 1;
 
   // credential.data 也兜底
   const cd = credential.data ?? {};
-  config.apiKey = cd.api_key ?? config.apiKey ?? "";
-  config.baseURL = cd.base_url ?? config.baseURL ?? "";
-  config.organization = cd.organization ?? config.organization ?? "";
-  config.region = cd.region ?? config.region ?? "";
-  config.azureDeployment = cd.azure_deployment ?? config.azureDeployment;
+  currentState.value.apiKey = cd.api_key ?? currentState.value.apiKey ?? "";
+  currentState.value.baseURL = cd.base_url ?? currentState.value.baseURL ?? "";
+  currentState.value.organization =
+    cd.organization ?? currentState.value.organization ?? "";
+  currentState.value.region = cd.region ?? currentState.value.region ?? "";
+  currentState.value.azureDeployment =
+    cd.azure_deployment ?? currentState.value.azureDeployment;
 }
 
-// 监听 provider 改变（含初始化立即执行）
+// 获取当前激活的配置
+async function loadActiveConfiguration() {
+  // console.log("加载激活配置", { env: env.value, modality: modality.value });
+  try {
+    const activeData = await aiSettingsStore.fetchActiveProfile(
+      env.value,
+      modality.value
+    );
+    if (activeData && activeData.profile) {
+      const profile = activeData.profile;
+      const config = currentState.value;
+
+      // 更新当前状态
+      config.provider = profile.provider;
+      config.model = profile.model;
+
+      // 更新默认参数
+      if (profile.defaults) {
+        config.maxTokens = profile.defaults.maxTokens ?? config.maxTokens;
+        config.stream = profile.defaults.stream ?? config.stream;
+        config.temperature = profile.defaults.temperature ?? config.temperature;
+        config.topP = profile.defaults.topP ?? config.topP;
+      }
+
+      // console.log("激活配置加载成功", profile);
+
+      // 加载对应的模型列表
+      if (profile.provider) {
+        await onProviderChanged(profile.provider);
+      }
+    }
+  } catch (error) {
+    console.error("加载激活配置失败", error);
+  }
+}
+
+// 监听 provider 改变（初始化已手动调用过）
 watch(
   () => currentState.value.provider,
-  (p) => onProviderChanged(p),
-  { immediate: true }
+  (p) => {
+    if (p) onProviderChanged(p);
+  },
+  { immediate: false }
 );
 
 // 监听模态切换，重新加载配置
 watch(modality, async () => {
-  loadExistingConfiguration();
+  // 优先加载激活配置，如果没有则加载现有配置
+  await loadActiveConfiguration();
+  if (!currentState.value.provider) {
+    loadExistingConfiguration();
+  }
   // 模态切换时重新获取模型列表
   await onProviderChanged();
 });

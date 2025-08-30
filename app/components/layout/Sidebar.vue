@@ -131,8 +131,8 @@ const viewGroups = computed<MenuGroup[]>(() => {
 
   return [
     { id: "top", title: "置顶", items: processMenuItems(top, 0) },
-    { id: "plugin", title: "已安装应用", items: processMenuItems(plugin, 0) },
-    { id: "system", title: "系统功能", items: processMenuItems(system, 0) },
+    { id: "plugin", title: "应用", items: processMenuItems(plugin, 0) },
+    { id: "system", title: "系统", items: processMenuItems(system, 0) },
   ].filter((g) => g.items.length > 0);
 });
 
@@ -159,7 +159,7 @@ onMounted(async () => {
   try {
     await userStore.fetchUserContext();
     // 调试菜单数据结构
-    console.log("菜单数据:", menuResponse.value);
+    // console.log("菜单数据:", menuResponse.value);
   } catch (e) {
     console.error("初始化用户数据失败:", e);
   }

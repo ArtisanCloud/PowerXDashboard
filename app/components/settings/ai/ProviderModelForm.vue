@@ -9,6 +9,8 @@
         <USelect
           v-model="state.provider"
           :items="providerOptions"
+          :disabled="!providerOptions?.length"
+          :loading="!providerOptions?.length"
           icon="i-heroicons-building-library"
           placeholder="请选择供应商"
           @update:model-value="emit('providerChanged', $event)"
@@ -21,6 +23,7 @@
         <USelect
           v-model="state.model"
           :items="modelOptions"
+          :disabled="!modelOptions?.length"
           icon="i-heroicons-cpu-chip"
           placeholder="请选择模型"
           :loading="!modelOptions?.length"
@@ -75,8 +78,8 @@
 <script setup lang="ts">
 const props = withDefaults(
   defineProps<{
-    providerOptions?: string[];
-    modelOptions?: string[];
+    providerOptions?: { label: string; value: string }[];
+    modelOptions?: { label: string; value: string }[];
     state: {
       provider: string;
       model: string;
