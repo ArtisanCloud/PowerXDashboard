@@ -184,66 +184,6 @@ const env = ref<"default" | "staging" | "production">("default");
  */
 const providerOptions = computed(() => aiSettingsStore.providers ?? []);
 
-const modelCatalog = {
-  llm: {
-    OpenAI: ["gpt-4o-mini", "gpt-4.1-mini", "gpt-3.5-turbo"],
-    "Azure OpenAI": ["gpt-4o-mini", "gpt-4o", "gpt-35-turbo"],
-    Anthropic: ["claude-3-5-sonnet", "claude-3-haiku"],
-    "Google (Vertex/GenAI)": ["gemini-1.5-pro", "gemini-1.5-flash"],
-    OpenRouter: ["openrouter/auto", "mistral-large", "llama-3.1-70b"],
-    "AWS Bedrock": ["anthropic.claude-3-sonnet", "meta.llama3-70b"],
-    "Ollama (Local)": ["llama3", "qwen2", "mistral"],
-  },
-  image: {
-    OpenAI: ["dall-e-3", "dall-e-2"],
-    "Google (Vertex/GenAI)": ["imagen-2", "imagen-3"],
-    OpenRouter: [
-      "black-forest-labs/flux-schnell",
-      "stability/stable-diffusion-xl",
-    ],
-    "AWS Bedrock": ["stability.stable-diffusion-xl", "amazon.titan-image"],
-    "Ollama (Local)": ["sdxl", "flux"],
-  },
-  embedding: {
-    OpenAI: ["text-embedding-3-small", "text-embedding-3-large"],
-    "Google (Vertex/GenAI)": ["text-embedding-004"],
-    OpenRouter: ["voyage-large-2-instruct", "gte-large"],
-    "AWS Bedrock": ["amazon.titan-embed-text-v2"],
-    "Ollama (Local)": ["nomic-embed-text", "bge-large"],
-  },
-  audio_tts: {
-    OpenAI: ["tts-1", "tts-1-hd"],
-    "Google (Vertex/GenAI)": [
-      "text-to-speech-wavenet",
-      "text-to-speech-neural2",
-    ],
-    "AWS Bedrock": ["amazon.polly-neural", "amazon.polly-standard"],
-    "Azure OpenAI": ["tts-1", "tts-1-hd"],
-    "Ollama (Local)": ["coqui-tts", "bark"],
-  },
-  audio_asr: {
-    OpenAI: ["whisper-1"],
-    "Google (Vertex/GenAI)": ["speech-to-text-v2", "chirp-universal"],
-    "AWS Bedrock": ["amazon.transcribe-medical", "amazon.transcribe-standard"],
-    "Azure OpenAI": ["whisper-1"],
-    "Ollama (Local)": ["whisper-large-v3", "faster-whisper"],
-  },
-  video: {
-    OpenAI: ["sora-preview"],
-    "Google (Vertex/GenAI)": ["veo-2-preview"],
-    OpenRouter: ["luma-video", "pika-1.0"],
-    "AWS Bedrock": ["runway.gen-3", "heygen.video"],
-    "Ollama (Local)": ["animatediff", "zeroscope"],
-  },
-  rerank: {
-    OpenAI: ["text-embedding-3-large"],
-    "Google (Vertex/GenAI)": ["textembedding-gecko-multilingual"],
-    OpenRouter: ["voyage-rerank-lite", "cohere-rerank-v3"],
-    "AWS Bedrock": ["cohere.rerank-multilingual-v3"],
-    "Ollama (Local)": ["bge-reranker-large", "colbert-v2"],
-  },
-};
-
 /**
  * 各模态的 state（包含 Provider/Model/凭证 + 模态参数）
  */

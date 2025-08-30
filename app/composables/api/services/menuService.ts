@@ -56,6 +56,9 @@ export interface MenuUpdateParams {
 /** ===== Utils ===== */
 
 const SLOT_ROOT = "group.root" as const;
+const KEY_PLUGINS = "plugins" as const;
+const KEY_SYSTEM = "system" as const;
+const ORIGIN_PLUGIN = "plugin" as const;
 
 /** DEV 下冻结，帮助发现谁在改顺序 */
 function deepFreezeDev<T>(obj: T): T {
@@ -142,29 +145,73 @@ function parseMenusFromResponse(resp: unknown): MenuItem[] {
   return toTopLevelMenusFromCategories(catsRaw);
 }
 
-/** 从 categories 恢复顶层菜单并按后端规则稳定排序（子级不排序） */
+/** 从 categories 恢复顶层菜单并按“置顶→插件→系统”稳定排序 */
 function toTopLevelMenusFromCategories(categories: unknown[]): MenuItem[] {
   if (!Array.isArray(categories)) return [];
 
-  // 扁平化顶层：保持“分类内的相对顺序”，再统一按规则排序
   let seq = 0;
-  const flat: (MenuItem & { _i: number })[] = [];
+  const top: (MenuItem & { _i: number })[] = [];
+  const plugin: (MenuItem & { _i: number })[] = [];
+  const system: (MenuItem & { _i: number })[] = [];
+
+  const liftChildren = (
+    parentRaw: unknown,
+    bucket: (MenuItem & { _i: number })[]
+  ) => {
+    const p = (parentRaw ?? {}) as Record<string, unknown>;
+    const kids = Array.isArray(p.children) ? (p.children as unknown[]) : [];
+    for (const k of kids) {
+      const child = normalizeMenuItem(k) as MenuItem & { _i: number };
+      (child as any)._i = seq++;
+      bucket.push(child);
+    }
+  };
 
   for (let ci = 0; ci < categories.length; ci++) {
     const cat = (categories[ci] ?? {}) as Record<string, unknown>;
-    const children = Array.isArray(cat.children)
-      ? (cat.children as unknown[])
-      : [];
-    for (let j = 0; j < children.length; j++) {
-      const item = normalizeMenuItem(children[j]);
+    const catId = typeof cat.id === "string" ? (cat.id as string) : "";
+    const kids = Array.isArray(cat.children) ? (cat.children as unknown[]) : [];
+
+    for (let j = 0; j < kids.length; j++) {
+      const raw = kids[j];
+      const item = normalizeMenuItem(raw) as MenuItem & { _i: number };
       (item as any)._i = seq++;
-      flat.push(item as MenuItem & { _i: number });
+
+      // ① 置顶：只要 slot===group.root，不管 origin
+      if (item.slot === SLOT_ROOT) {
+        top.push(item);
+        continue;
+      }
+
+      // ② 插件：分类=plugins 或 origin=plugin
+      if (catId === KEY_PLUGINS || item.origin === ORIGIN_PLUGIN) {
+        plugin.push(item);
+        continue;
+      }
+
+      // 兼容 system 分类下的 plugins 容器：抬升 children
+      if (
+        catId === KEY_SYSTEM &&
+        item.id === KEY_PLUGINS &&
+        Array.isArray(item.children) &&
+        item.children.length > 0
+      ) {
+        liftChildren(raw, plugin);
+        continue; // 容器本身不进
+      }
+
+      // ③ 其它：系统
+      system.push(item);
     }
   }
 
-  flat.sort(compareTopLevel);
-  // 移除 _i
-  return flat.map(({ _i, ...rest }) => rest);
+  // 桶内稳定排序
+  top.sort(compareTopLevel);
+  plugin.sort(compareTopLevel);
+  system.sort(compareTopLevel);
+
+  // 顺序：置顶 → 插件 → 系统
+  return [...top, ...plugin, ...system].map(({ _i, ...r }) => r);
 }
 
 /** ===== Service ===== */
@@ -182,20 +229,10 @@ export const useMenuService = () => {
 
       deepFreezeDev(menus);
 
-      const normalized: ApiResponse<MenuItem[]> = {
-        code: serverResp.code ?? 200,
-        message: serverResp.message ?? "success",
-        data: menus,
-        timestamp: serverResp.timestamp,
-      };
-      return normalized;
-    },
-
-    /** 获取所有菜单（管理员） */
-    getAllMenus: async () => {
-      const res = await apiClient.get<ApiResponse<MenusResponse>>(baseUrl);
-      const serverResp = (res?.data ?? res) as ApiResponse<MenusResponse>;
-      const menus = parseMenusFromResponse(serverResp);
+      // console.log(
+      //   "[getUserMenus] menus =",
+      //   menus.map((m) => `${m.title}(${m.id})`)
+      // );
 
       const normalized: ApiResponse<MenuItem[]> = {
         code: serverResp.code ?? 200,

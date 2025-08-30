@@ -65,7 +65,13 @@ const {
   refresh: refreshMenus,
 } = await useAsyncData("user-menus", () => menuService.getUserMenus(), {
   default: () => ({ data: [] }),
-  transform: (response) => response || { data: [] },
+  transform: (response) => {
+    // service.getUserMenus() 返回的是 ApiResponse<MenuItem[]>
+    if (response && Array.isArray(response.data)) {
+      return { data: response.data };
+    }
+    return { data: [] };
+  },
 });
 
 /* ---------- 子级排序（顶层不排序） ---------- */
@@ -99,78 +105,35 @@ const processMenuItems = (items: MenuItem[], level = 0): MenuItem[] => {
 /* ---------- 分组 ---------- */
 type MenuGroup = { id: string; title: string; items: MenuItem[] };
 
-function categoriesToGroups(resp: any): MenuGroup[] | null {
-  const data = resp?.data ?? resp;
-  const cats: any[] | undefined = Array.isArray(data?.categories)
-    ? data.categories
-    : undefined;
-  if (!cats) return null;
-
-  const groups: MenuGroup[] = [];
-  for (const cat of cats) {
-    const items = Array.isArray(cat?.children)
-      ? (cat.children as MenuItem[])
-      : [];
-    if (!items.length) continue;
-    groups.push({
-      id: String(cat.id ?? ""),
-      title: typeof cat.title === "string" ? cat.title : "",
-      items,
-    });
-  }
-  return groups.length ? groups : null;
-}
-
-function fallbackBucketByOrigin(menus: MenuItem[]): MenuGroup[] {
-  const rootPlugins: MenuItem[] = [];
-  const system: MenuItem[] = [];
-  const others: MenuItem[] = [];
-  for (const m of menus) {
-    if (m.origin === "system") system.push(m);
-    else if (m.slot === "group.root") rootPlugins.push(m);
-    else others.push(m);
-  }
-  const groups: MenuGroup[] = [];
-  if (rootPlugins.length)
-    groups.push({
-      id: "root",
-      title: $t("menu.groups.pinned"),
-      items: rootPlugins,
-    });
-  if (system.length)
-    groups.push({
-      id: "system",
-      title: $t("menu.groups.system"),
-      items: system,
-    });
-  if (others.length)
-    groups.push({
-      id: "plugins",
-      title: $t("menu.groups.plugins"),
-      items: others,
-    });
-  return groups;
-}
-
-const flatTopMenus = computed<MenuItem[]>(() =>
-  menuResponse.value?.data ? processMenuItems(menuResponse.value.data, 0) : []
-);
-
 const viewGroups = computed<MenuGroup[]>(() => {
-  const catGroups = categoriesToGroups(menuResponse.value);
-  if (catGroups) {
-    return catGroups.map((g) => ({
-      id: g.id,
-      title: translateTitle(g.title),
-      items: processMenuItems(g.items, 0),
-    }));
+  // menuService 已经处理了数据结构转换，返回的是扁平的 MenuItem[]
+  const flatMenus: MenuItem[] = menuResponse.value?.data || [];
+
+  const top: MenuItem[] = [];
+  const plugin: MenuItem[] = [];
+  const system: MenuItem[] = [];
+
+  // 按照 menuService 中的逻辑进行分组
+  for (const item of flatMenus) {
+    // ① 置顶：slot === "group.root"
+    if (item.slot === "group.root") {
+      top.push(item);
+    }
+    // ② 插件：origin === "plugin"
+    else if (item.origin === "plugin") {
+      plugin.push(item);
+    }
+    // ③ 其它 → 系统
+    else {
+      system.push(item);
+    }
   }
-  const flatTop = flatTopMenus.value;
-  return fallbackBucketByOrigin(flatTop).map((g) => ({
-    id: g.id,
-    title: translateTitle(g.title),
-    items: processMenuItems(g.items, 0),
-  }));
+
+  return [
+    { id: "top", title: "置顶", items: processMenuItems(top, 0) },
+    { id: "plugin", title: "已安装应用", items: processMenuItems(plugin, 0) },
+    { id: "system", title: "系统功能", items: processMenuItems(system, 0) },
+  ].filter((g) => g.items.length > 0);
 });
 
 /* ---------- 展开状态 ---------- */
@@ -195,6 +158,8 @@ onMounted(async () => {
   expandByRoute();
   try {
     await userStore.fetchUserContext();
+    // 调试菜单数据结构
+    console.log("菜单数据:", menuResponse.value);
   } catch (e) {
     console.error("初始化用户数据失败:", e);
   }
