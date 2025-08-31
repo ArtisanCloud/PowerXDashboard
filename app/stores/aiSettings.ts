@@ -5,7 +5,7 @@ import {
   type AgentCredential,
   type SaveSettingsPayload,
   type Provider,
-} from "~/composables/api/services/AISettingService";
+} from "~/composables/api/services/aiSettingService";
 
 export interface AISettingsState {
   providers: Provider[];

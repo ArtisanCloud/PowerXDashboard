@@ -155,7 +155,7 @@ import { useEnvStore, ENV_OPTIONS } from "~/stores/envStore";
 import type {
   Provider,
   SaveSettingsPayload,
-} from "~/composables/api/services/AISettingService";
+} from "~/composables/api/services/aiSettingService";
 import type { SelectOption } from "~/composables/api/types/select";
 
 type Modality =
