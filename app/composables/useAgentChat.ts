@@ -62,7 +62,7 @@ export function useAgentChat(options: AgentChatOptions = {}) {
   async function loadAgents() {
     isLoading.value = true;
     try {
-      const response = await apiClient.get<{ data: Agent[] }>("/api/agents");
+      const response = await apiClient.get<{ data: Agent[] }>("/admin/agents");
       agents.value = response.data || [];
 
       // 如果没有当前 Agent，选择第一个

@@ -749,6 +749,7 @@
       "modelConfig": "模型配置",
       "model": "模型",
       "selectModel": "选择模型",
+      "selectProvider": "选择提供商",
       "temperature": "温度",
       "conservative": "保守",
       "creative": "创意",
@@ -796,6 +797,50 @@
       }
     },
     "confirmDelete": "确定要删除这个 Agent 吗？此操作不可撤销。"
+  },
+  "env": {
+    "title": "环境配置",
+    "current": "当前环境",
+    "switch": "切换环境",
+    "dev": "开发环境",
+    "staging": "预发布环境",
+    "prod": "生产环境",
+    "canary": "金丝雀环境",
+    "blue": "蓝色环境",
+    "green": "绿色环境"
+  },
+  "system": {
+    "info": {
+      "title": "系统信息",
+      "appName": "应用名称",
+      "appVersion": "应用版本"
+    },
+    "language": {
+      "title": "语言设置",
+      "current": "当前语言",
+      "available": "可用语言",
+      "forced": "强制语言"
+    },
+    "theme": {
+      "title": "主题设置",
+      "current": "当前主题",
+      "available": "可用主题",
+      "forced": "强制主题"
+    },
+    "debug": {
+      "title": "调试信息",
+      "languageSwitch": "语言切换",
+      "themeSwitch": "主题切换",
+      "userPreferences": "用户偏好"
+    },
+    "actions": {
+      "reset": "重置配置",
+      "showConfig": "显示配置"
+    }
+  },
+  "common": {
+    "enabled": "已启用",
+    "disabled": "已禁用"
   },
   "workflow": {
     "title": "工作流编辑器",

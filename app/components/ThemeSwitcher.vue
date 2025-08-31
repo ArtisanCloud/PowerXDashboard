@@ -1,13 +1,14 @@
 <script setup lang="ts">
 import type { DropdownMenuItem } from "@nuxt/ui";
 import { ref, watch, onMounted, computed } from "vue";
+import { useI18n } from "vue-i18n";
 import "~/assets/css/theme.css";
 
 // 创建全局状态
 const themeState = useState("theme", () => "auto");
 
 // 主题选项
-const { $i18n } = useNuxtApp();
+const { t } = useI18n();
 
 // 主题标签的默认值
 const defaultLabels = {
@@ -19,20 +20,6 @@ const defaultLabels = {
 };
 
 // 翻译函数
-const t = (key: string) => {
-  try {
-    // 尝试使用 i18n 翻译
-    if ($i18n && typeof $i18n.t === "function") {
-      return $i18n.t(key);
-    }
-
-    // 如果没有 i18n 或翻译失败，使用默认值
-    return defaultLabels[key] || key;
-  } catch (e) {
-    // 出错时返回默认值或键名
-    return defaultLabels[key] || key;
-  }
-};
 
 const themes = computed(() => [
   { value: "light", label: t("theme.light"), icon: "i-heroicons-sun" },

@@ -12,7 +12,7 @@
           :disabled="!providerOptions?.length"
           :loading="!providerOptions?.length"
           icon="i-heroicons-building-library"
-          placeholder="请选择供应商"
+          :placeholder="$t('agent.config.selectProvider')"
           @update:model-value="emit('providerChanged', $event)"
         />
       </div>
@@ -25,7 +25,7 @@
           :items="modelOptions"
           :disabled="!modelOptions?.length"
           icon="i-heroicons-cpu-chip"
-          placeholder="请选择模型"
+          :placeholder="$t('agent.config.selectModel')"
           :loading="!modelOptions?.length"
         />
       </div>
@@ -54,10 +54,12 @@
 </template>
 
 <script setup lang="ts">
+import type { SelectOption } from "~/composables/api/types/select";
+
 const props = withDefaults(
   defineProps<{
-    providerOptions?: { label: string; value: string }[];
-    modelOptions?: { label: string; value: string }[];
+    providerOptions?: SelectOption[];
+    modelOptions?: SelectOption[];
     activeProvider?: {
       id: string;
       name: string;

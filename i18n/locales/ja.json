@@ -457,6 +457,7 @@
       "modelConfig": "モデル設定",
       "model": "モデル",
       "selectModel": "モデルを選択",
+      "selectProvider": "プロバイダーを選択",
       "temperature": "温度",
       "conservative": "保守的",
       "creative": "創造的",
@@ -504,5 +505,16 @@
       }
     },
     "confirmDelete": "このエージェントを削除してもよろしいですか？この操作は元に戻せません。"
+  },
+  "env": {
+    "title": "環境設定",
+    "current": "現在の環境",
+    "switch": "環境切り替え",
+    "dev": "開発環境",
+    "staging": "ステージング環境",
+    "prod": "本番環境",
+    "canary": "カナリア環境",
+    "blue": "ブルー環境",
+    "green": "グリーン環境"
   }
 }

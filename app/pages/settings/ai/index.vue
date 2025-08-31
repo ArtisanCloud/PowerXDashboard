@@ -47,7 +47,14 @@
               :items="envOptions"
               class="w-full"
               icon="i-heroicons-circle-stack"
-            />
+            >
+              <template #leading>
+                <div
+                  class="w-2 h-2 rounded-full"
+                  :class="`bg-${envStore.currentEnvColor}-500`"
+                ></div>
+              </template>
+            </USelect>
           </div>
 
           <!-- 垂直Tab -->
@@ -144,10 +151,12 @@ import ProviderModelForm from "~/components/settings/ai/ProviderModelForm.vue";
 import ModalityParamsForm from "~/components/settings/ai/ModalityParamsForm.vue";
 import TestPanel from "~/components/settings/ai/TestPanel.vue";
 import { useAISettingsStore } from "~/stores/aiSettings";
+import { useEnvStore, ENV_OPTIONS } from "~/stores/envStore";
 import type {
   Provider,
   SaveSettingsPayload,
 } from "~/composables/api/services/AISettingService";
+import type { SelectOption } from "~/composables/api/types/select";
 
 type Modality =
   | "llm"
@@ -179,32 +188,41 @@ const modalityTabs = [
 ] as const;
 
 const modality = ref<Modality>("llm");
-const envOptions = ["default", "staging", "production"];
-const env = ref<"default" | "staging" | "production">("default");
+
+// 使用环境store
+const envStore = useEnvStore();
+const envOptions = computed(() =>
+  ENV_OPTIONS.map((option) => ({
+    label: option.label,
+    value: option.value,
+  }))
+);
+const env = computed({
+  get: () => envStore.currentEnv,
+  set: (value: string) => envStore.setCurrentEnv(value),
+});
 
 /**
  * Provider 列表与模型目录（从 store 获取）
  */
-const providerOptions = computed(() => {
+const providerOptions = computed<SelectOption[]>(() => {
   const providers = aiSettingsStore.providers;
-  // console.log("providers from store", providers, typeof providers);
+  const placeholder: SelectOption = {
+    label: $t("agent.config.selectProvider"),
+    value: null,
+  };
 
-  // 确保 providers 是数组
   if (!Array.isArray(providers)) {
     console.warn("providers 不是数组:", providers);
-    return [];
+    return [placeholder];
   }
 
-  // 返回 {label, value} 格式，基于后端的 id 和 name 字段
-  return providers.map((p: Provider) => {
-    // console.log(p);
-    const item = {
-      label: p.Name,
-      value: p.ID!,
-    };
-    // console.log(item);
-    return item;
-  });
+  const options = providers.map((p: Provider) => ({
+    label: p.Name,
+    value: p.ID!,
+  }));
+
+  return [placeholder, ...options];
 });
 
 // 当前选中的 Provider
@@ -220,8 +238,8 @@ const activeModel = computed(
  * 各模态的 state（包含 Provider/Model/凭证 + 模态参数）
  */
 type BaseConn = {
-  provider: string;
-  model: string;
+  provider: string | null;
+  model: string | null;
   apiKey: string;
   baseURL: string;
   region: string;
@@ -237,8 +255,8 @@ const llm = reactive<
     stream: boolean;
   }
 >({
-  provider: "OpenAI",
-  model: "gpt-4o-mini",
+  provider: null,
+  model: null,
   apiKey: "",
   baseURL: "",
   region: "",
@@ -414,21 +432,27 @@ const currentState = computed<any>({
 /**
  * ProviderModelForm 的 Model 下拉选项：从后端获取
  */
-const modelOptions = computed(() => {
+const modelOptions = computed<SelectOption[]>(() => {
   const models = aiSettingsStore.models;
-  // console.log("models from store", models, typeof models);
+  const placeholder: SelectOption = {
+    label: $t("agent.config.selectModel"),
+    value: null,
+  };
 
-  // 确保 models 是数组
   if (!Array.isArray(models)) {
     console.warn("models 不是数组:", models);
-    return [];
+    return [placeholder];
   }
 
-  // 返回 {label, value} 格式
-  return models.map((model) => ({
+  // 可选：去重 + 过滤空值
+  const uniq = Array.from(new Set(models)).filter((m) => !!m);
+
+  const options = uniq.map((model) => ({
     label: model,
     value: model,
   }));
+
+  return [placeholder, ...options];
 });
 
 async function onProviderChanged(nextProvider?: string) {
@@ -590,6 +614,9 @@ async function testQuickCall() {
 // 页面初始化
 onMounted(async () => {
   try {
+    // 初始化环境store
+    envStore.initialize();
+
     // 等待全局初始化完成（如果还没完成的话）
     if (aiSettingsStore.loading) {
       console.log("等待全局初始化完成...");

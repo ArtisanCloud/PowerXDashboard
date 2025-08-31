@@ -749,6 +749,7 @@
       "modelConfig": "Model Configuration",
       "model": "Model",
       "selectModel": "Select Model",
+      "selectProvider": "Select Provider",
       "temperature": "Temperature",
       "conservative": "Conservative",
       "creative": "Creative",
@@ -796,6 +797,50 @@
       }
     },
     "confirmDelete": "Are you sure you want to delete this Agent? This action cannot be undone."
+  },
+  "env": {
+    "title": "Environment Configuration",
+    "current": "Current Environment",
+    "switch": "Switch Environment",
+    "dev": "Development",
+    "staging": "Staging",
+    "prod": "Production",
+    "canary": "Canary",
+    "blue": "Blue",
+    "green": "Green"
+  },
+  "system": {
+    "info": {
+      "title": "System Information",
+      "appName": "Application Name",
+      "appVersion": "Application Version"
+    },
+    "language": {
+      "title": "Language Settings",
+      "current": "Current Language",
+      "available": "Available Languages",
+      "forced": "Forced Language"
+    },
+    "theme": {
+      "title": "Theme Settings",
+      "current": "Current Theme",
+      "available": "Available Themes",
+      "forced": "Forced Theme"
+    },
+    "debug": {
+      "title": "Debug Information",
+      "languageSwitch": "Language Switch",
+      "themeSwitch": "Theme Switch",
+      "userPreferences": "User Preferences"
+    },
+    "actions": {
+      "reset": "Reset Configuration",
+      "showConfig": "Show Configuration"
+    }
+  },
+  "common": {
+    "enabled": "Enabled",
+    "disabled": "Disabled"
   },
   "workflow": {
     "title": "Workflow Editor",
