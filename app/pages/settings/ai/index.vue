@@ -87,8 +87,6 @@
             {{ currentTitle }} - 通用
           </div>
           <ProviderModelForm
-            :provider="activeProvider"
-            :model="activeModel"
             :provider-options="providerOptions"
             :model-options="modelOptions"
             :state="currentState"
@@ -486,32 +484,30 @@ async function saveSettings() {
   try {
     const currentConfig = currentState.value;
 
-    const payload: SaveSettingsPayload = {
+    // 构建嵌套的数据结构，类似测试连接的格式
+    const payload = {
+      env: env.value,
       modality: modality.value,
-      provider: currentConfig.provider,
-      model: currentConfig.model,
-      label: `${modality.value}-${currentConfig.provider}`,
-      defaults: {
-        maxTokens: currentConfig.maxTokens || 4096,
-        stream:
-          currentConfig.stream !== undefined ? currentConfig.stream : true,
-        temperature: currentConfig.temperature || 0.7,
-        topP: currentConfig.topP || 1,
-      },
-      credentials: {
-        name: `${currentConfig.provider.toLowerCase()}-${env.value}`,
-        provider: currentConfig.provider.toLowerCase(),
-        authScheme: "bearer",
-        data: {
-          api_key: currentConfig.apiKey || "",
-          base_url: currentConfig.baseURL || "",
-          organization: currentConfig.organization || "",
-          region: currentConfig.region || "",
-          azure_deployment: currentConfig.azureDeployment || "",
-        },
+      [modality.value]: {
+        provider: currentConfig.provider,
+        model: currentConfig.model,
+        apiKey: currentConfig.apiKey || "",
+        baseURL: currentConfig.baseURL || "",
+        organization: currentConfig.organization || "",
+        region: currentConfig.region || "",
+        azureDeployment: currentConfig.azureDeployment || "",
+        // 添加模态特定的参数
+        ...(modality.value === "llm" && {
+          temperature: currentConfig.temperature || 0.7,
+          maxTokens: currentConfig.maxTokens || 4096,
+          topP: currentConfig.topP || 1,
+          stream:
+            currentConfig.stream !== undefined ? currentConfig.stream : true,
+        }),
       },
     };
 
+    console.log("保存设置请求参数:", payload);
     await aiSettingsStore.saveSettings(payload);
   } catch (error) {
     console.error("保存设置失败:", error);
@@ -543,13 +539,22 @@ async function resetSettings() {
 
 async function testConnection() {
   try {
-    const config = currentState.value;
-    await aiSettingsStore.testConnection(config.provider, {
-      api_key: config.apiKey,
-      base_url: config.baseURL,
-      organization: config.organization,
-      region: config.region,
-    });
+    const payload = {
+      env: "default",
+      modality: modality.value,
+      [modality.value]: {
+        provider: currentState.value.provider,
+        model: currentState.value.model,
+        apiKey: currentState.value.apiKey,
+        baseURL: currentState.value.baseURL,
+        organization: currentState.value.organization,
+        region: currentState.value.region,
+        azureDeployment: currentState.value.azureDeployment,
+      },
+    };
+
+    console.log("测试连接请求参数:", payload);
+    await aiSettingsStore.testConnection(currentState.value.provider, payload);
   } catch (error) {
     console.error("连接测试失败:", error);
   }
@@ -557,13 +562,27 @@ async function testConnection() {
 
 async function testQuickCall() {
   try {
-    const config = currentState.value;
-    await aiSettingsStore.testQuickCall(config.provider, config.model, {
-      api_key: config.apiKey,
-      base_url: config.baseURL,
-      organization: config.organization,
-      region: config.region,
-    });
+    const payload = {
+      env: "default",
+      modality: modality.value,
+      [modality.value]: {
+        provider: currentState.value.provider,
+        model: currentState.value.model,
+        apiKey: currentState.value.apiKey,
+        baseURL: currentState.value.baseURL,
+        organization: currentState.value.organization,
+        region: currentState.value.region,
+        azureDeployment: currentState.value.azureDeployment,
+      },
+    };
+
+    console.log("快速调用测试请求参数:", payload);
+    await aiSettingsStore.testQuickCall(
+      currentState.value.provider,
+      currentState.value.model,
+      payload,
+      "Hello, this is a test message."
+    );
   } catch (error) {
     console.error("快速调用测试失败:", error);
   }

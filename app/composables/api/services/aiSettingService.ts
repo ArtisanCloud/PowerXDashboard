@@ -42,27 +42,96 @@ export interface AgentCredential extends PowerModel {
 }
 
 export interface SaveSettingsPayload {
+  env?: string;
   modality: string;
-  provider: string;
-  model: string;
-  label?: string;
-  defaults: {
-    maxTokens: number;
-    stream: boolean;
-    temperature: number;
-    topP: number;
-  };
-  credentials: {
-    name: string;
+  llm?: {
     provider: string;
-    authScheme: string;
-    data: {
-      api_key: string;
-      azure_deployment?: string;
-      base_url: string;
-      organization?: string;
-      region?: string;
-    };
+    model: string;
+    apiKey?: string;
+    baseURL?: string;
+    organization?: string;
+    region?: string;
+    azureDeployment?: string;
+    temperature?: number;
+    maxTokens?: number;
+    topP?: number;
+    stream?: boolean;
+  };
+  image?: {
+    provider: string;
+    model: string;
+    apiKey?: string;
+    baseURL?: string;
+    organization?: string;
+    region?: string;
+    azureDeployment?: string;
+    size?: string;
+    quality?: string;
+    format?: string;
+    promptHint?: string;
+  };
+  embedding?: {
+    provider: string;
+    model: string;
+    apiKey?: string;
+    baseURL?: string;
+    organization?: string;
+    region?: string;
+    azureDeployment?: string;
+    dimensions?: number;
+    truncate?: string;
+    batch?: number;
+  };
+  audio_tts?: {
+    provider: string;
+    model: string;
+    apiKey?: string;
+    baseURL?: string;
+    organization?: string;
+    region?: string;
+    azureDeployment?: string;
+    voice?: string;
+    speed?: number;
+    format?: string;
+    quality?: string;
+  };
+  audio_asr?: {
+    provider: string;
+    model: string;
+    apiKey?: string;
+    baseURL?: string;
+    organization?: string;
+    region?: string;
+    azureDeployment?: string;
+    language?: string;
+    responseFormat?: string;
+    temperature?: number;
+    prompt?: string;
+  };
+  video?: {
+    provider: string;
+    model: string;
+    apiKey?: string;
+    baseURL?: string;
+    organization?: string;
+    region?: string;
+    azureDeployment?: string;
+    resolution?: string;
+    fps?: number;
+    maxDurationSec?: number;
+    promptHint?: string;
+  };
+  rerank?: {
+    provider: string;
+    model: string;
+    apiKey?: string;
+    baseURL?: string;
+    organization?: string;
+    region?: string;
+    azureDeployment?: string;
+    topK?: number;
+    returnDocuments?: boolean;
+    maxChunksPerDoc?: number;
   };
 }
 

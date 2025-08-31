@@ -254,7 +254,14 @@ export const useAISettingsStore = defineStore("aiSettings", {
     async saveSettings(payload: SaveSettingsPayload) {
       this.saving = true;
       try {
-        const result = await AISettingService.saveSettings(payload);
+        // 转换字段名以匹配后端期望的格式
+        const transformedPayload = {
+          ...payload,
+          // 如果 payload 中有 env 字段，转换为 Env
+          ...(payload.env && { Env: payload.env }),
+        };
+
+        const result = await AISettingService.saveSettings(transformedPayload);
         if (result.ok) {
           // 重新获取配置文件和凭证
           await Promise.all([this.fetchProfiles(), this.fetchCredentials()]);
@@ -273,13 +280,10 @@ export const useAISettingsStore = defineStore("aiSettings", {
     /**
      * 测试连接
      */
-    async testConnection(provider: string, credentials: any) {
+    async testConnection(provider: string, payload: any) {
       this.testing = true;
       try {
-        const result = await AISettingService.testConnection({
-          provider,
-          credentials,
-        });
+        const result = await AISettingService.testConnection(payload);
         this.lastTestMessage = `连接测试成功 - Provider: ${provider}`;
         return result;
       } catch (error) {
@@ -297,15 +301,13 @@ export const useAISettingsStore = defineStore("aiSettings", {
     async testQuickCall(
       provider: string,
       model: string,
-      credentials: any,
+      payload: any,
       message = "Hello, this is a test message."
     ) {
       this.testing = true;
       try {
         const result = await AISettingService.testQuickCall({
-          provider,
-          model,
-          credentials,
+          ...payload,
           message,
         });
         this.lastTestMessage = `快速调用测试成功 - Model: ${model}`;
