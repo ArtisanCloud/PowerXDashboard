@@ -3,7 +3,7 @@ import {
   useAuthService,
   type User,
   type UserFilters,
-} from "~/composables/api/services";
+} from "~/composables/api/services/authService";
 import type { PaginatedResponse } from "~/composables/api/types/types";
 
 /**

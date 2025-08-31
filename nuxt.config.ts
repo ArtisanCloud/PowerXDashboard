@@ -15,6 +15,27 @@ export default defineNuxtConfig({
     public: {
       apiBase: "/api", // 前端请求 /api/**，对应后台的 /api/**
       wsUrl: "/ws", // 如果要同域 WS，可再配反代；暂时可用你现有的 ws://localhost:3001/ws
+
+      // 语言配置
+      defaultLanguage: process.env.NUXT_DEFAULT_LANGUAGE || "zh",
+      availableLanguages: process.env.NUXT_AVAILABLE_LANGUAGES || "zh,en,ja,ko",
+      forceLanguage: process.env.NUXT_FORCE_LANGUAGE || undefined,
+      enableLanguageSwitch: process.env.NUXT_ENABLE_LANGUAGE_SWITCH !== "false",
+
+      // 主题配置
+      defaultTheme: process.env.NUXT_DEFAULT_THEME || "auto",
+      availableThemes: process.env.NUXT_AVAILABLE_THEMES || "light,dark,auto",
+      forceTheme: process.env.NUXT_FORCE_THEME || undefined,
+      enableThemeSwitch: process.env.NUXT_ENABLE_THEME_SWITCH !== "false",
+
+      // 应用配置
+      appName: process.env.NUXT_APP_NAME || "PowerX Admin",
+      appVersion: process.env.NUXT_APP_VERSION || "1.0.0",
+      debugMode: process.env.NUXT_DEBUG_MODE === "true",
+
+      // 功能开关
+      enableUserPreferences:
+        process.env.NUXT_ENABLE_USER_PREFERENCES !== "false",
     },
   },
 
@@ -37,7 +58,7 @@ export default defineNuxtConfig({
   },
   srcDir: "app",
   devtools: { enabled: true },
-  modules: ["@nuxt/ui", "@nuxt/icon", "@nuxtjs/i18n"],
+  modules: ["@nuxt/ui", "@nuxt/icon", "@nuxtjs/i18n", "@pinia/nuxt"],
   css: ["~/assets/css/main.css", "@/assets/scss/main.scss"],
   compatibilityDate: "2024-11-01",
   ui: { fonts: false },
@@ -49,7 +70,7 @@ export default defineNuxtConfig({
 
   // i18n 配置
   i18n: {
-    defaultLocale: "zh",
+    defaultLocale: process.env.NUXT_DEFAULT_LANGUAGE || "zh",
     locales: [
       { code: "zh", name: "简体中文", file: "zh.json" },
       { code: "en", name: "English", file: "en.json" },
@@ -62,7 +83,7 @@ export default defineNuxtConfig({
       cookieKey: "i18n_redirected",
       redirectOn: "no prefix",
       alwaysRedirect: false,
-      fallbackLocale: "zh",
+      fallbackLocale: process.env.NUXT_DEFAULT_LANGUAGE || "zh",
     },
   },
 

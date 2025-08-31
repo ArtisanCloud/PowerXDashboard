@@ -1,5 +1,6 @@
 import { useApiClient } from "../index";
 import type { ApiResponse } from "../types/types";
+import { useOneShotAlert } from "../../useOneShotAlert";
 
 // 部门接口定义
 export interface Department {
@@ -8,6 +9,9 @@ export interface Department {
   sort?: number;
   leader_member_id?: number | null;
   parent_id?: number | null;
+  key?: string;
+  status?: number;
+  meta?: any;
   children?: Department[];
 }
 
@@ -66,7 +70,7 @@ function normalizeDepartmentTree(departments: any[]): Department[] {
  */
 export function useDepartmentService() {
   const apiClient = useApiClient();
-  const baseUrl = "/admin/organization/departments";
+  const baseUrl = "/admin/iam/departments";
 
   return {
     /**
@@ -75,15 +79,24 @@ export function useDepartmentService() {
      */
     getDepartmentTree: async (): Promise<Department[]> => {
       try {
-        const res = await apiClient.get<ApiResponse<Department[]>>(
-          `${baseUrl}/tree`
-        );
+        // 先尝试 /tree 端点
+        let res;
+        try {
+          res = await apiClient.get<ApiResponse<Department[]>>(
+            `${baseUrl}/tree`
+          );
+        } catch (treeError: any) {
+          console.warn("尝试 /tree 端点失败，尝试使用基础端点:", treeError);
+          // 如果 /tree 不存在，尝试使用基础端点
+          res = await apiClient.get<ApiResponse<Department[]>>(baseUrl);
+        }
+
         const serverResp = res?.data ?? res;
-        // console.log("获取部门树形结构成功:", serverResp);
+        // console.log("获取部门数据成功:", serverResp);
         return parseDepartmentsFromResponse(serverResp);
       } catch (error) {
-        console.error("获取部门树形结构失败:", error);
-        return [];
+        throw error;
+        // return [];
       }
     },
 
@@ -99,10 +112,10 @@ export function useDepartmentService() {
           data
         );
         const serverResp = res?.data ?? res;
-        return serverResp.data;
+        return serverResp;
       } catch (error) {
         console.error("创建部门失败:", error);
-        return null;
+        throw error;
       }
     },
 
@@ -114,15 +127,17 @@ export function useDepartmentService() {
       data: DepartmentUpdateParams
     ): Promise<Department | null> => {
       try {
-        const res = await apiClient.put<ApiResponse<Department>>(
+        const res = await apiClient.patch<ApiResponse<Department>>(
           `${baseUrl}/${id}`,
           data
         );
         const serverResp = res?.data ?? res;
-        return serverResp.data;
+        // 成功提醒
+        return serverResp;
       } catch (error) {
         console.error("更新部门失败:", error);
-        return null;
+        // 失败提醒
+        throw error;
       }
     },
 
@@ -134,8 +149,7 @@ export function useDepartmentService() {
         await apiClient.delete<ApiResponse<null>>(`${baseUrl}/${id}`);
         return true;
       } catch (error) {
-        console.error("删除部门失败:", error);
-        return false;
+        throw error;
       }
     },
 
@@ -150,8 +164,7 @@ export function useDepartmentService() {
         const serverResp = res?.data ?? res;
         return serverResp.data;
       } catch (error) {
-        console.error("获取部门信息失败:", error);
-        return null;
+        throw error;
       }
     },
   };

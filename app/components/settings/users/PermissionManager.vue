@@ -1,315 +1,137 @@
 <script setup lang="ts">
-import { ref, reactive, computed, h, resolveComponent } from "vue";
+import {
+  ref,
+  reactive,
+  computed,
+  h,
+  resolveComponent,
+  watchEffect,
+  onMounted,
+  watch,
+} from "vue";
+import { watchDebounced } from "@vueuse/core";
 import { useI18n } from "#imports";
+import { storeToRefs } from "pinia";
+import { useRoleStore } from "~/stores/role";
+import { usePermissionStore } from "~/stores/permission"; // ✅ 权限 store
+import SelectTree from "~/components/ui/SelectTree.vue";
+import { useOneShotAlert } from "~/composables/useOneShotAlert";
+import { useTenantService } from "~/composables/api/services/tenantService";
+import { normalizeApiError } from "~/composables/api/normalizeApiError";
 
 const { t, locale } = useI18n();
+const { notifyOnce, visible, title, description, color, variant, hide } =
+  useOneShotAlert();
 
+const tenantService = useTenantService();
+
+/** ====== 类型 ====== */
 type Role = {
   id: number;
   name: string;
   code: string;
-  description: string;
-  userCount: number;
-  isSystem: boolean;
+  description?: string;
+  userCount?: number;
+  builtin?: boolean; // ✅ 与模板字段一致
 };
 
 type Permission = {
   id: number;
+  plugin?: string;
+  resource?: string;
+  action?: string;
   name: string;
   code: string;
   module: string;
-  description: string;
+  description?: string;
   type: "menu" | "action" | "data" | "api";
   apiEndpoint?: string;
   httpMethod?: "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
   dataScope?: "own" | "department" | "company" | "all";
 };
 
-// 模拟角色数据
-const roles = ref<Role[]>([
-  {
-    id: 1,
-    name: "超级管理员",
-    code: "super_admin",
-    description: "拥有系统所有权限",
-    userCount: 2,
-    isSystem: true,
-  },
-  {
-    id: 2,
-    name: "管理员",
-    code: "admin",
-    description: "拥有大部分系统管理权限",
-    userCount: 5,
-    isSystem: true,
-  },
-  {
-    id: 3,
-    name: "编辑",
-    code: "editor",
-    description: "可以管理内容和部分用户",
-    userCount: 8,
-    isSystem: true,
-  },
-  {
-    id: 4,
-    name: "用户",
-    code: "user",
-    description: "基本系统访问权限",
-    userCount: 15,
-    isSystem: true,
-  },
-  {
-    id: 5,
-    name: "市场专员",
-    code: "marketing",
-    description: "市场部门专用角色",
-    userCount: 6,
-    isSystem: false,
-  },
-]);
+/** ====== Pinia Store ====== */
+const roleStore = useRoleStore();
+const { roles } = storeToRefs(roleStore);
+roleStore.ensureInitialized?.();
 
-// 模拟权限数据
-const permissions = ref<Permission[]>([
-  // 用户管理权限
-  {
-    id: 1,
-    name: "查看用户",
-    code: "user:view",
-    module: "用户管理",
-    description: "查看用户列表和详情",
-    type: "menu",
-  },
-  {
-    id: 2,
-    name: "创建用户",
-    code: "user:create",
-    module: "用户管理",
-    description: "创建新用户",
-    type: "action",
-  },
-  {
-    id: 3,
-    name: "编辑用户",
-    code: "user:edit",
-    module: "用户管理",
-    description: "编辑现有用户信息",
-    type: "action",
-  },
-  {
-    id: 4,
-    name: "删除用户",
-    code: "user:delete",
-    module: "用户管理",
-    description: "删除用户",
-    type: "action",
-  },
-  // 用户API权限
-  {
-    id: 101,
-    name: "用户列表API",
-    code: "api:user:list",
-    module: "用户管理",
-    description: "获取用户列表的API访问权限",
-    type: "api",
-    apiEndpoint: "/api/users",
-    httpMethod: "GET",
-  },
-  {
-    id: 102,
-    name: "创建用户API",
-    code: "api:user:create",
-    module: "用户管理",
-    description: "创建用户的API访问权限",
-    type: "api",
-    apiEndpoint: "/api/users",
-    httpMethod: "POST",
-  },
-  // 用户数据权限
-  {
-    id: 201,
-    name: "用户敏感数据",
-    code: "data:user:sensitive",
-    module: "用户管理",
-    description: "访问用户敏感信息（如手机号、邮箱）",
-    type: "data",
-    dataScope: "department",
-  },
+const permissionStore = usePermissionStore();
+const { normalizedList, roleSelection } = storeToRefs(permissionStore);
 
-  // 部门管理权限
-  {
-    id: 5,
-    name: "查看部门",
-    code: "department:view",
-    module: "部门管理",
-    description: "查看部门列表和详情",
-    type: "menu",
-  },
-  {
-    id: 6,
-    name: "创建部门",
-    code: "department:create",
-    module: "部门管理",
-    description: "创建新部门",
-    type: "action",
-  },
-  {
-    id: 7,
-    name: "编辑部门",
-    code: "department:edit",
-    module: "部门管理",
-    description: "编辑现有部门信息",
-    type: "action",
-  },
-  {
-    id: 8,
-    name: "删除部门",
-    code: "department:delete",
-    module: "部门管理",
-    description: "删除部门",
-    type: "action",
-  },
+// 租户相关状态
+interface TreeNode {
+  label: string;
+  value: string;
+  children?: TreeNode[];
+  disabled?: boolean;
+  icon?: string;
+}
 
-  // 角色权限管理
-  {
-    id: 9,
-    name: "查看角色",
-    code: "role:view",
-    module: "权限管理",
-    description: "查看角色列表和详情",
-    type: "menu",
-  },
-  {
-    id: 10,
-    name: "创建角色",
-    code: "role:create",
-    module: "权限管理",
-    description: "创建新角色",
-    type: "action",
-  },
-  {
-    id: 11,
-    name: "编辑角色",
-    code: "role:edit",
-    module: "权限管理",
-    description: "编辑现有角色信息",
-    type: "action",
-  },
-  {
-    id: 12,
-    name: "删除角色",
-    code: "role:delete",
-    module: "权限管理",
-    description: "删除角色",
-    type: "action",
-  },
+const selectedTenant = ref<string | null>(null);
+const tenants = ref<any[]>([]);
+const loadingTenants = ref(false);
+const isRootUser = ref(true); // 假设当前是 root 用户，实际应该从用户状态获取
 
-  // 系统设置权限
-  {
-    id: 13,
-    name: "查看设置",
-    code: "setting:view",
-    module: "系统设置",
-    description: "查看系统设置",
-    type: "menu",
-  },
-  {
-    id: 14,
-    name: "修改设置",
-    code: "setting:edit",
-    module: "系统设置",
-    description: "修改系统设置",
-    type: "action",
-  },
-
-  // 内容管理权限
-  {
-    id: 15,
-    name: "查看内容",
-    code: "content:view",
-    module: "内容管理",
-    description: "查看内容列表和详情",
-    type: "menu",
-  },
-  {
-    id: 16,
-    name: "创建内容",
-    code: "content:create",
-    module: "内容管理",
-    description: "创建新内容",
-    type: "action",
-  },
-  {
-    id: 17,
-    name: "编辑内容",
-    code: "content:edit",
-    module: "内容管理",
-    description: "编辑现有内容",
-    type: "action",
-  },
-  {
-    id: 18,
-    name: "删除内容",
-    code: "content:delete",
-    module: "内容管理",
-    description: "删除内容",
-    type: "action",
-  },
-
-  // 产品管理权限
-  {
-    id: 19,
-    name: "查看产品",
-    code: "product:view",
-    module: "产品管理",
-    description: "查看产品列表和详情",
-    type: "menu",
-  },
-  {
-    id: 20,
-    name: "创建产品",
-    code: "product:create",
-    module: "产品管理",
-    description: "创建新产品",
-    type: "action",
-  },
-  {
-    id: 21,
-    name: "编辑产品",
-    code: "product:edit",
-    module: "产品管理",
-    description: "编辑现有产品信息",
-    type: "action",
-  },
-  {
-    id: 22,
-    name: "删除产品",
-    code: "product:delete",
-    module: "产品管理",
-    description: "删除产品",
-    type: "action",
-  },
-]);
-
-// 角色权限映射
-const rolePermissions = ref<Record<number, number[]>>({
-  1: [
-    1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21,
-    22, 101, 102, 201,
-  ],
-  2: [1, 2, 3, 5, 6, 7, 9, 10, 11, 13, 15, 16, 17, 19, 20, 21, 101],
-  3: [1, 5, 9, 13, 15, 16, 17, 19],
-  4: [1, 5, 9, 15, 19],
-  5: [1, 5, 15, 16, 17, 19, 20, 21],
+// 租户树形选项计算属性
+const tenantTreeItems = computed<TreeNode[]>(() => {
+  return tenants.value.map((t) => ({
+    label: t.name,
+    value: String(t.id),
+    icon: "i-heroicons-building-office",
+    disabled: t.status === 0, // 假设 status 为 0 表示禁用
+  }));
 });
 
-// 当前选中的角色
-const selectedRole = ref<Role>(roles.value[0]);
+// 监听租户选择变化，同步到表单
+watch(selectedTenant, (tenantId) => {
+  roleForm.tenant_id = tenantId ? parseInt(tenantId) : undefined;
+});
 
-// 搜索关键词
+/** 页面展示用权限数组 */
+const getPermissionDisplayName = (perm: Permission) => {
+  const segs = [
+    (perm as any).plugin,
+    (perm as any).resource,
+    (perm as any).action,
+  ].filter(Boolean);
+  if (segs.length === 3) return segs.join(".");
+
+  // 很多项目会把 “plugin.resource.action” 放在 code 里
+  if (perm.code && perm.code.includes(".")) return perm.code;
+
+  if (import.meta.dev) {
+    if (
+      !(perm as any).plugin ||
+      !(perm as any).resource ||
+      !(perm as any).action
+    ) {
+      console.warn("权限缺少 plugin/resource/action：", perm);
+    }
+  }
+
+  // 兜底：name
+  return perm.name;
+};
+
+const permissions = computed<Permission[]>(() => normalizedList.value as any);
+
+/** ====== 当前选中角色 ====== */
+const selectedRole = ref<Role | null>((roles.value as any[])[0] ?? null);
+watchEffect(() => {
+  if (!selectedRole.value && roles.value.length > 0) {
+    selectedRole.value = roles.value[0] as unknown as Role;
+  }
+});
+
+/** 选中角色变化时拉取其权限ID */
+watch(selectedRole, async (r) => {
+  if (r?.id) {
+    await permissionStore.fetchRolePermissionIDs(r.id);
+  }
+});
+
+/** ====== 搜索 & 表单状态 ====== */
 const searchQuery = ref("");
-
-// 角色表单
 const showRoleForm = ref(false);
 const isEditing = ref(false);
 const editingId = ref<number | null>(null);
@@ -318,308 +140,320 @@ const roleForm = reactive({
   name: "",
   code: "",
   description: "",
+  scope: "tenant" as "system" | "tenant",
+  tenant_id: undefined as number | undefined,
   permissions: [] as number[],
 });
 
-// 权限分组 - 按模块和类型分组
+/** ====== 首屏加载权限 & 当前角色权限 ====== */
+onMounted(async () => {
+  await permissionStore.fetchAllActive(); // ← 改成全量拉取
+  if (selectedRole.value?.id) {
+    await permissionStore.fetchRolePermissionIDs(selectedRole.value.id);
+  }
+});
+
+/** 分组：module -> type -> Permission[] */
 const permissionGroups = computed(() => {
   const groups: Record<string, Record<string, Permission[]>> = {};
-
-  permissions.value.forEach((permission) => {
-    const module = permission.module;
-    const type = permission.type;
-
-    if (!groups[module]) {
-      groups[module] = {};
-    }
-    if (!groups[module][type]) {
-      groups[module][type] = [];
-    }
-    groups[module][type].push(permission);
-  });
-
+  for (const p of permissions.value) {
+    const m = p.module;
+    const t = p.type;
+    if (!groups[m]) groups[m] = {};
+    if (!groups[m][t]) groups[m][t] = [];
+    groups[m][t].push(p);
+  }
   return groups;
 });
 
-// 重置表单
+/** ====== 工具函数 ====== */
 const resetRoleForm = () => {
   roleForm.name = "";
   roleForm.code = "";
   roleForm.description = "";
+  roleForm.scope = "tenant";
+  roleForm.tenant_id = undefined;
   roleForm.permissions = [];
+  selectedTenant.value = null;
   isEditing.value = false;
   editingId.value = null;
 };
 
-// 打开新增表单
 const openAddRoleForm = () => {
   resetRoleForm();
+  loadTenantOptions(); // 加载租户选项
   showRoleForm.value = true;
 };
 
-// 打开编辑表单
+// 加载租户选项
+const loadTenantOptions = async () => {
+  if (!isRootUser.value) return;
+  loadingTenants.value = true;
+  try {
+    // 这里应该调用实际的租户 API
+    const response = await tenantService.getTenants({
+      page: 1,
+      page_size: 100,
+    });
+    if (response?.code === 200 && response.data) {
+      tenants.value = response.data.items;
+    }
+  } catch (err) {
+    console.error("加载租户列表失败:", err);
+  } finally {
+    loadingTenants.value = false;
+  }
+};
+
 const openEditRoleForm = (role: Role) => {
   roleForm.name = role.name;
   roleForm.code = role.code;
-  roleForm.description = role.description;
-  roleForm.permissions = rolePermissions.value[role.id] || [];
+  roleForm.description = role.description || "";
+  roleForm.permissions = [...(roleSelection.value[role.id] || [])];
   isEditing.value = true;
   editingId.value = role.id;
   showRoleForm.value = true;
 };
 
-// 保存角色
-const saveRole = () => {
+const saveRole = async () => {
   if (!roleForm.name || !roleForm.code) {
-    alert("请填写必填字段");
+    notifyOnce("请填写必填字段", "角色名称和代码为必填项", "warning" as const);
     return;
   }
-
-  if (isEditing.value && editingId.value !== null) {
-    // 编辑现有角色
-    const index = roles.value.findIndex((r) => r.id === editingId.value);
-    if (index !== -1) {
-      roles.value[index] = {
-        ...roles.value[index],
+  try {
+    if (isEditing.value && editingId.value !== null) {
+      // 更新角色
+      await roleStore.updateRole(editingId.value, {
         name: roleForm.name,
         code: roleForm.code,
         description: roleForm.description,
-      };
-      // 更新角色权限
-      rolePermissions.value[editingId.value] = [...roleForm.permissions];
-    }
-  } else {
-    // 添加新角色
-    const newId = Math.max(0, ...roles.value.map((r) => r.id)) + 1;
-    roles.value.push({
-      id: newId,
-      name: roleForm.name,
-      code: roleForm.code,
-      description: roleForm.description,
-      userCount: 0,
-      isSystem: false,
-    });
-    // 添加角色权限
-    rolePermissions.value[newId] = [...roleForm.permissions];
-  }
+      });
+      // 更新权限
+      roleSelection.value[editingId.value] = [...roleForm.permissions];
+      await permissionStore.setRolePermissionIDs(
+        editingId.value,
+        roleForm.permissions
+      );
+    } else {
+      // 创建角色（直接带权限）
+      const result = await roleStore.createRole({
+        name: roleForm.name,
+        code: roleForm.code,
+        description: roleForm.description,
+        scope: roleForm.scope,
+        tenant_id: roleForm.tenant_id, // 添加租户ID
+        perm_ids: roleForm.permissions, // 直接传递权限ID
+      });
 
-  showRoleForm.value = false;
-  resetRoleForm();
-};
-
-// 删除角色
-const deleteRole = (id: number) => {
-  const role = roles.value.find((r) => r.id === id);
-  if (role && role.isSystem) {
-    alert("系统角色不能删除");
-    return;
-  }
-
-  if (confirm("确定要删除此角色吗？")) {
-    roles.value = roles.value.filter((r) => r.id !== id);
-    // 删除角色权限
-    delete rolePermissions.value[id];
-  }
-};
-
-// 过滤后的角色列表
-const filteredRoles = computed(() => {
-  if (!searchQuery.value) return roles.value;
-
-  const query = searchQuery.value.toLowerCase();
-  return roles.value.filter(
-    (role) =>
-      role.name.toLowerCase().includes(query) ||
-      role.code.toLowerCase().includes(query) ||
-      role.description.toLowerCase().includes(query)
-  );
-});
-
-// 选择角色
-const selectRole = (role: Role) => {
-  selectedRole.value = role;
-};
-
-// 检查权限是否已分配给当前角色
-const hasPermission = (permissionId: number) => {
-  return (
-    rolePermissions.value[selectedRole.value.id]?.includes(permissionId) ||
-    false
-  );
-};
-
-// 切换权限
-const togglePermission = (permissionId: number) => {
-  const roleId = selectedRole.value.id;
-  if (!rolePermissions.value[roleId]) {
-    rolePermissions.value[roleId] = [];
-  }
-
-  const index = rolePermissions.value[roleId].indexOf(permissionId);
-  if (index === -1) {
-    rolePermissions.value[roleId].push(permissionId);
-  } else {
-    rolePermissions.value[roleId].splice(index, 1);
-  }
-};
-
-// 全选/取消全选模块权限
-const toggleModulePermissions = (module: string, checked: boolean) => {
-  const modulePermissionIds = permissions.value
-    .filter((p) => p.module === module)
-    .map((p) => p.id);
-
-  const roleId = selectedRole.value.id;
-  if (!rolePermissions.value[roleId]) {
-    rolePermissions.value[roleId] = [];
-  }
-
-  if (checked) {
-    // 添加所有模块权限
-    modulePermissionIds.forEach((id) => {
-      if (!rolePermissions.value[roleId].includes(id)) {
-        rolePermissions.value[roleId].push(id);
+      // 更新本地权限选择状态
+      if (result.role?.id) {
+        const finalPermIds = result.perm?.now || roleForm.permissions;
+        roleSelection.value[result.role.id] = [...finalPermIds];
+        // 同时更新初始态
+        permissionStore.roleInitialSelection[result.role.id] = [
+          ...finalPermIds,
+        ];
       }
+    }
+    showRoleForm.value = false;
+    resetRoleForm();
+  } catch (error) {
+    console.error("保存角色失败:", error);
+    const { title, description } = normalizeApiError(error, {
+      meta: "metaText",
     });
-  } else {
-    // 移除所有模块权限
-    rolePermissions.value[roleId] = rolePermissions.value[roleId].filter(
-      (id) => !modulePermissionIds.includes(id)
+    notifyOnce(
+      title || "保存角色失败",
+      description,
+      "error" as const,
+      "solid" as const
     );
   }
 };
 
-// 检查模块是否全选
-const isModuleFullySelected = (module: string) => {
-  const modulePermissionIds = permissions.value
-    .filter((p) => p.module === module)
-    .map((p) => p.id);
+const deleteRole = async (id: number) => {
+  const role = roles.value.find((r: any) => r.id === id) as Role | undefined;
+  if (role && role.builtin) {
+    notifyOnce(
+      "系统角色不能删除",
+      "内置角色受系统保护，无法删除",
+      "warning" as const
+    );
+    return;
+  }
+  if (confirm("确定要删除此角色吗？")) {
+    try {
+      await roleStore.deleteRole(id);
+      delete roleSelection.value[id];
+      if (selectedRole.value?.id === id) {
+        selectedRole.value = (roles.value[0] as any) ?? null;
+      }
+    } catch (error) {
+      console.error("删除角色失败:", error);
+      const { title, description } = normalizeApiError(error, {
+        meta: "metaText",
+      }); // ✨ 统一解析
+      notifyOnce(
+        title || "删除失败",
+        description,
+        "error" as const,
+        "solid" as const
+      );
+    }
+  }
+};
 
-  const roleId = selectedRole.value.id;
-  if (!rolePermissions.value[roleId]) return false;
-
-  return modulePermissionIds.every((id) =>
-    rolePermissions.value[roleId].includes(id)
+const filteredRoles = computed<Role[]>(() => {
+  if (!searchQuery.value) return roles.value as any;
+  const q = searchQuery.value.toLowerCase();
+  return (roles.value as any).filter(
+    (r: Role) =>
+      r.name.toLowerCase().includes(q) ||
+      r.code.toLowerCase().includes(q) ||
+      (r.description || "").toLowerCase().includes(q)
   );
+});
+
+const selectRole = (role: Role) => {
+  selectedRole.value = role;
 };
 
-// 检查模块是否部分选中
-const isModulePartiallySelected = (module: string) => {
-  const modulePermissionIds = permissions.value
+/** —— 当前角色权限 —— */
+const hasPermission = (permissionId: number) => {
+  const roleId = selectedRole.value?.id;
+  if (!roleId) return false;
+  return (roleSelection.value[roleId] || []).includes(permissionId);
+};
+
+// ✅ 新增：是否有改动（对比初始态）
+const dirty = computed(() => {
+  const roleId = selectedRole.value?.id;
+  if (!roleId) return false;
+  const cur = new Set(roleSelection.value[roleId] || []);
+  const init = new Set(permissionStore.roleInitialSelection[roleId] || []);
+  if (cur.size !== init.size) return true;
+  for (const id of cur) if (!init.has(id)) return true;
+  return false;
+});
+
+/** 勾选单个权限（列表页） */
+const togglePermission = (permissionId: number) => {
+  const roleId = selectedRole.value?.id;
+  if (!roleId) return;
+  const set = new Set(roleSelection.value[roleId] || []);
+  if (set.has(permissionId)) set.delete(permissionId);
+  else set.add(permissionId);
+  roleSelection.value[roleId] = Array.from(set);
+};
+
+/** 勾选整模块权限（列表页） */
+const toggleModulePermissions = (module: string, checked: boolean) => {
+  const roleId = selectedRole.value?.id;
+  if (!roleId) return;
+  const ids = permissions.value
     .filter((p) => p.module === module)
     .map((p) => p.id);
-
-  const roleId = selectedRole.value.id;
-  if (!rolePermissions.value[roleId]) return false;
-
-  const selectedCount = modulePermissionIds.filter((id) =>
-    rolePermissions.value[roleId].includes(id)
-  ).length;
-
-  return selectedCount > 0 && selectedCount < modulePermissionIds.length;
+  const set = new Set(roleSelection.value[roleId] || []);
+  if (checked) ids.forEach((id) => set.add(id));
+  else ids.forEach((id) => set.delete(id));
+  roleSelection.value[roleId] = Array.from(set);
 };
 
-// 权限类型相关辅助函数
-const getPermissionTypeLabel = (type: string) => {
-  const labels: Record<string, string> = {
-    menu: "菜单",
-    action: "操作",
-    data: "数据",
-    api: "API",
-  };
-  return labels[type] || type;
+const isModuleFullySelected = (module: string) => {
+  const roleId = selectedRole.value?.id;
+  if (!roleId) return false;
+  const ids = permissions.value
+    .filter((p) => p.module === module)
+    .map((p) => p.id);
+  const cur = new Set(roleSelection.value[roleId] || []);
+  return ids.length > 0 && ids.every((id) => cur.has(id));
 };
 
-const getPermissionTypeColor = (type: string) => {
-  const colors: Record<
-    string,
-    "primary" | "success" | "error" | "warning" | "neutral"
-  > = {
-    menu: "primary",
-    action: "success",
-    data: "error",
-    api: "warning",
-  };
-  return colors[type] || "neutral";
+const isModulePartiallySelected = (module: string) => {
+  const roleId = selectedRole.value?.id;
+  if (!roleId) return false;
+  const ids = permissions.value
+    .filter((p) => p.module === module)
+    .map((p) => p.id);
+  const cur = new Set(roleSelection.value[roleId] || []);
+  const picked = ids.filter((id) => cur.has(id)).length;
+  return picked > 0 && picked < ids.length;
 };
 
-// 获取权限名称的文字颜色类 - 更舒适的颜色搭配
-const getPermissionTextColor = (type: string) => {
-  const colors: Record<string, string> = {
-    menu: "text-blue-600", // 柔和的蓝色 - 菜单权限
-    action: "text-emerald-600", // 翠绿色 - 操作权限
-    data: "text-rose-600", // 玫瑰红 - 数据权限
-    api: "text-violet-600", // 紫罗兰色 - API权限
-  };
-  return colors[type] || "text-slate-600";
+/** 保存按钮：一次性提交 set-ids */
+const saving = ref(false);
+const saveRolePermissions = async () => {
+  const roleId = selectedRole.value?.id;
+  if (!roleId) return;
+  try {
+    saving.value = true;
+    const ids = roleSelection.value[roleId] || [];
+    await permissionStore.setRolePermissionIDs(roleId, ids);
+  } catch (e) {
+    console.error(e);
+    const { title, description } = normalizeApiError(e, {
+      meta: "metaText",
+    });
+    notifyOnce(
+      title || "保存权限失败",
+      description,
+      "error" as const,
+      "solid" as const
+    );
+  } finally {
+    saving.value = false;
+  }
 };
 
-const getHttpMethodColor = (method?: string) => {
-  const colors: Record<
-    string,
-    "primary" | "success" | "error" | "warning" | "neutral"
-  > = {
-    GET: "success",
-    POST: "primary",
-    PUT: "warning",
-    DELETE: "error",
-    PATCH: "warning",
-  };
-  return colors[method || ""] || "neutral";
-};
+/** 标签 & 颜色 */
+const getPermissionTypeLabel = (type: string) =>
+  (({ menu: "菜单", action: "操作", data: "数据", api: "API" }) as any)[type] ||
+  type;
+const getPermissionTypeColor = (m?: string) =>
+  (
+    ({
+      GET: "success",
+      POST: "primary",
+      PUT: "warning",
+      DELETE: "error",
+      PATCH: "warning",
+    }) as any
+  )[m || ""] || "neutral";
+const getDataScopeLabel = (s?: string) =>
+  (
+    ({
+      own: "仅自己",
+      department: "本部门",
+      company: "本公司",
+      all: "全部",
+    }) as any
+  )[s || ""] ||
+  s ||
+  "";
+const getPermissionTextColor = (type: string) =>
+  (
+    ({
+      menu: "text-blue-600",
+      action: "text-emerald-600",
+      data: "text-rose-600",
+      api: "text-violet-600",
+    }) as any
+  )[type] || "text-slate-600";
+const getTypeOrder = (type: string) =>
+  (({ menu: 1, action: 2, api: 3, data: 4 }) as any)[type] || 999;
+const getSortedTypes = (types: string[]) =>
+  types.sort((a, b) => getTypeOrder(a) - getTypeOrder(b));
 
-const getDataScopeLabel = (scope?: string) => {
-  const labels: Record<string, string> = {
-    own: "仅自己",
-    department: "本部门",
-    company: "本公司",
-    all: "全部",
-  };
-  return labels[scope || ""] || scope || "";
-};
-
-// 权限类型排序
-const getTypeOrder = (type: string) => {
-  const order: Record<string, number> = {
-    menu: 1,
-    action: 2,
-    api: 3,
-    data: 4,
-  };
-  return order[type] || 999;
-};
-
-// 获取排序后的权限类型
-const getSortedTypes = (types: string[]) => {
-  return types.sort((a, b) => getTypeOrder(a) - getTypeOrder(b));
-};
-
-// ====== ✅ Nuxt UI 3.3+：TanStack 列定义 ======
+/** ====== Nuxt UI / TanStack ====== */
 const UButton = resolveComponent("UButton");
 
+/** （如需表格列配置，可保留） */
 const roleColumns = computed(() => {
-  const _ = locale.value; // 显式依赖，切换语言时重算
+  const _ = locale.value; // 响应式依赖
   return [
-    {
-      id: "name",
-      accessorKey: "name",
-      header: "角色名称",
-    },
-    {
-      id: "code",
-      accessorKey: "code",
-      header: "角色代码",
-    },
-    {
-      id: "description",
-      accessorKey: "description",
-      header: "描述",
-    },
-    {
-      id: "userCount",
-      accessorKey: "userCount",
-      header: "用户数量",
-    },
+    { id: "name", accessorKey: "name", header: "角色名称" },
+    { id: "code", accessorKey: "code", header: "角色代码" },
+    { id: "description", accessorKey: "description", header: "描述" },
     {
       id: "actions",
       header: "操作",
@@ -639,12 +473,12 @@ const roleColumns = computed(() => {
               },
               { default: () => "编辑" }
             ),
-            !role.isSystem &&
+            !role.builtin &&
               h(
                 UButton,
                 {
                   size: "xs",
-                  color: "error",
+                  color: "red",
                   variant: "ghost",
                   icon: "i-heroicons-trash",
                   onClick: () => deleteRole(role.id),
@@ -658,20 +492,16 @@ const roleColumns = computed(() => {
   ];
 });
 
-// ====== 表单内（新增/编辑角色弹窗）用到的权限选择辅助 ======
+/** ====== 表单内权限选择（弹窗） ====== */
 const formModulePermissionIds = (module: string) =>
   permissions.value.filter((p) => p.module === module).map((p) => p.id);
-
-const hasFormPermission = (permissionId: number) => {
-  return roleForm.permissions.includes(permissionId);
-};
-
+const hasFormPermission = (permissionId: number) =>
+  roleForm.permissions.includes(permissionId);
 const toggleFormPermission = (permissionId: number) => {
   const i = roleForm.permissions.indexOf(permissionId);
   if (i === -1) roleForm.permissions.push(permissionId);
   else roleForm.permissions.splice(i, 1);
 };
-
 const toggleFormModulePermissions = (module: string, checked: boolean) => {
   const ids = formModulePermissionIds(module);
   if (checked) {
@@ -684,12 +514,10 @@ const toggleFormModulePermissions = (module: string, checked: boolean) => {
     );
   }
 };
-
 const isFormModuleFullySelected = (module: string) => {
   const ids = formModulePermissionIds(module);
   return ids.length > 0 && ids.every((id) => roleForm.permissions.includes(id));
 };
-
 const isFormModulePartiallySelected = (module: string) => {
   const ids = formModulePermissionIds(module);
   const picked = ids.filter((id) => roleForm.permissions.includes(id)).length;
@@ -709,9 +537,24 @@ const isFormModulePartiallySelected = (module: string) => {
           {{ $t("organization.permission.description") }}
         </p>
       </div>
-      <UButton color="primary" icon="i-heroicons-plus" @click="openAddRoleForm">
-        {{ $t("organization.permission.add") }}
-      </UButton>
+      <div class="flex gap-3">
+        <UButton
+          :loading="saving"
+          :disabled="!dirty"
+          color="primary"
+          icon="i-heroicons-check"
+          @click="saveRolePermissions"
+        >
+          保存
+        </UButton>
+        <UButton
+          color="primary"
+          icon="i-heroicons-plus"
+          @click="openAddRoleForm"
+        >
+          {{ $t("organization.permission.add") }}
+        </UButton>
+      </div>
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -737,7 +580,9 @@ const isFormModulePartiallySelected = (module: string) => {
               @click="selectRole(role)"
               :class="[
                 'p-4 cursor-pointer hover:bg-gray-50',
-                selectedRole.id === role.id ? 'bg-primary-50' : '',
+                selectedRole && selectedRole.id === role.id
+                  ? 'bg-primary-50'
+                  : '',
               ]"
             >
               <div class="flex justify-between items-start">
@@ -745,7 +590,7 @@ const isFormModulePartiallySelected = (module: string) => {
                   <div class="flex items-center">
                     <h4 class="font-medium text-gray-900">{{ role.name }}</h4>
                     <UBadge
-                      v-if="role.isSystem"
+                      v-if="role.builtin"
                       color="primary"
                       variant="subtle"
                       size="sm"
@@ -763,7 +608,7 @@ const isFormModulePartiallySelected = (module: string) => {
                       name="i-heroicons-users"
                       class="w-4 h-4 inline-block mr-1"
                     />
-                    {{ role.userCount }}
+                    {{ role.userCount ?? 0 }}
                     {{ $t("organization.permission.userCount") }}
                   </p>
                 </div>
@@ -776,8 +621,8 @@ const isFormModulePartiallySelected = (module: string) => {
                     @click.stop="openEditRoleForm(role)"
                   />
                   <UButton
-                    v-if="!role.isSystem"
-                    color="error"
+                    v-if="!role.builtin"
+                    color="red"
                     variant="ghost"
                     icon="i-heroicons-trash"
                     size="xs"
@@ -820,8 +665,10 @@ const isFormModulePartiallySelected = (module: string) => {
         <div class="bg-white rounded-lg shadow">
           <div class="p-4 border-b">
             <h3 class="text-lg font-medium text-gray-900">
-              {{ selectedRole.name }}
-              {{ $t("organization.permission.roleConfig") }}
+              {{
+                (selectedRole && selectedRole.name) ||
+                $t("organization.permission.roleConfig")
+              }}
             </h3>
             <p class="text-sm text-gray-500 mt-1">
               {{ $t("organization.permission.configDesc") }}
@@ -838,7 +685,9 @@ const isFormModulePartiallySelected = (module: string) => {
                 <UCheckbox
                   :model-value="isModuleFullySelected(module)"
                   :indeterminate="isModulePartiallySelected(module)"
-                  @update:model-value="toggleModulePermissions(module, $event)"
+                  @update:model-value="
+                    toggleModulePermissions(module, $event as boolean)
+                  "
                 />
                 <h4 class="ml-2 font-bold text-gray-900 text-lg">
                   {{ module }}
@@ -873,27 +722,28 @@ const isFormModulePartiallySelected = (module: string) => {
                             class="text-sm font-medium"
                             :class="getPermissionTextColor(perm.type)"
                           >
-                            {{ perm.name }}
+                            {{ getPermissionDisplayName(perm) }}
                           </span>
                         </div>
-                        <div class="text-xs text-gray-500">
-                          {{ perm.description }}
-                        </div>
-                        <!-- API权限显示端点信息 -->
+                        <UTooltip :text="perm.name">
+                          <div class="text-xs text-gray-500">
+                            {{ perm.description }}
+                          </div>
+                        </UTooltip>
                         <div
                           v-if="perm.type === 'api'"
                           class="text-xs text-blue-600 mt-1"
                         >
                           <UBadge
                             size="xs"
-                            :color="getHttpMethodColor(perm.httpMethod)"
-                            class="mr-1"
+                            :color="getPermissionTypeColor(perm.httpMethod)"
                           >
                             {{ perm.httpMethod }}
                           </UBadge>
-                          <code class="text-xs">{{ perm.apiEndpoint }}</code>
+                          <code class="text-xs ml-1">{{
+                            perm.apiEndpoint
+                          }}</code>
                         </div>
-                        <!-- 数据权限显示范围信息 -->
                         <div
                           v-if="perm.type === 'data'"
                           class="text-xs text-green-600 mt-1"
@@ -904,8 +754,10 @@ const isFormModulePartiallySelected = (module: string) => {
                     </div>
                   </div>
                 </div>
+                <!-- /type -->
               </div>
             </div>
+            <!-- /module -->
           </div>
         </div>
       </div>
@@ -915,8 +767,6 @@ const isFormModulePartiallySelected = (module: string) => {
     <UModal
       v-model:open="showRoleForm"
       :ui="{ content: 'w-full max-w-5xl' }"
-      title="permission-manager-title"
-      description="permission-manager-desc"
       :title="
         isEditing
           ? $t('organization.permission.edit')
@@ -949,6 +799,7 @@ const isFormModulePartiallySelected = (module: string) => {
               </UFormField>
 
               <UFormField
+                v-if="!isEditing"
                 :label="$t('organization.permission.form.code')"
                 required
               >
@@ -968,6 +819,17 @@ const isFormModulePartiallySelected = (module: string) => {
                   :placeholder="
                     $t('organization.permission.form.descriptionPlaceholder')
                   "
+                />
+              </UFormField>
+
+              <UFormField v-if="!isEditing" label="租户" required>
+                <SelectTree
+                  v-model="selectedTenant"
+                  :items="tenantTreeItems"
+                  placeholder="选择租户"
+                  searchable
+                  clearable
+                  class="w-full"
                 />
               </UFormField>
 
@@ -1030,7 +892,9 @@ const isFormModulePartiallySelected = (module: string) => {
                                 <UBadge
                                   v-if="perm.type === 'api'"
                                   size="xs"
-                                  :color="getHttpMethodColor(perm.httpMethod)"
+                                  :color="
+                                    getPermissionTypeColor(perm.httpMethod)
+                                  "
                                 >
                                   {{ perm.httpMethod }}
                                 </UBadge>
@@ -1077,5 +941,4 @@ const isFormModulePartiallySelected = (module: string) => {
       </template>
     </UModal>
   </div>
-  <!-- 最外层 <div> -->
 </template>

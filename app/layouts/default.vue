@@ -4,6 +4,8 @@ import { useWindowSize } from "../composables/useWindowSize";
 import Sidebar from "../components/layout/Sidebar.vue";
 import Header from "../components/layout/Header.vue";
 import FooterBar from "../components/layout/FooterBar.vue";
+import WelcomeGuide from "~/components/onboarding/WelcomeGuide.vue";
+import GuideButton from "~/components/ui/GuideButton.vue";
 
 // 获取当前路由
 const route = useRoute();
@@ -14,8 +16,8 @@ const shouldHideFooter = computed(() => {
   return path.startsWith("/agent") || path.startsWith("/workflow");
 });
 
-// 侧边栏折叠状态
-const sidebarCollapsed = ref(false);
+// 侧边栏折叠状态 - 使用与 Sidebar 组件相同的状态
+const sidebarCollapsed = useState<boolean>("sidebar-collapsed", () => false);
 
 // 切换侧边栏状态
 const toggleSidebar = () => {
@@ -73,7 +75,12 @@ const closeMobileSidebar = () => {
     </div>
 
     <!-- 主内容区域 -->
-    <div class="flex-1 flex flex-col min-w-0">
+    <div
+      class="flex-1 flex flex-col min-w-0 transition-all duration-200"
+      :class="[
+        'md:ml-0', // 在桌面端不需要额外的 margin，因为侧边栏是相对定位的
+      ]"
+    >
       <!-- 顶部导航 -->
       <div class="sticky top-0 z-30">
         <Header @toggle-sidebar="toggleSidebar" />
@@ -94,6 +101,12 @@ const closeMobileSidebar = () => {
       <!-- 页脚 -->
       <FooterBar v-if="!shouldHideFooter" />
     </div>
+
+    <!-- 欢迎引导组件 -->
+    <WelcomeGuide />
+
+    <!-- 测试按钮 -->
+    <GuideButton />
   </div>
 </template>
 

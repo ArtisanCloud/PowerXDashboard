@@ -30,7 +30,7 @@ const { setAuth } = useAuth();
 
 // 表单数据
 const form = reactive({
-  email: "",
+  identifier: "",
   password: "",
   remember: false,
 });
@@ -41,7 +41,7 @@ const error = ref("");
 
 // 登录处理
 const handleLogin = async () => {
-  if (!form.email || !form.password) {
+  if (!form.identifier || !form.password) {
     error.value = t("auth.required");
     return;
   }
@@ -53,7 +53,7 @@ const handleLogin = async () => {
     // 调用登录API
     const response = await login({
       tenant: "",
-      identifier: form.email,
+      identifier: form.identifier,
       password: form.password,
     });
 
@@ -153,17 +153,17 @@ const handleForgotPassword = () => {
             <!-- 邮箱输入 -->
             <div class="mb-6">
               <label
-                for="email"
+                for="identifier"
                 class="block text-sm font-medium text-gray-700 mb-3"
               >
-                {{ $t("auth.email") }} <span class="text-red-500">*</span>
+                {{ $t("auth.identifier") }} <span class="text-red-500">*</span>
               </label>
               <UInput
-                id="email"
-                name="email"
-                v-model="form.email"
-                type="email"
-                :placeholder="$t('auth.email')"
+                id="identifier"
+                name="identifier"
+                v-model="form.identifier"
+                type="text"
+                :placeholder="$t('auth.identifier')"
                 size="lg"
                 :disabled="loading"
                 class="w-full"

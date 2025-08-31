@@ -8,6 +8,7 @@ import {
   watch,
   onMounted,
 } from "vue";
+import { storeToRefs } from "pinia";
 import { useI18n } from "#imports";
 import {
   useDepartmentService,
@@ -15,18 +16,29 @@ import {
   type DepartmentCreateParams,
   type DepartmentUpdateParams,
 } from "~/composables/api/services/departmentService";
+import { useDepartmentStore } from "~/stores/department";
 import { useMemberService } from "~/composables/api/services/memberService";
+import { useOneShotAlert } from "~/composables/useOneShotAlert";
+import * as v from "valibot";
+import type { FormSubmitEvent } from "@nuxt/ui";
 
+import { normalizeApiError } from "~/composables/api/normalizeApiError";
+const { notifyOnce, reset } = useOneShotAlert();
+
+// 字段/表单错误位
+const formError = ref<string | null>(null);
+const fieldErrors = reactive<Record<string, string>>({});
+const clearErrors = () => {
+  formError.value = null;
+  Object.keys(fieldErrors).forEach((k) => delete fieldErrors[k]);
+};
+
+/** ================== UI ================== */
 const { t, locale } = useI18n();
 const UButton = resolveComponent("UButton");
 
 /** ================== 状态 ================== */
 const deptService = useDepartmentService();
-
-const tree = ref<Department[]>([]); // 后端返回的树
-const flat = ref<Department[]>([]); // 扁平化，用于选择上级部门等
-const isLoadingTree = ref(false);
-const loadError = ref<string | null>(null);
 
 const activeNodeId = ref<number | null>(null); // UTree 当前选中部门 id
 const activeNode = computed(
@@ -127,13 +139,24 @@ const openEditForm = (dept: Department & any) => {
 };
 
 /** ================== 数据获取 & 工具 ================== */
+// 使用全局Store
+const deptStore = useDepartmentStore();
+const {
+  tree: storeTree,
+  flat: storeFlat,
+  status,
+  error,
+} = storeToRefs(deptStore);
+
+// 计算属性来兼容现有代码
+const tree = computed(() => storeTree.value);
+const flat = computed(() => storeFlat.value);
+const isLoadingTree = computed(() => status.value === "loading");
+const loadError = computed(() => error.value);
+
 const fetchTree = async () => {
-  isLoadingTree.value = true;
-  loadError.value = null;
   try {
-    const data = await deptService.getDepartmentTree();
-    tree.value = data;
-    flat.value = flattenDepartments(data);
+    await deptStore.fetchTree();
 
     // 默认选择第一个根节点
     if (!activeNodeId.value) {
@@ -144,9 +167,7 @@ const fetchTree = async () => {
       ? [String(activeNodeId.value)]
       : [];
   } catch (e: any) {
-    loadError.value = e?.message ?? "加载失败";
-  } finally {
-    isLoadingTree.value = false;
+    console.error("获取部门树失败:", e);
   }
 };
 
@@ -188,6 +209,13 @@ watch(selectedValue, (vals) => {
 });
 
 onMounted(fetchTree);
+
+const onFormSubmit = async (
+  _e: FormSubmitEvent<v.InferOutput<typeof schema>>
+) => {
+  reset();
+  await saveDepartment(); // 仍然走你已经改造过的 saveDepartment（带 notifyOnce）
+};
 
 function flattenDepartments(nodes: Department[], result: Department[] = []) {
   for (const n of nodes) {
@@ -267,15 +295,18 @@ const parentOptions = computed(() => {
 /** ================== CRUD（走后端） ================== */
 const deleteDepartment = async (id: number) => {
   if (!confirm(t("organization.department.confirmDelete") as string)) return;
-  const ok = await deptService.deleteDepartment(id);
-  if (ok) {
-    // 若删除的是当前选中节点，则切回父级或任一根
+  try {
+    await deptStore.deleteDepartment(id);
     if (activeNodeId.value === id) {
       const deleted = flat.value.find((d) => d.id === id);
       activeNodeId.value =
         deleted?.parent_id ?? flat.value.find((d) => !d.parent_id)?.id ?? null;
     }
-    await fetchTree();
+    notifyOnce("部门删除成功", "", "success", "solid");
+  } catch (e: any) {
+    const { title, description } = normalizeApiError(e, { meta: "metaText" }); // ✨ 统一解析
+    reset(); // ✨ 先重置一次 one-shot
+    notifyOnce(title || "删除失败", description, "error", "solid"); // ✨ 弹全局 Alert（会在 Modal 之上）
   }
 };
 
@@ -408,25 +439,64 @@ function onSelectNode(payload: any) {
   pagination.page = 1;
 }
 
+const schema = v.object({
+  name: v.pipe(v.string(), v.minLength(1, "部门名称为必填项")),
+  // 允许为空/不选
+  parent_id: v.nullable(v.optional(v.number())),
+  // 仅字母/数字/下划线/短横线；可留空
+  key: v.optional(
+    v.pipe(
+      v.string(),
+      v.maxLength(64, "Key 最长 64 个字符"),
+      v.regex(/^[A-Za-z0-9_-]*$/, "仅允许字母/数字/下划线/短横线")
+    )
+  ),
+  // 可选；如果填了必须是 >=0 的整数
+  sort: v.optional(
+    v.pipe(
+      v.number(),
+      v.integer("排序必须是整数"),
+      v.minValue(0, "排序不能为负数")
+    )
+  ),
+  // 允许 null/不选
+  leader_member_id: v.nullable(v.optional(v.number())),
+  // 只能是 0 或 1
+  status: v.union([v.literal(0), v.literal(1)], "状态不合法"),
+  // 留空通过；非空必须是合法 JSON
+  metaText: v.pipe(
+    v.string(),
+    v.check((s) => {
+      if (!s?.trim()) return true;
+      try {
+        JSON.parse(s);
+        return true;
+      } catch {
+        return false;
+      }
+    }, "Meta 必须是合法的 JSON")
+  ),
+  // 仅编辑时会用到；这里统一允许 null/不传
+  new_parent_id: v.nullable(v.optional(v.number())),
+});
+
 const saveDepartment = async () => {
+  let success = false; // 标记是否成功
   try {
     if (isEditing.value && editingId.value) {
       const payload = buildUpdatePayload();
-      // 如果确实没有任何变化，就不调接口
+
+      // 没有任何变化：不调接口，直接提示并返回
       if (Object.keys(payload).length === 0) {
-        showForm.value = false;
+        notifyOnce("无变更", "没有检测到修改内容", "warning", "solid");
         return;
       }
-      // 序列化 meta：如果你的 deptService 内没做
-      const reqBody: any = { ...payload };
-      if ("meta" in reqBody) {
-        // 有些后端直接收 JSON 对象即可；若必须字符串，可改成 JSON.stringify
-        // reqBody.meta = reqBody.meta === null ? null : JSON.stringify(reqBody.meta)
-      }
-      const ok = await deptService.updateDepartment(editingId.value, reqBody);
-      if (!ok) return;
+
+      // 如果你的 deptService 要求 meta 为对象，保持不变；若后端要字符串，可在这里 JSON.stringify
+      const ok = await deptService.updateDepartment(editingId.value, payload);
+      success = !!ok;
     } else {
-      // 创建：沿用你原有的 CreateParams（保持兼容）
+      // 创建
       const created = await deptService.createDepartment({
         name: departmentForm.name,
         parent_id: departmentForm.parent_id,
@@ -437,14 +507,21 @@ const saveDepartment = async () => {
         meta: departmentForm.metaText?.trim()
           ? JSON.parse(departmentForm.metaText)
           : undefined,
-      } as any);
-      if (!created) return;
+      } as DepartmentCreateParams);
+      success = !!created;
     }
-    showForm.value = false;
-    await fetchTree();
-    resetForm();
   } catch (e: any) {
-    alert(e?.message || "保存失败");
+    const { title, description } = normalizeApiError(e, { meta: "metaText" }); // ✨ 统一解析
+    reset(); // ✨ 先重置一次 one-shot
+    notifyOnce(title || "保存失败", description, "error", "solid"); // ✨ 弹全局 Alert（会在 Modal 之上）
+  } finally {
+    if (success) {
+      reset(); // 允许成功提示出现
+      notifyOnce("保存成功", "部门信息已成功保存", "success", "solid");
+      showForm.value = false;
+      await fetchTree();
+      resetForm();
+    }
   }
 };
 
@@ -686,11 +763,15 @@ function buildUpdatePayload(): DepartmentUpdateParams {
 
         <template #footer>
           <div class="flex justify-between items-center text-sm text-gray-500">
-            <span
-              >显示第 {{ paginationInfo.start }} -
-              {{ paginationInfo.end }} 条，共
-              {{ paginationInfo.total }} 条</span
-            >
+            <span>
+              {{
+                t("organization.department.pagination.showing", {
+                  start: paginationInfo.start,
+                  end: paginationInfo.end,
+                  total: paginationInfo.total,
+                })
+              }}
+            </span>
           </div>
         </template>
       </UCard>
@@ -723,21 +804,24 @@ function buildUpdatePayload(): DepartmentUpdateParams {
             </h3>
           </template>
 
-          <form @submit.prevent="saveDepartment">
+          <UForm
+            :schema="schema"
+            :state="departmentForm"
+            @submit="onFormSubmit"
+          >
             <div class="grid grid-cols-2 gap-4">
               <UFormField
+                name="name"
                 :label="$t('organization.department.form.name')"
                 required
               >
-                <UInput
-                  v-model="departmentForm.name"
-                  :placeholder="
-                    $t('organization.department.form.namePlaceholder')
-                  "
-                />
+                <UInput v-model="departmentForm.name" />
               </UFormField>
 
-              <UFormField :label="$t('organization.department.form.parent')">
+              <UFormField
+                name="parent_id"
+                :label="$t('organization.department.form.parent')"
+              >
                 <USelect
                   :model-value="departmentForm.parent_id"
                   :items="parentOptions"
@@ -753,8 +837,9 @@ function buildUpdatePayload(): DepartmentUpdateParams {
                   "
                 />
               </UFormField>
-              <!-- Key -->
+
               <UFormField
+                name="key"
                 :label="$t('organization.department.form.key') || '唯一键 Key'"
               >
                 <UInput
@@ -763,9 +848,9 @@ function buildUpdatePayload(): DepartmentUpdateParams {
                 />
               </UFormField>
 
-              <!-- 变更父级（仅编辑时可见）：new_parent_id -->
               <UFormField
                 v-if="isEditing"
+                name="new_parent_id"
                 :label="
                   $t('organization.department.form.moveParent') ||
                   '移动到新上级'
@@ -794,10 +879,11 @@ function buildUpdatePayload(): DepartmentUpdateParams {
                 </p>
               </UFormField>
 
-              <!-- 排序 -->
               <UFormField
+                name="sort"
                 :label="$t('organization.department.form.sort') || '排序'"
               >
+                <!-- 用 v-model.number 确保是 number，配合 schema 的 number 校验 -->
                 <UInput
                   type="number"
                   :min="0"
@@ -806,8 +892,8 @@ function buildUpdatePayload(): DepartmentUpdateParams {
                 />
               </UFormField>
 
-              <!-- 负责人 -->
               <UFormField
+                name="leader_member_id"
                 :label="
                   $t('organization.department.form.leader') || '部门负责人'
                 "
@@ -831,8 +917,8 @@ function buildUpdatePayload(): DepartmentUpdateParams {
                 />
               </UFormField>
 
-              <!-- 状态 -->
               <UFormField
+                name="status"
                 :label="$t('organization.department.form.status') || '状态'"
               >
                 <URadioGroup
@@ -850,8 +936,8 @@ function buildUpdatePayload(): DepartmentUpdateParams {
                 />
               </UFormField>
 
-              <!-- Meta JSON -->
               <UFormField
+                name="metaText"
                 :label="
                   $t('organization.department.form.meta') || '扩展 Meta(JSON)'
                 "
@@ -877,7 +963,7 @@ function buildUpdatePayload(): DepartmentUpdateParams {
                 {{ $t("organization.common.save") }}
               </UButton>
             </div>
-          </form>
+          </UForm>
         </UCard>
       </template>
     </UModal>

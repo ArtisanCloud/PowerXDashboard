@@ -24,6 +24,7 @@ const props = withDefaults(
     isTyping?: boolean;
     currentAgent?: ViewAgent | null;
     connectionType?: ConnectionType;
+    canSendMessage?: boolean;
   }>(),
   {
     messages: () => [],
@@ -32,6 +33,7 @@ const props = withDefaults(
     isTyping: false,
     currentAgent: null,
     connectionType: "sse",
+    canSendMessage: true,
   }
 );
 
@@ -185,7 +187,13 @@ onMounted(() => {
 /* ----------------- 输入 & 发送 ----------------- */
 function sendMessage() {
   const content = messageInput.value.trim();
-  if (!content || props.isStreaming || !props.isConnected) return;
+  if (
+    !content ||
+    props.isStreaming ||
+    !props.isConnected ||
+    !props.canSendMessage
+  )
+    return;
   emit("send-message", content);
   messageInput.value = "";
   if (inputRef.value) {
@@ -601,12 +609,9 @@ function onSendClick() {
                     size="sm"
                     aria-label="添加"
                     class="w-8 h-8 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800"
-                    :disabled="!isConnected || isStreaming"
+                    :disabled="!canSendMessage || isStreaming"
                     :ui="{
-                      base: 'inline-flex items-center justify-center',
-                      padding: 'p-0',
-                      gap: 'gap-0',
-                      rounded: 'rounded-full',
+                      base: 'inline-flex items-center justify-center p-0 gap-0 rounded-full',
                     }"
                   >
                     <UIcon name="i-heroicons-plus" class="w-4 h-4" />
@@ -619,11 +624,11 @@ function onSendClick() {
                 ref="inputRef"
                 v-model="messageInput"
                 :placeholder="
-                  isConnected
+                  canSendMessage
                     ? t('agent.chat.inputPlaceholder')
                     : t('agent.chat.disconnectedPlaceholder')
                 "
-                :disabled="!isConnected || isStreaming"
+                :disabled="!canSendMessage || isStreaming"
                 class="w-full resize-none border border-gray-300 dark:border-gray-600 rounded-xl pl-12 pr-24 px-4 py-3 leading-6 focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed dark:bg-gray-900 dark:text-white"
                 rows="1"
                 style="min-height: 44px; max-height: 160px"
@@ -652,13 +657,10 @@ function onSendClick() {
                       ? 'text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20'
                       : 'text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800'
                   "
-                  :disabled="!isConnected || isStreaming"
+                  :disabled="!canSendMessage || isStreaming"
                   @click="toggleRecording"
                   :ui="{
-                    base: 'inline-flex items-center justify-center',
-                    padding: 'p-0',
-                    gap: 'gap-0',
-                    rounded: 'rounded-full',
+                    base: 'inline-flex items-center justify-center p-0 gap-0 rounded-full',
                   }"
                 >
                   <UIcon
@@ -677,19 +679,16 @@ function onSendClick() {
                   :class="
                     isStreaming
                       ? 'bg-red-500 hover:bg-red-600 text-white'
-                      : messageInput.trim() && isConnected
+                      : messageInput.trim() && canSendMessage
                         ? 'bg-green-500 hover:bg-green-600 text-white'
                         : 'bg-gray-200 dark:bg-gray-700 text-gray-400'
                   "
                   :disabled="
-                    !isConnected || (!messageInput.trim() && !isStreaming)
+                    !canSendMessage || (!messageInput.trim() && !isStreaming)
                   "
                   @click="onSendClick"
                   :ui="{
-                    base: 'inline-flex items-center justify-center',
-                    padding: 'p-0',
-                    gap: 'gap-0',
-                    rounded: 'rounded-full',
+                    base: 'inline-flex items-center justify-center p-0 gap-0 rounded-full',
                   }"
                 >
                   <UIcon
@@ -714,10 +713,7 @@ function onSendClick() {
                 :disabled="messages.length === 0"
                 @click="$emit('clear-messages')"
                 :ui="{
-                  base: 'inline-flex items-center justify-center',
-                  padding: 'p-0',
-                  gap: 'gap-0',
-                  rounded: 'rounded-full',
+                  base: 'inline-flex items-center justify-center p-0 gap-0 rounded-full',
                 }"
               >
                 <UIcon name="i-heroicons-trash" class="w-5 h-5" />

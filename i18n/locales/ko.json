@@ -264,6 +264,7 @@
       "modelConfig": "모델 설정",
       "model": "모델",
       "selectModel": "모델 선택",
+      "selectProvider": "제공업체 선택",
       "temperature": "온도",
       "conservative": "보수적",
       "creative": "창의적",
@@ -311,6 +312,17 @@
       }
     },
     "confirmDelete": "이 에이전트를 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다."
+  },
+  "env": {
+    "title": "환경 설정",
+    "current": "현재 환경",
+    "switch": "환경 전환",
+    "dev": "개발 환경",
+    "staging": "스테이징 환경",
+    "prod": "프로덕션 환경",
+    "canary": "카나리 환경",
+    "blue": "블루 환경",
+    "green": "그린 환경"
   },
   "error": {
     "tip": "이 페이지에서 문제가 발생했습니다",

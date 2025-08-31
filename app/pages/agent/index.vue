@@ -74,25 +74,55 @@ const chatConnection = useAgentChat({
 const {
   messages,
   isConnected,
-  isStreaming,
-  isTyping,
   error: chatError,
-  currentAgent,
   sendMessage,
   connect,
   disconnect,
-  switchConnection,
-  switchAgent,
   clearMessages,
-  retryLastMessage,
 } = chatConnection;
+
+// 添加缺失的状态
+const isStreaming = ref(false);
+const isTyping = ref(false);
+const currentAgent = ref(null);
+
+// 添加缺失的方法
+const switchConnection = (type: "sse" | "websocket") => {
+  connectionType.value = type;
+  // 重新连接逻辑
+  disconnect();
+  setTimeout(() => connect(), 100);
+};
+
+const switchAgent = async (agentId: string) => {
+  currentAgentId.value = agentId;
+  // 可以在这里添加切换 agent 的逻辑
+};
+
+const retryLastMessage = async () => {
+  // 重试最后一条消息的逻辑
+  console.log("重试最后一条消息");
+};
 
 // 初始化
 onMounted(async () => {
-  await agentManager.fetchAgents(API_URL);
-  connect();
+  try {
+    await agentManager.fetchAgents(API_URL);
+  } catch (e: any) {
+    // 404 当作“空列表”处理，其它错误提示一下
+    if (e?.status === 404 || e?.statusCode === 404) {
+      console.warn("[agent] /agents 404，当作空数据处理");
+    } else {
+      notifyOnce(
+        t("agent.list.loadFailed") || "加载 Agent 列表失败",
+        e?.message || ""
+      );
+    }
+  } finally {
+    // 不管拉取是否成功，都去尝试建立聊天连接
+    connect();
+  }
 });
-
 // 组件卸载时断开连接
 onUnmounted(() => {
   disconnect();
@@ -119,6 +149,11 @@ const handleConnectionSwitch = (type: "sse" | "websocket") => {
 
 // 处理发送消息
 const handleSendMessage = async (content: string) => {
+  // 检查是否允许发送消息
+  if (!canSendMessage.value) {
+    console.warn("无法发送消息：agent列表为空或连接失败");
+    return;
+  }
   await sendMessage(content);
 };
 
@@ -159,7 +194,9 @@ const handleDeleteAgent = async (agentId: string) => {
       await agentManager.deleteAgent(API_URL, agentId);
       if (agentId === currentAgentId.value && agents.value.length > 0) {
         const firstAgent = agents.value[0];
-        await handleAgentSelect(firstAgent.id);
+        if (firstAgent) {
+          await handleAgentSelect(firstAgent.id);
+        }
       }
     } catch (error) {
       console.error("删除 Agent 失败:", error);
@@ -177,7 +214,9 @@ const handleSaveAgent = async (config: Partial<AgentConfig>) => {
         ...config,
         id: `agent_${Date.now()}`,
         isActive: true,
-        capabilities: config.capabilities || [],
+        capabilities: Array.isArray(config.capabilities)
+          ? [...config.capabilities]
+          : [],
         temperature: config.temperature || 0.7,
         maxTokens: config.maxTokens || 2000,
       });
@@ -195,6 +234,26 @@ const selectedAgent = computed(() => {
   return (
     agents.value.find((agent) => agent.id === currentAgentId.value) || null
   );
+});
+
+// 计算是否允许发送消息
+const canSendMessage = computed(() => {
+  // 检查agent列表是否为空
+  if (!agents.value || agents.value.length === 0) {
+    return false;
+  }
+
+  // 检查websocket连接状态（如果使用websocket连接方式）
+  if (connectionType.value === "websocket" && !isConnected.value) {
+    return false;
+  }
+
+  // 检查是否有选中的agent
+  if (!selectedAgent.value) {
+    return false;
+  }
+
+  return true;
 });
 </script>
 
@@ -223,6 +282,7 @@ const selectedAgent = computed(() => {
           :is-typing="!!isTyping"
           :current-agent="selectedAgent || null"
           :connection-type="connectionType"
+          :can-send-message="canSendMessage"
           @send-message="handleSendMessage"
           @retry-message="handleRetryMessage"
           @clear-messages="handleClearMessages"
@@ -237,23 +297,6 @@ const selectedAgent = computed(() => {
       :is-visible="showConfigPanel"
       @close="handleCloseConfig"
       @save="handleSaveAgent"
-    />
-
-    <!-- 错误提示（只显示一次） -->
-    <UAlert
-      v-if="alertVisible"
-      :title="alertTitle || '实时连接失败'"
-      :description="alertDesc || 'SSE/WebSocket 连接建立失败，请稍后再试。'"
-      :color="'error'"
-      :variant="'solid'"
-      :icon="'i-heroicons-signal-slash-20-solid'"
-      close
-      @update:open="
-        (val) => {
-          hide();
-        }
-      "
-      class="fixed bottom-4 right-4 max-w-sm z-50"
     />
   </div>
 </template>

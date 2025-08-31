@@ -5,6 +5,13 @@ import type {
   ResponseInterceptor,
 } from "./types/types";
 
+// ✅ 引入你的全局 Loading 状态（只改 visible，不动手动锁屏逻辑）
+import {
+  useGlobalLoading,
+  useGL_AutoVisible,
+  useGL_ReqPending,
+} from "~/composables/useGlobalLoading";
+
 /** =========================
  * API 客户端配置
  * ======================== */
@@ -16,6 +23,14 @@ interface ApiClientConfig {
   responseInterceptors?: ResponseInterceptor[];
 }
 
+/**
+ * 小贴士：可以在 ./types/types 里给 ApiRequestConfig 扩展可选字段
+ * interface ApiRequestConfig {
+ *   useGlobalLoading?: boolean;  // 默认 true：显示全局 Loading
+ *   loadingMessage?: string;     // 单次请求的临时文案
+ * }
+ */
+
 // 全局配置（可通过 setApiConfig 动态修改）
 let globalConfig: ApiClientConfig = {
   baseURL: "/api",
@@ -25,6 +40,7 @@ let globalConfig: ApiClientConfig = {
     Accept: "application/json",
   },
   requestInterceptors: [
+    // --- 认证头 ---
     {
       onRequest: async (config) => {
         // 自动添加认证头（仅客户端）
@@ -41,8 +57,66 @@ let globalConfig: ApiClientConfig = {
         return config;
       },
     },
+    // --- 全局 Loading：请求开始 +1，显示 autoVisible ---
+    {
+      onRequest: async (config) => {
+        if (!process.client) return config;
+
+        // 默认开启；显式传 false 关闭
+        const enable =
+          typeof (config as any).useGlobalLoading === "undefined"
+            ? true
+            : (config as any).useGlobalLoading !== false;
+
+        if (enable) {
+          const reqPending = useGL_ReqPending();
+          const auto = useGL_AutoVisible();
+          const gl = useGlobalLoading();
+
+          reqPending.value += 1;
+          auto.value = true; // 只要有请求在飞就显示
+          if ((config as any).loadingMessage) {
+            gl.setMessage(String((config as any).loadingMessage));
+          }
+        }
+        return config;
+      },
+    },
   ],
-  responseInterceptors: [],
+  responseInterceptors: [
+    // --- 全局 Loading：请求结束 -1，计数为 0 时关闭 autoVisible ---
+    {
+      onResponse: async (response) => {
+        if (process.client) {
+          const reqPending = useGL_ReqPending();
+          const auto = useGL_AutoVisible();
+          const gl = useGlobalLoading();
+
+          reqPending.value = Math.max(0, reqPending.value - 1);
+          if (reqPending.value === 0) {
+            auto.value = false;
+            gl.setProgress(undefined);
+          }
+        }
+        return response;
+      },
+      onResponseError: async (error) => {
+        if (process.client) {
+          const reqPending = useGL_ReqPending();
+          const auto = useGL_AutoVisible();
+          const gl = useGlobalLoading();
+
+          reqPending.value = Math.max(0, reqPending.value - 1);
+          if (reqPending.value === 0) {
+            auto.value = false;
+            gl.setProgress(undefined);
+          }
+        }
+        // 不吞错，抛给上层（normalizeApiError）
+        throw error;
+      },
+    },
+  ],
 };
 
 /**
@@ -176,7 +250,7 @@ const handleRequestConfig = async (
       fullUrl = handleUrl(fullUrl, data);
     } else {
       body = isNativeBody(data) ? data : JSON.stringify(data);
-      // 如果是原生体，移除 Content-Type，让浏览器/运行时自动设置
+      // 如果是原生体，移除 Content-Type，让运行时自动设置
       if (isNativeBody(data) && headers["Content-Type"]) {
         delete headers["Content-Type"];
       }
@@ -198,11 +272,12 @@ const handleRequestConfig = async (
   const {
     params, // 已经处理
     useGlobalError, // 仅透传，不在此实现
-    useGlobalLoading, // 仅透传，不在此实现
+    useGlobalLoading, // 已由拦截器处理，不透传给 $fetch
+    loadingMessage, // 已由拦截器处理
     skipAuth, // 已被 onRequest 使用
     // 其余透传字段不破坏
     ...rest
-  } = mergedConfig;
+  } = mergedConfig as any;
 
   const fetchOptions = {
     method: method as any,
@@ -244,8 +319,6 @@ export const useApiClient = () => {
       // - 失败：抛出 FetchError，内含 response/status 等
       const responseData = await $fetch(fullUrl, {
         ...fetchOptions,
-        // 这里也可以使用 ofetch 的 onResponse/onResponseError，
-        // 但我们已有自定义拦截器链，避免重复
       });
 
       // 应用响应拦截器
@@ -259,7 +332,7 @@ export const useApiClient = () => {
 
   /** 便捷方法族 */
   const get = <T = any>(url: string, config?: ApiRequestConfig) => {
-    return request<T>("GET", url, undefined, config);
+    return request<T>("GET", url, undefined, config as any);
   };
 
   const post = <T = any>(
@@ -267,15 +340,15 @@ export const useApiClient = () => {
     data?: any,
     config?: ApiRequestConfig
   ) => {
-    return request<T>("POST", url, data, config);
+    return request<T>("POST", url, data, config as any);
   };
 
   const put = <T = any>(url: string, data?: any, config?: ApiRequestConfig) => {
-    return request<T>("PUT", url, data, config);
+    return request<T>("PUT", url, data, config as any);
   };
 
   const del = <T = any>(url: string, config?: ApiRequestConfig) => {
-    return request<T>("DELETE", url, undefined, config);
+    return request<T>("DELETE", url, undefined, config as any);
   };
 
   const patch = <T = any>(
@@ -283,7 +356,7 @@ export const useApiClient = () => {
     data?: any,
     config?: ApiRequestConfig
   ) => {
-    return request<T>("PATCH", url, data, config);
+    return request<T>("PATCH", url, data, config as any);
   };
 
   /**
@@ -302,9 +375,9 @@ export const useApiClient = () => {
       },
     };
     if (uploadConfig.headers && "Content-Type" in uploadConfig.headers) {
-      delete uploadConfig.headers["Content-Type"];
+      delete (uploadConfig.headers as any)["Content-Type"];
     }
-    return request<T>("POST", url, formData, uploadConfig);
+    return request<T>("POST", url, formData, uploadConfig as any);
   };
 
   return {
