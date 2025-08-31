@@ -4,6 +4,7 @@ import {
   useMenuService,
   type MenuItem,
 } from "~/composables/api/services/menuService";
+import { cloneWithFilteredChildren } from "~/composables/useCopy";
 import { useUserStore } from "~/stores/user";
 
 /* ---------- stores / utils ---------- */
@@ -106,34 +107,60 @@ const processMenuItems = (items: MenuItem[], level = 0): MenuItem[] => {
 type MenuGroup = { id: string; title: string; items: MenuItem[] };
 
 const viewGroups = computed<MenuGroup[]>(() => {
-  // menuService 已经处理了数据结构转换，返回的是扁平的 MenuItem[]
   const flatMenus: MenuItem[] = menuResponse.value?.data || [];
 
   const top: MenuItem[] = [];
   const plugin: MenuItem[] = [];
   const system: MenuItem[] = [];
 
-  // 按照 menuService 中的逻辑进行分组
   for (const item of flatMenus) {
-    // ① 置顶：slot === "group.root"
+    // ① 置顶
     if (item.slot === "group.root") {
       top.push(item);
+      continue;
     }
-    // ② 插件：origin === "plugin"
-    else if (item.origin === "plugin") {
+
+    // ② 系统“插件市场”容器：id === "plugins"
+    if (
+      item.origin === "system" &&
+      item.id === "plugins" &&
+      Array.isArray((item as any).children) &&
+      (item as any).children.length > 0
+    ) {
+      const children = (item as any).children as MenuItem[];
+
+      // 推到 plugin 分组（保持原对象，不拷贝也不裁剪字段）
+      const pluginChildren = children.filter(
+        (ch) => ch && ch.origin === "plugin"
+      );
+      if (pluginChildren.length > 0) {
+        plugin.push(...pluginChildren);
+      }
+
+      // system 分组里放“克隆体”，仅 children 做过滤（不含 plugin 子项）
+      const sysItem = cloneWithFilteredChildren(
+        item,
+        (ch) => !(ch && ch.origin === "plugin")
+      );
+      system.push(sysItem);
+      continue;
+    }
+
+    // ③ 普通插件
+    if (item.origin === "plugin") {
       plugin.push(item);
+      continue;
     }
-    // ③ 其它 → 系统
-    else {
-      system.push(item);
-    }
+
+    // ④ 其余 → 系统
+    system.push(item);
   }
 
   return [
-    { id: "top", title: "置顶", items: processMenuItems(top, 0) },
-    { id: "plugin", title: "应用", items: processMenuItems(plugin, 0) },
-    { id: "system", title: "系统", items: processMenuItems(system, 0) },
-  ].filter((g) => g.items.length > 0);
+    { title: "置顶", items: processMenuItems(top) },
+    { title: "应用", items: processMenuItems(plugin) },
+    { title: "系统", items: processMenuItems(system) },
+  ];
 });
 
 /* ---------- 展开状态 ---------- */

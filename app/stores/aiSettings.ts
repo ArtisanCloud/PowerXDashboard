@@ -108,10 +108,10 @@ export const useAISettingsStore = defineStore("aiSettings", {
         // });
 
         // 添加调试日志
-        console.log(
-          "providers after init in store",
-          JSON.stringify(this.providers)
-        );
+        // console.log(
+        //   "providers after init in store",
+        //   JSON.stringify(this.providers)
+        // );
 
         // 可选：获取默认的激活配置（LLM 模态）
         try {

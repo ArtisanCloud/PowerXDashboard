@@ -71,3 +71,28 @@ export function useCopy(defaultOptions: CopyOptions = { showToast: true }) {
 
   return { copy, copying, lastText };
 }
+
+export function cloneWithFilteredChildren<T extends object>(
+  obj: T,
+  predicate: (child: any) => boolean
+): T {
+  // 1) 拿到所有属性描述符
+  const desc = Object.getOwnPropertyDescriptors(obj);
+  // 2) 先移除 children 的原始描述符，避免不可配置场景下无法覆盖
+  delete desc.children;
+  // 3) 用剩余描述符 + 原型 创建一个“等价克隆”
+  const clone = Object.create(Object.getPrototypeOf(obj), desc) as T;
+
+  // 4) 在克隆上定义一个 getter：返回过滤后的 children
+  const rawChildren = (obj as any).children;
+  Object.defineProperty(clone, "children", {
+    enumerable: true,
+    configurable: true,
+    get() {
+      return Array.isArray(rawChildren)
+        ? rawChildren.filter(predicate)
+        : rawChildren;
+    },
+  });
+  return clone;
+}
