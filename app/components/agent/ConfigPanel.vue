@@ -197,7 +197,7 @@ function resetForm() {
 
 <template>
   <USlideover
-    :model-value="isVisible"
+    :model-value="props.isVisible"
     side="right"
     @update:model-value="
       (v) => {
@@ -212,7 +212,9 @@ function resetForm() {
       >
         <h2 class="text-xl font-semibold text-gray-900">
           {{
-            agent ? t("agent.config.editTitle") : t("agent.config.createTitle")
+            props.agent
+              ? t("agent.config.editTitle")
+              : t("agent.config.createTitle")
           }}
         </h2>
         <UButton

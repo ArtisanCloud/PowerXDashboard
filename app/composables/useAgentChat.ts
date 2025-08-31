@@ -1,6 +1,7 @@
 import type { ChatMessage, Agent } from "~/types/agent";
 import { useSSEChat } from "@/composables/sse/useSSEChat";
 import { useWebSocketChat } from "@/composables/websocket/useWebSocketChat";
+import { useApiClient } from "~/composables/api";
 
 export type ConnectionType = "sse" | "websocket";
 
@@ -55,17 +56,22 @@ export function useAgentChat(options: AgentChatOptions = {}) {
   const isConnecting = computed(() => activeChat.value.isConnecting);
   const error = computed(() => activeChat.value.error);
 
+  const apiClient = useApiClient();
+
   // Agent 管理
   async function loadAgents() {
     isLoading.value = true;
     try {
-      const { data } = await $fetch<{ data: Agent[] }>("/api/agents");
-      agents.value = data || [];
+      const response = await apiClient.get<{ data: Agent[] }>("/api/agents");
+      agents.value = response.data || [];
 
       // 如果没有当前 Agent，选择第一个
       if (!currentAgent.value && agents.value.length > 0) {
-        currentAgent.value = agents.value[0];
-        activeChat.value.setAgent(currentAgent.value);
+        const firstAgent = agents.value[0];
+        if (firstAgent) {
+          currentAgent.value = firstAgent;
+          activeChat.value.setAgent(firstAgent);
+        }
       }
     } catch (err) {
       console.error("加载 Agent 列表失败:", err);
@@ -78,13 +84,12 @@ export function useAgentChat(options: AgentChatOptions = {}) {
   async function createAgent(agentData: Partial<Agent>) {
     isLoading.value = true;
     try {
-      const { data } = await $fetch<{ data: Agent }>("/api/agents", {
-        method: "POST",
-        body: agentData,
-      });
-
-      agents.value.push(data);
-      return data;
+      const response = await apiClient.post<{ data: Agent }>(
+        "/api/agents",
+        agentData
+      );
+      agents.value.push(response.data);
+      return response.data;
     } catch (err) {
       console.error("创建 Agent 失败:", err);
       onError?.("创建 Agent 失败");
@@ -97,10 +102,11 @@ export function useAgentChat(options: AgentChatOptions = {}) {
   async function updateAgent(id: string, agentData: Partial<Agent>) {
     isLoading.value = true;
     try {
-      const { data } = await $fetch<{ data: Agent }>(`/api/agents/${id}`, {
-        method: "PUT",
-        body: agentData,
-      });
+      const response = await apiClient.put<{ data: Agent }>(
+        `/api/agents/${id}`,
+        agentData
+      );
+      const data = response.data;
 
       const index = agents.value.findIndex((a) => a.id === id);
       if (index >= 0) {
@@ -126,16 +132,14 @@ export function useAgentChat(options: AgentChatOptions = {}) {
   async function deleteAgent(id: string) {
     isLoading.value = true;
     try {
-      await $fetch(`/api/agents/${id}`, {
-        method: "DELETE",
-      });
-
+      await apiClient.delete(`/api/agents/${id}`);
       agents.value = agents.value.filter((a) => a.id !== id);
 
       // 如果删除的是当前 Agent，切换到第一个可用的 Agent
       if (currentAgent.value?.id === id) {
-        currentAgent.value = agents.value.length > 0 ? agents.value[0] : null;
-        activeChat.value.setAgent(currentAgent.value);
+        const firstAvailable = agents.value.length > 0 ? agents.value[0] : null;
+        currentAgent.value = firstAvailable;
+        activeChat.value.setAgent(firstAvailable);
       }
     } catch (err) {
       console.error("删除 Agent 失败:", err);
@@ -199,13 +203,51 @@ export function useAgentChat(options: AgentChatOptions = {}) {
     activeChat.value.clearMessages();
   }
 
-  // 连接管理
-  function connect() {
-    if (currentConnectionType.value === "sse") {
-      sseChat.connectChat();
-    } else {
-      wsChat.connectChat();
+  // 连接管理 - 带超时看门狗
+  async function connectWithTimeout(kind: "sse" | "websocket", ms = 3000) {
+    const isConnecting = ref(true);
+    let done = false;
+    const timer = setTimeout(() => {
+      if (done) return;
+      done = true;
+      isConnecting.value = false;
+      onError?.(`${kind.toUpperCase()} 连接超时 (${ms}ms)`);
+      // 可选：自动切到另一种协议
+      if (kind === "sse") {
+        currentConnectionType.value = "websocket";
+        connectWithTimeout("websocket");
+      }
+    }, ms);
+
+    try {
+      // 执行实际连接
+      if (kind === "sse") {
+        sseChat.connectChat();
+      } else {
+        wsChat.connectChat();
+      }
+
+      if (done) return;
+      done = true;
+      clearTimeout(timer);
+      isConnecting.value = false;
+      onConnectionChange?.(true);
+    } catch (e: any) {
+      if (done) return;
+      done = true;
+      clearTimeout(timer);
+      isConnecting.value = false;
+      onError?.(e?.message || `${kind} 连接失败`);
+      // 可选：失败后自动降级
+      if (kind === "sse") {
+        currentConnectionType.value = "websocket";
+        connectWithTimeout("websocket");
+      }
     }
+  }
+
+  function connect() {
+    connectWithTimeout(currentConnectionType.value);
   }
 
   function disconnect() {
