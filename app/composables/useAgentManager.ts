@@ -1,5 +1,11 @@
-import type { Agent } from "~/types/agent";
-import { useApiClient } from "~/composables/api";
+import type {
+  Agent,
+  AgentListResponse,
+  AgentDetailResponse,
+  CreateAgentRequest,
+  UpdateAgentRequest,
+} from "~/types/agent";
+import { useApiClient } from "~/composables/api/index";
 
 export interface AgentConfig {
   id: string;
@@ -15,208 +21,137 @@ export interface AgentConfig {
   presencePenalty: number;
   isActive: boolean;
   capabilities: Array<{
-    id: string;
     name: string;
     description: string;
     enabled: boolean;
-    config?: Record<string, any>;
   }>;
 }
 
-export function useAgentManager() {
+export const useAgentManager = () => {
   const agents = ref<Agent[]>([]);
   const loading = ref(false);
   const error = ref<string | null>(null);
-  const apiClient = useApiClient();
+
+  // 使用封装的 API 客户端
+  const { get, post, put, delete: del } = useApiClient();
 
   // 获取 Agent 列表
-  async function fetchAgents(apiUrl?: string) {
+  const fetchAgents = async () => {
     loading.value = true;
     error.value = null;
 
-    // 1) 为本次请求创建 AbortController，并在路由离开/作用域销毁时取消
-    const ctl =
-      typeof AbortController !== "undefined" ? new AbortController() : null;
-    tryOnScopeDispose(() => ctl?.abort());
-    if (import.meta.client) {
-      // 页面隐藏（切页/后台）也取消，避免"挂后台卡网络"
-      const onVis = () => {
-        if (document.hidden) ctl?.abort();
-      };
-      document.addEventListener("visibilitychange", onVis, { once: true });
-      tryOnScopeDispose(() =>
-        document.removeEventListener("visibilitychange", onVis)
-      );
-    }
-
     try {
-      // 2) 快失败：5s 超时 + 不重试
-      const response = await apiClient.get<{ data: Agent[] }>(
-        `${apiUrl || "/api/v1"}/agents`,
-        {
-          timeout: 5000,
-          retry: 0,
-          signal: ctl?.signal,
-        }
-      );
+      const response = await get<AgentListResponse>("/admin/agents", {
+        params: {
+          env: "dev",
+          status: "active",
+        },
+      });
 
-      const list = Array.isArray(response) ? response : (response?.data ?? []);
-      agents.value = list;
-      return agents.value;
-    } catch (e: any) {
-      // 3) 404 视为空态；其它错误只记状态，不要阻断页面
-      if (e?.status === 404 || e?.statusCode === 404) {
-        agents.value = [];
-        error.value = "404";
-        return agents.value;
+      if (response.code === 200) {
+        agents.value = response.data.items;
+      } else {
+        throw new Error(response.message || "获取 Agent 列表失败");
       }
-      error.value = e?.message || "获取 Agent 列表失败";
+    } catch (e: any) {
+      error.value = e.message || "网络请求失败";
+      console.error("获取 Agent 列表失败:", e);
       throw e;
     } finally {
       loading.value = false;
     }
-  }
+  };
+
+  // 获取单个 Agent 详情
+  const fetchAgentDetail = async (agentId: number) => {
+    try {
+      const response = await get<AgentDetailResponse>(
+        `/admin/agents/${agentId}`,
+        {
+          params: {
+            modality: "llm",
+          },
+        }
+      );
+
+      if (response.code === 200) {
+        return response.data;
+      } else {
+        throw new Error(response.message || "获取 Agent 详情失败");
+      }
+    } catch (e: any) {
+      console.error("获取 Agent 详情失败:", e);
+      throw e;
+    }
+  };
 
   // 创建 Agent
-  async function createAgent(apiUrl: string, agentData: Partial<AgentConfig>) {
-    loading.value = true;
-    error.value = null;
-
+  const createAgent = async (agentData: CreateAgentRequest) => {
     try {
-      const response = await apiClient.post<{ data: Agent }>(
-        `${apiUrl}/agents`,
-        {
-          ...agentData,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        }
+      const response = await post<AgentDetailResponse>(
+        "/admin/agents",
+        agentData
       );
 
-      const newAgent = response.data;
-      agents.value.push(newAgent);
-      return newAgent;
-    } catch (err) {
-      console.error("创建 Agent 失败:", err);
-      error.value = "创建 Agent 失败";
-      throw err;
-    } finally {
-      loading.value = false;
+      if (response.code === 200) {
+        // 重新获取列表
+        await fetchAgents();
+        return response.data;
+      } else {
+        throw new Error(response.message || "创建 Agent 失败");
+      }
+    } catch (e: any) {
+      console.error("创建 Agent 失败:", e);
+      throw e;
     }
-  }
+  };
 
   // 更新 Agent
-  async function updateAgent(
-    apiUrl: string,
-    agentId: string,
-    agentData: Partial<AgentConfig>
-  ) {
-    loading.value = true;
-    error.value = null;
-
+  const updateAgent = async (
+    agentId: number,
+    agentData: UpdateAgentRequest
+  ) => {
     try {
-      const response = await apiClient.put<{ data: Agent }>(
-        `${apiUrl}/agents/${agentId}`,
-        {
-          ...agentData,
-          updatedAt: new Date().toISOString(),
-        }
+      const response = await put<AgentDetailResponse>(
+        `/admin/agents/${agentId}`,
+        agentData
       );
 
-      const updatedAgent = response.data;
-      const index = agents.value.findIndex((a) => a.id === agentId);
-      if (index >= 0) {
-        agents.value[index] = updatedAgent;
+      if (response.code === 200) {
+        // 重新获取列表
+        await fetchAgents();
+        return response.data;
+      } else {
+        throw new Error(response.message || "更新 Agent 失败");
       }
-
-      return updatedAgent;
-    } catch (err) {
-      console.error("更新 Agent 失败:", err);
-      error.value = "更新 Agent 失败";
-      throw err;
-    } finally {
-      loading.value = false;
+    } catch (e: any) {
+      console.error("更新 Agent 失败:", e);
+      throw e;
     }
-  }
+  };
 
   // 删除 Agent
-  async function deleteAgent(apiUrl: string, agentId: string) {
-    loading.value = true;
-    error.value = null;
-
+  const deleteAgent = async (agentId: number) => {
     try {
-      await apiClient.delete(`${apiUrl}/agents/${agentId}`);
-      agents.value = agents.value.filter((a) => a.id !== agentId);
-    } catch (err) {
-      console.error("删除 Agent 失败:", err);
-      error.value = "删除 Agent 失败";
-      throw err;
-    } finally {
-      loading.value = false;
+      const response = await del(`/admin/agents/${agentId}`);
+
+      // 重新获取列表
+      await fetchAgents();
+      return response;
+    } catch (e: any) {
+      console.error("删除 Agent 失败:", e);
+      throw e;
     }
-  }
-
-  // 获取单个 Agent
-  async function getAgent(apiUrl: string, agentId: string) {
-    loading.value = true;
-    error.value = null;
-
-    try {
-      const response = await apiClient.get<{ data: Agent }>(
-        `${apiUrl}/agents/${agentId}`
-      );
-      return response.data;
-    } catch (err) {
-      console.error("获取 Agent 失败:", err);
-      error.value = "获取 Agent 失败";
-      throw err;
-    } finally {
-      loading.value = false;
-    }
-  }
-
-  // 切换 Agent 状态
-  async function toggleAgentStatus(apiUrl: string, agentId: string) {
-    const agent = agents.value.find((a) => a.id === agentId);
-    if (!agent) {
-      throw new Error("Agent 不存在");
-    }
-
-    return await updateAgent(apiUrl, agentId, {
-      isActive: !agent.isActive,
-    });
-  }
-
-  // 复制 Agent
-  async function duplicateAgent(apiUrl: string, agentId: string) {
-    const agent = agents.value.find((a) => a.id === agentId);
-    if (!agent) {
-      throw new Error("Agent 不存在");
-    }
-
-    const duplicatedAgent = {
-      ...agent,
-      id: `${agent.id}_copy_${Date.now()}`,
-      name: `${agent.name} (副本)`,
-      createdAt: undefined,
-      updatedAt: undefined,
-    };
-
-    return await createAgent(apiUrl, duplicatedAgent);
-  }
+  };
 
   return {
-    // 状态
     agents: readonly(agents),
     loading: readonly(loading),
     error: readonly(error),
-
-    // 方法
     fetchAgents,
+    fetchAgentDetail,
     createAgent,
     updateAgent,
     deleteAgent,
-    getAgent,
-    toggleAgentStatus,
-    duplicateAgent,
   };
-}
+};

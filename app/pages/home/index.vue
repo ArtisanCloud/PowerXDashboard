@@ -462,7 +462,7 @@ onUnmounted(() => {
                   <!-- 控制按钮 -->
                   <div class="flex flex-col sm:flex-row gap-4">
                     <NuxtLink
-                      :to="$localePath('/dashboard')"
+                      :to="$localePath('/agent')"
                       class="group relative px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-semibold rounded-xl transition-all duration-300 text-center overflow-hidden shadow-lg shadow-blue-500/25"
                     >
                       <span

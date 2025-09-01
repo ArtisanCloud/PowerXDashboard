@@ -1,72 +1,109 @@
 <script setup lang="ts">
-import type { AgentConfig } from '~/composables/useAgentManager'
+import type { Agent } from "~/types/agent";
 
 interface Props {
-  agents?: AgentConfig[]          // ✅ 可选
-  currentAgentId?: string
-  loading?: boolean
+  agents?: Agent[];
+  currentAgentId?: number;
+  loading?: boolean;
 }
 interface Emits {
-  (e: 'select', agentId: string): void
-  (e: 'create'): void
-  (e: 'edit', agentId: string): void
-  (e: 'delete', agentId: string): void
+  (e: "select", agentId: number): void;
+  (e: "create"): void;
+  (e: "edit", agentId: number): void;
+  (e: "delete", agentId: number): void;
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  agents: () => [],               // ✅ 默认空数组（SSR 安全）
+  agents: () => [],
   loading: false,
-  currentAgentId: ''
-})
-const emit = defineEmits<Emits>()
-const { t } = useI18n()
+  currentAgentId: 0,
+});
+const emit = defineEmits<Emits>();
+const { t } = useI18n();
 
-// ✅ 统一的“安全数组”，后续逻辑全部用它，不直接用 props.agents
-const list = computed<AgentConfig[]>(() =>
+// 统一的"安全数组"
+const list = computed<Agent[]>(() =>
   Array.isArray(props.agents) ? props.agents : []
-)
-const safeLen = computed(() => list.value.length)
+);
+const safeLen = computed(() => list.value.length);
 
 // 搜索
-const searchQuery = ref('')
-const filteredAgents = computed<AgentConfig[]>(() => {
-  const q = searchQuery.value?.trim().toLowerCase()
-  if (!q) return list.value
+const searchQuery = ref("");
+const filteredAgents = computed<Agent[]>(() => {
+  const q = searchQuery.value?.trim().toLowerCase();
+  if (!q) return list.value;
 
-  return list.value.filter(a => {
-    const name = a.name?.toLowerCase() || ''
-    const desc = a.description?.toLowerCase() || ''
-    // ✅ capabilities 是对象数组，取 name/description 再匹配
-    const caps = (a.capabilities || []).some(c =>
-      (c.name?.toLowerCase() || '').includes(q) ||
-      (c.description?.toLowerCase() || '').includes(q)
-    )
-    return name.includes(q) || desc.includes(q) || caps
-  })
-})
+  return list.value.filter((a) => {
+    const name = a.name?.toLowerCase() || "";
+    const desc = a.description?.toLowerCase() || "";
+    const key = a.key?.toLowerCase() || "";
+    const tags = (a.meta?.tags || []).join(" ").toLowerCase();
+    return (
+      name.includes(q) ||
+      desc.includes(q) ||
+      key.includes(q) ||
+      tags.includes(q)
+    );
+  });
+});
 
 // 分组
 const groupedAgents = computed(() => {
-  const active = filteredAgents.value.filter(a => a.isActive)
-  const inactive = filteredAgents.value.filter(a => !a.isActive)
-  return { active, inactive }
-})
+  const active = filteredAgents.value.filter((a) => a.status === "active");
+  const inactive = filteredAgents.value.filter((a) => a.status === "inactive");
+  return { active, inactive };
+});
 
-const selectAgent = (id: string) => emit('select', id)
+const selectAgent = (id: number) => emit("select", id);
 
-const getStatusColor = (agent: AgentConfig) => {
-  if (!agent.isActive) return 'neutral'
-  if (agent.id === props.currentAgentId) return 'primary'
-  return 'success'
-}
+const getStatusColor = (agent: Agent) => {
+  if (agent.status === "inactive") return "neutral";
+  if (agent.id === props.currentAgentId) return "primary";
+  return "success";
+};
 
-const getModelIcon = (model: string) => {
-  const m = model?.toLowerCase() || ''
-  if (m.includes('gpt')) return 'i-simple-icons-openai'
-  if (m.includes('claude')) return 'i-simple-icons-anthropic'
-  if (m.includes('gemini')) return 'i-simple-icons-google'
-  return 'i-heroicons-cpu-chip'
-}
+const getAgentIcon = (agent: Agent) => {
+  // 如果有自定义图标，使用自定义图标
+  if (agent.meta?.icon) {
+    return agent.meta.icon;
+  }
+
+  // 根据 source 或 tags 返回默认图标
+  if (agent.source === "core") return "i-heroicons-cog-6-tooth";
+  if (agent.meta?.tags?.includes("support"))
+    return "i-heroicons-chat-bubble-left-right";
+  if (agent.meta?.tags?.includes("enterprise"))
+    return "i-heroicons-building-office";
+
+  return "i-heroicons-cpu-chip";
+};
+
+const getAgentInitials = (name: string) => {
+  return (
+    name
+      ?.split(" ")
+      .map((word) => word.charAt(0))
+      .join("")
+      .toUpperCase()
+      .slice(0, 2) || "A"
+  );
+};
+
+const canDelete = (agent: Agent) => {
+  return !agent.meta?.protect_from_delete;
+};
+
+// ✅ 记录哪些行处于展开态
+const expandedIds = ref<Set<number>>(new Set());
+
+const isExpanded = (id: number) => expandedIds.value.has(id);
+
+const toggleExpand = (id: number) => {
+  // 用新 Set 触发响应式
+  const s = new Set(expandedIds.value);
+  s.has(id) ? s.delete(id) : s.add(id);
+  expandedIds.value = s;
+};
 </script>
 
 <template>
@@ -75,10 +112,15 @@ const getModelIcon = (model: string) => {
     <div class="p-4 border-b border-gray-200">
       <div class="flex items-center justify-between mb-3">
         <h2 class="text-lg font-semibold text-gray-900">
-          {{ t('agent.selector.title') }}
+          {{ t("agent.selector.title") }}
         </h2>
-        <UButton icon="i-heroicons-plus" size="sm" variant="outline" @click="emit('create')">
-          {{ t('agent.selector.create') }}
+        <UButton
+          icon="i-heroicons-plus"
+          size="sm"
+          variant="outline"
+          @click="emit('create')"
+        >
+          {{ t("agent.selector.create") }}
         </UButton>
       </div>
 
@@ -101,81 +143,171 @@ const getModelIcon = (model: string) => {
 
       <div v-else-if="filteredAgents.length === 0" class="p-4 text-center">
         <div class="text-gray-400 mb-2">
-                    <UIcon class="w-12 h-12 mx-auto inline-block" name="i-heroicons-face-frown"  />
+          <UIcon
+            class="w-12 h-12 mx-auto inline-block"
+            name="i-heroicons-face-frown"
+          />
         </div>
         <p class="text-sm text-gray-500">
-          {{ searchQuery ? t('agent.selector.noResults') : t('agent.selector.noAgents') }}
+          {{
+            searchQuery
+              ? t("agent.selector.noResults")
+              : t("agent.selector.noAgents")
+          }}
         </p>
       </div>
 
       <div v-else class="p-2">
         <!-- 活跃 -->
         <div v-if="groupedAgents.active.length > 0" class="mb-4">
-          <div class="px-2 py-1 text-xs font-medium text-gray-500 uppercase tracking-wide">
-            {{ t('agent.selector.active') }}
+          <div
+            class="px-2 py-1 text-xs font-medium text-gray-500 uppercase tracking-wide"
+          >
+            {{ t("agent.selector.active") }}
           </div>
           <div class="space-y-1 mt-2">
             <div
               v-for="agent in groupedAgents.active"
               :key="agent.id"
-              class="group relative p-3 rounded-lg cursor-pointer transition-all duration-200 hover:bg-gray-50"
+              class="group relative p-3 rounded-lg cursor-pointer transition-colors duration-200"
               :class="{
-                'bg-blue-50 border border-blue-200': agent.id === currentAgentId,
-                'hover:bg-gray-50': agent.id !== currentAgentId
+                'bg-blue-50 border border-blue-200':
+                  agent.id === currentAgentId,
+                'hover:bg-gray-50': agent.id !== currentAgentId,
               }"
               @click="selectAgent(agent.id)"
+              @dblclick.stop="emit('edit', agent.id)"
             >
-              <div class="flex items-start space-x-3">
+              <div class="flex items-start gap-3">
+                <!-- 左侧头像/图标 -->
                 <div class="flex-shrink-0">
                   <div
-                    v-if="agent.avatar"
-                    class="w-10 h-10 rounded-full bg-cover bg-center"
-                    :style="{ backgroundImage: `url(${agent.avatar})` }"
-                  />
-                  <div
-                    v-else
-                    class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-medium text-sm"
+                    class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white"
                   >
-                    {{ agent.name?.charAt(0)?.toUpperCase() || 'A' }}
+                    <UIcon :name="getAgentIcon(agent)" class="w-5 h-5" />
                   </div>
                 </div>
 
+                <!-- 右侧主体 -->
                 <div class="flex-1 min-w-0">
-                  <div class="flex items-center justify-between">
+                  <!-- 行头部：名称 + 右侧工具区（展开按钮/状态/操作） -->
+                  <div class="flex items-center gap-2">
                     <h3 class="text-sm font-medium text-gray-900 truncate">
                       {{ agent.name }}
                     </h3>
-                    <UBadge :color="getStatusColor(agent)" size="xs" class="ml-2">
-                      {{ agent.id === currentAgentId ? t('agent.selector.current') : t('agent.selector.available') }}
-                    </UBadge>
+
+                    <!-- 展开/收起按钮（放在名称右边） -->
+                    <UButton
+                      icon="i-heroicons-chevron-down"
+                      size="xs"
+                      variant="ghost"
+                      class="transition-transform ml-1"
+                      :class="{ 'rotate-180': isExpanded(agent.id) }"
+                      @click.stop="toggleExpand(agent.id)"
+                    />
+
+                    <!-- 右侧工具区：贴右对齐，避免覆盖 current 徽标 -->
+                    <div class="flex items-center gap-1 ml-auto">
+                      <UBadge :color="getStatusColor(agent)" size="xs">
+                        {{
+                          agent.id === currentAgentId
+                            ? t("agent.selector.current")
+                            : t("agent.selector.available")
+                        }}
+                      </UBadge>
+
+                      <!-- 直接编辑按钮（非透明，不重叠） -->
+                      <UButton
+                        icon="i-heroicons-pencil"
+                        size="xs"
+                        variant="outline"
+                        class="hidden sm:inline-flex"
+                        @click.stop="emit('edit', agent.id)"
+                      />
+
+                      <!-- Kebab 菜单 -->
+                      <UDropdownMenu
+                        :items="[
+                          [
+                            {
+                              label: t('agent.selector.edit'),
+                              icon: 'i-heroicons-pencil',
+                              click: () => emit('edit', agent.id),
+                            },
+                          ],
+                          ...(canDelete(agent)
+                            ? [
+                                [
+                                  {
+                                    label: t('agent.selector.delete'),
+                                    icon: 'i-heroicons-trash',
+                                    click: () => emit('delete', agent.id),
+                                  },
+                                ],
+                              ]
+                            : []),
+                        ]"
+                      >
+                        <UButton
+                          icon="i-heroicons-ellipsis-vertical"
+                          size="xs"
+                          variant="outline"
+                          class="hidden sm:inline-flex"
+                          @click.stop
+                        />
+                      </UDropdownMenu>
+                    </div>
                   </div>
-                  <p class="text-xs text-gray-500 mt-1 line-clamp-2">
+
+                  <!-- 精简信息行（收起时显示） -->
+                  <p
+                    v-if="!isExpanded(agent.id)"
+                    class="text-xs text-gray-500 mt-1 line-clamp-2"
+                  >
                     {{ agent.description }}
                   </p>
-                  <div class="flex items-center mt-2 space-x-2">
-                    <div class="flex items-center text-xs text-gray-400">
-                                            <span class="w-3 h-3 mr-1 inline-block">
-                                              <UIcon class="w-3 h-3 mr-1 inline-block" :name="getModelIcon(agent.model)"  />
-                                            </span>
-                      {{ agent.model }}
+
+                  <!-- 展开区（详尽信息 + 小屏操作按钮） -->
+                  <div v-show="isExpanded(agent.id)" class="mt-2 space-y-2">
+                    <p class="text-xs text-gray-600">{{ agent.description }}</p>
+
+                    <div
+                      class="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-gray-500"
+                    >
+                      <span class="flex items-center">
+                        <UIcon name="i-heroicons-key" class="w-3 h-3 mr-1" />
+                        {{ agent.key }}
+                      </span>
+                      <span class="text-gray-300">•</span>
+                      <span>{{ agent.source }}</span>
+                      <template v-if="agent.meta?.tags?.length">
+                        <span class="text-gray-300">•</span>
+                        <span>{{ agent.meta.tags.join(", ") }}</span>
+                      </template>
                     </div>
-                    <div class="text-xs text-gray-300">•</div>
-                    <div class="text-xs text-gray-400">
-                      {{ (agent.capabilities?.length || 0) }} {{ t('agent.selector.capabilities') }}
+
+                    <!-- 小屏操作按钮：展开时显示，避免与徽标拥挤 -->
+                    <div class="flex items-center gap-2 sm:hidden pt-1">
+                      <UButton
+                        size="xs"
+                        icon="i-heroicons-pencil"
+                        variant="outline"
+                        @click.stop="emit('edit', agent.id)"
+                      >
+                        {{ t("agent.selector.edit") }}
+                      </UButton>
+                      <UButton
+                        v-if="canDelete(agent)"
+                        size="xs"
+                        icon="i-heroicons-trash"
+                        variant="outline"
+                        @click.stop="emit('delete', agent.id)"
+                      >
+                        {{ t("agent.selector.delete") }}
+                      </UButton>
                     </div>
                   </div>
                 </div>
-              </div>
-
-              <div class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                <UDropdownMenu
-                  :items="[
-                    [{ label: t('agent.selector.edit'), icon: 'i-heroicons-pencil',   click: () => emit('edit', agent.id) }],
-                    [{ label: t('agent.selector.delete'), icon: 'i-heroicons-trash', click: () => emit('delete', agent.id) }]
-                  ]"
-                >
-                  <UButton icon="i-heroicons-ellipsis-vertical" size="xs" variant="ghost" class="text-gray-400 hover:text-gray-600" />
-                </UDropdownMenu>
               </div>
             </div>
           </div>
@@ -183,54 +315,145 @@ const getModelIcon = (model: string) => {
 
         <!-- 非活跃 -->
         <div v-if="groupedAgents.inactive.length > 0">
-          <div class="px-2 py-1 text-xs font-medium text-gray-500 uppercase tracking-wide">
-            {{ t('agent.selector.inactive') }}
+          <div
+            class="px-2 py-1 text-xs font-medium text-gray-500 uppercase tracking-wide"
+          >
+            {{ t("agent.selector.inactive") }}
           </div>
           <div class="space-y-1 mt-2">
             <div
               v-for="agent in groupedAgents.inactive"
               :key="agent.id"
-              class="group relative p-3 rounded-lg cursor-pointer transition-all duration-200 hover:bg-gray-50 opacity-60"
+              class="group relative p-3 rounded-lg cursor-pointer transition-colors duration-200 hover:bg-gray-50 opacity-60"
               @click="selectAgent(agent.id)"
+              @dblclick.stop="emit('edit', agent.id)"
             >
-              <div class="flex items-start space-x-3">
+              <div class="flex items-start gap-3">
+                <!-- 左侧头像/图标 -->
                 <div class="flex-shrink-0">
                   <div
-                    v-if="agent.avatar"
-                    class="w-10 h-10 rounded-full bg-cover bg-center grayscale"
-                    :style="{ backgroundImage: `url(${agent.avatar})` }"
-                  />
-                  <div
-                    v-else
-                    class="w-10 h-10 rounded-full bg-gray-400 flex items-center justify-center text-white font-medium text-sm"
+                    class="w-10 h-10 rounded-full bg-gray-400 flex items-center justify-center text-white"
                   >
-                    {{ agent.name?.charAt(0)?.toUpperCase() || 'A' }}
+                    <UIcon :name="getAgentIcon(agent)" class="w-5 h-5" />
                   </div>
                 </div>
+
+                <!-- 右侧主体 -->
                 <div class="flex-1 min-w-0">
-                  <div class="flex items-center justify-between">
+                  <!-- 行头部：名称 + 右侧工具区（展开按钮/状态/操作） -->
+                  <div class="flex items-center gap-2">
                     <h3 class="text-sm font-medium text-gray-600 truncate">
                       {{ agent.name }}
                     </h3>
-                    <UBadge color="neutral" size="xs" class="ml-2">
-                      {{ t('agent.selector.inactive') }}
-                    </UBadge>
+
+                    <!-- 展开/收起按钮（放在名称右边） -->
+                    <UButton
+                      icon="i-heroicons-chevron-down"
+                      size="xs"
+                      variant="ghost"
+                      class="transition-transform ml-1"
+                      :class="{ 'rotate-180': isExpanded(agent.id) }"
+                      @click.stop="toggleExpand(agent.id)"
+                    />
+
+                    <!-- 右侧工具区：贴右对齐，避免覆盖 current 徽标 -->
+                    <div class="flex items-center gap-1 ml-auto">
+                      <UBadge color="neutral" size="xs">
+                        {{ t("agent.selector.inactive") }}
+                      </UBadge>
+
+                      <!-- 直接编辑按钮（非透明，不重叠） -->
+                      <UButton
+                        icon="i-heroicons-pencil"
+                        size="xs"
+                        variant="outline"
+                        class="hidden sm:inline-flex"
+                        @click.stop="emit('edit', agent.id)"
+                      />
+
+                      <!-- Kebab 菜单 -->
+                      <UDropdownMenu
+                        :items="[
+                          [
+                            {
+                              label: t('agent.selector.edit'),
+                              icon: 'i-heroicons-pencil',
+                              click: () => emit('edit', agent.id),
+                            },
+                          ],
+                          ...(canDelete(agent)
+                            ? [
+                                [
+                                  {
+                                    label: t('agent.selector.delete'),
+                                    icon: 'i-heroicons-trash',
+                                    click: () => emit('delete', agent.id),
+                                  },
+                                ],
+                              ]
+                            : []),
+                        ]"
+                      >
+                        <UButton
+                          icon="i-heroicons-ellipsis-vertical"
+                          size="xs"
+                          variant="outline"
+                          class="hidden sm:inline-flex"
+                          @click.stop
+                        />
+                      </UDropdownMenu>
+                    </div>
                   </div>
-                  <p class="text-xs text-gray-400 mt-1 line-clamp-2">
+
+                  <!-- 精简信息行（收起时显示） -->
+                  <p
+                    v-if="!isExpanded(agent.id)"
+                    class="text-xs text-gray-400 mt-1 line-clamp-2"
+                  >
                     {{ agent.description }}
                   </p>
-                </div>
-              </div>
 
-              <div class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                <UDropdownMenu
-                  :items="[
-                    [{ label: t('agent.selector.edit'), icon: 'i-heroicons-pencil',   click: () => emit('edit', agent.id) }],
-                    [{ label: t('agent.selector.delete'), icon: 'i-heroicons-trash', click: () => emit('delete', agent.id) }]
-                  ]"
-                >
-                  <UButton icon="i-heroicons-ellipsis-vertical" size="xs" variant="ghost" class="text-gray-400 hover:text-gray-600" />
-                </UDropdownMenu>
+                  <!-- 展开区（详尽信息 + 小屏操作按钮） -->
+                  <div v-show="isExpanded(agent.id)" class="mt-2 space-y-2">
+                    <p class="text-xs text-gray-500">{{ agent.description }}</p>
+
+                    <div
+                      class="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-gray-400"
+                    >
+                      <span class="flex items-center">
+                        <UIcon name="i-heroicons-key" class="w-3 h-3 mr-1" />
+                        {{ agent.key }}
+                      </span>
+                      <span class="text-gray-300">•</span>
+                      <span>{{ agent.source }}</span>
+                      <template v-if="agent.meta?.tags?.length">
+                        <span class="text-gray-300">•</span>
+                        <span>{{ agent.meta.tags.join(", ") }}</span>
+                      </template>
+                    </div>
+
+                    <!-- 小屏操作按钮：展开时显示，避免与徽标拥挤 -->
+                    <div class="flex items-center gap-2 sm:hidden pt-1">
+                      <UButton
+                        size="xs"
+                        icon="i-heroicons-pencil"
+                        variant="outline"
+                        @click.stop="emit('edit', agent.id)"
+                      >
+                        {{ t("agent.selector.edit") }}
+                      </UButton>
+                      <UButton
+                        v-if="canDelete(agent)"
+                        size="xs"
+                        icon="i-heroicons-trash"
+                        variant="outline"
+                        @click.stop="emit('delete', agent.id)"
+                      >
+                        {{ t("agent.selector.delete") }}
+                      </UButton>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -241,7 +464,7 @@ const getModelIcon = (model: string) => {
     <!-- 底部 -->
     <div class="p-4 border-t border-gray-200 bg-gray-50">
       <div class="text-xs text-gray-500 text-center">
-        {{ t('agent.selector.totalCount', { count: safeLen }) }}
+        {{ t("agent.selector.totalCount", { count: safeLen }) }}
       </div>
     </div>
   </div>

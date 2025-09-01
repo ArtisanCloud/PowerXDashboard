@@ -41,7 +41,7 @@ export default defineNuxtPlugin((nuxtApp) => {
     };
 
     // 应用主题设置
-    console.log("🎯 init applying:", { lang, theme });
+    // console.log("🎯 init applying:", { lang, theme });
     if (theme && theme !== "auto") {
       applyTheme(theme);
     } else if (theme === "auto") {
