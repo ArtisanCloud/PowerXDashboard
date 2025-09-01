@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import FooterBar from "~/components/layout/FooterBar.vue";
+import { useAuth } from "~/composables/useAuth";
 
 definePageMeta({
   alias: ["/"], // 让 /home 这个页面同时匹配 "/"
@@ -73,7 +74,7 @@ const userInitials = computed(() => {
   const name = userName.value;
   if (!name) return "U";
   const names = name.split(" ");
-  if (names.length >= 2 && names[0] && names[1]) {
+  if (names.length >= 2 && names[0]?.[0] && names[1]?.[0]) {
     return (names[0][0] + names[1][0]).toUpperCase();
   }
   return name.substring(0, 2).toUpperCase();
@@ -93,29 +94,34 @@ const handleClickOutside = (event: Event) => {
   }
 };
 
-// 退出登录 - 使用与Header组件相同的逻辑
+// 退出登录 - 使用统一的认证退出方法
 const handleLogout = async () => {
   try {
-    // 清除用户状态
-    userStore.clearUserState();
     showUserMenu.value = false;
-
-    // 跳转到登录页面
-    const localePath = useLocalePath();
-    await navigateTo(localePath("/users/login"));
+    // 使用统一的认证退出方法
+    const { logout } = useAuth();
+    await logout();
   } catch (error) {
     console.error("退出登录失败:", error);
-    // 可以添加错误提示
   }
 };
+
+// 使用统一的认证工具方法
+const { getToken, isTokenExpired } = useAuth();
+
+const hasValidToken = () => !!getToken();
 
 // 在客户端初始化主题和动效
 onMounted(async () => {
   if (process.client) {
     // 随机选择渐变
     const randomIndex = Math.floor(Math.random() * primaryToTechGreen.length);
-    currentGradient.value = primaryToTechGreen[randomIndex];
-    currentDarkGradient.value = darkPrimaryToTechGreen[randomIndex];
+    currentGradient.value =
+      primaryToTechGreen[randomIndex] ||
+      "from-blue-600 via-teal-500 to-emerald-400";
+    currentDarkGradient.value =
+      darkPrimaryToTechGreen[randomIndex] ||
+      "from-blue-800 via-teal-700 to-emerald-600";
 
     // 生成浮动元素
     floatingElements.value = generateFloatingElements();
@@ -137,11 +143,19 @@ onMounted(async () => {
     // 点击外部关闭用户菜单
     document.addEventListener("click", handleClickOutside);
 
-    // 初始化用户数据
-    try {
-      await userStore.fetchUserContext();
-    } catch (error) {
-      console.error("初始化用户数据失败:", error);
+    // ⚠️ 只有有有效 token 才去取"需要登录"的数据
+    if (hasValidToken()) {
+      try {
+        await userStore.fetchUserContext();
+      } catch (error) {
+        console.error("初始化用户数据失败:", error);
+      }
+    } else {
+      // 匿名态：不要调用会 401 的接口
+      // 可选：清一次"旧状态"
+      if (userStore.clearUserState) {
+        userStore.clearUserState();
+      }
     }
   }
 });

@@ -100,7 +100,44 @@ export const useAuth = () => {
     } catch (error) {
       console.error("登出API调用失败:", error);
     } finally {
+      // 清理认证信息
       clearAuth();
+
+      // 清理用户store状态
+      const { useUserStore } = await import("~/stores/user");
+      const userStore = useUserStore();
+      if (userStore.clearUserState) {
+        userStore.clearUserState();
+      }
+
+      // 清理可能的cookie和其他存储
+      if (process.client) {
+        // 清理特定的认证相关cookie
+        const authCookies = [
+          "px_token",
+          "auth_token",
+          "auth-token",
+          "i18n_redirected",
+        ];
+        authCookies.forEach((cookieName) => {
+          document.cookie = `${cookieName}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+          document.cookie = `${cookieName}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=${window.location.hostname};`;
+        });
+
+        // 清理sessionStorage
+        sessionStorage.clear();
+
+        // 清理可能的其他localStorage项
+        const keysToRemove = Object.keys(localStorage).filter(
+          (key) =>
+            key.includes("auth") ||
+            key.includes("token") ||
+            key.includes("user") ||
+            key.includes("px_")
+        );
+        keysToRemove.forEach((key) => localStorage.removeItem(key));
+      }
+
       await navigateTo("/users/login");
     }
   };

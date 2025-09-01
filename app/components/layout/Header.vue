@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useDebounceFn } from "@vueuse/core";
 import { useUserStore } from "~/stores/user";
+import { useAuth } from "~/composables/useAuth";
 
 const { t } = useI18n();
 const userStore = useUserStore();
@@ -12,15 +13,33 @@ const { getStats, notifications, fetchNotifications } = useNotifications();
 const notificationStats = computed(() => getStats());
 const unreadCount = computed(() => notificationStats.value.unread);
 
+// 使用统一的认证工具方法
+const { getToken } = useAuth();
+
+const hasValidToken = () => !!getToken();
+
 // 初始化通知数据和用户数据
 onMounted(async () => {
-  fetchNotifications();
+  // ⚠️ 只有有有效 token 才去取"需要登录"的数据
+  if (hasValidToken()) {
+    try {
+      await userStore.fetchUserContext();
+    } catch (error) {
+      console.error("初始化用户数据失败:", error);
+    }
 
-  // 初始化用户数据
-  try {
-    await userStore.fetchUserContext();
-  } catch (error) {
-    console.error("初始化用户数据失败:", error);
+    // 通知接口通常也需要登录
+    try {
+      fetchNotifications();
+    } catch (error) {
+      console.error("fetchNotifications error:", error);
+    }
+  } else {
+    // 匿名态：不要调用会 401 的接口
+    // 可选：清一次"旧状态"
+    if (userStore.clearUserState) {
+      userStore.clearUserState();
+    }
   }
 });
 
@@ -72,7 +91,7 @@ const notificationItems = computed(() => {
         icon: "i-heroicons-eye",
         to: "/notifications",
         description: "",
-        badge: unreadCount.value,
+        badge: unreadCount.value.toString(),
       },
     ]);
   } else {
@@ -81,7 +100,7 @@ const notificationItems = computed(() => {
         label: "暂无通知",
         icon: "i-heroicons-bell-slash",
         description: "",
-        badge: unreadCount.value,
+        badge: unreadCount.value > 0 ? unreadCount.value.toString() : undefined,
       },
     ]);
   }
@@ -110,12 +129,9 @@ const getNotificationIcon = (type: string) => {
 // 退出登录
 const handleLogout = async () => {
   try {
-    // 清除用户状态
-    userStore.clearUserState();
-
-    // 跳转到登录页面
-    const localePath = useLocalePath();
-    await navigateTo(localePath("/users/login"));
+    // 使用统一的认证退出方法
+    const { logout } = useAuth();
+    await logout();
   } catch (error) {
     console.error("退出登录失败:", error);
   }

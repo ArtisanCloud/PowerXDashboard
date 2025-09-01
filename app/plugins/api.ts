@@ -26,19 +26,13 @@ export default defineNuxtPlugin(() => {
 
           const token = getToken();
 
-          // 非 skipAuth 请求必须有有效 token
-          if (!token || isTokenExpired()) {
-            clearAuth();
-            const router = useRouter();
-            router.push("/users/login");
-            throw new Error("Token missing or expired");
+          // 只有有 token 才加上 Authorization，没有 token 不抛错
+          if (token && !isTokenExpired()) {
+            req.headers = {
+              ...req.headers,
+              Authorization: `Bearer ${token}`,
+            };
           }
-
-          // 给请求加上 Authorization
-          req.headers = {
-            ...req.headers,
-            Authorization: `Bearer ${token}`,
-          };
 
           return req;
         },
@@ -57,10 +51,15 @@ export default defineNuxtPlugin(() => {
           const statusCode = error?.response?.status;
 
           if (statusCode === 401) {
-            // 如果服务端返回未授权，也清理并跳转
-            clearAuth();
-            const router = useRouter();
-            router.push("/users/login");
+            // 只有非 skipAuth 的请求才跳转登录页面
+            const requireAuth =
+              error.config?.headers?.["X-Require-Auth"] === "1" ||
+              !error.config?.skipAuth;
+            if (requireAuth) {
+              clearAuth();
+              const router = useRouter();
+              router.push("/users/login");
+            }
           }
 
           if (error?.response?.data?.message) {
