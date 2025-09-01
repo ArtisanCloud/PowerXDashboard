@@ -57,8 +57,60 @@ const generateFloatingElements = () => {
   return elements;
 };
 
+// 用户状态管理 - 使用与Header组件相同的逻辑
+const userStore = useUserStore();
+
+// 计算属性：判断是否已登录
+const isLoggedIn = computed(() => !!userStore.user);
+
+// 用户信息计算属性
+const userName = computed(() => {
+  if (!userStore.user) return "";
+  return userStore.displayName || userStore.user.email || "用户";
+});
+
+const userInitials = computed(() => {
+  const name = userName.value;
+  if (!name) return "U";
+  const names = name.split(" ");
+  if (names.length >= 2 && names[0] && names[1]) {
+    return (names[0][0] + names[1][0]).toUpperCase();
+  }
+  return name.substring(0, 2).toUpperCase();
+});
+
+// 用户菜单状态
+const showUserMenu = ref(false);
+const userMenuRef = ref<HTMLElement | null>(null);
+
+const toggleUserMenu = () => {
+  showUserMenu.value = !showUserMenu.value;
+};
+
+const handleClickOutside = (event: Event) => {
+  if (userMenuRef.value && !userMenuRef.value.contains(event.target as Node)) {
+    showUserMenu.value = false;
+  }
+};
+
+// 退出登录 - 使用与Header组件相同的逻辑
+const handleLogout = async () => {
+  try {
+    // 清除用户状态
+    userStore.clearUserState();
+    showUserMenu.value = false;
+
+    // 跳转到登录页面
+    const localePath = useLocalePath();
+    await navigateTo(localePath("/users/login"));
+  } catch (error) {
+    console.error("退出登录失败:", error);
+    // 可以添加错误提示
+  }
+};
+
 // 在客户端初始化主题和动效
-onMounted(() => {
+onMounted(async () => {
   if (process.client) {
     // 随机选择渐变
     const randomIndex = Math.floor(Math.random() * primaryToTechGreen.length);
@@ -81,6 +133,23 @@ onMounted(() => {
     // 初始化主题
     const savedTheme = localStorage.getItem("theme") || "auto";
     theme.value = savedTheme;
+
+    // 点击外部关闭用户菜单
+    document.addEventListener("click", handleClickOutside);
+
+    // 初始化用户数据
+    try {
+      await userStore.fetchUserContext();
+    } catch (error) {
+      console.error("初始化用户数据失败:", error);
+    }
+  }
+});
+
+// 清理事件监听器
+onUnmounted(() => {
+  if (process.client) {
+    document.removeEventListener("click", handleClickOutside);
   }
 });
 </script>
@@ -203,20 +272,81 @@ onMounted(() => {
           </h1>
         </div>
 
-        <!-- 右侧区域：语言切换器、登录注册按钮 -->
+        <!-- 右侧区域：语言切换器、登录注册按钮或用户信息 -->
         <div class="flex items-center space-x-4">
-          <NuxtLink
-            :to="$localePath('/users/login')"
-            class="px-4 py-2 text-gray-700 dark:text-gray-300 hover:text-blue-600 transition-colors"
-          >
-            {{ $t("login") }}
-          </NuxtLink>
-          <NuxtLink
-            :to="$localePath('/users/register')"
-            class="px-6 py-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-lg transition-all"
-          >
-            {{ $t("register") }}
-          </NuxtLink>
+          <!-- 未登录状态：显示登录注册按钮 -->
+          <template v-if="!isLoggedIn">
+            <NuxtLink
+              :to="$localePath('/users/login')"
+              class="px-4 py-2 text-gray-700 dark:text-gray-300 hover:text-blue-600 transition-colors"
+            >
+              {{ $t("login") }}
+            </NuxtLink>
+            <NuxtLink
+              :to="$localePath('/users/register')"
+              class="px-6 py-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-lg transition-all"
+            >
+              {{ $t("register") }}
+            </NuxtLink>
+          </template>
+
+          <!-- 已登录状态：显示用户信息和下拉菜单 -->
+          <template v-else>
+            <div class="relative" ref="userMenuRef">
+              <button
+                @click="toggleUserMenu"
+                class="flex items-center space-x-2 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+              >
+                <div
+                  class="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center text-white text-sm font-medium"
+                >
+                  {{ userInitials }}
+                </div>
+                <span class="text-gray-700 dark:text-gray-300">{{
+                  userName
+                }}</span>
+                <Icon
+                  name="heroicons:chevron-down"
+                  class="w-4 h-4 text-gray-500 transition-transform"
+                  :class="{ 'rotate-180': showUserMenu }"
+                />
+              </button>
+
+              <!-- 用户下拉菜单 -->
+              <div
+                v-show="showUserMenu"
+                class="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-1 z-50"
+              >
+                <NuxtLink
+                  :to="$localePath('/profile')"
+                  class="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                  @click="showUserMenu = false"
+                >
+                  <Icon name="heroicons:user" class="w-4 h-4 mr-3" />
+                  {{ $t("profile") }}
+                </NuxtLink>
+                <NuxtLink
+                  :to="$localePath('/settings')"
+                  class="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                  @click="showUserMenu = false"
+                >
+                  <Icon name="heroicons:cog-6-tooth" class="w-4 h-4 mr-3" />
+                  {{ $t("settings") }}
+                </NuxtLink>
+                <hr class="my-1 border-gray-200 dark:border-gray-700" />
+                <button
+                  @click="handleLogout"
+                  class="flex items-center w-full px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700"
+                >
+                  <Icon
+                    name="heroicons:arrow-right-on-rectangle"
+                    class="w-4 h-4 mr-3"
+                  />
+                  {{ $t("logout") }}
+                </button>
+              </div>
+            </div>
+          </template>
         </div>
       </div>
 
