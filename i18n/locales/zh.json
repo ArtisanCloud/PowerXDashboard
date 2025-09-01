@@ -2,6 +2,8 @@
   "welcome": "欢迎使用",
   "login": "登录",
   "register": "注册",
+  "logout": "退出登录",
+
   "common": {
     "language": "语言",
     "reload": "重新加载",
@@ -166,6 +168,26 @@
     "footer": "保留所有权利"
   },
   "auth": {
+    "backToHome": "返回首页",
+    "welcomeBack": "欢迎回来",
+    "loginSubtitle": "登录到您的账户",
+    "identifier": "用户名或邮箱",
+    "password": "密码",
+    "signUpNow": "立即注册",
+    "remember": "记住我",
+    "hasAccount": "已有账户？",
+    "email": "邮箱",
+    "agreeTerms": "我同意服务条款和隐私政策",
+    "signInNow": "立即登录",
+    "createAccount": "创建账户",
+    "registerSubtitle": "创建您的新账户",
+    "and": "和",
+    "termsInfo": "点击链接可查看服务条款和隐私政策",
+    "passwordStrength": {
+      "weak": "弱",
+      "medium": "中等",
+      "strong": "强"
+    },
     "login": {
       "title": "登录",
       "username": "用户名",
@@ -838,10 +860,7 @@
       "showConfig": "显示配置"
     }
   },
-  "common": {
-    "enabled": "已启用",
-    "disabled": "已禁用"
-  },
+
   "workflow": {
     "title": "工作流编辑器",
     "newWorkflow": "新建工作流",

@@ -201,7 +201,7 @@ const handleForgotPassword = () => {
                 :to="$localePath('/users/forgot-password')"
                 class="text-sm text-blue-600 hover:text-blue-700"
               >
-                {{ $t("auth.forgotPassword") }}
+                {{ $t("auth.login.forgotPassword") }}
               </NuxtLink>
             </div>
 
@@ -222,7 +222,7 @@ const handleForgotPassword = () => {
           <!-- 注册链接 -->
           <div class="text-center mt-6 pt-4 border-t border-gray-200">
             <p class="text-gray-600 text-sm">
-              {{ $t("auth.noAccount") }}
+              {{ $t("auth.login.noAccount") }}
               <NuxtLink
                 :to="$localePath('/users/register')"
                 class="text-blue-600 hover:text-blue-700 font-medium"

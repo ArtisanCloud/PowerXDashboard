@@ -434,13 +434,14 @@ const handleRegister = async () => {
                 for="username"
                 class="block text-sm font-medium text-gray-700 mb-3"
               >
-                {{ $t("auth.username") }} <span class="text-red-500">*</span>
+                {{ $t("auth.register.username") }}
+                <span class="text-red-500">*</span>
               </label>
               <UInput
                 id="username"
                 name="username"
                 v-model="form.username"
-                :placeholder="$t('auth.username')"
+                :placeholder="$t('auth.register.username')"
                 size="lg"
                 :disabled="loading"
                 class="w-full"
@@ -521,7 +522,7 @@ const handleRegister = async () => {
                 for="confirmPassword"
                 class="block text-sm font-medium text-gray-700 mb-3"
               >
-                {{ $t("auth.confirmPassword") }}
+                {{ $t("auth.register.confirmPassword") }}
                 <span class="text-red-500">*</span>
               </label>
               <UInput
@@ -529,7 +530,7 @@ const handleRegister = async () => {
                 name="confirmPassword"
                 v-model="form.confirmPassword"
                 type="password"
-                :placeholder="$t('auth.confirmPassword')"
+                :placeholder="$t('auth.register.confirmPassword')"
                 size="lg"
                 :disabled="loading"
                 class="w-full"
@@ -585,7 +586,7 @@ const handleRegister = async () => {
               class="text-xs text-blue-600 dark:text-blue-400 flex items-center space-x-1"
             >
               <UIcon name="i-heroicons-information-circle" class="w-4 h-4" />
-              <span>点击链接可查看服务条款和隐私政策</span>
+              <span>{{ $t("auth.termsInfo") }}</span>
             </div>
 
             <!-- 注册按钮 -->

@@ -337,7 +337,7 @@ onUnmounted(() => {
                   @click="showUserMenu = false"
                 >
                   <Icon name="heroicons:user" class="w-4 h-4 mr-3" />
-                  {{ $t("profile") }}
+                  {{ $t("header.profile") }}
                 </NuxtLink>
                 <NuxtLink
                   :to="$localePath('/settings')"
@@ -345,7 +345,7 @@ onUnmounted(() => {
                   @click="showUserMenu = false"
                 >
                   <Icon name="heroicons:cog-6-tooth" class="w-4 h-4 mr-3" />
-                  {{ $t("settings") }}
+                  {{ $t("header.settings") }}
                 </NuxtLink>
                 <hr class="my-1 border-gray-200 dark:border-gray-700" />
                 <button
@@ -356,7 +356,7 @@ onUnmounted(() => {
                     name="heroicons:arrow-right-on-rectangle"
                     class="w-4 h-4 mr-3"
                   />
-                  {{ $t("logout") }}
+                  {{ $t("header.logout") }}
                 </button>
               </div>
             </div>

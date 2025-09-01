@@ -2,6 +2,9 @@
   "welcome": "Welcome to",
   "login": "Login",
   "register": "Register",
+  "logout": "Logout",
+  "profile": "Profile",
+  "settings": "Settings",
   "common": {
     "language": "Language",
     "reload": "Reload",
@@ -166,6 +169,26 @@
     "footer": "All rights reserved"
   },
   "auth": {
+    "backToHome": "Back to Home",
+    "welcomeBack": "Welcome Back",
+    "loginSubtitle": "Sign in to your account",
+    "identifier": "Username or Email",
+    "password": "Password",
+    "signUpNow": "Sign Up Now",
+    "remember": "Remember me",
+    "hasAccount": "Already have an account?",
+    "email": "Email",
+    "agreeTerms": "I agree to the Terms of Service and Privacy Policy",
+    "signInNow": "Sign In Now",
+    "createAccount": "Create Account",
+    "registerSubtitle": "Create your new account",
+    "and": "and",
+    "termsInfo": "Click the links to view Terms of Service and Privacy Policy",
+    "passwordStrength": {
+      "weak": "Weak",
+      "medium": "Medium",
+      "strong": "Strong"
+    },
     "login": {
       "title": "Login",
       "username": "Username",
