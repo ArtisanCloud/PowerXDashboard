@@ -2,6 +2,10 @@
 import type { Agent } from "~/types/agent";
 import ChatInterface from "@/components/agent/ChatInterface.vue";
 import ConfigPanel from "@/components/agent/ConfigPanel.vue";
+import ConnectionIndicators from "@/components/agent/ConnectionIndicators.vue";
+import { useDualChannelConnection } from "~/composables/agent/useDualChannelConnection";
+import { useAgentManager } from "~/composables/agent/useAgentManager";
+import { useOneShotAlert } from "~/composables/useOneShotAlert";
 
 definePageMeta({
   title: "Agent 对话",
@@ -13,7 +17,20 @@ const { t } = useI18n();
 
 // 状态管理
 const currentAgentId = ref<number>(1);
-const connectionType = ref<"sse" | "websocket">("sse");
+// 双通道聊天流管理
+const chat = useDualChannelConnection({
+  baseURL: "/api/v1",
+  defaultFlowId: "chat",
+  onMessage: (message) => {
+    console.log("收到消息:", message);
+  },
+  onError: (error) => {
+    console.error("聊天错误:", error);
+  },
+  onComplete: () => {
+    console.log("对话完成");
+  },
+});
 const showConfigPanel = ref(false);
 const editingAgent = ref<Agent | null>(null);
 
@@ -37,40 +54,19 @@ const {
 const agentManager = useAgentManager();
 const { agents, loading: agentsLoading, error: agentsError } = agentManager;
 
-// 临时的聊天状态（等待实现真正的聊天功能）
-const messages = ref([]);
-const isConnected = ref(false);
+// 使用双通道聊天的状态
+const messages = computed(() => chat.messages.value);
+const isConnected = computed(() => chat.sseActive.value || chat.wsActive.value);
 const chatError = ref(null);
+const isStreaming = computed(() => chat.isGenerating.value);
+const isTyping = ref(false);
 
 const sendMessage = async (content: string) => {
-  console.log("发送消息:", content);
-  // TODO: 实现真正的消息发送
-};
-
-const connect = () => {
-  console.log("连接聊天服务");
-  isConnected.value = true;
-};
-
-const disconnect = () => {
-  console.log("断开聊天连接");
-  isConnected.value = false;
+  await chat.send(content);
 };
 
 const clearMessages = () => {
-  messages.value = [];
-};
-
-// 添加缺失的状态
-const isStreaming = ref(false);
-const isTyping = ref(false);
-
-// 添加缺失的方法
-const switchConnection = (type: "sse" | "websocket") => {
-  connectionType.value = type;
-  // 重新连接逻辑
-  disconnect();
-  setTimeout(() => connect(), 100);
+  chat.clearMessages();
 };
 
 const switchAgent = async (agentId: string) => {
@@ -108,7 +104,7 @@ onMounted(async () => {
 
 // 组件卸载时断开连接
 onUnmounted(() => {
-  disconnect();
+  chat.disconnect();
 });
 
 const agentsList = computed(() =>
@@ -120,14 +116,6 @@ const handleAgentSelect = async (agentId: number) => {
   if (agentId === currentAgentId.value) return;
   currentAgentId.value = agentId;
   await switchAgent(agentId.toString());
-};
-
-// 处理连接方式切换
-const handleConnectionSwitch = (type: "sse" | "websocket") => {
-  connectionType.value = type;
-  switchConnection(type);
-  // 切换连接方式时，重置一次性提醒标记，让用户在新方式失败时仍能看到一次提示
-  reset();
 };
 
 // 处理发送消息
@@ -159,16 +147,16 @@ const handleCreateAgent = () => {
 
 // 编辑 Agent
 const handleEditAgent = (agentId: number) => {
-  console.log("[父组件] 收到编辑事件，agentId:", agentId);
-  console.log("[父组件] agents.value:", agents.value);
+  // console.log("[父组件] 收到编辑事件，agentId:", agentId);
+  // console.log("[父组件] agents.value:", agents.value);
   const agent = agents.value.find((a) => a.id === agentId);
-  console.log("[父组件] 找到的 agent:", agent);
+  // console.log("[父组件] 找到的 agent:", agent);
   if (agent) {
     // ✅ 深拷贝解决 readonly 属性问题
     editingAgent.value = JSON.parse(JSON.stringify(agent));
-    console.log("[父组件] 设置 editingAgent:", editingAgent.value);
+    // console.log("[父组件] 设置 editingAgent:", editingAgent.value);
     showConfigPanel.value = true;
-    console.log("[父组件] 打开配置面板");
+    // console.log("[父组件] 打开配置面板");
   } else {
     console.error("[父组件] 未找到对应的 agent，agentId:", agentId);
   }
@@ -257,8 +245,8 @@ const canSendMessage = computed(() => {
     return false;
   }
 
-  // 检查websocket连接状态（如果使用websocket连接方式）
-  if (connectionType.value === "websocket" && !isConnected.value) {
+  // 检查连接状态
+  if (!isConnected.value) {
     return false;
   }
 
@@ -354,6 +342,11 @@ const getAgentIcon = (agent: Agent) => {
 
     <!-- 中间聊天界面 -->
     <div class="flex-1 flex flex-col min-w-0">
+      <!-- 连接状态指示器 -->
+      <div class="p-4 border-b border-gray-200 bg-white">
+        <ConnectionIndicators :connection="chat" />
+      </div>
+
       <ClientOnly>
         <ChatInterface
           :messages="Array.isArray(messages) ? messages : []"
@@ -361,12 +354,11 @@ const getAgentIcon = (agent: Agent) => {
           :is-streaming="!!isStreaming"
           :is-typing="!!isTyping"
           :current-agent="currentAgentForChat"
-          :connection-type="connectionType"
+          :connection-indicators="true"
           :can-send-message="canSendMessage"
           @send-message="handleSendMessage"
           @retry-message="handleRetryMessage"
           @clear-messages="handleClearMessages"
-          @switch-connection="handleConnectionSwitch"
         />
       </ClientOnly>
     </div>

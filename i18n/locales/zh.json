@@ -753,7 +753,8 @@
       "enterToSend": "Enter 发送",
       "shiftEnterNewLine": "Shift+Enter 换行",
       "model": "模型",
-      "temperature": "温度"
+      "temperature": "温度",
+      "cancel": "取消"
     },
     "config": {
       "editTitle": "编辑 Agent",
@@ -992,5 +993,10 @@
     "light": "浅色",
     "dark": "深色",
     "auto": "自动"
+  },
+  "connection": {
+    "chatSignal": "对话信号",
+    "commandChannel": "指令通讯器",
+    "reconnect": "重新连接"
   }
 }

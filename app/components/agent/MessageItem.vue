@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { ChatMessage } from "~/types/agent";
+import type { ChatMessage } from "~/types/message";
 import type {
   EnhancedChatMessage,
   MessageContent,

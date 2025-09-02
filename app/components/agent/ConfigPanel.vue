@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { reactive, watch, ref, computed } from "vue";
-import type { AgentConfig } from "~/composables/useAgentManager";
+import type { AgentConfig } from "~/composables/agent/useAgentManager";
 import type { Agent } from "~/types/agent";
 
 type AgentConfigEx = AgentConfig & {

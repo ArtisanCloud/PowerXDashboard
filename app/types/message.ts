@@ -12,6 +12,9 @@ export const MESSAGE_TYPES = {
 
 export type MessageType = (typeof MESSAGE_TYPES)[keyof typeof MESSAGE_TYPES];
 
+// 统一的消息角色
+export type ChatRole = "user" | "assistant" | "system";
+
 // 消息内容接口
 export interface MessageContent {
   type: MessageType;
@@ -77,9 +80,18 @@ export interface SystemContent {
 // 扩展的聊天消息接口
 export interface EnhancedChatMessage {
   id: string;
-  role: "user" | "assistant" | "system";
+  role: ChatRole;
   content: MessageContent[];
   timestamp: Date;
   status?: "sending" | "sent" | "error";
+  metadata?: Record<string, any>;
+}
+
+// ✅ 统一的基础聊天消息（兼容历史：content 可为 string 或结构化内容数组）
+export interface ChatMessage {
+  id: string;
+  role: ChatRole;
+  content: string | MessageContent[];
+  timestamp: Date;
   metadata?: Record<string, any>;
 }

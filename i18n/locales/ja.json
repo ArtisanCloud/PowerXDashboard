@@ -439,7 +439,8 @@
       "enterToSend": "Enter で送信",
       "shiftEnterNewLine": "Shift+Enter で改行",
       "model": "モデル",
-      "temperature": "温度"
+      "temperature": "温度",
+      "cancel": "キャンセル"
     },
     "config": {
       "editTitle": "エージェントを編集",
@@ -516,5 +517,10 @@
     "canary": "カナリア環境",
     "blue": "ブルー環境",
     "green": "グリーン環境"
+  },
+  "connection": {
+    "chatSignal": "チャット信号",
+    "commandChannel": "コマンドチャンネル",
+    "reconnect": "再接続"
   }
 }

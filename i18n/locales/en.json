@@ -754,7 +754,8 @@
       "enterToSend": "Enter to send",
       "shiftEnterNewLine": "Shift+Enter for new line",
       "model": "Model",
-      "temperature": "Temperature"
+      "temperature": "Temperature",
+      "cancel": "Cancel"
     },
     "config": {
       "editTitle": "Edit Agent",
@@ -996,5 +997,10 @@
     "light": "Light",
     "dark": "Dark",
     "auto": "Auto"
+  },
+  "connection": {
+    "chatSignal": "Chat Signal",
+    "commandChannel": "Command Channel",
+    "reconnect": "Reconnect"
   }
 }

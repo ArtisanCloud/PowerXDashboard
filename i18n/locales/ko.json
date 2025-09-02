@@ -246,7 +246,8 @@
       "enterToSend": "Enter로 전송",
       "shiftEnterNewLine": "Shift+Enter로 줄바꿈",
       "model": "모델",
-      "temperature": "온도"
+      "temperature": "온도",
+      "cancel": "취소"
     },
     "config": {
       "editTitle": "에이전트 편집",
@@ -479,5 +480,10 @@
       "filter": "필터",
       "reset": "초기화"
     }
+  },
+  "connection": {
+    "chatSignal": "채팅 신호",
+    "commandChannel": "명령 채널",
+    "reconnect": "재연결"
   }
 }

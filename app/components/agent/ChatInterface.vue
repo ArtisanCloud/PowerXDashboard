@@ -8,11 +8,10 @@ import {
   nextTick,
 } from "vue";
 import type { DeepReadonly } from "vue";
-import type { ChatMessage } from "~/types/agent";
-import type { AgentConfig } from "~/composables/useAgentManager";
+import type { ChatMessage } from "~/types/message";
+import type { AgentConfig } from "~/composables/agent/useAgentManager";
 import MessageItem from "~/components/agent/MessageItem.vue";
 
-type ConnectionType = "sse" | "websocket";
 type ViewAgent = AgentConfig | DeepReadonly<AgentConfig>;
 type ViewMessage = ChatMessage | DeepReadonly<ChatMessage>;
 
@@ -23,7 +22,7 @@ const props = withDefaults(
     isStreaming?: boolean;
     isTyping?: boolean;
     currentAgent?: ViewAgent | null;
-    connectionType?: ConnectionType;
+
     canSendMessage?: boolean;
   }>(),
   {
@@ -32,7 +31,7 @@ const props = withDefaults(
     isStreaming: false,
     isTyping: false,
     currentAgent: null,
-    connectionType: "sse",
+
     canSendMessage: true,
   }
 );
@@ -41,7 +40,6 @@ const emit = defineEmits<{
   (e: "send-message", content: string): void;
   (e: "retry-message"): void;
   (e: "clear-messages"): void;
-  (e: "switch-connection", type: ConnectionType): void;
 }>();
 
 /* ----------------- 基础状态 ----------------- */
@@ -240,7 +238,7 @@ function handlePaste(e: ClipboardEvent) {
 }
 
 /* ----------------- UI 辅助 ----------------- */
-const connectionLabel = computed(() => props.connectionType.toUpperCase());
+
 function getConnectionStatusText() {
   if (!props.isConnected) return t("agent.chat.disconnected");
   if (props.isStreaming) return t("agent.chat.responding");
@@ -390,58 +388,8 @@ function onSendClick() {
               <span :class="getConnectionStatusColor()">
                 {{ getConnectionStatusText() }}
               </span>
-              <span class="text-gray-300">•</span>
-              <span class="text-gray-500">
-                {{ connectionLabel }}
-              </span>
             </div>
           </div>
-        </div>
-
-        <div class="flex items-center space-x-2">
-          <!-- 切换连接 -->
-          <UDropdownMenu
-            :items="[
-              [
-                {
-                  label: 'SSE',
-                  icon: 'i-heroicons-signal',
-                  click: () => $emit('switch-connection', 'sse'),
-                  disabled: connectionLabel === 'SSE',
-                },
-              ],
-              [
-                {
-                  label: 'WebSocket',
-                  icon: 'i-heroicons-wifi',
-                  click: () => $emit('switch-connection', 'websocket'),
-                  disabled: connectionLabel === 'WEBSOCKET',
-                },
-              ],
-            ]"
-          >
-            <UButton
-              variant="outline"
-              size="sm"
-              :icon="
-                connectionLabel === 'SSE'
-                  ? 'i-heroicons-signal'
-                  : 'i-heroicons-wifi'
-              "
-            >
-              {{ connectionLabel }}
-            </UButton>
-          </UDropdownMenu>
-
-          <UButton
-            variant="outline"
-            size="sm"
-            icon="i-heroicons-trash"
-            @click="$emit('clear-messages')"
-            :disabled="messages.length === 0"
-          >
-            {{ t("agent.chat.clear") }}
-          </UButton>
         </div>
       </div>
     </div>
