@@ -13,7 +13,7 @@ export interface ChatSession {
 
 interface Props {
   agents?: Agent[];
-  currentAgentId?: number;
+  currentAgentId?: number | null;
   currentSessionId?: number | string; // ✅ 高亮当前会话
   loading?: boolean;
 
@@ -532,4 +532,3 @@ function fmtTime(ts?: string | number | Date) {
   background: #a8a8a8;
 }
 </style>
-

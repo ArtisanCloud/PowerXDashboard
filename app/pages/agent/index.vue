@@ -19,7 +19,7 @@ definePageMeta({
 const { t } = useI18n();
 
 // 状态管理
-const currentAgentId = ref<number>(1);
+const currentAgentId = ref<number | null>(null);
 
 // ===== 会话状态（按 Agent 维度）=====
 const currentSessionId = ref<number | string | null>(null);
@@ -190,7 +190,6 @@ const handleRenameSession = async (payload: {
 };
 
 const handleAgentSelect = async (agentId: number) => {
-  if (agentId === currentAgentId.value) return;
   currentAgentId.value = agentId;
   chat.clearMessages();
 
@@ -237,7 +236,7 @@ const handleSendMessage = async (content: string) => {
   const meta: any = {};
   if (currentSessionId.value) meta.sessionId = currentSessionId.value;
   if (currentAgentId.value) meta.agentId = currentAgentId.value;
-  await chat.send(content, meta);
+  await chat.sendMessage(content, "chat", meta);
 };
 
 const handleRetryMessage = async () => {
@@ -453,7 +452,7 @@ watch(
             class="flex-1 min-h-0"
             v-show="!isLeftPanelCollapsed"
             :agents="agentsList"
-            :current-agent-id="currentAgentId"
+            :current-agent-id="currentAgentId || undefined"
             :current-session-id="currentSessionId || undefined"
             :sessions-by-agent="sessionsByAgent"
             :sessions-loading-by-agent="sessionsLoadingByAgent"
@@ -468,7 +467,7 @@ watch(
             @unpin-session="
               (sessionId: string) =>
                 handlePinSession({
-                  agentId: currentAgentId!,
+                  agentId: Number(currentAgentId),
                   sessionId,
                   pinned: false,
                 })

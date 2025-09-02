@@ -43,6 +43,9 @@ export default defineNuxtConfig({
 
   // 添加开发服务器代理配置
   nitro: {
+    experimental: {
+      websocket: true, // ✅ 开启 Nitro 原生 WS
+    },
     routeRules: {
       "/__up/_p/**": { proxy: "http://127.0.0.1:8077/_p/**" },
 
