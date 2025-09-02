@@ -213,7 +213,11 @@
       "capabilities": "개 기능",
       "edit": "편집",
       "delete": "삭제",
-      "totalCount": "총 {count}개 에이전트"
+      "totalCount": "총 {count}개 에이전트",
+      "sessions": "최근 세션",
+      "newSession": "새 세션",
+      "noSessions": "세션이 없습니다",
+      "untitledSession": "제목 없는 세션"
     },
     "message": {
       "justNow": "방금 전",

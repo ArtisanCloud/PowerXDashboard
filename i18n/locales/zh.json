@@ -719,7 +719,21 @@
       "capabilities": "项能力",
       "edit": "编辑",
       "delete": "删除",
-      "totalCount": "共 {count} 个 Agent"
+      "totalCount": "共 {count} 个 Agent",
+      "sessions": "最近会话",
+      "newSession": "新会话",
+      "newAgent": "新建 Agent",
+      "editAgent": "编辑 Agent",
+      "noSessions": "暂无会话",
+      "untitledSession": "未命名会话",
+      "searchSessions": "搜索会话…",
+      "pickAgentToSeeSessions": "请选择一个 Agent 查看会话列表",
+      "pinned": "置顶",
+      "recents": "最近",
+      "pin": "置顶",
+      "unpin": "取消置顶",
+      "rename": "重命名",
+      "renameSession": "重命名会话"
     },
     "message": {
       "justNow": "刚刚",

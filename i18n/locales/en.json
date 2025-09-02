@@ -720,7 +720,13 @@
       "capabilities": "capabilities",
       "edit": "Edit",
       "delete": "Delete",
-      "totalCount": "Total {count} Agents"
+      "totalCount": "Total {count} Agents",
+      "sessions": "Recent Sessions",
+      "newSession": "New Session",
+      "newAgent": "New Agent",
+      "editAgent": "Edit Agent",
+      "noSessions": "No sessions",
+      "untitledSession": "Untitled Session"
     },
     "message": {
       "justNow": "Just now",

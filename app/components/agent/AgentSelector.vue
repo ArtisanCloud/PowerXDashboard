@@ -1,22 +1,53 @@
 <script setup lang="ts">
 import type { Agent } from "~/types/agent";
 
+// 会话类型：可按需扩展
+export interface ChatSession {
+  id: number | string;
+  title?: string;
+  lastMessage?: string;
+  updatedAt?: string | number | Date;
+  unread?: number;
+  pinned?: boolean;
+}
+
 interface Props {
   agents?: Agent[];
   currentAgentId?: number;
   loading?: boolean;
+  // ✅ 外部传入的会话数据/状态（推荐做"单一事实来源"）
+  sessionsByAgent?: Record<number, ChatSession[]>;
+  sessionsLoadingByAgent?: Record<number, boolean>;
+  hasMoreByAgent?: Record<number, boolean>;
+  // （可选）如果你希望在子组件里直接触发加载，也可传入这个函数
+  fetchSessions?: (agentId: number) => Promise<void>;
 }
 interface Emits {
   (e: "select", agentId: number): void;
   (e: "create"): void;
   (e: "edit", agentId: number): void;
   (e: "delete", agentId: number): void;
+  // ✅ 新增会话相关事件
+  (
+    e: "select-session",
+    payload: { agentId: number; sessionId: number | string }
+  ): void;
+  (e: "create-session", agentId: number): void;
+  (
+    e: "delete-session",
+    payload: { agentId: number; sessionId: number | string }
+  ): void;
+  (e: "load-sessions", agentId: number): void; // 若不传 fetchSessions，用这个让父组件去拉
+  (e: "load-more-sessions", agentId: number): void; // 翻页
 }
 
 const props = withDefaults(defineProps<Props>(), {
   agents: () => [],
   loading: false,
   currentAgentId: 0,
+  sessionsByAgent: () => ({}),
+  sessionsLoadingByAgent: () => ({}),
+  hasMoreByAgent: () => ({}),
 });
 const emit = defineEmits<Emits>();
 const { t } = useI18n();
@@ -54,7 +85,17 @@ const groupedAgents = computed(() => {
   return { active, inactive };
 });
 
-const selectAgent = (id: number) => emit("select", id);
+const selectAgent = async (id: number) => {
+  emit("select", id);
+  // 选中即展开
+  if (!isExpanded(id)) {
+    const s = new Set(expandedIds.value);
+    s.add(id);
+    expandedIds.value = s;
+  }
+  // 选中即加载（如果还没加载过）
+  await ensureSessionsLoaded(id);
+};
 
 const getStatusColor = (agent: Agent) => {
   if (agent.status === "inactive") return "neutral";
@@ -93,8 +134,8 @@ const canDelete = (agent: Agent) => {
   return !agent.meta?.protect_from_delete;
 };
 
-const makeMenuItems = (agent: Agent): DropdownMenuItem[][] => {
-  const items: DropdownMenuItem[][] = [
+const makeMenuItems = (agent: Agent): any[][] => {
+  const items: any[][] = [
     [
       {
         label: t("agent.selector.edit"),
@@ -132,12 +173,60 @@ const expandedIds = ref<Set<number>>(new Set());
 
 const isExpanded = (id: number) => expandedIds.value.has(id);
 
-const toggleExpand = (id: number) => {
+const toggleExpand = async (id: number) => {
   // 用新 Set 触发响应式
   const s = new Set(expandedIds.value);
   s.has(id) ? s.delete(id) : s.add(id);
   expandedIds.value = s;
+  // 首次展开时尝试加载该 Agent 的会话
+  if (expandedIds.value.has(id)) {
+    await ensureSessionsLoaded(id);
+  }
 };
+
+// 工具：取会话/加载/更多标识
+const getSessions = (agentId: number): ChatSession[] =>
+  props.sessionsByAgent?.[agentId] ?? [];
+const isSessionsLoading = (agentId: number): boolean =>
+  !!props.sessionsLoadingByAgent?.[agentId];
+const hasMoreSessions = (agentId: number): boolean =>
+  !!props.hasMoreByAgent?.[agentId];
+
+// 首次展开时加载
+async function ensureSessionsLoaded(agentId: number) {
+  if (getSessions(agentId)?.length) return; // 已有缓存
+  if (props.fetchSessions) {
+    try {
+      await props.fetchSessions(agentId);
+    } catch {}
+  } else {
+    emit("load-sessions", agentId);
+  }
+}
+
+// 格式化时间（简单版；你也可换 dayjs）
+function fmtTime(ts?: string | number | Date) {
+  if (!ts) return "";
+  const d = new Date(ts);
+  const mm = String(d.getMonth() + 1).padStart(2, "0");
+  const dd = String(d.getDate()).padStart(2, "0");
+  const hh = String(d.getHours()).padStart(2, "0");
+  const mi = String(d.getMinutes()).padStart(2, "0");
+  return `${mm}-${dd} ${hh}:${mi}`;
+}
+
+// 当外部切换 currentAgentId 时也自动展开+加载
+watch(
+  () => props.currentAgentId,
+  async (id) => {
+    if (!id) return;
+    const s = new Set(expandedIds.value);
+    s.add(id);
+    expandedIds.value = s;
+    await ensureSessionsLoaded(id);
+  },
+  { immediate: true } // 初次挂载也跑一次
+);
 </script>
 
 <template>
@@ -285,7 +374,10 @@ const toggleExpand = (id: number) => {
                   </p>
 
                   <!-- 展开区（详尽信息 + 小屏操作按钮） -->
-                  <div v-show="isExpanded(agent.id)" class="mt-2 space-y-2">
+                  <div
+                    v-show="agent.id === currentAgentId || isExpanded(agent.id)"
+                    class="mt-2 space-y-2"
+                  >
                     <p class="text-xs text-gray-600">{{ agent.description }}</p>
 
                     <div
@@ -322,6 +414,107 @@ const toggleExpand = (id: number) => {
                       >
                         {{ t("agent.selector.delete") }}
                       </UButton>
+                    </div>
+
+                    <!-- ✅ 会话列表（该 Agent） -->
+                    <div
+                      class="mt-2 rounded-md border border-gray-200 bg-gray-50 p-2"
+                    >
+                      <div class="flex items-center justify-between mb-2">
+                        <div class="text-xs font-medium text-gray-600">
+                          {{ t("agent.selector.sessions") || "最近会话" }}
+                        </div>
+                        <UButton
+                          size="xs"
+                          variant="ghost"
+                          icon="i-heroicons-plus"
+                          @click.stop="emit('create-session', agent.id)"
+                        >
+                          {{ t("agent.selector.newSession") || "新建会话" }}
+                        </UButton>
+                      </div>
+
+                      <div v-if="isSessionsLoading(agent.id)" class="space-y-2">
+                        <USkeleton
+                          class="h-10 w-full"
+                          v-for="i in 3"
+                          :key="i"
+                        />
+                      </div>
+
+                      <template v-else>
+                        <div
+                          v-if="getSessions(agent.id).length === 0"
+                          class="text-xs text-gray-400 py-2"
+                        >
+                          {{ t("agent.selector.noSessions") || "暂无会话" }}
+                        </div>
+
+                        <ul
+                          v-else
+                          class="divide-y divide-gray-200 rounded-md bg-white"
+                        >
+                          <li
+                            v-for="s in getSessions(agent.id)"
+                            :key="String(s.id)"
+                            class="flex items-center gap-2 px-3 py-2 hover:bg-gray-50 cursor-pointer"
+                            @click.stop="
+                              emit('select-session', {
+                                agentId: agent.id,
+                                sessionId: s.id,
+                              })
+                            "
+                          >
+                            <div class="flex-1 min-w-0">
+                              <div class="text-sm text-gray-900 truncate">
+                                {{
+                                  s.title ||
+                                  s.lastMessage ||
+                                  t("agent.selector.untitledSession") ||
+                                  "未命名会话"
+                                }}
+                              </div>
+                              <div class="text-[11px] text-gray-500 truncate">
+                                {{ s.lastMessage || "" }}
+                              </div>
+                            </div>
+                            <div class="flex items-center gap-2">
+                              <span class="text-[11px] text-gray-400">{{
+                                fmtTime(s.updatedAt)
+                              }}</span>
+                              <UBadge
+                                v-if="s.unread"
+                                color="primary"
+                                size="xs"
+                                class="min-w-[1.25rem] justify-center"
+                                >{{ s.unread }}</UBadge
+                              >
+                              <UButton
+                                icon="i-heroicons-trash"
+                                size="xs"
+                                variant="ghost"
+                                @click.stop="
+                                  emit('delete-session', {
+                                    agentId: agent.id,
+                                    sessionId: s.id,
+                                  })
+                                "
+                              />
+                            </div>
+                          </li>
+                        </ul>
+
+                        <div v-if="hasMoreSessions(agent.id)" class="pt-2">
+                          <UButton
+                            size="xs"
+                            variant="outline"
+                            block
+                            @click.stop="emit('load-more-sessions', agent.id)"
+                          >
+                            {{ t("common.loadMore") || "加载更多" }}
+                          </UButton>
+                        </div>
+                      </template>
                     </div>
                   </div>
                 </div>
@@ -413,7 +606,10 @@ const toggleExpand = (id: number) => {
                   </p>
 
                   <!-- 展开区（详尽信息 + 小屏操作按钮） -->
-                  <div v-show="isExpanded(agent.id)" class="mt-2 space-y-2">
+                  <div
+                    v-show="agent.id === currentAgentId || isExpanded(agent.id)"
+                    class="mt-2 space-y-2"
+                  >
                     <p class="text-xs text-gray-500">{{ agent.description }}</p>
 
                     <div
@@ -450,6 +646,107 @@ const toggleExpand = (id: number) => {
                       >
                         {{ t("agent.selector.delete") }}
                       </UButton>
+                    </div>
+
+                    <!-- ✅ 会话列表（该 Agent） -->
+                    <div
+                      class="mt-2 rounded-md border border-gray-200 bg-gray-50 p-2"
+                    >
+                      <div class="flex items-center justify-between mb-2">
+                        <div class="text-xs font-medium text-gray-600">
+                          {{ t("agent.selector.sessions") || "最近会话" }}
+                        </div>
+                        <UButton
+                          size="xs"
+                          variant="ghost"
+                          icon="i-heroicons-plus"
+                          @click.stop="emit('create-session', agent.id)"
+                        >
+                          {{ t("agent.selector.newSession") || "新建会话" }}
+                        </UButton>
+                      </div>
+
+                      <div v-if="isSessionsLoading(agent.id)" class="space-y-2">
+                        <USkeleton
+                          class="h-10 w-full"
+                          v-for="i in 3"
+                          :key="i"
+                        />
+                      </div>
+
+                      <template v-else>
+                        <div
+                          v-if="getSessions(agent.id).length === 0"
+                          class="text-xs text-gray-400 py-2"
+                        >
+                          {{ t("agent.selector.noSessions") || "暂无会话" }}
+                        </div>
+
+                        <ul
+                          v-else
+                          class="divide-y divide-gray-200 rounded-md bg-white"
+                        >
+                          <li
+                            v-for="s in getSessions(agent.id)"
+                            :key="String(s.id)"
+                            class="flex items-center gap-2 px-3 py-2 hover:bg-gray-50 cursor-pointer"
+                            @click.stop="
+                              emit('select-session', {
+                                agentId: agent.id,
+                                sessionId: s.id,
+                              })
+                            "
+                          >
+                            <div class="flex-1 min-w-0">
+                              <div class="text-sm text-gray-900 truncate">
+                                {{
+                                  s.title ||
+                                  s.lastMessage ||
+                                  t("agent.selector.untitledSession") ||
+                                  "未命名会话"
+                                }}
+                              </div>
+                              <div class="text-[11px] text-gray-500 truncate">
+                                {{ s.lastMessage || "" }}
+                              </div>
+                            </div>
+                            <div class="flex items-center gap-2">
+                              <span class="text-[11px] text-gray-400">{{
+                                fmtTime(s.updatedAt)
+                              }}</span>
+                              <UBadge
+                                v-if="s.unread"
+                                color="primary"
+                                size="xs"
+                                class="min-w-[1.25rem] justify-center"
+                                >{{ s.unread }}</UBadge
+                              >
+                              <UButton
+                                icon="i-heroicons-trash"
+                                size="xs"
+                                variant="ghost"
+                                @click.stop="
+                                  emit('delete-session', {
+                                    agentId: agent.id,
+                                    sessionId: s.id,
+                                  })
+                                "
+                              />
+                            </div>
+                          </li>
+                        </ul>
+
+                        <div v-if="hasMoreSessions(agent.id)" class="pt-2">
+                          <UButton
+                            size="xs"
+                            variant="outline"
+                            block
+                            @click.stop="emit('load-more-sessions', agent.id)"
+                          >
+                            {{ t("common.loadMore") || "加载更多" }}
+                          </UButton>
+                        </div>
+                      </template>
                     </div>
                   </div>
                 </div>

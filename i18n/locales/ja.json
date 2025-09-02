@@ -406,7 +406,11 @@
       "capabilities": "の機能",
       "edit": "編集",
       "delete": "削除",
-      "totalCount": "合計 {count} エージェント"
+      "totalCount": "合計 {count} エージェント",
+      "sessions": "最近のセッション",
+      "newSession": "新しいセッション",
+      "noSessions": "セッションがありません",
+      "untitledSession": "無題のセッション"
     },
     "message": {
       "justNow": "たった今",

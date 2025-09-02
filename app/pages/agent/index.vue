@@ -1,10 +1,13 @@
 <script setup lang="ts">
 import type { Agent } from "~/types/agent";
+import type { ChatSession } from "~/components/agent/AgentSidebar.vue";
 import ChatInterface from "@/components/agent/ChatInterface.vue";
 import ConfigPanel from "@/components/agent/ConfigPanel.vue";
 import ConnectionIndicators from "@/components/agent/ConnectionIndicators.vue";
+import AgentSidebar from "@/components/agent/AgentSidebar.vue";
 import { useDualChannelConnection } from "~/composables/agent/useDualChannelConnection";
 import { useAgentManager } from "~/composables/agent/useAgentManager";
+import { useChatSessions } from "~/composables/agent/useChatSessions";
 import { useOneShotAlert } from "~/composables/useOneShotAlert";
 
 definePageMeta({
@@ -17,6 +20,16 @@ const { t } = useI18n();
 
 // 状态管理
 const currentAgentId = ref<number>(1);
+
+// ===== 会话状态（按 Agent 维度）=====
+const currentSessionId = ref<number | string | null>(null);
+const sessionsByAgent = reactive<Record<number, ChatSession[]>>({});
+const sessionsLoadingByAgent = reactive<Record<number, boolean>>({});
+const hasMoreByAgent = reactive<Record<number, boolean>>({});
+
+// 工具：拿到某 agent 的数组（始终给个安全数组）
+const getSessions = (agentId: number) => sessionsByAgent[agentId] || [];
+
 // 双通道聊天流管理
 const chat = useDualChannelConnection({
   baseURL: "/api/v1",
@@ -61,6 +74,9 @@ const chatError = ref(null);
 const isStreaming = computed(() => chat.isGenerating.value);
 const isTyping = ref(false);
 
+// 会话管理 composable
+const { listSessions, createSession, deleteSession } = useChatSessions();
+
 const sendMessage = async (content: string) => {
   await chat.send(content);
 };
@@ -84,7 +100,7 @@ onMounted(async () => {
     await agentManager.fetchAgents();
     // 如果有 agents，选择第一个作为默认
     if (agents.value && agents.value.length > 0) {
-      currentAgentId.value = agents.value[0].id;
+      await handleAgentSelect(agents.value[0].id);
     }
   } catch (e: any) {
     // 404 当作"空列表"处理，其它错误提示一下
@@ -111,11 +127,225 @@ const agentsList = computed(() =>
   Array.isArray(agents.value) ? agents.value : []
 );
 
-// 处理 Agent 选择
+// ===== 会话事件处理 =====
+const handleSelectSession = async (payload: {
+  agentId: number;
+  sessionId: string | number;
+}) => {
+  const { agentId, sessionId } = payload;
+  if (currentAgentId.value !== agentId) {
+    currentAgentId.value = agentId;
+  }
+  currentSessionId.value = sessionId;
+  // TODO: 加载会话历史消息
+  chat.clearMessages();
+  console.log("选择会话:", sessionId);
+};
+
+const handleNewSession = async () => {
+  if (!currentAgentId.value) return;
+
+  try {
+    // 临时创建会话对象，因为 createSession 可能还没实现
+    const session: ChatSession = {
+      id: `session-${currentAgentId.value}-${Date.now()}`,
+      title: t("agent.sessions.untitledSession") || "新会话",
+      lastMessage: "新会话已创建",
+      updatedAt: new Date(),
+      unread: 0,
+      pinned: false,
+    };
+
+    // 添加到当前 agent 的会话列表
+    const agentId = currentAgentId.value;
+    if (!sessionsByAgent[agentId]) {
+      sessionsByAgent[agentId] = [];
+    }
+    sessionsByAgent[agentId].unshift(session);
+
+    // 选择新会话
+    currentSessionId.value = session.id;
+
+    // 清空当前消息
+    chat.clearMessages();
+  } catch (error) {
+    console.error("创建会话失败:", error);
+  }
+};
+
+const handleDeleteSession = async (payload: {
+  agentId: number;
+  sessionId: string | number;
+}) => {
+  const { agentId, sessionId } = payload;
+  if (!confirm(t("agent.confirmDelete") || "确定删除该会话？")) return;
+
+  try {
+    // TODO: 调用后端删除 API
+    // await deleteSession(sessionId);
+
+    // 从列表中移除
+    const sessions = sessionsByAgent[agentId] || [];
+    const index = sessions.findIndex((s) => s.id === sessionId);
+    if (index > -1) {
+      sessions.splice(index, 1);
+    }
+
+    // 如果删除的是当前会话，切换到第一个会话或清空
+    if (currentSessionId.value === sessionId) {
+      const remainingSessions = sessionsByAgent[agentId] || [];
+      if (remainingSessions.length > 0) {
+        currentSessionId.value = remainingSessions[0].id;
+      } else {
+        currentSessionId.value = null;
+        chat.clearMessages();
+      }
+    }
+  } catch (error) {
+    console.error("删除会话失败:", error);
+  }
+};
+
+const handlePinSession = async (payload: {
+  agentId: number;
+  sessionId: string | number;
+  pinned: boolean;
+}) => {
+  const { agentId, sessionId, pinned } = payload;
+
+  try {
+    // TODO: 调用后端 API 更新置顶状态
+    // await fetch(`/api/sessions/${sessionId}/pin`, { method: 'PATCH', body: JSON.stringify({ pinned }) });
+
+    // 更新本地状态
+    const sessions = sessionsByAgent[agentId] || [];
+    const session = sessions.find((s) => s.id === sessionId);
+    if (session) {
+      session.pinned = pinned;
+    }
+  } catch (error) {
+    console.error("置顶会话失败:", error);
+  }
+};
+
+const handleLoadMoreSessions = async () => {
+  if (!currentAgentId.value || sessionsLoadingByAgent[currentAgentId.value])
+    return;
+
+  try {
+    sessionsLoadingByAgent[currentAgentId.value] = true;
+
+    // 临时模拟加载更多数据
+    const moreSessions: ChatSession[] = [
+      {
+        id: `session-${currentAgentId.value}-more-${Date.now()}`,
+        title: "更多历史会话",
+        lastMessage: "这是加载的更多会话内容...",
+        updatedAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 7),
+        unread: 0,
+        pinned: false,
+      },
+    ];
+
+    const agentId = currentAgentId.value;
+    if (!sessionsByAgent[agentId]) {
+      sessionsByAgent[agentId] = [];
+    }
+    sessionsByAgent[agentId].push(...moreSessions);
+
+    hasMoreByAgent[agentId] = false; // 模拟没有更多数据
+  } catch (error) {
+    console.error("加载更多会话失败:", error);
+  } finally {
+    if (currentAgentId.value) {
+      sessionsLoadingByAgent[currentAgentId.value] = false;
+    }
+  }
+};
+
+const handleRenameSession = async (payload: {
+  agentId: number;
+  sessionId: string | number;
+  title: string;
+}) => {
+  const { agentId, sessionId, title } = payload;
+
+  try {
+    // TODO: 调用后端 API 更新会话标题
+    // await updateSession(sessionId, { title });
+
+    // 更新本地状态
+    const sessions = sessionsByAgent[agentId] || [];
+    const session = sessions.find((s) => s.id === sessionId);
+    if (session) {
+      session.title = title;
+    }
+  } catch (error) {
+    console.error("重命名会话失败:", error);
+  }
+};
+
 const handleAgentSelect = async (agentId: number) => {
   if (agentId === currentAgentId.value) return;
   currentAgentId.value = agentId;
-  await switchAgent(agentId.toString());
+
+  // 清空当前消息
+  chat.clearMessages();
+
+  // 加载该 Agent 的会话列表
+  if (!sessionsByAgent[agentId]) {
+    try {
+      sessionsLoadingByAgent[agentId] = true;
+
+      // 临时模拟数据，因为 listSessions 可能还没实现
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      const sessions: ChatSession[] = [
+        {
+          id: `session-${agentId}-1`,
+          title: "测试会话 1",
+          lastMessage: "这是一个测试会话",
+          updatedAt: new Date(),
+          unread: 0,
+          pinned: false,
+        },
+        {
+          id: `session-${agentId}-2`,
+          title: "测试会话 2",
+          lastMessage: "另一个测试会话",
+          updatedAt: new Date(Date.now() - 1000 * 60 * 30),
+          unread: 2,
+          pinned: true,
+        },
+      ];
+
+      sessionsByAgent[agentId] = sessions;
+      hasMoreByAgent[agentId] = true;
+
+      // 如果有会话，选择第一个
+      if (sessions.length > 0) {
+        currentSessionId.value = sessions[0].id;
+      } else {
+        currentSessionId.value = null;
+      }
+    } catch (error) {
+      console.error("加载会话列表失败:", error);
+      sessionsByAgent[agentId] = [];
+      hasMoreByAgent[agentId] = false;
+      currentSessionId.value = null;
+    } finally {
+      sessionsLoadingByAgent[agentId] = false;
+    }
+  } else {
+    // 如果已有会话列表，选择第一个
+    const sessions = sessionsByAgent[agentId] || [];
+    if (sessions.length > 0) {
+      currentSessionId.value = sessions[0].id;
+    } else {
+      currentSessionId.value = null;
+    }
+  }
+
+  console.log("切换到 Agent:", agentId);
 };
 
 // 处理发送消息
@@ -125,7 +355,13 @@ const handleSendMessage = async (content: string) => {
     console.warn("无法发送消息：agent列表为空或连接失败");
     return;
   }
-  await sendMessage(content);
+
+  // 携带会话上下文
+  const meta: any = {};
+  if (currentSessionId.value) meta.sessionId = currentSessionId.value;
+  if (currentAgentId.value) meta.agentId = currentAgentId.value;
+
+  await chat.send(content, meta);
 };
 
 // 处理重试消息
@@ -147,16 +383,11 @@ const handleCreateAgent = () => {
 
 // 编辑 Agent
 const handleEditAgent = (agentId: number) => {
-  // console.log("[父组件] 收到编辑事件，agentId:", agentId);
-  // console.log("[父组件] agents.value:", agents.value);
   const agent = agents.value.find((a) => a.id === agentId);
-  // console.log("[父组件] 找到的 agent:", agent);
   if (agent) {
-    // ✅ 深拷贝解决 readonly 属性问题
-    editingAgent.value = JSON.parse(JSON.stringify(agent));
-    // console.log("[父组件] 设置 editingAgent:", editingAgent.value);
+    // ✅ 深拷贝并转换为可变类型解决 readonly 属性问题
+    editingAgent.value = JSON.parse(JSON.stringify(agent)) as Agent;
     showConfigPanel.value = true;
-    // console.log("[父组件] 打开配置面板");
   } else {
     console.error("[父组件] 未找到对应的 agent，agentId:", agentId);
   }
@@ -301,15 +532,31 @@ const getAgentIcon = (agent: Agent) => {
 
       <!-- Agent 选择器内容 -->
       <div class="h-full overflow-hidden">
-        <AgentSelector
+        <AgentSidebar
           v-show="!isLeftPanelCollapsed"
           :agents="agentsList"
           :current-agent-id="currentAgentId"
-          :loading="agentsLoading"
+          :current-session-id="currentSessionId || undefined"
+          :sessions-by-agent="sessionsByAgent"
+          :sessions-loading-by-agent="sessionsLoadingByAgent"
+          :has-more-by-agent="hasMoreByAgent"
           @select="handleAgentSelect"
-          @create="handleCreateAgent"
-          @edit="handleEditAgent"
-          @delete="handleDeleteAgent"
+          @create-agent="handleCreateAgent"
+          @edit-agent="handleEditAgent"
+          @new-session="handleNewSession"
+          @select-session="handleSelectSession"
+          @delete-session="handleDeleteSession"
+          @pin-session="handlePinSession"
+          @unpin-session="
+            (sessionId: string) =>
+              handlePinSession({
+                agentId: currentAgentId!,
+                sessionId,
+                pinned: false,
+              })
+          "
+          @load-more-sessions="handleLoadMoreSessions"
+          @rename-session="handleRenameSession"
         />
 
         <!-- 收缩状态下的简化显示 -->
