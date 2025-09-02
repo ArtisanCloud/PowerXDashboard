@@ -1,473 +1,524 @@
-import { ref, computed, onMounted, onUnmounted, shallowRef } from "vue";
-import type { Ref } from "vue";
-import type { ChatMessage } from "~/types/message";
-
-export interface DualChannelOptions {
-  baseURL?: string;
-  sseUrl?: string;
-  wsUrl?: string;
-  defaultFlowId?: string;
-  autoConnect?: boolean;
-  reconnectInterval?: number;
-  maxReconnectAttempts?: number;
-  onMessage?: (message: ChatMessage) => void;
-  onError?: (error: Error) => void;
-  onComplete?: () => void;
-}
-
-export interface ConnectionStatus {
-  sse: {
-    connected: boolean;
-    connecting: boolean;
-    error: string | null;
-    lastConnected: Date | null;
-  };
-  ws: {
-    connected: boolean;
-    connecting: boolean;
-    error: string | null;
-    lastConnected: Date | null;
-  };
-}
+import { ref, computed, watchEffect, type Ref, type ComputedRef } from "vue";
+import { useApiClient } from "~/composables/api";
+import { useRuntimeConfig } from "#imports";
 
 export interface DualChannelConnection {
-  // 状态
-  status: Ref<ConnectionStatus>;
-  messages: Ref<ChatMessage[]>;
-  isConnected: Ref<boolean>;
-  isConnecting: Ref<boolean>;
-  isGenerating: Ref<boolean>;
-  hasErrors: Ref<boolean>;
-  currentRequestId: Ref<string>;
+  // 连接状态
   sseActive: Ref<boolean>;
   wsActive: Ref<boolean>;
 
-  // 连接控制
-  connect: () => Promise<void>;
-  disconnect: () => void;
+  // 当前请求ID
+  currentRequestId: Ref<string | null>;
+
+  // 连接方法
   reconnectSSE: () => Promise<void>;
   reconnectWS: () => Promise<void>;
 
-  // 聊天功能
-  send: (content: string, flowId?: string) => Promise<void>;
+  // 取消当前请求
   cancel: () => void;
+
+  // 发送消息方法
+  sendMessage: (message: string, flowId?: string) => Promise<void>;
+
+  // 兼容层 - 页面期望的字段和方法
+  messages: Ref<any[]>;
+  isGenerating: ComputedRef<boolean>;
   clearMessages: () => void;
-
-  // 事件监听
-  onMessage: (callback: (data: any, channel: "sse" | "ws") => void) => void;
-  onError: (callback: (error: Error, channel: "sse" | "ws") => void) => void;
-  onStatusChange: (callback: (status: ConnectionStatus) => void) => void;
-}
-
-export function useDualChannelConnection(
-  options: DualChannelOptions = {}
-): DualChannelConnection {
-  const {
-    baseURL = "/api/agents",
-    sseUrl,
-    wsUrl,
-    defaultFlowId = "chat",
-    autoConnect = true,
-    reconnectInterval = 3000,
-    maxReconnectAttempts = 5,
-    onMessage: onMessageCallback,
-    onError: onErrorCallback,
-    onComplete: onCompleteCallback,
-  } = options;
-
-  // 构建完整的 URL
-  const fullSSEUrl = sseUrl || `${baseURL}/stream/sse`;
-  const fullWSUrl = wsUrl || `${baseURL}/stream/ws`;
-
-  // 状态管理
-  const messages = ref<ChatMessage[]>([]);
-  const currentRequestId = ref<string>("");
-
-  const status = ref<ConnectionStatus>({
-    sse: {
-      connected: false,
-      connecting: false,
-      error: null,
-      lastConnected: null,
-    },
-    ws: {
-      connected: false,
-      connecting: false,
-      error: null,
-      lastConnected: null,
-    },
-  });
-
-  // 连接实例
-  const sse = shallowRef<EventSource | null>(null);
-  const ws = shallowRef<WebSocket | null>(null);
-
-  // 重连计数器
-  let sseReconnectCount = 0;
-  let wsReconnectCount = 0;
-  let sseReconnectTimer: NodeJS.Timeout | null = null;
-  let wsReconnectTimer: NodeJS.Timeout | null = null;
+  disconnect: () => void;
 
   // 事件回调
-  const messageCallbacks: Array<(data: any, channel: "sse" | "ws") => void> =
-    [];
-  const errorCallbacks: Array<(error: Error, channel: "sse" | "ws") => void> =
-    [];
-  const statusCallbacks: Array<(status: ConnectionStatus) => void> = [];
+  onMessage?: (data: any) => void;
+  onError?: (error: any) => void;
+}
 
-  // 计算属性
-  const isConnected = computed(
-    () => status.value.sse.connected || status.value.ws.connected
-  );
+export function useDualChannelConnection(): DualChannelConnection {
+  // 状态管理
+  const sseActive = ref(false);
+  const wsActive = ref(false);
+  const currentRequestId = ref<string | null>(null);
 
-  const isConnecting = computed(
-    () => status.value.sse.connecting || status.value.ws.connecting
-  );
+  // 兼容层 - 消息列表和生成状态
+  const messages = ref<any[]>([]);
+  const isGenerating = computed(() => !!currentRequestId.value);
 
-  const hasErrors = computed(
-    () => !!status.value.sse.error || !!status.value.ws.error
-  );
+  // 连接实例
+  let sseConnection: EventSource | null = null;
+  let wsConnection: WebSocket | null = null;
 
-  const sseActive = computed(() => status.value.sse.connected);
-  const wsActive = computed(() => status.value.ws.connected);
-  const isGenerating = computed(() => status.value.sse.connected);
+  // 回调函数
+  let onMessageCallback: ((data: any) => void) | undefined;
+  let onErrorCallback: ((error: any) => void) | undefined;
 
-  // 触发状态变化回调
-  const notifyStatusChange = () => {
-    statusCallbacks.forEach((callback) => callback(status.value));
+  // API 客户端
+  const apiClient = useApiClient();
+
+  // 获取认证token
+  const getAuthToken = () => {
+    if (typeof window === "undefined") return "";
+    return localStorage.getItem("access_token") || "";
   };
 
-  // 生成请求ID
-  const generateRequestId = () => {
-    return `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+  // 获取token类型
+  const getTokenType = () => {
+    if (typeof window === "undefined") return "Bearer";
+    return localStorage.getItem("token_type") || "Bearer";
   };
 
-  // WebSocket 连接管理
-  const ensureWS = () => {
-    if (ws.value && ws.value.readyState === WebSocket.OPEN) return;
+  // Base64URL编码（符合HTTP token规范）
+  const toBase64Url = (s: string) => {
+    return btoa(s).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+  };
 
-    const protocol = location.protocol === "https:" ? "wss" : "ws";
-    const url = `${protocol}://${location.host}${fullWSUrl}?q=_handshake&flow_id=${encodeURIComponent(defaultFlowId)}`;
+  // 构建完整URL（参考API客户端逻辑）
+  const buildFullUrl = (path: string, params?: Record<string, any>) => {
+    const baseURL = "/api"; // 让 Nuxt 代理
+    let fullUrl = path.startsWith("http") ? path : `${baseURL}${path}`;
 
-    status.value.ws.connecting = true;
-    notifyStatusChange();
+    if (params) {
+      const queryString = Object.entries(params)
+        .filter(([, value]) => value !== undefined && value !== null)
+        .map(
+          ([key, value]) =>
+            `${encodeURIComponent(key)}=${encodeURIComponent(value)}`
+        )
+        .join("&");
 
-    ws.value = new WebSocket(url);
-
-    ws.value.onopen = () => {
-      status.value.ws.connected = true;
-      status.value.ws.connecting = false;
-      status.value.ws.error = null;
-      status.value.ws.lastConnected = new Date();
-      wsReconnectCount = 0;
-      notifyStatusChange();
-      console.log("WebSocket 连接已建立");
-    };
-
-    ws.value.onclose = () => {
-      status.value.ws.connected = false;
-      status.value.ws.connecting = false;
-      ws.value = null;
-      notifyStatusChange();
-      console.log("WebSocket 连接已关闭");
-
-      // 自动重连
-      if (wsReconnectCount < maxReconnectAttempts) {
-        wsReconnectTimer = setTimeout(() => {
-          wsReconnectCount++;
-          ensureWS();
-        }, reconnectInterval);
+      if (queryString) {
+        fullUrl = `${fullUrl}${fullUrl.includes("?") ? "&" : "?"}${queryString}`;
       }
-    };
-
-    ws.value.onerror = (error) => {
-      const err = new Error("WebSocket 连接错误");
-      status.value.ws.connected = false;
-      status.value.ws.connecting = false;
-      status.value.ws.error = err.message;
-      notifyStatusChange();
-
-      console.error("WebSocket 错误:", error);
-      errorCallbacks.forEach((callback) => callback(err, "ws"));
-      onErrorCallback?.(err);
-    };
-
-    ws.value.onmessage = (event) => {
-      try {
-        const data = JSON.parse(event.data);
-        handleWSMessage(data);
-        messageCallbacks.forEach((callback) => callback(data, "ws"));
-      } catch (error) {
-        console.error("WebSocket 消息解析错误:", error);
-      }
-    };
+    }
+    return fullUrl;
   };
 
-  // 处理 WebSocket 消息
-  const handleWSMessage = (data: any) => {
-    switch (data.event) {
-      case "progress":
-        console.log("进度更新:", data);
-        break;
-      case "tool_call":
-        console.log("工具调用:", data);
-        break;
-      case "notification":
-        console.log("通知:", data);
-        break;
-      case "heartbeat":
-        break;
-      default:
-        console.log("未知 WebSocket 事件:", data);
+  // 构建WebSocket URL - 直接连接到后端，绕过代理
+  const buildWSUrl = (path: string, params?: Record<string, any>) => {
+    const config = useRuntimeConfig();
+    // 优先用 public.wsUpstream，没配就退回到同域 /api 前缀
+    const base =
+      (config.public as any).wsUpstream ||
+      `${window.location.protocol === "https:" ? "wss:" : "ws:"}//${window.location.host}`;
+
+    let fullUrl = `${base}/api${path}`; // 例如 ws://127.0.0.1:8077 + /api + /agents/stream/ws
+
+    if (params) {
+      const qs = Object.entries(params)
+        .filter(([, v]) => v !== undefined && v !== null)
+        .map(
+          ([k, v]) =>
+            `${encodeURIComponent(k)}=${encodeURIComponent(v as string)}`
+        )
+        .join("&");
+      if (qs) fullUrl += (fullUrl.includes("?") ? "&" : "?") + qs;
+    }
+    return fullUrl;
+  };
+
+  // SSE 探活测试 - 使用API客户端进行HTTP请求测试连通性
+  const testSSE = async (): Promise<boolean> => {
+    try {
+      const token = getAuthToken();
+      console.log(
+        "SSE探活使用token:",
+        token ? `${token.substring(0, 10)}...` : "无token"
+      );
+
+      const response = await apiClient.get("/agents/stream/flow", {
+        params: { probe: 1 },
+        useGlobalLoading: false,
+        skipAuth: false,
+      });
+      console.log("SSE探活响应:", response);
+      return true;
+    } catch (error) {
+      console.error("SSE探活测试失败:", error);
+      return false;
     }
   };
 
-  // SSE 连接管理
-  const startSSE = (query: string, flowId = defaultFlowId) => {
-    stopSSE();
-
-    const url = `${fullSSEUrl}?q=${encodeURIComponent(query)}&flow_id=${encodeURIComponent(flowId)}`;
-    const eventSource = new EventSource(url);
-
-    sse.value = eventSource;
-    status.value.sse.connecting = true;
-    status.value.sse.error = null;
-    currentRequestId.value = generateRequestId();
-    notifyStatusChange();
-
-    let currentMessage: ChatMessage | null = null;
-
-    eventSource.onopen = () => {
-      status.value.sse.connected = true;
-      status.value.sse.connecting = false;
-      status.value.sse.lastConnected = new Date();
-      sseReconnectCount = 0;
-      notifyStatusChange();
-    };
-
-    eventSource.addEventListener("token", (event: any) => {
+  // WebSocket 探活测试
+  const testWS = async (): Promise<boolean> => {
+    return new Promise((resolve) => {
       try {
-        const data = JSON.parse(event.data);
+        const token = getAuthToken();
+        const params: Record<string, any> = { probe: 1 };
+        if (token) params.authorization = `Bearer ${token}`;
 
-        if (!currentMessage) {
-          currentMessage = {
-            id: Date.now().toString(),
-            role: "assistant",
-            content: "",
-            timestamp: new Date(),
-          };
-          messages.value.push(currentMessage);
+        const wsUrl = buildWSUrl("/agents/stream/ws", params);
+        const protocols = token ? [`bearer.${toBase64Url(token)}`] : undefined;
+
+        const ws = new WebSocket(wsUrl, protocols);
+        let resolved = false;
+
+        ws.onopen = () => {
+          resolved = true;
+          ws.close();
+          resolve(true);
+        };
+        ws.onmessage = () => {
+          if (!resolved) {
+            resolved = true;
+            ws.close();
+            resolve(true);
+          }
+        };
+        ws.onerror = () => {
+          if (!resolved) {
+            resolved = true;
+            try {
+              ws.close();
+            } catch {}
+            resolve(false);
+          }
+        };
+        ws.onclose = () => {
+          if (!resolved) {
+            resolved = true;
+            resolve(false);
+          }
+        };
+
+        setTimeout(() => {
+          if (!resolved) {
+            resolved = true;
+            try {
+              ws.close();
+            } catch {}
+            resolve(false);
+          }
+        }, 5000);
+      } catch {
+        resolve(false);
+      }
+    });
+  };
+
+  // SSE 真实连接 - 使用EventSource建立流连接（目前 sendSSEMessage 改为 fetch，不一定用得到）
+  const createSSEConnection = (url: string) => {
+    const token = getAuthToken();
+    const tokenType = getTokenType();
+
+    const params: Record<string, any> = {};
+    if (token) params.authorization = `${tokenType} ${token}`;
+
+    const fullUrl = buildFullUrl(url, params);
+    console.log(
+      "SSE连接URL:",
+      fullUrl.replace(/authorization=[^&]+/, "authorization=***")
+    );
+    return new EventSource(fullUrl);
+  };
+
+  // WebSocket 真实连接
+  const createWSConnection = (url: string) => {
+    const token = getAuthToken();
+
+    const fullUrl = buildWSUrl(
+      url,
+      token ? { authorization: `Bearer ${token}` } : undefined
+    );
+
+    const protocols = token ? [`bearer.${toBase64Url(token)}`] : undefined;
+
+    console.log(
+      "WebSocket真实连接URL:",
+      fullUrl.replace(/authorization=[^&]+/, "authorization=***")
+    );
+    console.log("WebSocket子协议:", protocols);
+    return new WebSocket(fullUrl, protocols);
+  };
+
+  // 重连SSE
+  const reconnectSSE = async () => {
+    sseActive.value = false;
+    if (sseConnection) {
+      sseConnection.close();
+      sseConnection = null;
+    }
+    try {
+      const isActive = await testSSE();
+      sseActive.value = isActive;
+    } catch (error) {
+      console.error("SSE连接测试失败:", error);
+      sseActive.value = false;
+    }
+  };
+
+  // 重连WebSocket
+  const reconnectWS = async () => {
+    wsActive.value = false;
+    if (wsConnection) {
+      wsConnection.close();
+      wsConnection = null;
+    }
+    try {
+      const isActive = await testWS();
+      wsActive.value = isActive;
+    } catch (error) {
+      console.error("WebSocket连接测试失败:", error);
+      wsActive.value = false;
+    }
+  };
+
+  // 发送SSE消息（真流）- 用 fetch 以便带 Authorization header
+  const sendSSEMessage = async (message: string, flowId: string = "chat") => {
+    const requestId = `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    currentRequestId.value = requestId;
+
+    const url = `/agents/stream/flow?q=${encodeURIComponent(message)}&flow_id=${flowId}&request_id=${requestId}`;
+
+    try {
+      const response = await fetch(`/api${url}`, {
+        method: "GET",
+        headers: {
+          Accept: "text/event-stream",
+          "Cache-Control": "no-cache",
+          Authorization: `${getTokenType()} ${getAuthToken()}`,
+        },
+      });
+
+      if (!response.ok)
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+
+      console.log("SSE 连接已建立");
+      const reader = response.body?.getReader();
+      const decoder = new TextDecoder();
+      if (!reader) throw new Error("无法获取响应流");
+
+      const readStream = async () => {
+        let currentEvent: string | null = null;
+        try {
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) {
+              console.log("SSE 流结束");
+              currentRequestId.value = null;
+              break;
+            }
+            const chunk = decoder.decode(value, { stream: true });
+            const lines = chunk.split(/\r?\n/);
+
+            for (const line of lines) {
+              if (!line) continue;
+
+              if (line.startsWith("event:")) {
+                currentEvent = line.slice(6).trim();
+                continue;
+              }
+              if (line.startsWith("data:")) {
+                const raw = line.slice(5).trim();
+                if (!raw) continue;
+                if (raw === "[DONE]") {
+                  currentRequestId.value = null;
+                  continue;
+                }
+
+                let payload: any;
+                try {
+                  payload = JSON.parse(raw);
+                } catch {
+                  payload = { raw };
+                }
+
+                if (!payload.type && currentEvent) payload.type = currentEvent;
+
+                if (onMessageCallback) onMessageCallback(payload);
+
+                const text =
+                  payload?.data?.text ??
+                  payload?.data?.delta ??
+                  payload?.text ??
+                  "";
+
+                const last = messages.value[messages.value.length - 1];
+                const needNewAssistant =
+                  !last || last.role !== "assistant" || last.done === true;
+
+                if (payload.type === "token" || payload.type === "chunk") {
+                  if (needNewAssistant) {
+                    messages.value.push({
+                      id: `a_${Date.now()}`,
+                      role: "assistant",
+                      content: "",
+                    });
+                  }
+                  messages.value[messages.value.length - 1].content += text;
+                } else if (payload.type === "end") {
+                  if (last && last.role === "assistant") last.done = true;
+                  currentRequestId.value = null;
+                }
+              }
+            }
+          }
+        } catch (error) {
+          console.error("读取 SSE 流错误:", error);
+          if (onErrorCallback) onErrorCallback(error);
+          currentRequestId.value = null;
+        } finally {
+          reader.releaseLock();
         }
+      };
 
-        currentMessage.content += data.token || data.content || "";
-        onMessageCallback?.(currentMessage);
-        messageCallbacks.forEach((callback) => callback(data, "sse"));
-      } catch (error) {
-        console.error("SSE token 解析错误:", error);
-      }
-    });
+      readStream();
+    } catch (error) {
+      console.error("SSE连接错误:", error);
+      if (onErrorCallback) onErrorCallback(error);
+      currentRequestId.value = null;
+    }
+  };
 
-    eventSource.addEventListener("final", (event: any) => {
+  // 发送WebSocket消息（真流）
+  const sendWSMessage = (message: string, flowId: string = "chat") => {
+    const requestId = `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    currentRequestId.value = requestId;
+
+    if (wsConnection) wsConnection.close();
+
+    const url = `/agents/stream/ws?q=${encodeURIComponent(message)}&flow_id=${flowId}&request_id=${requestId}`;
+    wsConnection = createWSConnection(url);
+
+    wsConnection.onopen = () => {
+      console.log("WebSocket连接已建立");
+    };
+
+    wsConnection.onmessage = (event) => {
       try {
         const data = JSON.parse(event.data);
-        if (currentMessage) {
-          currentMessage.content = data.content || currentMessage.content;
-          currentMessage.metadata = data.metadata;
+        if (data.type === "intent") {
+          console.log("Intent:", data);
+        } else if (data.type === "token" || data.type === "chunk") {
+          if (onMessageCallback) onMessageCallback(data);
+        } else if (data.type === "end") {
+          wsConnection?.close();
+          currentRequestId.value = null;
         }
       } catch (error) {
-        console.error("SSE final 解析错误:", error);
+        console.error("WebSocket消息解析错误:", error);
       }
-    });
+    };
 
-    eventSource.addEventListener("end", () => {
-      stopSSE();
-      onCompleteCallback?.();
-    });
+    wsConnection.onerror = (error) => {
+      console.error("WebSocket连接错误:", error);
+      if (onErrorCallback) onErrorCallback(error);
+      currentRequestId.value = null;
+    };
 
-    eventSource.onerror = (event) => {
-      const error = new Error("SSE 连接错误");
-      status.value.sse.connected = false;
-      status.value.sse.connecting = false;
-      status.value.sse.error = error.message;
-      notifyStatusChange();
-
-      console.error("SSE 错误:", event);
-      errorCallbacks.forEach((callback) => callback(error, "sse"));
-      onErrorCallback?.(error);
-
-      // 自动重连
-      if (sseReconnectCount < maxReconnectAttempts) {
-        sseReconnectTimer = setTimeout(() => {
-          sseReconnectCount++;
-          // 这里需要重新开始 SSE，但需要保存查询参数
-        }, reconnectInterval);
-      }
+    wsConnection.onclose = () => {
+      currentRequestId.value = null;
     };
   };
 
-  const stopSSE = () => {
-    if (sse.value) {
-      sse.value.close();
-      sse.value = null;
-      status.value.sse.connected = false;
-      status.value.sse.connecting = false;
-      notifyStatusChange();
-    }
-  };
-
-  // 连接两个通道
-  const connect = async (): Promise<void> => {
-    ensureWS();
-    // SSE 会在发送消息时启动
-  };
-
-  // 断开连接
-  const disconnect = (): void => {
-    // 清理重连定时器
-    if (sseReconnectTimer) {
-      clearTimeout(sseReconnectTimer);
-      sseReconnectTimer = null;
-    }
-    if (wsReconnectTimer) {
-      clearTimeout(wsReconnectTimer);
-      wsReconnectTimer = null;
-    }
-
-    stopSSE();
-
-    if (ws.value) {
-      ws.value.close();
-      ws.value = null;
-    }
-
-    // 重置状态
-    status.value.sse.connected = false;
-    status.value.sse.connecting = false;
-    status.value.ws.connected = false;
-    status.value.ws.connecting = false;
-
-    notifyStatusChange();
-  };
-
-  // 重连 SSE
-  const reconnectSSE = async (): Promise<void> => {
-    console.log("重连 SSE");
-    stopSSE();
-    if (sseReconnectTimer) {
-      clearTimeout(sseReconnectTimer);
-      sseReconnectTimer = null;
-    }
-    sseReconnectCount = 0;
-  };
-
-  // 重连 WebSocket
-  const reconnectWS = async (): Promise<void> => {
-    console.log("重连 WebSocket");
-    if (ws.value) {
-      ws.value.close();
-      ws.value = null;
-    }
-    if (wsReconnectTimer) {
-      clearTimeout(wsReconnectTimer);
-      wsReconnectTimer = null;
-    }
-    wsReconnectCount = 0;
-    setTimeout(() => {
-      ensureWS();
-    }, 100);
-  };
-
-  // 发送消息
-  const send = async (content: string, flowId?: string) => {
-    const userMessage: ChatMessage = {
-      id: Date.now().toString(),
+  // 发送消息（自动选择通道）
+  const sendMessage = async (message: string, flowId: string = "chat") => {
+    messages.value.push({
+      id: `u_${Date.now()}`,
       role: "user",
-      content,
-      timestamp: new Date(),
-    };
-    messages.value.push(userMessage);
+      content: message,
+    });
 
-    ensureWS();
-    startSSE(content, flowId);
+    if (wsActive.value) {
+      sendWSMessage(message, flowId);
+    } else if (sseActive.value) {
+      sendSSEMessage(message, flowId);
+    } else {
+      throw new Error("没有可用的连接通道");
+    }
   };
 
   // 取消当前请求
   const cancel = () => {
-    console.log("取消当前生成");
-
-    if (ws.value && status.value.ws.connected && currentRequestId.value) {
-      ws.value.send(
-        JSON.stringify({
-          event: "cancel",
-          requestId: currentRequestId.value,
-        })
-      );
+    if (sseConnection) {
+      sseConnection.close();
+      sseConnection = null;
     }
-
-    stopSSE();
+    if (wsConnection) {
+      wsConnection.close();
+      wsConnection = null;
+    }
+    currentRequestId.value = null;
   };
 
-  // 清空消息
+  // 兼容层方法
   const clearMessages = () => {
     messages.value = [];
   };
 
-  // 事件监听器
-  const onMessage = (
-    callback: (data: any, channel: "sse" | "ws") => void
-  ): void => {
-    messageCallbacks.push(callback);
+  const disconnect = () => {
+    cancel();
   };
 
-  const onError = (
-    callback: (error: Error, channel: "sse" | "ws") => void
-  ): void => {
-    errorCallbacks.push(callback);
-  };
-
-  const onStatusChange = (
-    callback: (status: ConnectionStatus) => void
-  ): void => {
-    statusCallbacks.push(callback);
-  };
-
-  // 生命周期
-  onMounted(() => {
-    if (autoConnect) {
-      connect();
-    }
-  });
-
-  onUnmounted(() => {
-    disconnect();
-  });
-
-  return {
-    // 状态
-    status,
-    messages,
-    isConnected,
-    isConnecting,
-    isGenerating,
-    hasErrors,
-    currentRequestId,
+  // 创建连接对象
+  const connection: DualChannelConnection = {
     sseActive,
     wsActive,
-
-    // 连接控制
-    connect,
-    disconnect,
+    currentRequestId,
     reconnectSSE,
     reconnectWS,
-
-    // 聊天功能
-    send,
     cancel,
-    clearMessages,
+    sendMessage,
 
-    // 事件监听
-    onMessage,
-    onError,
-    onStatusChange,
+    // 兼容层
+    messages,
+    isGenerating,
+    clearMessages,
+    disconnect,
+
+    get onMessage() {
+      return onMessageCallback;
+    },
+    set onMessage(callback) {
+      onMessageCallback = callback;
+
+      // 自动处理消息拼接到 messages 数组
+      if (callback) {
+        const originalCallback = callback;
+        onMessageCallback = (packet: any) => {
+          originalCallback(packet);
+
+          const text =
+            packet?.data?.text ?? packet?.data?.delta ?? packet?.text ?? "";
+          const last = messages.value[messages.value.length - 1];
+          const needNewAssistant =
+            !last || last.role !== "assistant" || last.done === true;
+
+          if (packet?.type === "token" || packet?.type === "chunk") {
+            if (needNewAssistant) {
+              messages.value.push({
+                id: `a_${Date.now()}`,
+                role: "assistant",
+                content: "",
+              });
+            }
+            messages.value[messages.value.length - 1].content += text;
+          } else if (packet?.type === "end") {
+            if (last && last.role === "assistant") last.done = true;
+          }
+        };
+      }
+    },
+    get onError() {
+      return onErrorCallback;
+    },
+    set onError(callback) {
+      onErrorCallback = callback;
+    },
   };
+
+  // 初始化时进行连接测试（仅在客户端执行，避免 SSR 触发 window）
+  if (typeof window !== "undefined") {
+    reconnectSSE();
+    reconnectWS();
+  }
+
+  // 监听 token 变化，重新连接（仅客户端）
+  if (typeof window !== "undefined") {
+    watchEffect(() => {
+      const token = getAuthToken();
+      if (token) {
+        reconnectSSE();
+        reconnectWS();
+      }
+    });
+  }
+
+  return connection;
 }

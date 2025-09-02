@@ -31,19 +31,16 @@ const hasMoreByAgent = reactive<Record<number, boolean>>({});
 const getSessions = (agentId: number) => sessionsByAgent[agentId] || [];
 
 // 双通道聊天流管理
-const chat = useDualChannelConnection({
-  baseURL: "/api/v1",
-  defaultFlowId: "chat",
-  onMessage: (message) => {
-    console.log("收到消息:", message);
-  },
-  onError: (error) => {
-    console.error("聊天错误:", error);
-  },
-  onComplete: () => {
-    console.log("对话完成");
-  },
-});
+const chat = useDualChannelConnection();
+
+// 设置消息回调
+chat.onMessage = (message) => {
+  console.log("收到消息:", message);
+};
+
+chat.onError = (error) => {
+  console.error("聊天错误:", error);
+};
 const showConfigPanel = ref(false);
 const editingAgent = ref<Agent | null>(null);
 
@@ -497,7 +494,7 @@ watch(
               icon="i-heroicons-plus"
               size="xs"
               variant="ghost"
-              class="w-8 h-8 p-0"
+              class="w-8 h-8 p-0 flex items-center justify-center"
               :title="'新建 Agent'"
               @click="handleCreateAgent"
             />

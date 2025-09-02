@@ -11,8 +11,10 @@ export default defineNuxtConfig({
   runtimeConfig: {
     // 仅服务端可见
     upstream: process.env.UPSTREAM || "http://127.0.0.1:8077", // 你的后端基础域名
-    wsUpstream: process.env.WS_UPSTREAM || "ws://127.0.0.1:3001", // 你的 WS 服务
+    wsUpstream: process.env.WS_UPSTREAM || "ws://127.0.0.1:8077", // 你的 WS 服务
     public: {
+      // 注意这里直接给"完整前缀"，包含 /api
+      wsUpstream: process.env.WS_UPSTREAM || "ws://127.0.0.1:8077/api",
       apiBase: "/api", // 前端请求 /api/**，对应后台的 /api/**
       wsUrl: "/ws", // 如果要同域 WS，可再配反代；暂时可用你现有的 ws://localhost:3001/ws
 
@@ -53,6 +55,7 @@ export default defineNuxtConfig({
         target: "http://127.0.0.1:8077/api",
         changeOrigin: true,
         prependPath: true,
+        ws: true, // 必须：让 dev 代理支持 WebSocket
       },
     },
   },

@@ -8,6 +8,7 @@ interface Props {
 const props = defineProps<Props>();
 const { t } = useI18n();
 
+// 复制请求ID到剪贴板
 const copyRequestId = async () => {
   if (props.connection.currentRequestId.value) {
     try {
@@ -21,16 +22,29 @@ const copyRequestId = async () => {
     }
   }
 };
+
+// 测试SSE连接
+const testSSEConnection = async () => {
+  await props.connection.reconnectSSE();
+};
+
+// 测试WebSocket连接
+const testWSConnection = async () => {
+  await props.connection.reconnectWS();
+};
 </script>
 
 <template>
   <div class="flex items-center gap-2">
-    <!-- SSE 状态指示 -->
+    <!-- SSE 状态指示 (探活测试) -->
     <UButton
       size="xs"
       variant="soft"
       :color="connection.sseActive.value ? 'success' : 'neutral'"
-      @click="connection.reconnectSSE"
+      @click="testSSEConnection"
+      :title="
+        connection.sseActive.value ? 'SSE连接正常' : 'SSE连接异常，点击重新测试'
+      "
     >
       <span
         class="mr-1 text-xs"
@@ -38,15 +52,20 @@ const copyRequestId = async () => {
       >
         ●
       </span>
-      {{ $t("connection.chatSignal") }}
+      {{ t("connection.chatSignal") || "聊天信号" }}
     </UButton>
 
-    <!-- WebSocket 状态指示 -->
+    <!-- WebSocket 状态指示 (探活测试) -->
     <UButton
       size="xs"
       variant="soft"
       :color="connection.wsActive.value ? 'success' : 'neutral'"
-      @click="connection.reconnectWS"
+      @click="testWSConnection"
+      :title="
+        connection.wsActive.value
+          ? 'WebSocket连接正常'
+          : 'WebSocket连接异常，点击重新测试'
+      "
     >
       <span
         class="mr-1 text-xs"
@@ -54,7 +73,7 @@ const copyRequestId = async () => {
       >
         ●
       </span>
-      {{ $t("connection.commandChannel") }}
+      {{ t("connection.commandChannel") || "指令通道" }}
     </UButton>
 
     <!-- 取消按钮 -->

@@ -234,6 +234,7 @@ function fmtTime(ts?: string | number | Date) {
           v-model="selectedAgent"
           :items="agentOptions"
           option-attribute="label"
+          value-attribute="value"
           searchable
           class="flex-1"
         >
@@ -270,7 +271,7 @@ function fmtTime(ts?: string | number | Date) {
           variant="solid"
           :disabled="!currentAgentId"
           @click="createSession"
-          class="shrink-0"
+          class="shrink-0 px-3"
         >
           {{ t("agent.selector.newSession") || "新会话" }}
         </UButton>
@@ -531,3 +532,4 @@ function fmtTime(ts?: string | number | Date) {
   background: #a8a8a8;
 }
 </style>
+
