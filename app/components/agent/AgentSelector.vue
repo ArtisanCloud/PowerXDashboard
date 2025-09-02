@@ -93,6 +93,40 @@ const canDelete = (agent: Agent) => {
   return !agent.meta?.protect_from_delete;
 };
 
+const makeMenuItems = (agent: Agent): DropdownMenuItem[][] => {
+  const items: DropdownMenuItem[][] = [
+    [
+      {
+        label: t("agent.selector.edit"),
+        icon: "i-heroicons-pencil",
+        onSelect: () => emit("edit", agent.id),
+      },
+    ],
+  ];
+
+  if (canDelete(agent)) {
+    items.push([
+      {
+        label: t("agent.selector.delete"),
+        icon: "i-heroicons-trash",
+        color: "error", // 可选：高亮危险操作
+        onSelect: (e?: Event) => {
+          // 可选：阻止某些默认行为，比如复用快捷键时
+          e?.preventDefault?.();
+          emit("delete", agent.id);
+        },
+      },
+    ]);
+  }
+  return items;
+};
+
+const onDropdownSelect = (item: any, agent: Agent) => {
+  console.log(item);
+  if (item?.value === "edit") emit("edit", agent.id);
+  if (item?.value === "delete") emit("delete", agent.id);
+};
+
 // ✅ 记录哪些行处于展开态
 const expandedIds = ref<Set<number>>(new Set());
 
@@ -208,7 +242,11 @@ const toggleExpand = (id: number) => {
 
                     <!-- 右侧工具区：贴右对齐，避免覆盖 current 徽标 -->
                     <div class="flex items-center gap-1 ml-auto">
-                      <UBadge :color="getStatusColor(agent)" size="xs">
+                      <UBadge
+                        :color="getStatusColor(agent)"
+                        size="xs"
+                        class="whitespace-nowrap min-w-fit"
+                      >
                         {{
                           agent.id === currentAgentId
                             ? t("agent.selector.current")
@@ -226,28 +264,7 @@ const toggleExpand = (id: number) => {
                       />
 
                       <!-- Kebab 菜单 -->
-                      <UDropdownMenu
-                        :items="[
-                          [
-                            {
-                              label: t('agent.selector.edit'),
-                              icon: 'i-heroicons-pencil',
-                              click: () => emit('edit', agent.id),
-                            },
-                          ],
-                          ...(canDelete(agent)
-                            ? [
-                                [
-                                  {
-                                    label: t('agent.selector.delete'),
-                                    icon: 'i-heroicons-trash',
-                                    click: () => emit('delete', agent.id),
-                                  },
-                                ],
-                              ]
-                            : []),
-                        ]"
-                      >
+                      <UDropdownMenu :items="makeMenuItems(agent)">
                         <UButton
                           icon="i-heroicons-ellipsis-vertical"
                           size="xs"
@@ -373,26 +390,8 @@ const toggleExpand = (id: number) => {
 
                       <!-- Kebab 菜单 -->
                       <UDropdownMenu
-                        :items="[
-                          [
-                            {
-                              label: t('agent.selector.edit'),
-                              icon: 'i-heroicons-pencil',
-                              click: () => emit('edit', agent.id),
-                            },
-                          ],
-                          ...(canDelete(agent)
-                            ? [
-                                [
-                                  {
-                                    label: t('agent.selector.delete'),
-                                    icon: 'i-heroicons-trash',
-                                    click: () => emit('delete', agent.id),
-                                  },
-                                ],
-                              ]
-                            : []),
-                        ]"
+                        :items="makeMenuItems(agent)"
+                        @select="(item) => onDropdownSelect(item, agent)"
                       >
                         <UButton
                           icon="i-heroicons-ellipsis-vertical"

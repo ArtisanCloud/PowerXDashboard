@@ -315,6 +315,7 @@ function cancelConfig() {
               <UInput
                 v-model="form.name"
                 :placeholder="t('agent.config.namePlaceholder')"
+                class="w-full"
               />
             </UFormField>
 
@@ -323,6 +324,7 @@ function cancelConfig() {
                 v-model="form.description"
                 :rows="3"
                 :placeholder="t('agent.config.descriptionPlaceholder')"
+                class="w-full"
               />
             </UFormField>
 
@@ -330,6 +332,7 @@ function cancelConfig() {
               <UInput
                 v-model="form.avatar"
                 :placeholder="t('agent.config.avatarPlaceholder')"
+                class="w-full"
               />
               <div v-if="form.avatar" class="mt-2">
                 <img
@@ -364,6 +367,7 @@ function cancelConfig() {
                 v-model="form.model"
                 :items="modelOptions"
                 :placeholder="t('agent.config.selectModel')"
+                class="w-full"
               />
             </UFormField>
 
@@ -398,6 +402,7 @@ function cancelConfig() {
                 :min="1"
                 :max="32000"
                 :placeholder="t('agent.config.maxTokensPlaceholder')"
+                class="w-full"
               />
             </UFormField>
           </div>
@@ -427,6 +432,7 @@ function cancelConfig() {
                 v-model="form.systemPrompt"
                 :rows="6"
                 :placeholder="t('agent.config.systemPromptPlaceholder')"
+                class="w-full"
               />
             </UFormField>
           </div>
@@ -464,6 +470,7 @@ function cancelConfig() {
                 v-model.number="form.contextWindow"
                 type="number"
                 :placeholder="t('agent.config.contextWindowPlaceholder')"
+                class="w-full"
               />
             </UFormField>
 
@@ -478,6 +485,7 @@ function cancelConfig() {
                   },
                   { label: t('agent.config.formats.json'), value: 'json' },
                 ]"
+                class="w-full"
               />
             </UFormField>
 
