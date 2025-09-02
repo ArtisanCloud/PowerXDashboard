@@ -49,7 +49,10 @@
     "disabled": "已禁用",
     "expand": "展开",
     "collapse": "收起",
-    "toggleDensity": "切换密度"
+    "toggleDensity": "切换密度",
+    "loadMore": "加载更多",
+    "settings": "设置",
+    "trash": "回收站"
   },
   "menu": {
     "dashboard": "仪表板",
@@ -733,7 +736,8 @@
       "pin": "置顶",
       "unpin": "取消置顶",
       "rename": "重命名",
-      "renameSession": "重命名会话"
+      "renameSession": "重命名会话",
+      "pickAgent": "选择 Agent"
     },
     "message": {
       "justNow": "刚刚",

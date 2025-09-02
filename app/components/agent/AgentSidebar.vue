@@ -285,7 +285,7 @@ function fmtTime(ts?: string | number | Date) {
     </div>
 
     <!-- 会话列表 -->
-    <div class="flex-1 overflow-y-auto">
+    <div class="flex-1 overflow-y-auto pb-2">
       <div v-if="!currentAgentId" class="p-6 text-center text-gray-400">
         {{
           t("agent.selector.pickAgentToSeeSessions") ||
@@ -493,22 +493,25 @@ function fmtTime(ts?: string | number | Date) {
       </template>
     </div>
 
-    <!-- 底部（可放设置/回收站/账号信息，先留空位） -->
-    <div class="p-3 border-t border-gray-200 bg-gray-50">
-      <div class="flex items-center justify-between text-xs text-gray-500">
-        <span>{{
+    <!-- 底部（可放设置/回收站/账号信息） -->
+    <div class="p-3 border-t border-gray-200 bg-gray-50 sticky bottom-0 z-10">
+      <!-- 去掉 justify-between，改用 ml-auto 推右；并防止收缩换行 -->
+      <div class="flex items-center text-xs text-gray-500">
+        <span class="truncate">{{
           t("agent.selector.totalCount", {
             count: (sessionsByAgent?.[currentAgentId!] || []).length || 0,
-          })
+          }) ||
+          `共 ${(sessionsByAgent?.[currentAgentId!] || []).length || 0} 个会话`
         }}</span>
-        <!-- 预留"设置/回收站" -->
-        <div class="flex items-center gap-2">
-          <UButton size="xs" variant="ghost" icon="i-heroicons-cog-6-tooth">{{
-            t("common.settings") || "设置"
-          }}</UButton>
-          <UButton size="xs" variant="ghost" icon="i-heroicons-trash">{{
-            t("common.trash") || "回收站"
-          }}</UButton>
+
+        <!-- 这里：加 ml-auto + shrink-0，保证一直贴右且不被压到下一行 -->
+        <div class="flex items-center gap-2 ml-auto shrink-0">
+          <UButton size="xs" variant="ghost" icon="i-heroicons-cog-6-tooth">
+            {{ t("common.settings") || "设置" }}
+          </UButton>
+          <UButton size="xs" variant="ghost" icon="i-heroicons-trash">
+            {{ t("common.trash") || "回收站" }}
+          </UButton>
         </div>
       </div>
     </div>

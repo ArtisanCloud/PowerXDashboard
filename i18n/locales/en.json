@@ -3,8 +3,6 @@
   "login": "Login",
   "register": "Register",
   "logout": "Logout",
-  "profile": "Profile",
-  "settings": "Settings",
   "common": {
     "language": "Language",
     "reload": "Reload",
@@ -50,7 +48,10 @@
     "disabled": "Disabled",
     "expand": "Expand",
     "collapse": "Collapse",
-    "toggleDensity": "Toggle Density"
+    "toggleDensity": "Toggle Density",
+    "loadMore": "Load More",
+    "settings": "Settings",
+    "trash": "Trash"
   },
   "menu": {
     "dashboard": "Dashboard",
@@ -726,7 +727,16 @@
       "newAgent": "New Agent",
       "editAgent": "Edit Agent",
       "noSessions": "No sessions",
-      "untitledSession": "Untitled Session"
+      "untitledSession": "Untitled Session",
+      "searchSessions": "Search sessions...",
+      "pickAgentToSeeSessions": "Please select an Agent to view session list",
+      "pinned": "Pinned",
+      "recents": "Recent",
+      "pin": "Pin",
+      "unpin": "Unpin",
+      "rename": "Rename",
+      "renameSession": "Rename Session",
+      "pickAgent": "Select Agent"
     },
     "message": {
       "justNow": "Just now",
@@ -868,10 +878,7 @@
       "showConfig": "Show Configuration"
     }
   },
-  "common": {
-    "enabled": "Enabled",
-    "disabled": "Disabled"
-  },
+
   "workflow": {
     "title": "Workflow Editor",
     "newWorkflow": "New Workflow",

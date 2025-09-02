@@ -54,43 +54,24 @@ const toggleLeftPanel = () => {
 };
 
 // 一次性提醒（UAlert）
-const {
-  visible: alertVisible,
-  title: alertTitle,
-  description: alertDesc,
-  notifyOnce,
-  hide,
-  reset,
-} = useOneShotAlert();
+const { notifyOnce } = useOneShotAlert();
 
 // Agent 管理
 const agentManager = useAgentManager();
-const { agents, loading: agentsLoading, error: agentsError } = agentManager;
+const { agents } = agentManager;
 
 // 使用双通道聊天的状态
-const messages = computed(() => chat.messages.value);
+const messagesList = computed(() =>
+  Array.isArray(chat.messages.value) ? chat.messages.value : []
+);
 const isConnected = computed(() => chat.sseActive.value || chat.wsActive.value);
-const chatError = ref(null);
 const isStreaming = computed(() => chat.isGenerating.value);
 const isTyping = ref(false);
 
 // 会话管理 composable
-const { listSessions, createSession, deleteSession } = useChatSessions();
-
-const sendMessage = async (content: string) => {
-  await chat.send(content);
-};
-
-const clearMessages = () => {
-  chat.clearMessages();
-};
-
-const switchAgent = async (agentId: string) => {
-  // 可以在这里添加切换 agent 的逻辑
-};
+useChatSessions();
 
 const retryLastMessage = async () => {
-  // 重试最后一条消息的逻辑
   console.log("重试最后一条消息");
 };
 
@@ -98,23 +79,16 @@ const retryLastMessage = async () => {
 onMounted(async () => {
   try {
     await agentManager.fetchAgents();
-    // 如果有 agents，选择第一个作为默认
     if (agents.value && agents.value.length > 0) {
       await handleAgentSelect(agents.value[0].id);
     }
   } catch (e: any) {
-    // 404 当作"空列表"处理，其它错误提示一下
-    if (e?.status === 404 || e?.statusCode === 404) {
-      console.warn("[agent] /agents 404，当作空数据处理");
-    } else {
+    if (!(e?.status === 404 || e?.statusCode === 404)) {
       notifyOnce(
         t("agent.list.loadFailed") || "加载 Agent 列表失败",
         e?.message || ""
       );
     }
-  } finally {
-    // 不管拉取是否成功，都去尝试建立聊天连接
-    // connect(); // 暂时注释掉，等待聊天功能实现
   }
 });
 
@@ -133,44 +107,26 @@ const handleSelectSession = async (payload: {
   sessionId: string | number;
 }) => {
   const { agentId, sessionId } = payload;
-  if (currentAgentId.value !== agentId) {
-    currentAgentId.value = agentId;
-  }
+  if (currentAgentId.value !== agentId) currentAgentId.value = agentId;
   currentSessionId.value = sessionId;
-  // TODO: 加载会话历史消息
   chat.clearMessages();
-  console.log("选择会话:", sessionId);
 };
 
 const handleNewSession = async () => {
   if (!currentAgentId.value) return;
-
-  try {
-    // 临时创建会话对象，因为 createSession 可能还没实现
-    const session: ChatSession = {
-      id: `session-${currentAgentId.value}-${Date.now()}`,
-      title: t("agent.sessions.untitledSession") || "新会话",
-      lastMessage: "新会话已创建",
-      updatedAt: new Date(),
-      unread: 0,
-      pinned: false,
-    };
-
-    // 添加到当前 agent 的会话列表
-    const agentId = currentAgentId.value;
-    if (!sessionsByAgent[agentId]) {
-      sessionsByAgent[agentId] = [];
-    }
-    sessionsByAgent[agentId].unshift(session);
-
-    // 选择新会话
-    currentSessionId.value = session.id;
-
-    // 清空当前消息
-    chat.clearMessages();
-  } catch (error) {
-    console.error("创建会话失败:", error);
-  }
+  const session: ChatSession = {
+    id: `session-${currentAgentId.value}-${Date.now()}`,
+    title: t("agent.sessions.untitledSession") || "新会话",
+    lastMessage: "新会话已创建",
+    updatedAt: new Date(),
+    unread: 0,
+    pinned: false,
+  };
+  const agentId = currentAgentId.value;
+  if (!sessionsByAgent[agentId]) sessionsByAgent[agentId] = [];
+  sessionsByAgent[agentId].unshift(session);
+  currentSessionId.value = session.id;
+  chat.clearMessages();
 };
 
 const handleDeleteSession = async (payload: {
@@ -179,30 +135,13 @@ const handleDeleteSession = async (payload: {
 }) => {
   const { agentId, sessionId } = payload;
   if (!confirm(t("agent.confirmDelete") || "确定删除该会话？")) return;
-
-  try {
-    // TODO: 调用后端删除 API
-    // await deleteSession(sessionId);
-
-    // 从列表中移除
-    const sessions = sessionsByAgent[agentId] || [];
-    const index = sessions.findIndex((s) => s.id === sessionId);
-    if (index > -1) {
-      sessions.splice(index, 1);
-    }
-
-    // 如果删除的是当前会话，切换到第一个会话或清空
-    if (currentSessionId.value === sessionId) {
-      const remainingSessions = sessionsByAgent[agentId] || [];
-      if (remainingSessions.length > 0) {
-        currentSessionId.value = remainingSessions[0].id;
-      } else {
-        currentSessionId.value = null;
-        chat.clearMessages();
-      }
-    }
-  } catch (error) {
-    console.error("删除会话失败:", error);
+  const sessions = sessionsByAgent[agentId] || [];
+  const index = sessions.findIndex((s) => s.id === sessionId);
+  if (index > -1) sessions.splice(index, 1);
+  if (currentSessionId.value === sessionId) {
+    const remaining = sessionsByAgent[agentId] || [];
+    currentSessionId.value = remaining.length > 0 ? remaining[0].id : null;
+    if (!remaining.length) chat.clearMessages();
   }
 };
 
@@ -212,31 +151,17 @@ const handlePinSession = async (payload: {
   pinned: boolean;
 }) => {
   const { agentId, sessionId, pinned } = payload;
-
-  try {
-    // TODO: 调用后端 API 更新置顶状态
-    // await fetch(`/api/sessions/${sessionId}/pin`, { method: 'PATCH', body: JSON.stringify({ pinned }) });
-
-    // 更新本地状态
-    const sessions = sessionsByAgent[agentId] || [];
-    const session = sessions.find((s) => s.id === sessionId);
-    if (session) {
-      session.pinned = pinned;
-    }
-  } catch (error) {
-    console.error("置顶会话失败:", error);
-  }
+  const sessions = sessionsByAgent[agentId] || [];
+  const session = sessions.find((s) => s.id === sessionId);
+  if (session) session.pinned = pinned;
 };
 
 const handleLoadMoreSessions = async () => {
   if (!currentAgentId.value || sessionsLoadingByAgent[currentAgentId.value])
     return;
-
   try {
     sessionsLoadingByAgent[currentAgentId.value] = true;
-
-    // 临时模拟加载更多数据
-    const moreSessions: ChatSession[] = [
+    const more: ChatSession[] = [
       {
         id: `session-${currentAgentId.value}-more-${Date.now()}`,
         title: "更多历史会话",
@@ -246,20 +171,13 @@ const handleLoadMoreSessions = async () => {
         pinned: false,
       },
     ];
-
     const agentId = currentAgentId.value;
-    if (!sessionsByAgent[agentId]) {
-      sessionsByAgent[agentId] = [];
-    }
-    sessionsByAgent[agentId].push(...moreSessions);
-
-    hasMoreByAgent[agentId] = false; // 模拟没有更多数据
-  } catch (error) {
-    console.error("加载更多会话失败:", error);
+    if (!sessionsByAgent[agentId]) sessionsByAgent[agentId] = [];
+    sessionsByAgent[agentId].push(...more);
+    hasMoreByAgent[agentId] = false;
   } finally {
-    if (currentAgentId.value) {
+    if (currentAgentId.value)
       sessionsLoadingByAgent[currentAgentId.value] = false;
-    }
   }
 };
 
@@ -269,36 +187,20 @@ const handleRenameSession = async (payload: {
   title: string;
 }) => {
   const { agentId, sessionId, title } = payload;
-
-  try {
-    // TODO: 调用后端 API 更新会话标题
-    // await updateSession(sessionId, { title });
-
-    // 更新本地状态
-    const sessions = sessionsByAgent[agentId] || [];
-    const session = sessions.find((s) => s.id === sessionId);
-    if (session) {
-      session.title = title;
-    }
-  } catch (error) {
-    console.error("重命名会话失败:", error);
-  }
+  const sessions = sessionsByAgent[agentId] || [];
+  const session = sessions.find((s) => s.id === sessionId);
+  if (session) session.title = title;
 };
 
 const handleAgentSelect = async (agentId: number) => {
   if (agentId === currentAgentId.value) return;
   currentAgentId.value = agentId;
-
-  // 清空当前消息
   chat.clearMessages();
 
-  // 加载该 Agent 的会话列表
   if (!sessionsByAgent[agentId]) {
     try {
       sessionsLoadingByAgent[agentId] = true;
-
-      // 临时模拟数据，因为 listSessions 可能还没实现
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      await new Promise((r) => setTimeout(r, 500));
       const sessions: ChatSession[] = [
         {
           id: `session-${agentId}-1`,
@@ -317,18 +219,10 @@ const handleAgentSelect = async (agentId: number) => {
           pinned: true,
         },
       ];
-
       sessionsByAgent[agentId] = sessions;
       hasMoreByAgent[agentId] = true;
-
-      // 如果有会话，选择第一个
-      if (sessions.length > 0) {
-        currentSessionId.value = sessions[0].id;
-      } else {
-        currentSessionId.value = null;
-      }
-    } catch (error) {
-      console.error("加载会话列表失败:", error);
+      currentSessionId.value = sessions.length ? sessions[0].id : null;
+    } catch {
       sessionsByAgent[agentId] = [];
       hasMoreByAgent[agentId] = false;
       currentSessionId.value = null;
@@ -336,56 +230,36 @@ const handleAgentSelect = async (agentId: number) => {
       sessionsLoadingByAgent[agentId] = false;
     }
   } else {
-    // 如果已有会话列表，选择第一个
     const sessions = sessionsByAgent[agentId] || [];
-    if (sessions.length > 0) {
-      currentSessionId.value = sessions[0].id;
-    } else {
-      currentSessionId.value = null;
-    }
+    currentSessionId.value = sessions.length ? sessions[0].id : null;
   }
-
-  console.log("切换到 Agent:", agentId);
 };
 
-// 处理发送消息
 const handleSendMessage = async (content: string) => {
-  // 检查是否允许发送消息
-  if (!canSendMessage.value) {
-    console.warn("无法发送消息：agent列表为空或连接失败");
-    return;
-  }
-
-  // 携带会话上下文
+  if (!canSendMessage.value) return;
   const meta: any = {};
   if (currentSessionId.value) meta.sessionId = currentSessionId.value;
   if (currentAgentId.value) meta.agentId = currentAgentId.value;
-
   await chat.send(content, meta);
 };
 
-// 处理重试消息
 const handleRetryMessage = async () => {
   await retryLastMessage();
 };
 
-// 处理清空消息
 const handleClearMessages = () => {
-  clearMessages();
+  chat.clearMessages();
 };
 
-// 创建新 Agent
+// 创建/编辑/保存/删除 Agent
 const handleCreateAgent = () => {
-  console.log("点击了创建 Agent 按钮");
   editingAgent.value = null;
   showConfigPanel.value = true;
 };
 
-// 编辑 Agent
 const handleEditAgent = (agentId: number) => {
   const agent = agents.value.find((a) => a.id === agentId);
   if (agent) {
-    // ✅ 深拷贝并转换为可变类型解决 readonly 属性问题
     editingAgent.value = JSON.parse(JSON.stringify(agent)) as Agent;
     showConfigPanel.value = true;
   } else {
@@ -393,22 +267,18 @@ const handleEditAgent = (agentId: number) => {
   }
 };
 
-// 关闭配置面板
 const handleCloseConfig = () => {
   showConfigPanel.value = false;
   editingAgent.value = null;
 };
 
-// 删除 Agent
 const handleDeleteAgent = async (agentId: number) => {
   if (confirm(t("agent.confirmDelete"))) {
     try {
       await agentManager.deleteAgent(agentId);
       if (agentId === currentAgentId.value && agents.value.length > 0) {
-        const firstAgent = agents.value[0];
-        if (firstAgent) {
-          await handleAgentSelect(firstAgent.id);
-        }
+        const first = agents.value[0];
+        if (first) await handleAgentSelect(first.id);
       }
     } catch (error) {
       console.error("删除 Agent 失败:", error);
@@ -416,15 +286,12 @@ const handleDeleteAgent = async (agentId: number) => {
   }
 };
 
-// 保存 Agent 配置
 const handleSaveAgent = async (config: any) => {
   try {
-    // 如果有 id，说明是编辑现有 Agent
     if (config.id) {
       await agentManager.updateAgent(parseInt(config.id), config);
-      await agentManager.fetchAgents(); // ✅ 刷新列表
+      await agentManager.fetchAgents();
     } else {
-      // 否则是创建新 Agent
       const newAgent = await agentManager.createAgent({
         key: config.key || `agent_${Date.now()}`,
         name: config.name || "新建 Agent",
@@ -434,95 +301,103 @@ const handleSaveAgent = async (config: any) => {
       });
       await handleAgentSelect(newAgent.id);
     }
-    handleCloseConfig(); // ✅ 关抽屉并清理 editingAgent
+    handleCloseConfig();
   } catch (error) {
     console.error("保存 Agent 失败:", error);
   }
 };
 
-// 计算当前 Agent
+// 当前 Agent
 const selectedAgent = computed(() => {
   return (
     agents.value.find((agent) => agent.id === currentAgentId.value) || null
   );
 });
 
-// 将 Agent 转换为 ChatInterface 需要的格式
+// 转为 ChatInterface 需要的格式
 const currentAgentForChat = computed(() => {
   const agent = selectedAgent.value;
   if (!agent) return null;
-
   return {
     id: agent.id.toString(),
     name: agent.name,
     description: agent.description,
-    avatar: "", // Agent 类型没有 avatar 字段
-    model: "gpt-3.5-turbo", // 默认模型
-    systemPrompt: "", // 默认系统提示
+    avatar: "",
+    model: "gpt-3.5-turbo",
+    systemPrompt: "",
     temperature: 0.7,
     maxTokens: 2000,
     topP: 1,
     frequencyPenalty: 0,
     presencePenalty: 0,
     isActive: agent.status === "active",
-    capabilities: [], // 默认空能力列表
+    capabilities: [],
   };
 });
 
-// 计算是否允许发送消息
+// 允许发送消息
 const canSendMessage = computed(() => {
-  // 检查agent列表是否为空
-  if (!agents.value || agents.value.length === 0) {
-    return false;
-  }
-
-  // 检查连接状态
-  if (!isConnected.value) {
-    return false;
-  }
-
-  // 检查是否有选中的agent
-  if (!selectedAgent.value) {
-    return false;
-  }
-
+  if (!agents.value || agents.value.length === 0) return false;
+  if (!isConnected.value) return false;
+  if (!selectedAgent.value) return false;
   return true;
 });
 
-// Agent 图标获取方法（与 AgentSelector 中的方法保持一致）
+// Agent 图标
 const getAgentIcon = (agent: Agent) => {
-  // 如果有自定义图标，使用自定义图标
-  if (agent.meta?.icon) {
-    return agent.meta.icon;
-  }
-
-  // 根据 source 或 tags 返回默认图标
+  if (agent.meta?.icon) return agent.meta.icon;
   if (agent.source === "core") return "i-heroicons-cog-6-tooth";
   if (agent.meta?.tags?.includes("support"))
     return "i-heroicons-chat-bubble-left-right";
   if (agent.meta?.tags?.includes("enterprise"))
     return "i-heroicons-building-office";
-
   return "i-heroicons-cpu-chip";
 };
+
+/* ========= 插件专属侧栏：显示条件 & 收缩状态 ========= */
+// 这里先强制为 true 以便开发预览；接入真实判断后改回去
+
+const isPluginAgent = computed(() => {
+  const a = selectedAgent.value as Agent | null;
+  if (!a) return false;
+  return (
+    a.source === "plugin" ||
+    a.meta?.isPlugin === true ||
+    !!a.meta?.pluginId ||
+    a.meta?.tags?.includes?.("plugin")
+  );
+});
+
+const isPluginPanelCollapsed = ref(false);
+const togglePluginPanel = () => {
+  isPluginPanelCollapsed.value = !isPluginPanelCollapsed.value;
+};
+watch(
+  () => selectedAgent.value?.id,
+  () => {
+    isPluginPanelCollapsed.value = false;
+  }
+);
 </script>
 
 <template>
-  <div class="flex h-full bg-gray-50">
-    <!-- 左侧 Agent 选择器 -->
+  <!-- 外层：左右完全分离，中间有空隙 -->
+  <div class="flex h-full gap-4 px-4 pt-4 pb-0 bg-gray-50">
+    <!-- 🔌 左：插件面板（独立卡片） -->
     <div
-      class="flex-shrink-0 transition-all duration-300 ease-in-out relative"
-      :class="isLeftPanelCollapsed ? 'w-12' : 'w-80'"
+      v-if="isPluginAgent"
+      class="relative flex-shrink-0 transition-all duration-300 ease-in-out bg-white border border-gray-200 rounded-lg shadow-sm min-h-0"
+      :class="isPluginPanelCollapsed ? 'w-12' : 'w-[36rem]'"
     >
-      <!-- 收缩/展开按钮 -->
+      <!-- 收缩/展开按钮（浮在卡片右侧边缘） -->
       <button
-        @click="toggleLeftPanel"
+        @click="togglePluginPanel"
         class="absolute top-4 -right-3 z-10 w-6 h-6 bg-white border border-gray-200 rounded-full shadow-sm hover:shadow-md transition-shadow flex items-center justify-center text-gray-500 hover:text-gray-700"
-        :title="isLeftPanelCollapsed ? '展开面板' : '收缩面板'"
+        :title="isPluginPanelCollapsed ? '展开插件面板' : '收缩插件面板'"
       >
         <UIcon
           :name="
-            isLeftPanelCollapsed
+            isPluginPanelCollapsed
               ? 'i-heroicons-chevron-right'
               : 'i-heroicons-chevron-left'
           "
@@ -530,100 +405,143 @@ const getAgentIcon = (agent: Agent) => {
         />
       </button>
 
-      <!-- Agent 选择器内容 -->
-      <div class="h-full overflow-hidden">
-        <AgentSidebar
-          v-show="!isLeftPanelCollapsed"
-          :agents="agentsList"
-          :current-agent-id="currentAgentId"
-          :current-session-id="currentSessionId || undefined"
-          :sessions-by-agent="sessionsByAgent"
-          :sessions-loading-by-agent="sessionsLoadingByAgent"
-          :has-more-by-agent="hasMoreByAgent"
-          @select="handleAgentSelect"
-          @create-agent="handleCreateAgent"
-          @edit-agent="handleEditAgent"
-          @new-session="handleNewSession"
-          @select-session="handleSelectSession"
-          @delete-session="handleDeleteSession"
-          @pin-session="handlePinSession"
-          @unpin-session="
-            (sessionId: string) =>
-              handlePinSession({
-                agentId: currentAgentId!,
-                sessionId,
-                pinned: false,
-              })
-          "
-          @load-more-sessions="handleLoadMoreSessions"
-          @rename-session="handleRenameSession"
-        />
-
-        <!-- 收缩状态下的简化显示 -->
-        <div
-          v-show="isLeftPanelCollapsed"
-          class="h-full bg-white border-r border-gray-200 flex flex-col items-center py-4 space-y-3"
-        >
-          <!-- 当前选中的 Agent 头像 -->
-          <div
-            v-if="selectedAgent"
-            class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-xs cursor-pointer"
-            :title="selectedAgent.name"
-            @click="toggleLeftPanel"
-          >
-            <UIcon :name="getAgentIcon(selectedAgent)" class="w-4 h-4" />
+      <!-- 插件内容区 -->
+      <div v-show="!isPluginPanelCollapsed" class="h-full overflow-auto">
+        <div class="p-4 space-y-3">
+          <div class="text-xs text-gray-400 uppercase tracking-wide">
+            插件面板
           </div>
-
-          <!-- 新建按钮 -->
-          <UButton
-            icon="i-heroicons-plus"
-            size="xs"
-            variant="ghost"
-            class="w-8 h-8 p-0"
-            :title="'新建 Agent'"
-            @click="handleCreateAgent"
-          />
+          <div class="text-sm text-gray-700">
+            当前 Agent：<span class="font-medium">{{
+              selectedAgent?.name
+            }}</span>
+          </div>
+          <div class="text-xs text-gray-500">
+            可在此渲染插件自定义内容（表单/看板/指标/工具面板等）。
+          </div>
+          <!-- TODO: 真正的插件组件 -->
+          <!-- <PluginAgentPanel :agent="selectedAgent!" :session-id="currentSessionId || undefined" /> -->
         </div>
       </div>
     </div>
 
-    <!-- 中间聊天界面 -->
-    <div class="flex-1 flex flex-col min-w-0">
-      <!-- 连接状态指示器 -->
-      <div class="p-4 border-b border-gray-200 bg-white">
-        <ConnectionIndicators :connection="chat" />
+    <!-- 🧱 右：主容器（独立卡片） -->
+    <div
+      class="flex flex-1 min-w-0 min-h-0 bg-white border border-gray-200 rounded-lg shadow-sm"
+    >
+      <!-- 左侧 Agent 选择器 -->
+      <div
+        class="relative flex-shrink-0 transition-all duration-300 ease-in-out border-r border-gray-200 min-h-0"
+        :class="isLeftPanelCollapsed ? 'w-12' : 'w-80'"
+      >
+        <!-- 收缩/展开按钮 -->
+        <button
+          @click="toggleLeftPanel"
+          class="absolute top-4 -right-3 z-10 w-6 h-6 bg-white border border-gray-200 rounded-full shadow-sm hover:shadow-md transition-shadow flex items-center justify-center text-gray-500 hover:text-gray-700"
+          :title="isLeftPanelCollapsed ? '展开面板' : '收缩面板'"
+        >
+          <UIcon
+            :name="
+              isLeftPanelCollapsed
+                ? 'i-heroicons-chevron-right'
+                : 'i-heroicons-chevron-left'
+            "
+            class="w-3 h-3"
+          />
+        </button>
+
+        <!-- Agent 选择器内容 -->
+        <div class="h-full min-h-0 flex flex-col">
+          <AgentSidebar
+            class="flex-1 min-h-0"
+            v-show="!isLeftPanelCollapsed"
+            :agents="agentsList"
+            :current-agent-id="currentAgentId"
+            :current-session-id="currentSessionId || undefined"
+            :sessions-by-agent="sessionsByAgent"
+            :sessions-loading-by-agent="sessionsLoadingByAgent"
+            :has-more-by-agent="hasMoreByAgent"
+            @select="handleAgentSelect"
+            @create-agent="handleCreateAgent"
+            @edit-agent="handleEditAgent"
+            @new-session="handleNewSession"
+            @select-session="handleSelectSession"
+            @delete-session="handleDeleteSession"
+            @pin-session="handlePinSession"
+            @unpin-session="
+              (sessionId: string) =>
+                handlePinSession({
+                  agentId: currentAgentId!,
+                  sessionId,
+                  pinned: false,
+                })
+            "
+            @load-more-sessions="handleLoadMoreSessions"
+            @rename-session="handleRenameSession"
+          />
+
+          <!-- 收缩状态下的简化显示 -->
+          <div
+            v-show="isLeftPanelCollapsed"
+            class="flex-1 min-h-0 bg-white flex flex-col items-center py-4 space-y-3"
+          >
+            <div
+              v-if="selectedAgent"
+              class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-xs cursor-pointer"
+              :title="selectedAgent.name"
+              @click="toggleLeftPanel"
+            >
+              <UIcon :name="getAgentIcon(selectedAgent)" class="w-4 h-4" />
+            </div>
+            <UButton
+              icon="i-heroicons-plus"
+              size="xs"
+              variant="ghost"
+              class="w-8 h-8 p-0"
+              :title="'新建 Agent'"
+              @click="handleCreateAgent"
+            />
+          </div>
+        </div>
       </div>
 
-      <ClientOnly>
-        <ChatInterface
-          :messages="Array.isArray(messages) ? messages : []"
-          :is-connected="!!isConnected"
-          :is-streaming="!!isStreaming"
-          :is-typing="!!isTyping"
-          :current-agent="currentAgentForChat"
-          :connection-indicators="true"
-          :can-send-message="canSendMessage"
-          @send-message="handleSendMessage"
-          @retry-message="handleRetryMessage"
-          @clear-messages="handleClearMessages"
-        />
-      </ClientOnly>
-    </div>
+      <!-- 中间聊天界面 -->
+      <div class="flex-1 flex flex-col min-w-0 min-h-0">
+        <div class="p-4 border-b border-gray-200 bg-white">
+          <ConnectionIndicators :connection="chat" />
+        </div>
 
-    <!-- 配置面板 -->
-    <ConfigPanel
-      :key="editingAgent ? editingAgent.id : 'new'"
-      :agent="editingAgent"
-      :is-visible="showConfigPanel"
-      @close="handleCloseConfig"
-      @save="handleSaveAgent"
-    />
+        <ClientOnly>
+          <ChatInterface
+            :messages="messagesList"
+            :is-connected="!!isConnected"
+            :is-streaming="!!isStreaming"
+            :is-typing="!!isTyping"
+            :current-agent="currentAgentForChat"
+            :connection-indicators="true"
+            :can-send-message="canSendMessage"
+            @send-message="handleSendMessage"
+            @retry-message="handleRetryMessage"
+            @clear-messages="handleClearMessages"
+          />
+        </ClientOnly>
+      </div>
+
+      <!-- 配置面板（保持挂载在主容器） -->
+      <ConfigPanel
+        :key="editingAgent ? editingAgent.id : 'new'"
+        :agent="editingAgent"
+        :is-visible="showConfigPanel"
+        @close="handleCloseConfig"
+        @save="handleSaveAgent"
+      />
+    </div>
   </div>
 </template>
 
 <style scoped>
-/* 确保页面占满全高 */
+/* 确保页面占满全高（你有顶栏时这里按需调整数值） */
 .h-full {
-  height: calc(100vh - 64px); /* 减去头部高度 */
+  height: calc(100vh - 64px);
 }
 </style>
