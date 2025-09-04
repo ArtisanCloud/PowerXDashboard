@@ -22,7 +22,7 @@
         </UButton>
       </div>
       <div class="text-sm text-gray-500">
-        <p>• SSE测试: GET /api/agents/stream/flow?probe=1 (探活)</p>
+        <p>• SSE测试: GET /api/agents/stream//sse?probe=1 (探活)</p>
         <p>• WebSocket测试: WS /api/agents/stream/ws?probe=1 (探活)</p>
         <p>• 真实消息会根据连接状态自动选择SSE或WebSocket通道</p>
       </div>

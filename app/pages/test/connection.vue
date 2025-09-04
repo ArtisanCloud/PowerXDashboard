@@ -17,7 +17,7 @@
           测试 SSE 探活
         </UButton>
         <div class="mt-3 text-sm text-gray-600">
-          <p>测试地址: GET /api/agents/stream/flow?probe=1</p>
+          <p>测试地址: GET /api/agents/stream//sse?probe=1</p>
           <p>预期: event: ack → event: end</p>
         </div>
       </div>
@@ -70,7 +70,7 @@
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-600">
         <div>
           <p><strong>SSE 真流:</strong></p>
-          <p>GET /api/agents/stream/flow?q=今天天气如何&flow_id=chat</p>
+          <p>GET /api/agents/stream//sse?q=今天天气如何&flow_id=chat</p>
           <p>预期: intent → token 流 → end</p>
         </div>
         <div>

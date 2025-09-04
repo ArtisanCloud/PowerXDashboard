@@ -81,7 +81,7 @@ export function useDualChannelConnection(): DualChannelConnection {
   const reconnectSSE = async () => {
     try {
       const res = await fetch(
-        buildHttpUrl("/agents/stream/flow", { probe: 1 }),
+        buildHttpUrl("/agents/stream/sse", { probe: 1 }),
         {
           method: "GET",
           headers: {
@@ -143,7 +143,7 @@ export function useDualChannelConnection(): DualChannelConnection {
     const requestId = `req_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
     currentRequestId.value = requestId;
 
-    const url = buildHttpUrl("/agents/stream/flow", {
+    const url = buildHttpUrl("/agents/stream//sse", {
       q: message,
       flow_id: flowId,
       request_id: requestId,
