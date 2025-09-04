@@ -1,5 +1,6 @@
 // app/composables/agent/useDualChannelConnection.ts
 import { ref, computed, watchEffect, type Ref, type ComputedRef } from "vue";
+import { useStreamingThinkParser } from "~/composables/agent/useThinkParser";
 
 export interface DualChannelConnection {
   sseActive: Ref<boolean>;
@@ -31,6 +32,9 @@ export function useDualChannelConnection(): DualChannelConnection {
   let wsConnection: WebSocket | null = null;
   let onMessageCallback: ((data: any) => void) | undefined;
   let onErrorCallback: ((error: any) => void) | undefined;
+
+  // Think 解析器
+  const thinkParser = useStreamingThinkParser();
 
   // ---- helpers ----
   const getAuthToken = () =>
@@ -206,13 +210,23 @@ export function useDualChannelConnection(): DualChannelConnection {
                 !last || last.role !== "assistant" || last.done === true;
 
               if (payload.type === "token" || payload.type === "chunk") {
-                if (needNewAssistant)
+                if (needNewAssistant) {
                   messages.value.push({
                     id: `a_${Date.now()}`,
                     role: "assistant",
                     content: "",
                   });
-                messages.value[messages.value.length - 1].content += text;
+                  // 重置 think 解析器
+                  thinkParser.reset();
+                }
+
+                // 使用 think 解析器处理流式内容
+                const currentMessage =
+                  messages.value[messages.value.length - 1];
+                const parsed = thinkParser.parseStreamingContent(text);
+
+                // 更新消息内容（包含完整的原始内容，think 标签会在渲染时处理）
+                currentMessage.content += text;
               } else if (payload.type === "end") {
                 if (last && last.role === "assistant") last.done = true;
                 currentRequestId.value = null;
@@ -276,13 +290,22 @@ export function useDualChannelConnection(): DualChannelConnection {
           !last || last.role !== "assistant" || last.done === true;
 
         if (data.type === "token" || data.type === "chunk") {
-          if (needNewAssistant)
+          if (needNewAssistant) {
             messages.value.push({
               id: `a_${Date.now()}`,
               role: "assistant",
               content: "",
             });
-          messages.value[messages.value.length - 1].content += text;
+            // 重置 think 解析器
+            thinkParser.reset();
+          }
+
+          // 使用 think 解析器处理流式内容
+          const currentMessage = messages.value[messages.value.length - 1];
+          const parsed = thinkParser.parseStreamingContent(text);
+
+          // 更新消息内容（包含完整的原始内容，think 标签会在渲染时处理）
+          currentMessage.content += text;
         } else if (data.type === "end") {
           if (last && last.role === "assistant") last.done = true;
           currentRequestId.value = null;
@@ -335,6 +358,7 @@ export function useDualChannelConnection(): DualChannelConnection {
 
   const clearMessages = () => {
     messages.value = [];
+    thinkParser.reset();
   };
   const disconnect = () => {
     cancel();

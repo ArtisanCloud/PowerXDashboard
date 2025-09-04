@@ -5,6 +5,9 @@ import type {
   MessageContent,
   MESSAGE_TYPES,
 } from "~/types/message";
+import { useThinkParser } from "~/composables/agent/useThinkParser";
+import ThinkBlock from "~/components/agent/ThinkBlock.vue";
+import { ref, computed } from "vue";
 
 const props = defineProps<{
   message: ChatMessage | EnhancedChatMessage;
@@ -35,6 +38,28 @@ const getMessageContent = () => {
     {
       type: "text",
       data: { text: props.message.content },
+    },
+  ] as MessageContent[];
+};
+
+// Think 标签解析
+const messageContentRef = computed(() => props.message.content || "");
+const { parsedMessage } = useThinkParser(messageContentRef);
+
+// 获取处理后的消息内容（移除 think 标签）
+const getProcessedMessageContent = () => {
+  if (isEnhancedMessage(props.message)) {
+    return props.message.content;
+  }
+
+  // 对于简单文本消息，使用解析后的主要内容
+  const mainContent = parsedMessage.value.mainContent;
+  if (!mainContent) return [];
+
+  return [
+    {
+      type: "text",
+      data: { text: mainContent },
     },
   ] as MessageContent[];
 };
@@ -218,10 +243,21 @@ const renderMarkdown = (markdown: string) => {
           </div>
         </div>
 
+        <!-- Think 块渲染 -->
+        <div v-if="parsedMessage.hasThink" class="space-y-2 mb-4">
+          <ThinkBlock
+            v-for="(thinkBlock, index) in parsedMessage.thinkBlocks"
+            :key="`think-${index}`"
+            :content="thinkBlock.content"
+            :index="thinkBlock.index"
+            :is-streaming="isStreaming"
+          />
+        </div>
+
         <!-- 消息内容渲染 -->
         <div class="space-y-3">
           <template
-            v-for="(content, index) in getMessageContent()"
+            v-for="(content, index) in getProcessedMessageContent()"
             :key="index"
           >
             <!-- 文本消息 -->

@@ -7,8 +7,8 @@ import ConnectionIndicators from "@/components/agent/ConnectionIndicators.vue";
 import AgentSidebar from "@/components/agent/AgentSidebar.vue";
 import { useDualChannelConnection } from "~/composables/agent/useDualChannelConnection";
 import { useAgentManager } from "~/composables/agent/useAgentManager";
-import { useChatSessions } from "~/composables/agent/useChatSessions";
 import { useOneShotAlert } from "~/composables/useOneShotAlert";
+import { useChatSessions } from "~/composables/agent/useChatSessions";
 
 definePageMeta({
   title: "Agent 对话",
@@ -18,17 +18,18 @@ definePageMeta({
 
 const { t } = useI18n();
 
-// 状态管理
-const currentAgentId = ref<number | null>(null);
+// 会话状态管理
+const chatSessions = useChatSessions();
 
-// ===== 会话状态（按 Agent 维度）=====
-const currentSessionId = ref<number | string | null>(null);
-const sessionsByAgent = reactive<Record<number, ChatSession[]>>({});
-const sessionsLoadingByAgent = reactive<Record<number, boolean>>({});
-const hasMoreByAgent = reactive<Record<number, boolean>>({});
+// 状态管理
+const currentAgentId = chatSessions.currentAgentId;
+const currentSessionId = chatSessions.currentSessionId;
+const sessionsByAgent = chatSessions.sessionsByAgent;
+const sessionsLoadingByAgent = chatSessions.sessionsLoadingByAgent;
+const hasMoreByAgent = chatSessions.hasMoreByAgent;
 
 // 工具：拿到某 agent 的数组（始终给个安全数组）
-const getSessions = (agentId: number) => sessionsByAgent[agentId] || [];
+const getSessions = (agentId: number) => sessionsByAgent.value[agentId] || [];
 
 // 双通道聊天流管理
 const chat = useDualChannelConnection();
@@ -64,9 +65,6 @@ const messagesList = computed(() =>
 const isConnected = computed(() => chat.sseActive.value || chat.wsActive.value);
 const isStreaming = computed(() => chat.isGenerating.value);
 const isTyping = ref(false);
-
-// 会话管理 composable
-useChatSessions();
 
 const retryLastMessage = async () => {
   console.log("重试最后一条消息");
@@ -104,26 +102,43 @@ const handleSelectSession = async (payload: {
   sessionId: string | number;
 }) => {
   const { agentId, sessionId } = payload;
-  if (currentAgentId.value !== agentId) currentAgentId.value = agentId;
-  currentSessionId.value = sessionId;
+  chatSessions.selectSession(agentId, sessionId);
+
+  // 清空当前消息
   chat.clearMessages();
+
+  // 加载会话历史消息
+  try {
+    const messages = await chatSessions.loadSessionMessages(sessionId);
+
+    // 将历史消息添加到聊天界面
+    for (const message of messages) {
+      chat.messages.value.push({
+        id: message.id.toString(),
+        role: message.role,
+        content: message.content,
+        timestamp: message.timestamp,
+        isError: message.isError,
+        meta: message.meta,
+      });
+    }
+  } catch (error) {
+    console.error("加载会话消息失败:", error);
+    notifyOnce("加载会话消息失败", error instanceof Error ? error.message : "");
+  }
 };
 
 const handleNewSession = async () => {
   if (!currentAgentId.value) return;
-  const session: ChatSession = {
-    id: `session-${currentAgentId.value}-${Date.now()}`,
-    title: t("agent.sessions.untitledSession") || "新会话",
-    lastMessage: "新会话已创建",
-    updatedAt: new Date(),
-    unread: 0,
-    pinned: false,
-  };
-  const agentId = currentAgentId.value;
-  if (!sessionsByAgent[agentId]) sessionsByAgent[agentId] = [];
-  sessionsByAgent[agentId].unshift(session);
-  currentSessionId.value = session.id;
-  chat.clearMessages();
+  try {
+    const newSession = await chatSessions.createSession(currentAgentId.value);
+    if (newSession) {
+      chat.clearMessages();
+    }
+  } catch (error) {
+    console.error("创建新会话失败:", error);
+    notifyOnce("创建新会话失败", error instanceof Error ? error.message : "");
+  }
 };
 
 const handleDeleteSession = async (payload: {
@@ -132,13 +147,16 @@ const handleDeleteSession = async (payload: {
 }) => {
   const { agentId, sessionId } = payload;
   if (!confirm(t("agent.confirmDelete") || "确定删除该会话？")) return;
-  const sessions = sessionsByAgent[agentId] || [];
-  const index = sessions.findIndex((s) => s.id === sessionId);
-  if (index > -1) sessions.splice(index, 1);
-  if (currentSessionId.value === sessionId) {
-    const remaining = sessionsByAgent[agentId] || [];
-    currentSessionId.value = remaining.length > 0 ? remaining[0].id : null;
-    if (!remaining.length) chat.clearMessages();
+
+  try {
+    await chatSessions.deleteSession(agentId, sessionId);
+    // 如果删除的是当前会话，清空消息
+    if (currentSessionId.value === sessionId) {
+      chat.clearMessages();
+    }
+  } catch (error) {
+    console.error("删除会话失败:", error);
+    notifyOnce("删除会话失败", error instanceof Error ? error.message : "");
   }
 };
 
@@ -147,34 +165,17 @@ const handlePinSession = async (payload: {
   sessionId: string | number;
   pinned: boolean;
 }) => {
-  const { agentId, sessionId, pinned } = payload;
-  const sessions = sessionsByAgent[agentId] || [];
-  const session = sessions.find((s) => s.id === sessionId);
-  if (session) session.pinned = pinned;
+  // TODO: 后端暂不支持置顶功能，这里先保留接口
+  console.log("置顶会话功能待实现:", payload);
 };
 
 const handleLoadMoreSessions = async () => {
-  if (!currentAgentId.value || sessionsLoadingByAgent[currentAgentId.value])
-    return;
+  if (!currentAgentId.value) return;
   try {
-    sessionsLoadingByAgent[currentAgentId.value] = true;
-    const more: ChatSession[] = [
-      {
-        id: `session-${currentAgentId.value}-more-${Date.now()}`,
-        title: "更多历史会话",
-        lastMessage: "这是加载的更多会话内容...",
-        updatedAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 7),
-        unread: 0,
-        pinned: false,
-      },
-    ];
-    const agentId = currentAgentId.value;
-    if (!sessionsByAgent[agentId]) sessionsByAgent[agentId] = [];
-    sessionsByAgent[agentId].push(...more);
-    hasMoreByAgent[agentId] = false;
-  } finally {
-    if (currentAgentId.value)
-      sessionsLoadingByAgent[currentAgentId.value] = false;
+    await chatSessions.loadMore(currentAgentId.value);
+  } catch (error) {
+    console.error("加载更多会话失败:", error);
+    notifyOnce("加载更多会话失败", error instanceof Error ? error.message : "");
   }
 };
 
@@ -184,50 +185,22 @@ const handleRenameSession = async (payload: {
   title: string;
 }) => {
   const { agentId, sessionId, title } = payload;
-  const sessions = sessionsByAgent[agentId] || [];
-  const session = sessions.find((s) => s.id === sessionId);
-  if (session) session.title = title;
+  try {
+    await chatSessions.renameSession(agentId, sessionId, title);
+  } catch (error) {
+    console.error("重命名会话失败:", error);
+    notifyOnce("重命名会话失败", error instanceof Error ? error.message : "");
+  }
 };
 
 const handleAgentSelect = async (agentId: number) => {
-  currentAgentId.value = agentId;
-  chat.clearMessages();
-
-  if (!sessionsByAgent[agentId]) {
-    try {
-      sessionsLoadingByAgent[agentId] = true;
-      await new Promise((r) => setTimeout(r, 500));
-      const sessions: ChatSession[] = [
-        {
-          id: `session-${agentId}-1`,
-          title: "测试会话 1",
-          lastMessage: "这是一个测试会话",
-          updatedAt: new Date(),
-          unread: 0,
-          pinned: false,
-        },
-        {
-          id: `session-${agentId}-2`,
-          title: "测试会话 2",
-          lastMessage: "另一个测试会话",
-          updatedAt: new Date(Date.now() - 1000 * 60 * 30),
-          unread: 2,
-          pinned: true,
-        },
-      ];
-      sessionsByAgent[agentId] = sessions;
-      hasMoreByAgent[agentId] = true;
-      currentSessionId.value = sessions.length ? sessions[0].id : null;
-    } catch {
-      sessionsByAgent[agentId] = [];
-      hasMoreByAgent[agentId] = false;
-      currentSessionId.value = null;
-    } finally {
-      sessionsLoadingByAgent[agentId] = false;
-    }
-  } else {
-    const sessions = sessionsByAgent[agentId] || [];
-    currentSessionId.value = sessions.length ? sessions[0].id : null;
+  try {
+    chatSessions.selectAgent(agentId);
+    await chatSessions.listSessions(agentId);
+    chat.clearMessages();
+  } catch (error) {
+    console.error("选择 Agent 失败:", error);
+    notifyOnce("加载会话列表失败", error instanceof Error ? error.message : "");
   }
 };
 
@@ -272,9 +245,13 @@ const handleDeleteAgent = async (agentId: number) => {
   if (confirm(t("agent.confirmDelete"))) {
     try {
       await agentManager.deleteAgent(agentId);
-      if (agentId === currentAgentId.value && agents.value.length > 0) {
-        const first = agents.value[0];
-        if (first) await handleAgentSelect(first.id);
+      // 如果删除的是当前选中的 Agent，清空会话状态并选择第一个可用的 Agent
+      if (agentId === currentAgentId.value) {
+        chatSessions.clear();
+        if (agents.value.length > 0) {
+          const first = agents.value[0];
+          if (first) await handleAgentSelect(first.id);
+        }
       }
     } catch (error) {
       console.error("删除 Agent 失败:", error);
