@@ -1,16 +1,21 @@
 <script setup lang="ts">
 import type { ChatMessage } from "~/types/message";
-import type {
-  EnhancedChatMessage,
-  MessageContent,
-  MESSAGE_TYPES,
-} from "~/types/message";
+import type { EnhancedChatMessage, MessageContent } from "~/types/message";
+import type { DeepReadonly } from "vue";
+import { computed, watch, onBeforeUnmount } from "vue";
+import { useI18n } from "#imports";
 import { useThinkParser } from "~/composables/agent/useThinkParser";
+import { useMessageTypewriter } from "~/composables/agent/useTypewriter";
 import ThinkBlock from "~/components/agent/ThinkBlock.vue";
-import { ref, computed } from "vue";
+
+declare global {
+  interface Window {
+    open(url?: string | URL, target?: string, features?: string): Window | null;
+  }
+}
 
 const props = defineProps<{
-  message: ChatMessage | EnhancedChatMessage;
+  message: ChatMessage | EnhancedChatMessage | DeepReadonly<ChatMessage>;
   isStreaming?: boolean;
   agentName?: string;
 }>();
@@ -23,48 +28,117 @@ const emit = defineEmits<{
 
 const { t } = useI18n();
 
-// 判断是否为增强消息类型
-const isEnhancedMessage = (msg: any): msg is EnhancedChatMessage => {
-  return Array.isArray(msg.content);
-};
+const isEnhancedMessage = (msg: any): msg is EnhancedChatMessage =>
+  Array.isArray(msg?.content);
 
-// 获取消息内容
-const getMessageContent = () => {
+// 原始完整文本
+const fullContentRef = computed(() =>
+  typeof props.message.content === "string"
+    ? (props.message.content as string)
+    : ""
+);
+
+// 完整内容解析（静态）
+const { parsedMessage } = useThinkParser(fullContentRef);
+
+watch(
+  () => ({
+    id: (props.message as any)?.id,
+    role: props.message.role,
+    len:
+      typeof props.message.content === "string"
+        ? (props.message.content as string).length
+        : -1,
+    isStreaming: (props.message as any)?.isStreaming,
+    isThinking: (props.message as any)?.isThinking,
+    done: (props.message as any)?.done,
+  }),
+  (v) => {
+    console.log("[MessageItem]", v);
+  },
+  { deep: false, immediate: true }
+);
+
+// 打字是否启用：兼容父 prop 和消息自身
+const shouldUseTypewriter = computed(
+  () =>
+    props.message.role === "assistant" &&
+    !(props.message as any).isError &&
+    !(props.message as any).isThinking &&
+    ((props.isStreaming ?? false) || (props.message as any).isStreaming)
+);
+
+const typewriter = useMessageTypewriter({
+  speed: 25,
+  onComplete: () => {},
+});
+
+// “正在打字的可见文本”解析（稳定 computed）
+const displayedParsed = useThinkParser(
+  computed(() => typewriter?.displayedText?.value ?? "")
+);
+
+// 强制去除 <think>…</think> 兜底
+const stripThink = (s: string) =>
+  (s ?? "").replace(/<think>[\s\S]*?<\/think>/gi, "").trim();
+
+// 只在“明确完成”才 complete，避免过早掐断
+watch(
+  [
+    () => props.message.content,
+    () => (props.message as any).isStreaming,
+    () => (props.message as any).isThinking,
+    () => (props.message as any).done,
+  ],
+  ([newContent, isStreaming, isThinking, done]) => {
+    if (typeof newContent !== "string") return;
+
+    if (
+      (isStreaming || props.isStreaming) &&
+      !isThinking &&
+      props.message.role === "assistant" &&
+      !(props.message as any).isError
+    ) {
+      typewriter.updateMessage(newContent, true);
+    } else {
+      typewriter.setText(newContent, false);
+      if (done === true) typewriter.complete();
+    }
+  },
+  { immediate: true }
+);
+
+onBeforeUnmount(() => {
+  typewriter?.cleanup?.();
+});
+
+// 最终渲染内容（稳定 computed + 兜底）
+const processedContent = computed<MessageContent[]>(() => {
   if (isEnhancedMessage(props.message)) {
-    return props.message.content;
-  }
-  // 兼容原有的简单文本消息
-  return [
-    {
-      type: "text",
-      data: { text: props.message.content },
-    },
-  ] as MessageContent[];
-};
-
-// Think 标签解析
-const messageContentRef = computed(() => props.message.content || "");
-const { parsedMessage } = useThinkParser(messageContentRef);
-
-// 获取处理后的消息内容（移除 think 标签）
-const getProcessedMessageContent = () => {
-  if (isEnhancedMessage(props.message)) {
-    return props.message.content;
+    return props.message.content as MessageContent[];
   }
 
-  // 对于简单文本消息，使用解析后的主要内容
-  const mainContent = parsedMessage.value.mainContent;
-  if (!mainContent) return [];
+  const usingTyping =
+    props.message.role === "assistant" &&
+    !(props.message as any).isError &&
+    !(props.message as any).isThinking &&
+    ((props.isStreaming ?? false) || (props.message as any).isStreaming);
 
-  return [
-    {
-      type: "text",
-      data: { text: mainContent },
-    },
-  ] as MessageContent[];
-};
+  const parsedText = usingTyping
+    ? displayedParsed.parsedMessage.value.mainContent
+    : parsedMessage.value.mainContent;
 
-// 复制文本到剪贴板
+  const raw = usingTyping
+    ? (typewriter?.displayedText?.value ?? "")
+    : (fullContentRef.value ?? "");
+
+  const text = parsedText && parsedText.trim() ? parsedText : stripThink(raw);
+
+  if (!text) return [];
+  return [{ type: "text", data: { text } }];
+});
+
+// 工具函数 & 展示辅助
 const copyToClipboard = async (text: string) => {
   try {
     await navigator.clipboard.writeText(text);
@@ -73,27 +147,27 @@ const copyToClipboard = async (text: string) => {
     console.error("复制失败:", err);
   }
 };
-
-// 格式化文件大小
 const formatFileSize = (bytes: number) => {
   if (bytes === 0) return "0 Bytes";
-  const k = 1024;
-  const sizes = ["Bytes", "KB", "MB", "GB"];
+  const k = 1024,
+    sizes = ["Bytes", "KB", "MB", "GB"];
   const i = Math.floor(Math.log(bytes) / Math.log(k));
   return `${parseFloat((bytes / Math.pow(k, i)).toFixed(2))} ${sizes[i]}`;
 };
-
-// 格式化时间
-const formatTime = (date: Date) => {
-  return new Intl.DateTimeFormat("zh-CN", {
-    hour: "2-digit",
-    minute: "2-digit",
-  }).format(date);
+const formatTime = (date: Date | string | number) => {
+  try {
+    const d = new Date(date);
+    if (isNaN(d.getTime())) return "无效时间";
+    return new Intl.DateTimeFormat("zh-CN", {
+      hour: "2-digit",
+      minute: "2-digit",
+    }).format(d);
+  } catch {
+    return "无效时间";
+  }
 };
-
-// 获取代码语言显示名称
 const getLanguageDisplayName = (lang: string) => {
-  const langMap: Record<string, string> = {
+  const map: Record<string, string> = {
     javascript: "JavaScript",
     typescript: "TypeScript",
     python: "Python",
@@ -112,90 +186,60 @@ const getLanguageDisplayName = (lang: string) => {
     bash: "Bash",
     shell: "Shell",
   };
-  return langMap[lang.toLowerCase()] || lang.toUpperCase();
+  return map[lang.toLowerCase()] || lang.toUpperCase();
+};
+const openExternalLink = (url: string) => {
+  if (typeof window !== "undefined") window.open(url, "_blank");
+};
+const downloadFile = (url: string, downloadUrl?: string) => {
+  if (typeof window !== "undefined") window.open(downloadUrl || url, "_blank");
 };
 
-// 简单的 Markdown 渲染函数
+// 简单 Markdown 渲染（保持你的原逻辑）
 const renderMarkdown = (markdown: string) => {
   let html = markdown;
-
-  // 转义 HTML 特殊字符
-  const escapeHtml = (text: string) => {
-    const div = document.createElement("div");
-    div.textContent = text;
-    return div.innerHTML;
-  };
-
-  // 标题
   html = html.replace(/^### (.*$)/gim, "<h3>$1</h3>");
   html = html.replace(/^## (.*$)/gim, "<h2>$1</h2>");
   html = html.replace(/^# (.*$)/gim, "<h1>$1</h1>");
-
-  // 粗体
   html = html.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
-
-  // 斜体
   html = html.replace(/\*(.*?)\*/g, "<em>$1</em>");
-
-  // 行内代码
   html = html.replace(/`([^`]+)`/g, "<code>$1</code>");
-
-  // 链接
   html = html.replace(
     /\[([^\]]+)\]\(([^)]+)\)/g,
     '<a href="$2" target="_blank" class="text-blue-600 hover:underline">$1</a>'
   );
-
-  // 无序列表
   html = html.replace(/^\- (.*$)/gim, "<li>$1</li>");
   html = html.replace(/(<li>.*<\/li>)/s, "<ul>$1</ul>");
-
-  // 有序列表
   html = html.replace(/^\d+\. (.*$)/gim, "<li>$1</li>");
-
-  // 引用
   html = html.replace(/^> (.*$)/gim, "<blockquote>$1</blockquote>");
-
-  // 表格（简单处理）
   const tableRegex = /\|(.+)\|\n\|[-\s|]+\|\n((?:\|.+\|\n?)*)/g;
   html = html.replace(tableRegex, (match, header, rows) => {
     const headerCells = header
       .split("|")
-      .map((cell: string) => cell.trim())
-      .filter((cell: string) => cell);
+      .map((c) => c.trim())
+      .filter(Boolean);
     const headerRow =
-      "<tr>" +
-      headerCells.map((cell: string) => `<th>${cell}</th>`).join("") +
-      "</tr>";
-
+      "<tr>" + headerCells.map((c) => `<th>${c}</th>`).join("") + "</tr>";
     const bodyRows = rows
       .trim()
       .split("\n")
-      .map((row: string) => {
+      .map((row) => {
         const cells = row
           .split("|")
-          .map((cell: string) => cell.trim())
-          .filter((cell: string) => cell);
-        return (
-          "<tr>" +
-          cells.map((cell: string) => `<td>${cell}</td>`).join("") +
-          "</tr>"
-        );
+          .map((c) => c.trim())
+          .filter(Boolean);
+        return "<tr>" + cells.map((c) => `<td>${c}</td>`).join("") + "</tr>";
       })
       .join("");
-
     return `<table class="border-collapse border border-gray-300"><thead>${headerRow}</thead><tbody>${bodyRows}</tbody></table>`;
   });
-
-  // 换行
   html = html.replace(/\n/g, "<br>");
-
   return html;
 };
 </script>
 
 <template>
-  <div class="p-4 hover:bg-gray-50 transition-colors">
+  <div class="p-4 hover:bg-gray-50 transition-colors group">
     <div class="flex space-x-3">
       <!-- 头像 -->
       <div class="flex-shrink-0">
@@ -219,9 +263,9 @@ const renderMarkdown = (markdown: string) => {
         </div>
       </div>
 
-      <!-- 消息内容 -->
+      <!-- 内容 -->
       <div class="flex-1 min-w-0">
-        <!-- 消息头部 -->
+        <!-- 头部 -->
         <div class="flex items-center space-x-2 mb-2">
           <span class="font-medium text-gray-900">
             {{
@@ -232,10 +276,13 @@ const renderMarkdown = (markdown: string) => {
                   : t("agent.chat.system")
             }}
           </span>
-          <span class="text-xs text-gray-500">
-            {{ formatTime(new Date(message.timestamp)) }}
-          </span>
-          <div v-if="isStreaming" class="flex items-center space-x-1">
+          <span class="text-xs text-gray-500">{{
+            formatTime(message.timestamp)
+          }}</span>
+          <div
+            v-if="(message as any).isStreaming || isStreaming"
+            class="flex items-center space-x-1"
+          >
             <div class="w-1 h-1 bg-blue-500 rounded-full animate-pulse"></div>
             <span class="text-xs text-blue-500">{{
               t("agent.chat.generating")
@@ -243,34 +290,57 @@ const renderMarkdown = (markdown: string) => {
           </div>
         </div>
 
-        <!-- Think 块渲染 -->
-        <div v-if="parsedMessage.hasThink" class="space-y-2 mb-4">
+        <!-- 思考中 -->
+        <div
+          v-if="(message as any).isThinking"
+          class="flex items-center space-x-3 py-3"
+        >
+          <div class="flex space-x-1 items-center">
+            <div class="w-2 h-2 bg-gray-400 rounded-full thinking-dot"></div>
+            <div class="w-2 h-2 bg-gray-400 rounded-full thinking-dot"></div>
+            <div class="w-2 h-2 bg-gray-400 rounded-full thinking-dot"></div>
+          </div>
+          <span class="text-sm text-gray-500 italic">
+            {{ agentName || t("agent.chat.assistant") }} 正在思考...
+          </span>
+        </div>
+
+        <!-- Think 区块 -->
+        <div
+          v-if="parsedMessage.hasThink && !(message as any).isThinking"
+          class="space-y-2 mb-4"
+        >
           <ThinkBlock
             v-for="(thinkBlock, index) in parsedMessage.thinkBlocks"
             :key="`think-${index}`"
             :content="thinkBlock.content"
             :index="thinkBlock.index"
-            :is-streaming="isStreaming"
+            :is-streaming="(message as any).isStreaming || isStreaming"
           />
         </div>
 
-        <!-- 消息内容渲染 -->
-        <div class="space-y-3">
-          <template
-            v-for="(content, index) in getProcessedMessageContent()"
-            :key="index"
-          >
-            <!-- 文本消息 -->
+        <!-- 主体 -->
+        <div v-if="!(message as any).isThinking" class="space-y-3">
+          <template v-for="(content, index) in processedContent" :key="index">
+            <!-- 文本 -->
             <div
               v-if="content.type === 'text'"
               class="prose prose-sm max-w-none"
             >
               <p class="text-gray-800 whitespace-pre-wrap">
                 {{ content.data.text }}
+                <span
+                  v-if="
+                    (message as any).role === 'assistant' &&
+                    ((message as any).isStreaming || isStreaming)
+                  "
+                  class="inline-block w-0.5 h-4 bg-blue-500 ml-0.5 animate-pulse"
+                  style="animation: blink 1s infinite"
+                />
               </p>
             </div>
 
-            <!-- Markdown 消息 -->
+            <!-- Markdown -->
             <div
               v-else-if="content.type === 'markdown'"
               class="prose prose-sm max-w-none"
@@ -293,7 +363,7 @@ const renderMarkdown = (markdown: string) => {
               </div>
             </div>
 
-            <!-- 代码消息 -->
+            <!-- 代码 -->
             <div
               v-else-if="content.type === 'code'"
               class="bg-gray-900 rounded-lg overflow-hidden"
@@ -329,7 +399,7 @@ const renderMarkdown = (markdown: string) => {
               ><code>{{ content.data.code }}</code></pre>
             </div>
 
-            <!-- 图片消息 -->
+            <!-- 图片 -->
             <div v-else-if="content.type === 'image'" class="space-y-2">
               <div
                 class="relative inline-block rounded-lg overflow-hidden border border-gray-200"
@@ -353,7 +423,7 @@ const renderMarkdown = (markdown: string) => {
                     variant="solid"
                     color="neutral"
                     icon="i-heroicons-arrow-top-right-on-square"
-                    @click="window.open(content.data.url, '_blank')"
+                    @click="() => openExternalLink(content.data.url)"
                   />
                 </div>
               </div>
@@ -362,7 +432,7 @@ const renderMarkdown = (markdown: string) => {
               </p>
             </div>
 
-            <!-- 视频消息 -->
+            <!-- 视频 -->
             <div v-else-if="content.type === 'video'" class="space-y-2">
               <div
                 class="relative rounded-lg overflow-hidden border border-gray-200 bg-black"
@@ -391,7 +461,7 @@ const renderMarkdown = (markdown: string) => {
               </div>
             </div>
 
-            <!-- 卡片消息 -->
+            <!-- 卡片 -->
             <div
               v-else-if="content.type === 'card'"
               class="max-w-sm border border-gray-200 rounded-lg overflow-hidden bg-white shadow-sm"
@@ -437,7 +507,7 @@ const renderMarkdown = (markdown: string) => {
               </div>
             </div>
 
-            <!-- 文件消息 -->
+            <!-- 文件 -->
             <div
               v-else-if="content.type === 'file'"
               class="border border-gray-200 rounded-lg p-4 bg-gray-50"
@@ -464,10 +534,8 @@ const renderMarkdown = (markdown: string) => {
                     variant="outline"
                     icon="i-heroicons-arrow-down-tray"
                     @click="
-                      window.open(
-                        content.data.downloadUrl || content.data.url,
-                        '_blank'
-                      )
+                      () =>
+                        downloadFile(content.data.url, content.data.downloadUrl)
                     "
                   >
                     下载
@@ -494,12 +562,14 @@ const renderMarkdown = (markdown: string) => {
               <div class="flex items-center space-x-2">
                 <UIcon
                   :name="
-                    {
-                      info: 'i-heroicons-information-circle',
-                      warning: 'i-heroicons-exclamation-triangle',
-                      error: 'i-heroicons-x-circle',
-                      success: 'i-heroicons-check-circle',
-                    }[content.data.level]
+                    (
+                      {
+                        info: 'i-heroicons-information-circle',
+                        warning: 'i-heroicons-exclamation-triangle',
+                        error: 'i-heroicons-x-circle',
+                        success: 'i-heroicons-check-circle',
+                      } as Record<string, string>
+                    )[content.data.level] || 'i-heroicons-information-circle'
                   "
                   :class="{
                     'text-blue-500': content.data.level === 'info',
@@ -525,7 +595,7 @@ const renderMarkdown = (markdown: string) => {
           </template>
         </div>
 
-        <!-- 消息操作 -->
+        <!-- 操作区 -->
         <div
           class="flex items-center space-x-2 mt-3 opacity-0 group-hover:opacity-100 transition-opacity"
         >
@@ -535,25 +605,28 @@ const renderMarkdown = (markdown: string) => {
             variant="ghost"
             icon="i-heroicons-arrow-path"
             @click="emit('retry')"
+            >重试</UButton
           >
-            重试
-          </UButton>
           <UButton
             size="xs"
             variant="ghost"
             icon="i-heroicons-clipboard"
-            @click="copyToClipboard(JSON.stringify(message.content))"
+            @click="
+              copyToClipboard(
+                typeof message.content === 'string'
+                  ? message.content
+                  : JSON.stringify(message.content)
+              )
+            "
+            >复制</UButton
           >
-            复制
-          </UButton>
           <UButton
             size="xs"
             variant="ghost"
             icon="i-heroicons-trash"
             @click="emit('delete')"
+            >删除</UButton
           >
-            删除
-          </UButton>
         </div>
       </div>
     </div>
@@ -568,7 +641,6 @@ const renderMarkdown = (markdown: string) => {
 .markdown-content {
   color: #1f2937;
 }
-
 .markdown-content h1,
 .markdown-content h2,
 .markdown-content h3,
@@ -580,21 +652,17 @@ const renderMarkdown = (markdown: string) => {
   margin-top: 1rem;
   margin-bottom: 0.5rem;
 }
-
 .markdown-content p {
   margin-bottom: 0.75rem;
 }
-
 .markdown-content ul,
 .markdown-content ol {
   margin-left: 1rem;
   margin-bottom: 0.75rem;
 }
-
 .markdown-content li {
   margin-bottom: 0.25rem;
 }
-
 .markdown-content code {
   background-color: #f3f4f6;
   color: #1f2937;
@@ -603,18 +671,52 @@ const renderMarkdown = (markdown: string) => {
   font-size: 0.875rem;
   font-family: "Monaco", "Menlo", "Ubuntu Mono", monospace;
 }
-
 .markdown-content pre {
   background-color: #f3f4f6;
   padding: 0.75rem;
   border-radius: 0.5rem;
   overflow-x: auto;
 }
-
 .markdown-content blockquote {
   border-left: 4px solid #d1d5db;
   padding-left: 1rem;
   font-style: italic;
   color: #4b5563;
+}
+
+/* 思考动画 */
+@keyframes thinking-bounce {
+  0%,
+  60%,
+  100% {
+    transform: translateY(0);
+  }
+  30% {
+    transform: translateY(-8px);
+  }
+}
+.thinking-dot {
+  animation: thinking-bounce 1.4s infinite ease-in-out;
+}
+.thinking-dot:nth-child(1) {
+  animation-delay: 0ms;
+}
+.thinking-dot:nth-child(2) {
+  animation-delay: 200ms;
+}
+.thinking-dot:nth-child(3) {
+  animation-delay: 400ms;
+}
+
+/* 打字机光标动画 */
+@keyframes blink {
+  0%,
+  50% {
+    opacity: 1;
+  }
+  51%,
+  100% {
+    opacity: 0;
+  }
 }
 </style>

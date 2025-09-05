@@ -67,6 +67,9 @@ export interface ChatMessage {
   timestamp: number;
   isError?: boolean;
   meta?: Record<string, any>;
+  isStreaming?: boolean;
+  done?: boolean;
+  isThinking?: boolean;
 }
 
 export function useChatSessions(opts: { pageSize?: number } = {}) {
@@ -99,6 +102,10 @@ export function useChatSessions(opts: { pageSize?: number } = {}) {
       timestamp: new Date(dto.createdAt).getTime(),
       isError: dto.isError,
       meta: dto.meta,
+      // 历史消息不应该有流式状态
+      isStreaming: false,
+      done: true,
+      isThinking: false, // 历史消息不是思考状态
     };
   }
 

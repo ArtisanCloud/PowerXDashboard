@@ -65,7 +65,7 @@ const handleLogin = async () => {
 
       // 获取重定向URL
       const route = useRoute();
-      const redirectTo = (route.query.redirect as string) || "/dashboard";
+      const redirectTo = (route.query.redirect as string) || "/agent";
 
       // 登录成功后跳转
       await navigateTo(redirectTo);

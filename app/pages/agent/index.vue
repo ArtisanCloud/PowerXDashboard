@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import type { Agent } from "~/types/agent";
-import type { ChatSession } from "~/components/agent/AgentSidebar.vue";
 import ChatInterface from "@/components/agent/ChatInterface.vue";
 import ConfigPanel from "@/components/agent/ConfigPanel.vue";
 import ConnectionIndicators from "@/components/agent/ConnectionIndicators.vue";
@@ -29,14 +28,14 @@ const sessionsLoadingByAgent = chatSessions.sessionsLoadingByAgent;
 const hasMoreByAgent = chatSessions.hasMoreByAgent;
 
 // 工具：拿到某 agent 的数组（始终给个安全数组）
-const getSessions = (agentId: number) => sessionsByAgent.value[agentId] || [];
+// const getSessions = (agentId: number) => sessionsByAgent.value[agentId] || [];
 
 // 双通道聊天流管理
-const chat = useDualChannelConnection();
+const chat = useDualChannelConnection(currentAgentId, currentSessionId);
 
 // 设置消息回调
 chat.onMessage = (message) => {
-  console.log("收到消息:", message);
+  console.log("[Agent page] 收到消息:", message);
 };
 
 chat.onError = (error) => {
@@ -59,9 +58,6 @@ const agentManager = useAgentManager();
 const { agents } = agentManager;
 
 // 使用双通道聊天的状态
-const messagesList = computed(() =>
-  Array.isArray(chat.messages.value) ? chat.messages.value : []
-);
 const isConnected = computed(() => chat.sseActive.value || chat.wsActive.value);
 const isStreaming = computed(() => chat.isGenerating.value);
 const isTyping = ref(false);
@@ -110,7 +106,7 @@ const handleSelectSession = async (payload: {
   // 加载会话历史消息
   try {
     const messages = await chatSessions.loadSessionMessages(sessionId);
-
+    console.log("加载会话消息成功:", messages);
     // 将历史消息添加到聊天界面
     for (const message of messages) {
       chat.messages.value.push({
@@ -326,78 +322,13 @@ const getAgentIcon = (agent: Agent) => {
     return "i-heroicons-building-office";
   return "i-heroicons-cpu-chip";
 };
-
-/* ========= 插件专属侧栏：显示条件 & 收缩状态 ========= */
-// 这里先强制为 true 以便开发预览；接入真实判断后改回去
-
-const isPluginAgent = computed(() => {
-  const a = selectedAgent.value as Agent | null;
-  if (!a) return false;
-  return (
-    a.source === "plugin" ||
-    a.meta?.isPlugin === true ||
-    !!a.meta?.pluginId ||
-    a.meta?.tags?.includes?.("plugin")
-  );
-});
-
-const isPluginPanelCollapsed = ref(false);
-const togglePluginPanel = () => {
-  isPluginPanelCollapsed.value = !isPluginPanelCollapsed.value;
-};
-watch(
-  () => selectedAgent.value?.id,
-  () => {
-    isPluginPanelCollapsed.value = false;
-  }
-);
 </script>
 
 <template>
   <!-- 外层：左右完全分离，中间有空隙 -->
   <div class="flex h-full gap-4 px-4 pt-4 pb-0 bg-gray-50">
     <!-- 🔌 左：插件面板（独立卡片） -->
-    <div
-      v-if="isPluginAgent"
-      class="relative flex-shrink-0 transition-all duration-300 ease-in-out bg-white border border-gray-200 rounded-lg shadow-sm min-h-0"
-      :class="isPluginPanelCollapsed ? 'w-12' : 'w-[36rem]'"
-    >
-      <!-- 收缩/展开按钮（浮在卡片右侧边缘） -->
-      <button
-        @click="togglePluginPanel"
-        class="absolute top-4 -right-3 z-10 w-6 h-6 bg-white border border-gray-200 rounded-full shadow-sm hover:shadow-md transition-shadow flex items-center justify-center text-gray-500 hover:text-gray-700"
-        :title="isPluginPanelCollapsed ? '展开插件面板' : '收缩插件面板'"
-      >
-        <UIcon
-          :name="
-            isPluginPanelCollapsed
-              ? 'i-heroicons-chevron-right'
-              : 'i-heroicons-chevron-left'
-          "
-          class="w-3 h-3"
-        />
-      </button>
-
-      <!-- 插件内容区 -->
-      <div v-show="!isPluginPanelCollapsed" class="h-full overflow-auto">
-        <div class="p-4 space-y-3">
-          <div class="text-xs text-gray-400 uppercase tracking-wide">
-            插件面板
-          </div>
-          <div class="text-sm text-gray-700">
-            当前 Agent：<span class="font-medium">{{
-              selectedAgent?.name
-            }}</span>
-          </div>
-          <div class="text-xs text-gray-500">
-            可在此渲染插件自定义内容（表单/看板/指标/工具面板等）。
-          </div>
-          <!-- TODO: 真正的插件组件 -->
-          <!-- <PluginAgentPanel :agent="selectedAgent!" :session-id="currentSessionId || undefined" /> -->
-        </div>
-      </div>
-    </div>
-
+    <AgentPluginRenderView />
     <!-- 🧱 右：主容器（独立卡片） -->
     <div
       class="flex flex-1 min-w-0 min-h-0 bg-white border border-gray-200 rounded-lg shadow-sm"
@@ -486,7 +417,7 @@ watch(
 
         <ClientOnly>
           <ChatInterface
-            :messages="messagesList"
+            :messages="chat.messages"
             :is-connected="!!isConnected"
             :is-streaming="!!isStreaming"
             :is-typing="!!isTyping"

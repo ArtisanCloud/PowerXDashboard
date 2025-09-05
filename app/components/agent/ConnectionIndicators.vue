@@ -77,9 +77,9 @@ const testWSConnection = async () => {
     </UButton>
 
     <!-- 取消按钮 -->
-    <UButton size="xs" color="error" variant="soft" @click="connection.cancel">
+    <!-- <UButton size="xs" color="error" variant="soft" @click="connection.cancel">
       {{ t("agent.chat.cancel") }}
-    </UButton>
+    </UButton> -->
 
     <!-- 复制请求ID按钮 -->
     <UButton

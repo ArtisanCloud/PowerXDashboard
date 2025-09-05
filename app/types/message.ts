@@ -12,6 +12,26 @@ export const MESSAGE_TYPES = {
 
 export type MessageType = (typeof MESSAGE_TYPES)[keyof typeof MESSAGE_TYPES];
 
+// SSE 事件类型常量定义
+export const SSE_EVENT_TYPES = {
+  START: "start",
+  INTENT: "intent",
+  PLAN: "plan",
+  TOKEN: "token",
+  DATA: "data",
+  ACTION: "action",
+  FINAL: "final",
+  END: "end",
+  ERROR: "error",
+  HEARTBEAT: "heartbeat",
+  ACK: "ack",
+  META: "meta",
+  CHUNK: "chunk",
+} as const;
+
+export type SSEEventType =
+  (typeof SSE_EVENT_TYPES)[keyof typeof SSE_EVENT_TYPES];
+
 // 统一的消息角色
 export type ChatRole = "user" | "assistant" | "system";
 
@@ -77,21 +97,16 @@ export interface SystemContent {
   level: "info" | "warning" | "error" | "success";
 }
 
-// 扩展的聊天消息接口
-export interface EnhancedChatMessage {
-  id: string;
-  role: ChatRole;
-  content: MessageContent[];
-  timestamp: Date;
-  status?: "sending" | "sent" | "error";
-  metadata?: Record<string, any>;
-}
-
 // ✅ 统一的基础聊天消息（兼容历史：content 可为 string 或结构化内容数组）
 export interface ChatMessage {
   id: string;
   role: ChatRole;
-  content: string | MessageContent[];
+  content: MessageContent;
   timestamp: Date;
+  isThinking?: boolean; // 标记消息是否处于思考状态
   metadata?: Record<string, any>;
+  status?: "sending" | "sent" | "error";
+  done?: boolean; // 标记消息是否完成
+  isError?: boolean; // 标记消息是否为错误消息
+  isStreaming?: boolean; // 标记消息是否正在流式传输
 }

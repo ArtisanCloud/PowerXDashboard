@@ -4,26 +4,40 @@ import {
   computed,
   onMounted,
   onBeforeUnmount,
+  onUpdated,
   watch,
   nextTick,
+  isRef,
+  type Ref,
+  type DeepReadonly,
 } from "vue";
-import type { DeepReadonly } from "vue";
 import type { ChatMessage } from "~/types/message";
 import type { AgentConfig } from "~/composables/agent/useAgentManager";
 import MessageItem from "~/components/agent/MessageItem.vue";
 
 type ViewAgent = AgentConfig | DeepReadonly<AgentConfig>;
-type ViewMessage = ChatMessage | DeepReadonly<ChatMessage>;
+type MessageArray = ChatMessage[] | ReadonlyArray<ChatMessage>;
+
+// 允许 3 种传法：数组值 / Ref<数组> / DeepReadonly<数组>
+type MessagesProp =
+  | MessageArray
+  | Ref<MessageArray>
+  | DeepReadonly<MessageArray>;
+
+const DEBUG = true; // 想关就设为 false
+
+defineOptions({ inheritAttrs: false });
 
 const props = withDefaults(
   defineProps<{
-    messages?: ReadonlyArray<ViewMessage>;
+    messages?: MessagesProp;
     isConnected?: boolean;
     isStreaming?: boolean;
     isTyping?: boolean;
     currentAgent?: ViewAgent | null;
 
     canSendMessage?: boolean;
+    connectionIndicators?: boolean;
   }>(),
   {
     messages: () => [],
@@ -31,7 +45,6 @@ const props = withDefaults(
     isStreaming: false,
     isTyping: false,
     currentAgent: null,
-
     canSendMessage: true,
   }
 );
@@ -41,6 +54,12 @@ const emit = defineEmits<{
   (e: "retry-message"): void;
   (e: "clear-messages"): void;
 }>();
+
+/* ----------------- 把 props.messages 统一归一化为只读数组 ----------------- */
+const messages = computed<ReadonlyArray<ChatMessage>>(() => {
+  const m = props.messages as any;
+  return isRef(m) ? (m.value ?? []) : (m ?? []);
+});
 
 /* ----------------- 基础状态 ----------------- */
 const { t } = useI18n();
@@ -134,6 +153,73 @@ onMounted(async () => {
   bindMediaLoadScroll();
 });
 
+// 观察消息长度变化（使用归一化后的 messages）
+watch(
+  () => messages.value.length,
+  (len, oldLen) => {
+    if (!DEBUG) return;
+    console.log("[ChatInterface] messages.length:", oldLen, "→", len);
+  },
+  { immediate: true }
+);
+
+// 看“最后一条”是否变化（内容长度 & isStreaming）
+const lastMessage = computed(() => messages.value.at(-1));
+
+watch(
+  () => ({
+    id: lastMessage.value?.id,
+    role: lastMessage.value?.role,
+    contentLen:
+      typeof lastMessage.value?.content === "string"
+        ? (lastMessage.value?.content as string).length
+        : -1,
+    isStreaming: (lastMessage.value as any)?.isStreaming,
+    isThinking: (lastMessage.value as any)?.isThinking,
+    done: (lastMessage.value as any)?.done,
+  }),
+  (val, oldVal) => {
+    if (!DEBUG) return;
+    console.log("[ChatInterface] lastMessage snapshot:", oldVal, "→", val);
+  },
+  { deep: false }
+);
+
+// 观察指针是否变化（仅调试：父组件是否替换了数组引用）
+let _prevPtr: any = null;
+watch(
+  () => props.messages,
+  (now) => {
+    if (!DEBUG) return;
+    console.log(
+      "[ChatInterface] props.messages pointer changed?",
+      now === _prevPtr ? "NO" : "YES",
+      now
+    );
+    _prevPtr = now;
+  },
+  { deep: false, immediate: true }
+);
+
+// DOM 更新后再打一次快照（确保视图联动）
+onUpdated(() => {
+  if (!DEBUG) return;
+  nextTick(() => {
+    const cur = messages.value.at(-1);
+    // console.log("[ChatInterface] onUpdated: last message now =", {
+    //   id: cur?.id,
+    //   role: cur?.role,
+    //   content:
+    //     typeof cur?.content === "string"
+    //       ? (cur?.content as string).slice(-50)
+    //       : cur?.content,
+    //   isStreaming: (cur as any)?.isStreaming,
+    //   isThinking: (cur as any)?.isThinking,
+    //   done: (cur as any)?.done,
+    // });
+  });
+});
+
 onBeforeUnmount(() => {
   io?.disconnect();
   io = null;
@@ -141,13 +227,14 @@ onBeforeUnmount(() => {
   ro = null;
 });
 
+// —— 关键修复：以下监听全部改用 messages（而不是 props.messages）——
 watch(
-  () => props.messages.length,
+  () => messages.value.length,
   async (newLen, oldLen) => {
     await nextTick();
     if (isAtBottom.value) {
       scrollToBottom();
-    } else if (newLen > (oldLen ?? 0)) {
+    } else if ((newLen ?? 0) > (oldLen ?? 0)) {
       unreadCount.value++;
     }
     bindMediaLoadScroll();
@@ -155,7 +242,7 @@ watch(
 );
 
 watch(
-  () => props.messages.at(-1)?.content,
+  () => messages.value.at(-1)?.content,
   async () => {
     await nextTick();
     if (isAtBottom.value) scrollToBottom();
@@ -174,6 +261,8 @@ watch(
 /* 容器 Resize 补偿滚动 */
 let ro: ResizeObserver | null = null;
 onMounted(() => {
+  if (!DEBUG) return;
+  console.log("[ChatInterface] mounted; initial messages =", messages.value);
   if ("ResizeObserver" in window) {
     ro = new ResizeObserver(() => {
       if (isAtBottom.value) scrollToBottom();
@@ -226,10 +315,7 @@ function handlePaste(e: ClipboardEvent) {
     if (it.kind === "file") {
       const file = it.getAsFile();
       if (file && file.type.startsWith("image/")) {
-        // 复用现有上传逻辑
         console.log("粘贴图片:", file.name);
-        // 你可以在这里直接上传，或走 handleImageUpload 的统一入口
-        // 例如：uploadImageFile(file)
         e.preventDefault();
         break;
       }
@@ -348,17 +434,12 @@ function onUploadImage() {
   handleImageUpload();
   showPlusPanel.value = false;
 }
-
 function onPlusOpenStateChange(isOpen: boolean) {
   showPlusPanel.value = isOpen;
 }
-
 function onSendClick() {
-  if (props.isStreaming) {
-    stopGeneration();
-  } else {
-    sendMessage();
-  }
+  if (props.isStreaming) stopGeneration();
+  else sendMessage();
 }
 </script>
 
@@ -431,7 +512,8 @@ function onSendClick() {
             :key="message.id"
             :message="message"
             :is-streaming="
-              isStreaming && message === messages[messages.length - 1]
+              (isStreaming && message === messages[messages.length - 1]) ||
+              (message as any).isStreaming
             "
             :agent-name="currentAgent?.name"
             @retry="$emit('retry-message')"
@@ -474,11 +556,11 @@ function onSendClick() {
       <!-- 底部哨兵 -->
       <div ref="bottomSentinel" aria-hidden="true" class="h-px"></div>
 
-      <!-- 回到底部按钮（像 ChatGPT） -->
+      <!-- 回到底部按钮 -->
       <div class="sticky bottom-4 z-10">
         <transition name="fade">
           <button
-            v-if="showScrollBtn"
+            v-if="!isAtBottom"
             class="ml-auto mr-4 flex items-center gap-2 rounded-full shadow-lg px-3 py-2 bg-white border border-gray-200 hover:bg-gray-50 active:scale-95 transition pointer-events-auto"
             @click="jumpToBottom"
           >
@@ -504,14 +586,12 @@ function onSendClick() {
       </div>
     </div>
 
-    <!-- 输入区（ChatGPT 风格） -->
+    <!-- 输入区 -->
     <div class="flex-shrink-0 border-t border-gray-200 bg-white">
       <div class="p-4">
-        <!-- 统一定宽并居中，避免两侧元素错位 -->
         <div class="mx-auto w-full max-w-screen-lg px-4 space-y-2">
           <!-- 第 1 行：输入行 -->
           <div class="flex items-center gap-2">
-            <!-- 左侧：输入壳，负责两侧绝对定位 -->
             <div class="relative flex-1">
               <!-- 左侧 + 下拉 -->
               <div class="absolute left-2 top-1/2 -translate-y-1/2 z-20">
@@ -651,7 +731,7 @@ function onSendClick() {
               </div>
             </div>
 
-            <!-- 右侧：清空按钮（与输入框同一行、垂直居中） -->
+            <!-- 右侧：清空按钮 -->
             <div class="hidden sm:flex self-center">
               <UButton
                 variant="ghost"
@@ -669,7 +749,7 @@ function onSendClick() {
             </div>
           </div>
 
-          <!-- 第 2 行：底部提示（模型/温度/模式 + 快捷键），同样定宽居中 -->
+          <!-- 第 2 行：底部提示 -->
           <div class="flex items-center justify-between text-xs text-gray-500">
             <div
               v-if="currentAgent"
@@ -696,6 +776,37 @@ function onSendClick() {
             </div>
           </div>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- === Debug HUD（调试完删除） === -->
+  <div
+    v-if="true"
+    class="fixed bottom-3 right-3 text-xs bg-black/70 text-white rounded px-3 py-2 space-y-1 z-50"
+  >
+    <div>msgs: {{ messages.length }}</div>
+    <div v-if="messages.length">
+      <div>last.id: {{ messages[messages.length - 1].id }}</div>
+      <div>role: {{ messages[messages.length - 1].role }}</div>
+      <div>
+        len:
+        {{
+          typeof messages[messages.length - 1].content === "string"
+            ? (messages[messages.length - 1].content as string).length
+            : -1
+        }}
+      </div>
+      <div>
+        isStreaming:
+        {{ (messages[messages.length - 1] as any).isStreaming ? "T" : "F" }}
+      </div>
+      <div>
+        isThinking:
+        {{ (messages[messages.length - 1] as any).isThinking ? "T" : "F" }}
+      </div>
+      <div>
+        done: {{ (messages[messages.length - 1] as any).done ? "T" : "F" }}
       </div>
     </div>
   </div>
