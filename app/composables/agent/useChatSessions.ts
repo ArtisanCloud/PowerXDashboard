@@ -302,10 +302,10 @@ export function useChatSessions(opts: { pageSize?: number } = {}) {
 
     // 如果有缓存且不强制刷新，则返回缓存的消息
     if (!force && messageStore.getMessagesBySession(sessionIdStr).length > 0) {
-      console.log(
-        "使用缓存的消息:",
-        messageStore.getMessagesBySession(sessionIdStr)
-      );
+      // console.log(
+      //   "使用缓存的消息:",
+      //   messageStore.getMessagesBySession(sessionIdStr)
+      // );
       return messageStore.getMessagesBySession(sessionIdStr);
     }
 

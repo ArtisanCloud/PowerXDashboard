@@ -38,9 +38,10 @@ const fullContentRef = computed(() =>
     : ""
 );
 
-// 完整内容解析（静态）
+// ====== 静态解析（用于回退：后端未提供 meta.think 时）======
 const { parsedMessage } = useThinkParser(fullContentRef);
 
+// 方便调试
 watch(
   () => ({
     id: (props.message as any)?.id,
@@ -52,20 +53,25 @@ watch(
     isStreaming: (props.message as any)?.isStreaming,
     isThinking: (props.message as any)?.isThinking,
     done: (props.message as any)?.done,
+    metaThink: (props.message as any)?.meta?.think,
   }),
   (v) => {
-    console.log("[MessageItem]", v);
+    // console.log("[MessageItem]", v);
   },
   { deep: false, immediate: true }
 );
 
-// 打字是否启用：兼容父 prop 和消息自身
+// ====== 打字机：仅用于正文主内容（已剥离 think）======
+const streamMode = computed(
+  () => (props.message as any)?.meta?.streamMode || "delta"
+);
 const shouldUseTypewriter = computed(
   () =>
     props.message.role === "assistant" &&
     !(props.message as any).isError &&
     !(props.message as any).isThinking &&
-    ((props.isStreaming ?? false) || (props.message as any).isStreaming)
+    ((props.isStreaming ?? false) || (props.message as any).isStreaming) &&
+    streamMode.value === "delta" // 只有增量才打字
 );
 
 const typewriter = useMessageTypewriter({
@@ -73,14 +79,17 @@ const typewriter = useMessageTypewriter({
   onComplete: () => {},
 });
 
-// “正在打字的可见文本”解析（稳定 computed）
+// “正在打字的可见文本”解析（兜底去 think）
 const displayedParsed = useThinkParser(
   computed(() => typewriter?.displayedText?.value ?? "")
 );
 
 // 强制去除 <think>…</think> 兜底
 const stripThink = (s: string) =>
-  (s ?? "").replace(/<think>[\s\S]*?<\/think>/gi, "").trim();
+  (s ?? "")
+    .replace(/<think>[\s\S]*?<\/think>/gi, "") // 去完整块
+    .replace(/<think[\s\S]*$/i, "") // 去未闭合尾巴
+    .trim();
 
 // 只在“明确完成”才 complete，避免过早掐断
 watch(
@@ -93,6 +102,7 @@ watch(
   ([newContent, isStreaming, isThinking, done]) => {
     if (typeof newContent !== "string") return;
 
+    // 流式且不处于思考阶段时，走打字机；否则直接设定文本
     if (
       (isStreaming || props.isStreaming) &&
       !isThinking &&
@@ -112,30 +122,46 @@ onBeforeUnmount(() => {
   typewriter?.cleanup?.();
 });
 
-// 最终渲染内容（稳定 computed + 兜底）
-const processedContent = computed<MessageContent[]>(() => {
-  if (isEnhancedMessage(props.message)) {
-    return props.message.content as MessageContent[];
-  }
+// ====== Think 渲染数据：优先 meta.think，回退 parser ======
+const thinkMeta = computed(() => (props.message as any)?.meta?.think);
 
+const completedThinkBlocks = computed(() => {
+  const blocksFromMeta =
+    thinkMeta.value?.blocks?.map((b: any, i: number) => ({
+      content: String(b?.content ?? ""),
+      index: typeof b?.index === "number" ? b.index : i,
+    })) ?? null;
+
+  if (blocksFromMeta && blocksFromMeta.length > 0) return blocksFromMeta;
+  // 回退：使用静态解析（仅当后端未带 meta.think）
+  return parsedMessage.value.thinkBlocks || [];
+});
+
+const activeThinkContent = computed(
+  () => thinkMeta.value?.current ?? "" // 可能为空字符串
+);
+const hasActiveThink = computed(() => !!thinkMeta.value?.hasActiveThink);
+const hasThinkEver = computed(
+  () => !!thinkMeta.value?.hasThink || parsedMessage.value.hasThink
+);
+const showThink = computed(() => hasThinkEver.value || hasActiveThink.value);
+
+// ====== 主体渲染内容（纯主内容，剥离 think；流式时走打字机）======
+const processedContent = computed<MessageContent[]>(() => {
   const usingTyping =
     props.message.role === "assistant" &&
     !(props.message as any).isError &&
     !(props.message as any).isThinking &&
     ((props.isStreaming ?? false) || (props.message as any).isStreaming);
 
-  const parsedText = usingTyping
-    ? displayedParsed.parsedMessage.value.mainContent
-    : parsedMessage.value.mainContent;
-
-  const raw = usingTyping
+  const visible = usingTyping
     ? (typewriter?.displayedText?.value ?? "")
-    : (fullContentRef.value ?? "");
+    : typeof props.message.content === "string"
+      ? (props.message.content as string)
+      : "";
 
-  const text = parsedText && parsedText.trim() ? parsedText : stripThink(raw);
-
-  if (!text) return [];
-  return [{ type: "text", data: { text } }];
+  const text = stripThink(visible);
+  return text ? [{ type: "text", data: { text } }] : [];
 });
 
 // 工具函数 & 展示辅助
@@ -290,9 +316,9 @@ const renderMarkdown = (markdown: string) => {
           </div>
         </div>
 
-        <!-- 思考中 -->
+        <!-- “正在思考…” 提示：仅在没有可显示的 ThinkBlock 时出现 -->
         <div
-          v-if="(message as any).isThinking"
+          v-if="(message as any).isThinking && !showThink"
           class="flex items-center space-x-3 py-3"
         >
           <div class="flex space-x-1 items-center">
@@ -305,22 +331,35 @@ const renderMarkdown = (markdown: string) => {
           </span>
         </div>
 
-        <!-- Think 区块 -->
-        <div
-          v-if="parsedMessage.hasThink && !(message as any).isThinking"
-          class="space-y-2 mb-4"
-        >
+        <!-- Think 区块（优先使用 meta.think；无则回退 parser） -->
+        <div v-if="showThink" class="space-y-2 mb-4">
+          <!-- 已完成的 think 块：保持默认，是否展开你随意 -->
           <ThinkBlock
-            v-for="(thinkBlock, index) in parsedMessage.thinkBlocks"
-            :key="`think-${index}`"
-            :content="thinkBlock.content"
-            :index="thinkBlock.index"
-            :is-streaming="(message as any).isStreaming || isStreaming"
+            v-for="(b, i) in completedThinkBlocks"
+            :key="`think-completed-${i}`"
+            :content="b.content"
+            :index="b.index"
+            :is-streaming="false"
+            :default-expanded="false"
+          />
+
+          <!-- 正在进行的 think 块：默认收起 + 标题“思考中...” -->
+          <ThinkBlock
+            v-if="
+              (message as any).meta?.think?.hasActiveThink &&
+              (message as any).meta?.think?.current
+            "
+            :content="(message as any).meta?.think?.current"
+            :index="completedThinkBlocks.length"
+            :is-streaming="true"
+            :default-expanded="false"
+            :label="'思考中...'"
+            :auto-expand-on-streaming="false"
           />
         </div>
 
-        <!-- 主体 -->
-        <div v-if="!(message as any).isThinking" class="space-y-3">
+        <!-- 主体（正文） -->
+        <div class="space-y-3">
           <template v-for="(content, index) in processedContent" :key="index">
             <!-- 文本 -->
             <div
@@ -332,7 +371,8 @@ const renderMarkdown = (markdown: string) => {
                 <span
                   v-if="
                     (message as any).role === 'assistant' &&
-                    ((message as any).isStreaming || isStreaming)
+                    ((message as any).isStreaming || isStreaming) &&
+                    !(message as any).isThinking
                   "
                   class="inline-block w-0.5 h-4 bg-blue-500 ml-0.5 animate-pulse"
                   style="animation: blink 1s infinite"

@@ -24,7 +24,7 @@ type MessagesProp =
   | Ref<MessageArray>
   | DeepReadonly<MessageArray>;
 
-const DEBUG = true; // 想关就设为 false
+const DEBUG = false; // 想关就设为 false
 
 defineOptions({ inheritAttrs: false });
 

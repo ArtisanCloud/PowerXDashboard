@@ -1,3 +1,4 @@
+// app/composables/agent/useThinkParser.ts
 import { computed, type Ref } from "vue";
 
 export interface ThinkBlock {
@@ -12,23 +13,20 @@ export interface ParsedMessage {
 }
 
 /**
- * 解析消息中的 think 标签
+ * 非流式：从完整文本中解析 <think>…</think>
  */
 export function useThinkParser(content: Ref<string>) {
   const parsedMessage = computed<ParsedMessage>(() => {
     const contentValue = content.value || "";
 
-    // 匹配所有 <think>...</think> 标签
     const thinkRegex = /<think>([\s\S]*?)<\/think>/gi;
     const thinkMatches = Array.from(contentValue.matchAll(thinkRegex));
 
-    // 提取 think 内容
-    const thinkBlocks: ThinkBlock[] = thinkMatches.map((match, index) => ({
-      content: match[1].trim(),
-      index,
+    const thinkBlocks: ThinkBlock[] = thinkMatches.map((m, i) => ({
+      content: (m[1] ?? "").trim(),
+      index: i,
     }));
 
-    // 移除 think 标签，获取主要内容
     const mainContent = contentValue.replace(thinkRegex, "").trim();
 
     return {
@@ -38,70 +36,127 @@ export function useThinkParser(content: Ref<string>) {
     };
   });
 
-  return {
-    parsedMessage,
-  };
+  return { parsedMessage };
 }
 
 /**
- * 用于 SSE 流式输出的 think 解析器
+ * 流式解析器：
+ * - TOKEN/CHUNK：按增量 append
+ * - DATA/FINAL：按快照 snapshot（重算，不追加）
+ * 这样可以避免后端反复下发“全量文本”导致的重复块。
  */
 export function useStreamingThinkParser() {
   let buffer = "";
-  let completedThinks: ThinkBlock[] = [];
-  let currentThinkIndex = 0;
+  let completedThinks: { content: string; index: number }[] = [];
+  let lastSnapshot = "";
 
-  const parseStreamingContent = (chunk: string) => {
-    buffer += chunk;
+  const completeThinkRegex = /<think>([\s\S]*?)<\/think>/gi;
+  const incompleteTailRegex = /<think>(?![\s\S]*<\/think>)([\s\S]*)$/i;
 
-    // 查找完整的 think 标签
-    const completeThinkRegex = /<think>([\s\S]*?)<\/think>/gi;
-    const matches = Array.from(buffer.matchAll(completeThinkRegex));
+  function recomputeFromSnapshot(snapshotText: string) {
+    buffer = snapshotText;
 
-    // 处理新完成的 think 块
-    const newThinks: ThinkBlock[] = [];
-    matches.slice(completedThinks.length).forEach((match, index) => {
-      newThinks.push({
-        content: match[1].trim(),
-        index: completedThinks.length + index,
-      });
-    });
-
-    // 更新已完成的 think 块
-    completedThinks = [...completedThinks, ...newThinks];
-
-    // 检查是否有未完成的 think 标签
-    const incompleteThinkMatch = buffer.match(
-      /<think>(?![\s\S]*<\/think>)([\s\S]*)$/i
-    );
-    let currentThinkContent = "";
-    if (incompleteThinkMatch) {
-      currentThinkContent = incompleteThinkMatch[1];
+    if (snapshotText === lastSnapshot) {
+      const incomplete = buffer.match(incompleteTailRegex);
+      const currentThinkContent = incomplete ? incomplete[1] : "";
+      const mainContent = buffer
+        .replace(completeThinkRegex, "")
+        .replace(incompleteTailRegex, "")
+        .trim();
+      return {
+        completedThinks: [...completedThinks],
+        currentThinkContent,
+        mainContent,
+        hasActiveThink: !!incomplete,
+        hasThink: completedThinks.length > 0 || !!incomplete,
+      };
     }
+    lastSnapshot = snapshotText;
 
-    // 获取主要内容（移除所有 think 标签）
+    const matches = Array.from(buffer.matchAll(completeThinkRegex));
+    completedThinks = matches.map((m, i) => ({
+      content: (m[1] ?? "").trim(),
+      index: i,
+    }));
+
+    const incomplete = buffer.match(incompleteTailRegex);
+    const currentThinkContent = incomplete ? incomplete[1] : "";
     const mainContent = buffer
-      .replace(/<think>[\s\S]*?<\/think>/gi, "") // 移除完整的 think 标签
-      .replace(/<think>[\s\S]*$/i, "") // 移除未完成的 think 标签
+      .replace(completeThinkRegex, "")
+      .replace(incompleteTailRegex, "")
       .trim();
 
     return {
       completedThinks: [...completedThinks],
       currentThinkContent,
       mainContent,
-      hasActiveThink: !!incompleteThinkMatch,
-      hasThink: completedThinks.length > 0 || !!incompleteThinkMatch,
+      hasActiveThink: !!incomplete,
+      hasThink: completedThinks.length > 0 || !!incomplete,
     };
-  };
+  }
 
-  const reset = () => {
+  function appendDelta(delta: string) {
+    buffer += delta;
+
+    const matches = Array.from(buffer.matchAll(completeThinkRegex));
+    const newOnes = matches.slice(completedThinks.length);
+    if (newOnes.length > 0) {
+      completedThinks.push(
+        ...newOnes.map((m, i) => ({
+          content: (m[1] ?? "").trim(),
+          index: completedThinks.length + i,
+        }))
+      );
+    }
+
+    const incomplete = buffer.match(incompleteTailRegex);
+    const currentThinkContent = incomplete ? incomplete[1] : "";
+    const mainContent = buffer
+      .replace(completeThinkRegex, "")
+      .replace(incompleteTailRegex, "")
+      .trim();
+
+    return {
+      completedThinks: [...completedThinks],
+      currentThinkContent,
+      mainContent,
+      hasActiveThink: !!incomplete,
+      hasThink: completedThinks.length > 0 || !!incomplete,
+    };
+  }
+
+  /**
+   * @param chunk 文本分片
+   * @param mode  'delta'（TOKEN/CHUNK） | 'snapshot'（DATA/FINAL）
+   */
+  function parseStreamingContent(
+    chunk: string,
+    mode: "delta" | "snapshot" = "delta"
+  ) {
+    if (!chunk) {
+      const incomplete = buffer.match(incompleteTailRegex);
+      const mainContent = buffer
+        .replace(completeThinkRegex, "")
+        .replace(incompleteTailRegex, "")
+        .trim();
+      return {
+        completedThinks: [...completedThinks],
+        currentThinkContent: incomplete ? incomplete[1] : "",
+        mainContent,
+        hasActiveThink: !!incomplete,
+        hasThink: completedThinks.length > 0 || !!incomplete,
+      };
+    }
+    return mode === "snapshot"
+      ? recomputeFromSnapshot(chunk)
+      : appendDelta(chunk);
+  }
+
+  function reset() {
     buffer = "";
     completedThinks = [];
-    currentThinkIndex = 0;
-  };
+    lastSnapshot = "";
+  }
 
-  return {
-    parseStreamingContent,
-    reset,
-  };
+  return { parseStreamingContent, reset };
 }

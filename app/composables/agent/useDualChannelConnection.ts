@@ -1,5 +1,16 @@
 // app/composables/agent/useDualChannelConnection.ts
-import { ref, computed, watchEffect, type Ref, type ComputedRef } from "vue";
+import {
+  ref,
+  computed,
+  watchEffect,
+  watch,
+  type Ref,
+  type ComputedRef,
+} from "vue";
+import { useMessageStore } from "~/stores/message";
+import { SSE_EVENT_TYPES } from "~/types/message";
+import { BaseFlowKey } from "../api/types/agent";
+import { useStreamingThinkParser } from "./useThinkParser";
 
 export interface DualChannelConnection {
   sseActive: Ref<boolean>;
@@ -22,23 +33,6 @@ export interface DualChannelConnection {
   onError?: (error: any) => void;
 }
 
-// 事件类型（与你后端保持一致）
-export const SSE_EVENT_TYPES = {
-  START: "start",
-  INTENT: "intent",
-  PLAN: "plan",
-  TOKEN: "token",
-  DATA: "data",
-  ACTION: "action",
-  FINAL: "final",
-  END: "end",
-  ERROR: "error",
-  HEARTBEAT: "heartbeat",
-  ACK: "ack",
-  META: "meta",
-  CHUNK: "chunk",
-} as const;
-
 export function useDualChannelConnection(
   agentId?: Ref<number | null>,
   sessionId?: Ref<string | null>
@@ -48,20 +42,29 @@ export function useDualChannelConnection(
   const currentRequestId = ref<string | null>(null);
   const messages = ref<any[]>([]);
   const isGenerating = computed(() => !!currentRequestId.value);
+  const messageStore = useMessageStore();
+
+  let pendingAssistantId: string | null = null;
+
+  watch(sessionId, (newSessionId, oldSessionId) => {
+    if (oldSessionId && messages.value.length > 0) {
+      messageStore.setMessages(String(oldSessionId), messages.value);
+    }
+    if (newSessionId) {
+      const cached = messageStore.getMessagesBySession(String(newSessionId));
+      if (cached.length > 0) messages.value = cached;
+    }
+  });
 
   let wsConnection: WebSocket | null = null;
   let onMessageCallback: ((data: any) => void) | undefined;
   let onErrorCallback: ((error: any) => void) | undefined;
 
-  // ============ 工具函数 ============
   const getEnv = () => {
     if (typeof window === "undefined") return "dev";
     try {
       const envStore = localStorage.getItem("env-store");
-      if (envStore) {
-        const parsed = JSON.parse(envStore);
-        return parsed.currentEnv || "dev";
-      }
+      if (envStore) return JSON.parse(envStore)?.currentEnv || "dev";
     } catch {}
     return "dev";
   };
@@ -85,7 +88,9 @@ export function useDualChannelConnection(
         .filter(([, v]) => v != null)
         .map(
           ([k, v]) =>
-            `${encodeURIComponent(k)}=${encodeURIComponent(typeof v === "string" ? v : JSON.stringify(v))}`
+            `${encodeURIComponent(k)}=${encodeURIComponent(
+              typeof v === "string" ? v : JSON.stringify(v)
+            )}`
         )
         .join("&");
       if (qs) url += (url.includes("?") ? "&" : "?") + qs;
@@ -100,7 +105,9 @@ export function useDualChannelConnection(
         .filter(([, v]) => v != null)
         .map(
           ([k, v]) =>
-            `${encodeURIComponent(k)}=${encodeURIComponent(typeof v === "string" ? v : JSON.stringify(v))}`
+            `${encodeURIComponent(k)}=${encodeURIComponent(
+              typeof v === "string" ? v : JSON.stringify(v)
+            )}`
         )
         .join("&");
       if (qs) url += (url.includes("?") ? "&" : "?") + qs;
@@ -108,12 +115,10 @@ export function useDualChannelConnection(
     return url;
   };
 
-  // ============ 探活 ============
   const reconnectSSE = async () => {
     try {
       const res = await fetch(
         buildHttpUrl("/agents/stream/sse", { probe: 1 }),
-        // buildHttpUrl("/agents/stream/mock", { probe: 1 }),
         {
           method: "GET",
           headers: {
@@ -163,9 +168,7 @@ export function useDualChannelConnection(
     });
   };
 
-  // ============ 统一文本提取 ============
   function pickText(payload: any, kind?: string): string {
-    // 优先：token/chunk 增量
     if (kind === SSE_EVENT_TYPES.TOKEN || kind === SSE_EVENT_TYPES.CHUNK) {
       return (
         payload?.delta ??
@@ -175,28 +178,55 @@ export function useDualChannelConnection(
         ""
       );
     }
-    // data / final：整段或最终
     const c1 =
-      payload?.data?.data?.result?.content ?? // 深嵌套
-      payload?.data?.result?.content ?? // 常见
-      payload?.data?.content ?? // 你这次后端就是这个
-      payload?.text ?? // 有些后端放根上
-      payload?.delta ?? // 兜底
+      payload?.data?.data?.result?.content ??
+      payload?.data?.result?.content ??
+      payload?.data?.content ??
+      payload?.text ??
+      payload?.delta ??
       "";
     return typeof c1 === "string" ? c1 : JSON.stringify(c1);
   }
 
-  //（可选）强制触发依赖 messages.value 的 computed/watch
   function bumpMessagesRef() {
-    // 只有你真的依赖“数组引用变化”时再打开（比如外部有 computed(() => messages.value)）
-    // 为了安全，这里默认启用，避免你外层只盯数组引用导致看不到内部对象变化
     messages.value = [...messages.value];
+    syncMessagesToCache();
+  }
+  function syncMessagesToCache() {
+    if (sessionId?.value && messages.value.length > 0) {
+      messageStore.setMessages(String(sessionId.value), messages.value);
+    }
   }
 
-  // ============ SSE 主流程 ============
+  // ✅ 文本去重替换策略：杜绝 FINAL/快照把正文重复
+  function applyMainContent(prev: string, next: string) {
+    const a = (prev || "").trim();
+    const b = (next || "").trim();
+    if (!a) return b;
+    if (!b) return a;
+    if (a === b) return a;
+    if (b.startsWith(a)) return b; // 快照或增量超集 → 用 b
+    if (a.endsWith(b)) return a; // 已包含 → 保持
+    return b; // 其他情况以新为准（FINAL 通常权威）
+  }
+
+  // 简单去重：防止同一段 think 重复进入 blocks
+  function dedupeThinkBlocks(blocks: any[]) {
+    const seen = new Set<string>();
+    const out: { content: string; index: number }[] = [];
+    for (const b of blocks || []) {
+      const content = String(b?.content ?? "").trim();
+      if (!content) continue;
+      if (seen.has(content)) continue;
+      seen.add(content);
+      out.push({ content, index: out.length });
+    }
+    return out;
+  }
+
   const sendSSEMessage = async (
     message: string,
-    flowId = "chat",
+    flowId = BaseFlowKey,
     meta?: Record<string, any>
   ) => {
     const requestId = `req_${Date.now()}_${Math.random()
@@ -207,13 +237,14 @@ export function useDualChannelConnection(
     const params: Record<string, any> = {
       q: message,
       env: getEnv(),
+      flow_id: flowId,
     };
     if (agentId?.value) params.agent_id = agentId.value;
     if (sessionId?.value) params.session_id = sessionId.value;
     if (meta) Object.assign(params, meta);
 
-    const url = buildHttpUrl("/agents/stream/sse", params);
-    // const url = buildHttpUrl("/agents/stream/mock", params);
+    // 你现在用 mock 流
+    const url = buildHttpUrl("/agents/stream/mock", params);
 
     try {
       const resp = await fetch(url, {
@@ -235,22 +266,40 @@ export function useDualChannelConnection(
         let hasReceivedData = false;
         let timeoutId: any = null;
 
-        // 10 秒确认包超时
+        // 只创建一次解析器
+        const thinkParser = useStreamingThinkParser();
+        let started = false;
+
+        const getPendingAssistant = () => {
+          if (!pendingAssistantId) return { idx: -1, msg: null as any };
+          const idx = messages.value.findIndex(
+            (m) => m.id === pendingAssistantId
+          );
+          return { idx, msg: idx >= 0 ? messages.value[idx] : null };
+        };
+
         const connectionTimeout = () => {
           if (!hasReceivedData) {
-            // 移除思考消息
-            const thinkingIndex = messages.value.findIndex((m) => m.isThinking);
-            if (thinkingIndex !== -1) messages.value.splice(thinkingIndex, 1);
-
-            messages.value.push({
-              id: `error_${Date.now()}`,
-              role: "assistant",
-              content: "连接超时：服务器未响应确认包。",
-              timestamp: new Date(),
-              isError: true,
-            });
-            bumpMessagesRef();
-
+            const { idx } = getPendingAssistant();
+            if (idx >= 0) {
+              messages.value[idx] = {
+                ...messages.value[idx],
+                isThinking: false,
+                isStreaming: false,
+                isError: true,
+                content: "连接超时：服务器未响应确认包。",
+              };
+              bumpMessagesRef();
+            } else {
+              messages.value.push({
+                id: `error_${Date.now()}`,
+                role: "assistant",
+                content: "连接超时：服务器未响应确认包。",
+                timestamp: Date.now(),
+                isError: true,
+              });
+              bumpMessagesRef();
+            }
             currentRequestId.value = null;
           }
         };
@@ -285,7 +334,6 @@ export function useDualChannelConnection(
               }
               if (!payload.type && currentEvent) payload.type = currentEvent;
 
-              // 第一次收到任何数据 -> 取消超时
               if (!hasReceivedData) {
                 hasReceivedData = true;
                 if (timeoutId) {
@@ -295,12 +343,11 @@ export function useDualChannelConnection(
               }
 
               onMessageCallback?.(payload);
-
               const type = String(
                 payload.type || currentEvent || ""
               ).toLowerCase();
 
-              // 这些是“控制类”事件：去掉思考泡泡，不显示文本
+              // 控制事件略过
               if (
                 type === SSE_EVENT_TYPES.ACK ||
                 type === SSE_EVENT_TYPES.START ||
@@ -310,127 +357,162 @@ export function useDualChannelConnection(
                 type === SSE_EVENT_TYPES.HEARTBEAT ||
                 type === SSE_EVENT_TYPES.ACTION
               ) {
-                // 收到确认/控制类事件就把思考态移除
-                const thinkingIndex = messages.value.findIndex(
-                  (m) => m.isThinking
-                );
-                if (thinkingIndex !== -1) {
-                  messages.value.splice(thinkingIndex, 1);
-                  bumpMessagesRef();
-                }
                 continue;
               }
 
-              // 获取最后一条
-              let last = messages.value[messages.value.length - 1];
-              const needNewAssistant =
-                !last || last.role !== "assistant" || last.done === true;
-
-              // token/chunk/data/final：都视为“内容事件”
+              // 内容事件
               if (
                 type === SSE_EVENT_TYPES.TOKEN ||
                 type === SSE_EVENT_TYPES.CHUNK ||
                 type === SSE_EVENT_TYPES.DATA ||
                 type === SSE_EVENT_TYPES.FINAL
               ) {
-                // 干掉思考消息
-                const thinkingIndex = messages.value.findIndex(
-                  (m) => m.isThinking
+                // 1) 找到/创建唯一的 assistant 占位
+                const idx = messages.value.findIndex(
+                  (m) => m.id === pendingAssistantId
                 );
-                if (thinkingIndex !== -1) {
-                  messages.value.splice(thinkingIndex, 1);
-                }
-
-                if (needNewAssistant) {
+                if (idx < 0) {
+                  pendingAssistantId = `a_${Date.now()}`;
                   messages.value.push({
-                    id: `a_${Date.now()}`,
+                    id: pendingAssistantId,
                     role: "assistant",
                     content: "",
-                    timestamp: new Date(),
+                    timestamp: Date.now(),
                     isStreaming: true,
                     done: false,
-                    isThinking: false,
+                    isThinking: true,
                     isError: false,
+                    meta: {
+                      think: {
+                        blocks: [],
+                        current: "",
+                        hasActiveThink: false,
+                        hasThink: false,
+                      },
+                    },
                   });
-                  bumpMessagesRef();
+                }
+                const answerIdx = messages.value.findIndex(
+                  (m) => m.id === pendingAssistantId
+                );
+                const answer = messages.value[answerIdx];
+
+                // 2) 取本次文本片段
+                const piece = pickText(payload, type) || "";
+
+                // 3) 关键：DATA/FINAL = snapshot（覆盖），TOKEN/CHUNK = delta（追加）
+                const mode =
+                  type === SSE_EVENT_TYPES.DATA ||
+                  type === SSE_EVENT_TYPES.FINAL
+                    ? "snapshot"
+                    : "delta";
+
+                // ⚠️ 注意：thinkParser 要在 while 循环外提前 const thinkParser = useStreamingThinkParser();
+                const {
+                  completedThinks,
+                  currentThinkContent,
+                  mainContent,
+                  hasActiveThink,
+                  hasThink,
+                } = thinkParser.parseStreamingContent(piece, mode);
+
+                // 4) 覆盖正文（不要 +=）
+                answer.content = mainContent; // 覆盖！不要改成 +=
+
+                // 5) 更新状态 & Think 元数据
+                answer.isStreaming = type !== SSE_EVENT_TYPES.FINAL;
+                answer.done = type === SSE_EVENT_TYPES.FINAL;
+                answer.isThinking = hasActiveThink;
+                answer.meta = {
+                  ...(answer.meta || {}),
+                  think: {
+                    blocks: completedThinks,
+                    current: currentThinkContent,
+                    hasActiveThink,
+                    hasThink:
+                      hasThink ||
+                      completedThinks.length > 0 ||
+                      !!currentThinkContent,
+                  },
+                };
+
+                // 6) FINAL 收尾
+                if (type === SSE_EVENT_TYPES.FINAL) {
+                  pendingAssistantId = null;
                 }
 
-                // 当前可写入消息
-                const currentMessage =
-                  messages.value[messages.value.length - 1];
-
-                // 统一取文本
-                const text = pickText(payload, type);
-
-                if (
-                  (type === SSE_EVENT_TYPES.TOKEN ||
-                    type === SSE_EVENT_TYPES.CHUNK) &&
-                  text
-                ) {
-                  // 增量拼接
-                  currentMessage.content =
-                    (currentMessage.content || "") + text;
-                  currentMessage.isStreaming = true;
-                  bumpMessagesRef(); // 保守触发，避免外层只依赖数组引用的 computed 不更新
-                } else if (type === SSE_EVENT_TYPES.DATA && text) {
-                  // 整段覆盖（保持流式状态，交给前端逐字机去渲染）
-                  currentMessage.content = text;
-                  currentMessage.isStreaming = true;
-                  bumpMessagesRef();
-                } else if (type === SSE_EVENT_TYPES.FINAL) {
-                  // final 通常给全文
-                  if (text) currentMessage.content = text;
-                  currentMessage.isStreaming = false;
-                  currentMessage.done = true;
-                  bumpMessagesRef();
-                }
+                bumpMessagesRef();
                 continue;
               }
 
-              // end / error
               if (type === SSE_EVENT_TYPES.END) {
-                const thinkingIndex = messages.value.findIndex(
-                  (m) => m.isThinking
-                );
-                if (thinkingIndex !== -1)
-                  messages.value.splice(thinkingIndex, 1);
-
-                const lastMsg = messages.value[messages.value.length - 1];
-                if (lastMsg && lastMsg.role === "assistant") {
-                  lastMsg.done = true;
-                  lastMsg.isStreaming = false;
+                const { idx, msg } = getPendingAssistant();
+                if (idx >= 0 && msg) {
+                  msg.done = true;
+                  msg.isStreaming = false;
+                  msg.isThinking = false;
+                  bumpMessagesRef();
                 }
-                bumpMessagesRef();
                 currentRequestId.value = null;
+                pendingAssistantId = null;
                 continue;
               }
 
               if (type === SSE_EVENT_TYPES.ERROR) {
-                const thinkingIndex = messages.value.findIndex(
-                  (m) => m.isThinking
-                );
-                if (thinkingIndex !== -1)
-                  messages.value.splice(thinkingIndex, 1);
-
-                messages.value.push({
-                  id: `error_${Date.now()}`,
-                  role: "assistant",
-                  content:
+                const { idx, msg } = getPendingAssistant();
+                if (idx >= 0 && msg) {
+                  msg.isThinking = false;
+                  msg.isStreaming = false;
+                  msg.isError = true;
+                  msg.content =
                     payload?.message ||
                     payload?.error ||
-                    "发生错误：未知的服务端错误。",
-                  timestamp: new Date(),
-                  isError: true,
-                });
-                bumpMessagesRef();
+                    "发生错误：未知的服务端错误。";
+                  bumpMessagesRef();
+                } else {
+                  messages.value.push({
+                    id: `error_${Date.now()}`,
+                    role: "assistant",
+                    content:
+                      payload?.message ||
+                      payload?.error ||
+                      "发生错误：未知的服务端错误。",
+                    timestamp: Date.now(),
+                    isError: true,
+                  });
+                  bumpMessagesRef();
+                }
                 currentRequestId.value = null;
+                pendingAssistantId = null;
                 continue;
               }
             }
           }
         } catch (err) {
-          const thinkingIndex = messages.value.findIndex((m) => m.isThinking);
-          if (thinkingIndex !== -1) messages.value.splice(thinkingIndex, 1);
+          const { idx, msg } = (() => {
+            if (!pendingAssistantId) return { idx: -1, msg: null as any };
+            const i = messages.value.findIndex(
+              (m) => m.id === pendingAssistantId
+            );
+            return { idx: i, msg: i >= 0 ? messages.value[i] : null };
+          })();
+
+          if (idx >= 0 && msg) {
+            msg.isThinking = false;
+            msg.isStreaming = false;
+            msg.isError = true;
+            msg.content = `发生异常：${(err as any)?.message ?? "未知错误"}`;
+            bumpMessagesRef();
+          } else {
+            messages.value.push({
+              id: `error_${Date.now()}`,
+              role: "assistant",
+              content: `发生异常：${(err as any)?.message ?? "未知错误"}`,
+              timestamp: Date.now(),
+              isError: true,
+            });
+            bumpMessagesRef();
+          }
 
           onErrorCallback?.(err);
         } finally {
@@ -444,21 +526,38 @@ export function useDualChannelConnection(
 
       run();
     } catch (err) {
+      const { idx, msg } = (() => {
+        if (!pendingAssistantId) return { idx: -1, msg: null as any };
+        const i = messages.value.findIndex((m) => m.id === pendingAssistantId);
+        return { idx: i, msg: i >= 0 ? messages.value[i] : null };
+      })();
+
+      if (idx >= 0 && msg) {
+        msg.isThinking = false;
+        msg.isStreaming = false;
+        msg.isError = true;
+        msg.content = `发送失败：${(err as any)?.message ?? "未知错误"}`;
+        bumpMessagesRef();
+      } else {
+        messages.value.push({
+          id: `error_${Date.now()}`,
+          role: "assistant",
+          content: `发送失败：${(err as any)?.message ?? "未知错误"}`,
+          timestamp: Date.now(),
+          isError: true,
+        });
+        bumpMessagesRef();
+      }
+
       onErrorCallback?.(err);
       currentRequestId.value = null;
+      pendingAssistantId = null;
     }
   };
 
-  // ============ WS（保持原样占位，便于你后续需要） ============
-  const sendWSMessage = (
-    _message: string,
-    _flowId = "chat",
-    _meta?: Record<string, any>
-  ) => {
-    // 如你暂不使用 WS，可不实现
+  const sendWSMessage = (_message: string) => {
     return;
   };
-
   const sendCommand = (_command: any) => {
     if (wsConnection && wsConnection.readyState === WebSocket.OPEN) {
       wsConnection.send(JSON.stringify(_command));
@@ -467,45 +566,40 @@ export function useDualChannelConnection(
     return false;
   };
 
-  // ============ 对外发送（先入列本地消息，再走 SSE） ============
   const sendMessage = async (
     message: string,
-    flowId = "chat",
+    flowId = BaseFlowKey,
     meta?: Record<string, any>
   ) => {
-    // 用户消息
     messages.value.push({
       id: `u_${Date.now()}`,
       role: "user",
       content: message,
-      timestamp: new Date(),
+      timestamp: Date.now(),
     });
-    // 思考占位
+
+    pendingAssistantId = `thinking_${Date.now()}`;
     messages.value.push({
-      id: `thinking_${Date.now()}`,
+      id: pendingAssistantId,
       role: "assistant",
       content: "",
-      timestamp: new Date(),
+      timestamp: Date.now(),
       isThinking: true,
+      isStreaming: true,
+      done: false,
+      isError: false,
+      meta: {
+        think: {
+          blocks: [],
+          current: "",
+          hasActiveThink: false,
+          hasThink: false,
+        },
+      },
     });
     bumpMessagesRef();
 
-    try {
-      await sendSSEMessage(message, flowId, meta);
-    } catch (error) {
-      const thinkingIndex = messages.value.findIndex((m) => m.isThinking);
-      if (thinkingIndex !== -1) messages.value.splice(thinkingIndex, 1);
-
-      messages.value.push({
-        id: `error_${Date.now()}`,
-        role: "assistant",
-        content: `发送失败：${(error as any)?.message ?? "未知错误"}`,
-        timestamp: new Date(),
-        isError: true,
-      });
-      bumpMessagesRef();
-      throw error;
-    }
+    await sendSSEMessage(message, flowId, meta);
   };
 
   const cancel = () => {
@@ -518,6 +612,10 @@ export function useDualChannelConnection(
 
   const clearMessages = () => {
     messages.value = [];
+    pendingAssistantId = null;
+    if (sessionId?.value) {
+      messageStore.setMessages(String(sessionId.value), []);
+    }
   };
 
   const disconnect = () => cancel();
