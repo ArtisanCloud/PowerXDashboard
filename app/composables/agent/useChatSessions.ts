@@ -1,6 +1,7 @@
 import { computed } from "vue";
 import { useApiClient } from "~/composables/api";
 import { useAgentSessionStore } from "~/stores/agentSession";
+import { useMessageStore } from "~/stores/message";
 
 // 后端会话数据结构
 interface SessionDTO {
@@ -76,6 +77,7 @@ export function useChatSessions(opts: { pageSize?: number } = {}) {
   const pageSize = opts.pageSize ?? 50;
   const apiClient = useApiClient();
   const sessionStore = useAgentSessionStore();
+  const messageStore = useMessageStore();
 
   /**
    * 将后端数据转换为前端格式
@@ -290,32 +292,93 @@ export function useChatSessions(opts: { pageSize?: number } = {}) {
   }
 
   /**
-   * 加载会话消息
+   * 加载会话消息（带缓存）
    */
   async function loadSessionMessages(
     sessionId: number | string,
-    afterId?: number
+    force = false
   ): Promise<ChatMessage[]> {
+    const sessionIdStr = String(sessionId);
+
+    // 如果有缓存且不强制刷新，则返回缓存的消息
+    if (!force && messageStore.getMessagesBySession(sessionIdStr).length > 0) {
+      console.log(
+        "使用缓存的消息:",
+        messageStore.getMessagesBySession(sessionIdStr)
+      );
+      return messageStore.getMessagesBySession(sessionIdStr);
+    }
+
+    messageStore.setLoading(sessionIdStr, true);
+    messageStore.clearError();
+
     try {
       const response = await apiClient.get<ApiResponse<MessageDTO>>(
         `/agents/sessions/${sessionId}/messages`,
         {
           params: {
             env: "dev",
-            after_id: afterId || 0,
             limit: 200,
           },
         }
       );
 
       if (response.code === 200) {
-        return response.data.items.map(mapMessageDTO);
+        const messages = response.data.items.map(mapMessageDTO);
+        console.log("[useChatSessions] 加载会话消息成功:", messages);
+        messageStore.setMessages(sessionIdStr, messages);
+        return messages;
       }
       return [];
     } catch (error: any) {
       console.error("加载会话消息失败:", error);
-      sessionStore.setError(error?.message || "加载会话消息失败");
+      messageStore.setError(error?.message || "加载会话消息失败");
       throw error;
+    } finally {
+      messageStore.setLoading(sessionIdStr, false);
+    }
+  }
+
+  /**
+   * 加载更多消息（分页）
+   */
+  async function loadMoreMessages(
+    sessionId: number | string
+  ): Promise<ChatMessage[]> {
+    const sessionIdStr = String(sessionId);
+    const lastMessageId = messageStore.lastMessageIdBySession[sessionIdStr];
+
+    if (!lastMessageId || messageStore.isLoadingBySession(sessionIdStr)) {
+      return [];
+    }
+
+    messageStore.setLoading(sessionIdStr, true);
+
+    try {
+      const response = await apiClient.get<ApiResponse<MessageDTO>>(
+        `/agents/sessions/${sessionId}/messages`,
+        {
+          params: {
+            env: "dev",
+            after_id: lastMessageId,
+            limit: 50,
+          },
+        }
+      );
+
+      if (response.code === 200) {
+        const newMessages = response.data.items.map(mapMessageDTO);
+        messageStore.appendMessages(sessionIdStr, newMessages);
+        messageStore.setHasMore(sessionIdStr, newMessages.length >= 50);
+        return newMessages;
+      }
+      return [];
+    } catch (error: any) {
+      console.error("加载更多消息失败:", error);
+      messageStore.setError(error?.message || "加载更多消息失败");
+      throw error;
+    } finally {
+      messageStore.setLoading(sessionIdStr, false);
     }
   }
 
@@ -336,6 +399,7 @@ export function useChatSessions(opts: { pageSize?: number } = {}) {
     renameSession,
     archiveSession,
     loadSessionMessages,
+    loadMoreMessages,
 
     // Store 方法的直接暴露
     selectSession: sessionStore.selectSession,

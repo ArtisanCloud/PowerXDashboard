@@ -781,7 +781,7 @@ function onSendClick() {
   </div>
 
   <!-- === Debug HUD（调试完删除） === -->
-  <div
+  <!-- <div
     v-if="true"
     class="fixed bottom-3 right-3 text-xs bg-black/70 text-white rounded px-3 py-2 space-y-1 z-50"
   >
@@ -809,7 +809,7 @@ function onSendClick() {
         done: {{ (messages[messages.length - 1] as any).done ? "T" : "F" }}
       </div>
     </div>
-  </div>
+  </div> -->
 </template>
 
 <style scoped>

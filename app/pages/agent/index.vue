@@ -35,7 +35,7 @@ const chat = useDualChannelConnection(currentAgentId, currentSessionId);
 
 // 设置消息回调
 chat.onMessage = (message) => {
-  console.log("[Agent page] 收到消息:", message);
+  // console.log("[Agent page] 收到消息:", message);
 };
 
 chat.onError = (error) => {
@@ -100,24 +100,16 @@ const handleSelectSession = async (payload: {
   const { agentId, sessionId } = payload;
   chatSessions.selectSession(agentId, sessionId);
 
-  // 清空当前消息
-  chat.clearMessages();
+  // 不立即清空当前消息，等待历史加载后覆盖内存消息
+  // chat.clearMessages();
 
-  // 加载会话历史消息
+  // 加载会话历史消息（会自动缓存）
   try {
-    const messages = await chatSessions.loadSessionMessages(sessionId);
-    console.log("加载会话消息成功:", messages);
-    // 将历史消息添加到聊天界面
-    for (const message of messages) {
-      chat.messages.value.push({
-        id: message.id.toString(),
-        role: message.role,
-        content: message.content,
-        timestamp: message.timestamp,
-        isError: message.isError,
-        meta: message.meta,
-      });
-    }
+    const historyMessages = await chatSessions.loadSessionMessages(sessionId);
+    chat.messages.value = Array.isArray(historyMessages)
+      ? [...historyMessages]
+      : [];
+    // console.log("加载会话消息成功，已通过缓存同步", historyMessages);
   } catch (error) {
     console.error("加载会话消息失败:", error);
     notifyOnce("加载会话消息失败", error instanceof Error ? error.message : "");

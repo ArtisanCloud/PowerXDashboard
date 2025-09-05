@@ -77,15 +77,6 @@ export const useAgentSessionStore = defineStore("agentSession", {
         ...this.sessionsByAgent,
         [agentId]: sessions,
       };
-
-      // 如果是当前选中的agent且没有选中会话，自动选中第一个
-      if (
-        agentId === this.currentAgentId &&
-        !this.currentSessionId &&
-        sessions.length > 0
-      ) {
-        this.currentSessionId = sessions[0].id;
-      }
     },
 
     /**
