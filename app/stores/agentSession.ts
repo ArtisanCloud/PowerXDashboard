@@ -44,7 +44,7 @@ export const useAgentSessionStore = defineStore("agentSession", {
     /**
      * 获取指定 agent 是否还有更多数据
      */
-    hasMoreByAgent: (state) => (agentId: number) => {
+    getHasMoreByAgent: (state) => (agentId: number) => {
       return state.hasMoreByAgent[agentId] || false;
     },
 

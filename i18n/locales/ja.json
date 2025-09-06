@@ -444,9 +444,23 @@
       "shiftEnterNewLine": "Shift+Enter で改行",
       "model": "モデル",
       "temperature": "温度",
-      "cancel": "キャンセル"
+      "cancel": "キャンセル",
+      "newSession": "新しいセッション",
+      "untitledSession": "無題のセッション",
+      "errors": {
+        "loadSessionsFailed": "セッションの読み込みに失敗しました",
+        "loadMoreSessionsFailed": "さらなるセッションの読み込みに失敗しました",
+        "createSessionFailed": "セッションの作成に失敗しました",
+        "createSessionFailedNoData": "セッションの作成に失敗しました：レスポンスデータがありません",
+        "deleteSessionFailed": "セッションの削除に失敗しました",
+        "renameSessionFailed": "セッションの名前変更に失敗しました",
+        "archiveSessionFailed": "セッションのアーカイブに失敗しました",
+        "loadMessagesFailed": "メッセージの読み込みに失敗しました",
+        "loadMoreMessagesFailed": "さらなるメッセージの読み込みに失敗しました"
+      }
     },
     "config": {
+      "title": "エージェント設定",
       "editTitle": "エージェントを編集",
       "createTitle": "エージェントを作成",
       "basicInfo": "基本情報",

@@ -244,7 +244,8 @@ export function useDualChannelConnection(
     if (meta) Object.assign(params, meta);
 
     // 你现在用 mock 流
-    const url = buildHttpUrl("/agents/stream/mock", params);
+    // const url = buildHttpUrl("/agents/stream/mock", params);
+    const url = buildHttpUrl("/agents/stream/sse", params);
 
     try {
       const resp = await fetch(url, {

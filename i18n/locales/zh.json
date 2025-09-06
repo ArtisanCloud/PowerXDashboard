@@ -772,9 +772,23 @@
       "shiftEnterNewLine": "Shift+Enter 换行",
       "model": "模型",
       "temperature": "温度",
-      "cancel": "取消"
+      "cancel": "取消",
+      "newSession": "新会话",
+      "untitledSession": "未命名会话",
+      "errors": {
+        "loadSessionsFailed": "加载会话列表失败",
+        "loadMoreSessionsFailed": "加载更多会话失败",
+        "createSessionFailed": "创建会话失败",
+        "createSessionFailedNoData": "创建会话失败：无响应数据",
+        "deleteSessionFailed": "删除会话失败",
+        "renameSessionFailed": "重命名会话失败",
+        "archiveSessionFailed": "归档会话失败",
+        "loadMessagesFailed": "加载会话消息失败",
+        "loadMoreMessagesFailed": "加载更多消息失败"
+      }
     },
     "config": {
+      "title": "智能体配置",
       "editTitle": "编辑 Agent",
       "createTitle": "创建 Agent",
       "basicInfo": "基本信息",

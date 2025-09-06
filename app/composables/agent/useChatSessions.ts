@@ -2,6 +2,7 @@ import { computed } from "vue";
 import { useApiClient } from "~/composables/api";
 import { useAgentSessionStore } from "~/stores/agentSession";
 import { useMessageStore } from "~/stores/message";
+import { useI18n } from "vue-i18n";
 
 // 后端会话数据结构
 interface SessionDTO {
@@ -78,6 +79,7 @@ export function useChatSessions(opts: { pageSize?: number } = {}) {
   const apiClient = useApiClient();
   const sessionStore = useAgentSessionStore();
   const messageStore = useMessageStore();
+  const { t } = useI18n();
 
   /**
    * 将后端数据转换为前端格式
@@ -85,7 +87,7 @@ export function useChatSessions(opts: { pageSize?: number } = {}) {
   function mapSessionDTO(dto: SessionDTO): ChatSession {
     return {
       id: dto.id,
-      title: dto.title || "未命名会话",
+      title: dto.title || t("agent.chat.untitledSession"),
       lastMessage: dto.summary || "",
       updatedAt: new Date(dto.latestAt || dto.updatedAt),
       unread: 0, // 后端暂无此字段，默认为0
@@ -143,7 +145,9 @@ export function useChatSessions(opts: { pageSize?: number } = {}) {
       }
     } catch (error: any) {
       console.error("加载会话列表失败:", error);
-      sessionStore.setError(error?.message || "加载会话列表失败");
+      sessionStore.setError(
+        error?.message || t("agent.chat.errors.loadSessionsFailed")
+      );
       sessionStore.setSessions(agentId, []); // 设置空数组避免重复请求
       sessionStore.setHasMore(agentId, false);
       throw error;
@@ -157,7 +161,7 @@ export function useChatSessions(opts: { pageSize?: number } = {}) {
    */
   async function loadMore(agentId: number) {
     if (
-      !sessionStore.hasMoreByAgent(agentId) ||
+      !sessionStore.getHasMoreByAgent(agentId) ||
       sessionStore.isLoadingByAgent(agentId)
     ) {
       return;
@@ -191,7 +195,9 @@ export function useChatSessions(opts: { pageSize?: number } = {}) {
       }
     } catch (error: any) {
       console.error("加载更多会话失败:", error);
-      sessionStore.setError(error?.message || "加载更多会话失败");
+      sessionStore.setError(
+        error?.message || t("agent.chat.errors.loadMoreSessionsFailed")
+      );
       throw error;
     } finally {
       sessionStore.setLoading(agentId, false);
@@ -209,7 +215,7 @@ export function useChatSessions(opts: { pageSize?: number } = {}) {
       const response = await apiClient.post<SessionDTO>(`/agents/sessions`, {
         env: "dev",
         agentId: agentId,
-        title: title || "新会话",
+        title: title || t("agent.chat.newSession"),
       });
 
       if (response) {
@@ -217,10 +223,12 @@ export function useChatSessions(opts: { pageSize?: number } = {}) {
         sessionStore.addSession(agentId, newSession);
         return newSession;
       }
-      throw new Error("创建会话失败：无响应数据");
+      throw new Error(t("agent.chat.errors.createSessionFailedNoData"));
     } catch (error: any) {
       console.error("创建会话失败:", error);
-      sessionStore.setError(error?.message || "创建会话失败");
+      sessionStore.setError(
+        error?.message || t("agent.chat.errors.createSessionFailed")
+      );
       throw error;
     }
   }
@@ -239,7 +247,9 @@ export function useChatSessions(opts: { pageSize?: number } = {}) {
       sessionStore.removeSession(agentId, sessionId);
     } catch (error: any) {
       console.error("删除会话失败:", error);
-      sessionStore.setError(error?.message || "删除会话失败");
+      sessionStore.setError(
+        error?.message || t("agent.chat.errors.deleteSessionFailed")
+      );
       throw error;
     }
   }
@@ -266,7 +276,9 @@ export function useChatSessions(opts: { pageSize?: number } = {}) {
       sessionStore.updateSession(agentId, sessionId, { title });
     } catch (error: any) {
       console.error("重命名会话失败:", error);
-      sessionStore.setError(error?.message || "重命名会话失败");
+      sessionStore.setError(
+        error?.message || t("agent.chat.errors.renameSessionFailed")
+      );
       throw error;
     }
   }
@@ -286,7 +298,9 @@ export function useChatSessions(opts: { pageSize?: number } = {}) {
       sessionStore.removeSession(agentId, sessionId);
     } catch (error: any) {
       console.error("归档会话失败:", error);
-      sessionStore.setError(error?.message || "归档会话失败");
+      sessionStore.setError(
+        error?.message || t("agent.chat.errors.archiveSessionFailed")
+      );
       throw error;
     }
   }
@@ -325,14 +339,16 @@ export function useChatSessions(opts: { pageSize?: number } = {}) {
 
       if (response.code === 200) {
         const messages = response.data.items.map(mapMessageDTO);
-        console.log("[useChatSessions] 加载会话消息成功:", messages);
+        // console.log("[useChatSessions] 加载会话消息成功:", messages);
         messageStore.setMessages(sessionIdStr, messages);
         return messages;
       }
       return [];
     } catch (error: any) {
       console.error("加载会话消息失败:", error);
-      messageStore.setError(error?.message || "加载会话消息失败");
+      messageStore.setError(
+        error?.message || t("agent.chat.errors.loadMessagesFailed")
+      );
       throw error;
     } finally {
       messageStore.setLoading(sessionIdStr, false);
@@ -375,7 +391,9 @@ export function useChatSessions(opts: { pageSize?: number } = {}) {
       return [];
     } catch (error: any) {
       console.error("加载更多消息失败:", error);
-      messageStore.setError(error?.message || "加载更多消息失败");
+      messageStore.setError(
+        error?.message || t("agent.chat.errors.loadMoreMessagesFailed")
+      );
       throw error;
     } finally {
       messageStore.setLoading(sessionIdStr, false);
@@ -386,7 +404,7 @@ export function useChatSessions(opts: { pageSize?: number } = {}) {
     // 状态（从 store 获取）
     sessionsByAgent: computed(() => sessionStore.sessionsByAgent),
     sessionsLoadingByAgent: computed(() => sessionStore.sessionsLoadingByAgent),
-    hasMoreByAgent: computed(() => sessionStore.hasMoreByAgent),
+    hasMoreByAgent: computed(() => sessionStore.getHasMoreByAgent),
     currentSessionId: computed(() => sessionStore.currentSessionId),
     currentAgentId: computed(() => sessionStore.currentAgentId),
     error: computed(() => sessionStore.error),

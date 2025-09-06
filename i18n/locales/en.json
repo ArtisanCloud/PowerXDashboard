@@ -771,9 +771,23 @@
       "shiftEnterNewLine": "Shift+Enter for new line",
       "model": "Model",
       "temperature": "Temperature",
-      "cancel": "Cancel"
+      "cancel": "Cancel",
+      "newSession": "New Session",
+      "untitledSession": "Untitled Session",
+      "errors": {
+        "loadSessionsFailed": "Failed to load sessions",
+        "loadMoreSessionsFailed": "Failed to load more sessions",
+        "createSessionFailed": "Failed to create session",
+        "createSessionFailedNoData": "Failed to create session: No response data",
+        "deleteSessionFailed": "Failed to delete session",
+        "renameSessionFailed": "Failed to rename session",
+        "archiveSessionFailed": "Failed to archive session",
+        "loadMessagesFailed": "Failed to load messages",
+        "loadMoreMessagesFailed": "Failed to load more messages"
+      }
     },
     "config": {
+      "title": "Agent Configuration",
       "editTitle": "Edit Agent",
       "createTitle": "Create Agent",
       "basicInfo": "Basic Information",

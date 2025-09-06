@@ -251,9 +251,23 @@
       "shiftEnterNewLine": "Shift+Enter로 줄바꿈",
       "model": "모델",
       "temperature": "온도",
-      "cancel": "취소"
+      "cancel": "취소",
+      "newSession": "새 세션",
+      "untitledSession": "제목 없는 세션",
+      "errors": {
+        "loadSessionsFailed": "세션 로드 실패",
+        "loadMoreSessionsFailed": "추가 세션 로드 실패",
+        "createSessionFailed": "세션 생성 실패",
+        "createSessionFailedNoData": "세션 생성 실패: 응답 데이터 없음",
+        "deleteSessionFailed": "세션 삭제 실패",
+        "renameSessionFailed": "세션 이름 변경 실패",
+        "archiveSessionFailed": "세션 아카이브 실패",
+        "loadMessagesFailed": "메시지 로드 실패",
+        "loadMoreMessagesFailed": "추가 메시지 로드 실패"
+      }
     },
     "config": {
+      "title": "에이전트 설정",
       "editTitle": "에이전트 편집",
       "createTitle": "에이전트 생성",
       "basicInfo": "기본 정보",
