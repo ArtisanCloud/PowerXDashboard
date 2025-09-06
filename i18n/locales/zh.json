@@ -775,6 +775,8 @@
       "cancel": "取消",
       "newSession": "新会话",
       "untitledSession": "未命名会话",
+      "you": "你",
+      "agent": "助手",
       "errors": {
         "loadSessionsFailed": "加载会话列表失败",
         "loadMoreSessionsFailed": "加载更多会话失败",

@@ -17,17 +17,22 @@ export interface ParsedMessage {
  */
 export function useThinkParser(content: Ref<string>) {
   const parsedMessage = computed<ParsedMessage>(() => {
-    const contentValue = content.value || "";
+    const raw = content.value || "";
 
+    // ✅ 先去掉自闭合占位标签
+    const withoutSelfClosing = raw.replace(/<think\s*\/>/gi, "");
+
+    // 再匹配成对的 <think>…</think>
     const thinkRegex = /<think>([\s\S]*?)<\/think>/gi;
-    const thinkMatches = Array.from(contentValue.matchAll(thinkRegex));
+    const thinkMatches = Array.from(withoutSelfClosing.matchAll(thinkRegex));
 
     const thinkBlocks: ThinkBlock[] = thinkMatches.map((m, i) => ({
       content: (m[1] ?? "").trim(),
       index: i,
     }));
 
-    const mainContent = contentValue.replace(thinkRegex, "").trim();
+    // 主体文本也基于去除了自闭合标签的内容
+    const mainContent = withoutSelfClosing.replace(thinkRegex, "").trim();
 
     return {
       thinkBlocks,

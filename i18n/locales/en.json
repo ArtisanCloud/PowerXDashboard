@@ -774,6 +774,8 @@
       "cancel": "Cancel",
       "newSession": "New Session",
       "untitledSession": "Untitled Session",
+      "you": "You",
+      "agent": "Agent",
       "errors": {
         "loadSessionsFailed": "Failed to load sessions",
         "loadMoreSessionsFailed": "Failed to load more sessions",

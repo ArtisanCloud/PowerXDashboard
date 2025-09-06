@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import type { ChatMessage } from "~/types/message";
-import type { EnhancedChatMessage, MessageContent } from "~/types/message";
+import type { MessageContent } from "~/types/message";
 import type { DeepReadonly } from "vue";
 import { computed, watch, onBeforeUnmount } from "vue";
 import { useI18n } from "#imports";
 import { useThinkParser } from "~/composables/agent/useThinkParser";
 import { useMessageTypewriter } from "~/composables/agent/useTypewriter";
 import ThinkBlock from "~/components/agent/ThinkBlock.vue";
+import { MESSAGE_TYPES } from "~/types/message";
 
 declare global {
   interface Window {
@@ -15,7 +16,7 @@ declare global {
 }
 
 const props = defineProps<{
-  message: ChatMessage | EnhancedChatMessage | DeepReadonly<ChatMessage>;
+  message: ChatMessage | DeepReadonly<ChatMessage>;
   isStreaming?: boolean;
   agentName?: string;
 }>();
@@ -28,15 +29,37 @@ const emit = defineEmits<{
 
 const { t } = useI18n();
 
-const isEnhancedMessage = (msg: any): msg is EnhancedChatMessage =>
-  Array.isArray(msg?.content);
-
 // 原始完整文本
-const fullContentRef = computed(() =>
-  typeof props.message.content === "string"
-    ? (props.message.content as string)
-    : ""
-);
+const normalizedRawContent = computed(() => {
+  const c = (props.message as any)?.content;
+  if (typeof c === "string") return c;
+  // ✅ 单对象（MessageContent）
+  if (c && typeof c === "object" && !Array.isArray(c)) {
+    const t = c.type;
+    const d = c.data ?? {};
+    if (t === MESSAGE_TYPES.TEXT && d.text) return String(d.text);
+    if (t === MESSAGE_TYPES.MARKDOWN && d.markdown) return String(d.markdown);
+    if (t === MESSAGE_TYPES.CODE && d.code) return String(d.code);
+    return "";
+  }
+  if (Array.isArray(c)) {
+    return c
+      .map((item: any) => {
+        if (!item || !item.type) return "";
+        if (item.type === MESSAGE_TYPES.TEXT && item.data?.text)
+          return String(item.data.text);
+        if (item.type === MESSAGE_TYPES.MARKDOWN && item.data?.markdown)
+          return String(item.data.markdown);
+        if (item.type === MESSAGE_TYPES.CODE && item.data?.code)
+          return String(item.data.code);
+        return "";
+      })
+      .join("\n")
+      .trim();
+  }
+  return "";
+});
+const fullContentRef = normalizedRawContent;
 
 // ====== 静态解析（用于回退：后端未提供 meta.think 时）======
 const { parsedMessage } = useThinkParser(fullContentRef);
@@ -94,14 +117,13 @@ const stripThink = (s: string) =>
 // 只在“明确完成”才 complete，避免过早掐断
 watch(
   [
-    () => props.message.content,
+    () => normalizedRawContent.value, // ✅ 用规范化后的纯文本
     () => (props.message as any).isStreaming,
     () => (props.message as any).isThinking,
     () => (props.message as any).done,
   ],
-  ([newContent, isStreaming, isThinking, done]) => {
-    if (typeof newContent !== "string") return;
-
+  ([normText, isStreaming, isThinking, done]) => {
+    const text = String(normText ?? "");
     // 流式且不处于思考阶段时，走打字机；否则直接设定文本
     if (
       (isStreaming || props.isStreaming) &&
@@ -109,9 +131,9 @@ watch(
       props.message.role === "assistant" &&
       !(props.message as any).isError
     ) {
-      typewriter.updateMessage(newContent, true);
+      typewriter.updateMessage(text, true);
     } else {
-      typewriter.setText(newContent, false);
+      typewriter.setText(text, false);
       if (done === true) typewriter.complete();
     }
   },
@@ -123,28 +145,114 @@ onBeforeUnmount(() => {
 });
 
 // ====== Think 渲染数据：优先 meta.think，回退 parser ======
-const thinkMeta = computed(() => (props.message as any)?.meta?.think);
+const thinkMeta = computed(
+  () =>
+    (props.message as any)?.meta?.think ??
+    (props.message as any)?.metadata?.think
+);
 
-const completedThinkBlocks = computed(() => {
-  const blocksFromMeta =
-    thinkMeta.value?.blocks?.map((b: any, i: number) => ({
-      content: String(b?.content ?? ""),
-      index: typeof b?.index === "number" ? b.index : i,
-    })) ?? null;
+const normalize = (s: string) =>
+  String(s ?? "")
+    .replace(/\s+/g, " ")
+    .trim();
 
-  if (blocksFromMeta && blocksFromMeta.length > 0) return blocksFromMeta;
-  // 回退：使用静态解析（仅当后端未带 meta.think）
-  return parsedMessage.value.thinkBlocks || [];
+const lastCompleted = computed(() =>
+  completedThinkBlocks.value.length > 0
+    ? completedThinkBlocks.value[completedThinkBlocks.value.length - 1]
+    : null
+);
+
+const shouldShowActiveThink = computed(() => {
+  if (!hasActiveThink.value || !activeThinkNonEmpty.value) return false;
+  if (!lastCompleted.value) return true;
+  return (
+    normalize(activeThinkContent.value) !==
+    normalize(lastCompleted.value.content)
+  );
 });
 
-const activeThinkContent = computed(
-  () => thinkMeta.value?.current ?? "" // 可能为空字符串
+// 提取“非空”的 <think>…</think> 段（去除空白后长度>0 才算）
+const nonEmptyThinkSegmentsInRaw = computed(() => {
+  const raw =
+    typewriter?.displayedText?.value &&
+    ((props.message as any)?.isStreaming || props.isStreaming)
+      ? String(typewriter.displayedText.value)
+      : normalizedRawContent.value;
+  const matches = Array.from(raw.matchAll(/<think>([\s\S]*?)<\/think>/gi)).map(
+    (m) =>
+      String(m[1] ?? "")
+        .replace(/\s+/g, " ")
+        .trim()
+  );
+  return matches.filter((seg) => seg.length > 0);
+});
+// 只有当“原文中存在至少一个非空的 <think> 段”时才允许显示
+const hasNonEmptyThinkTag = computed(
+  () => nonEmptyThinkSegmentsInRaw.value.length > 0
 );
-const hasActiveThink = computed(() => !!thinkMeta.value?.hasActiveThink);
-const hasThinkEver = computed(
-  () => !!thinkMeta.value?.hasThink || parsedMessage.value.hasThink
+
+const completedThinkBlocks = computed(() => {
+  // 1) 优先使用后端 meta blocks
+  const blocksFromMeta =
+    thinkMeta.value?.blocks
+      ?.map((b: any, i: number) => ({
+        content: String(b?.content ?? ""),
+        index: typeof b?.index === "number" ? b.index : i,
+      }))
+      .filter((b) => b.content.replace(/\s+/g, " ").trim().length > 0) ?? null;
+
+  // console.log("[MessageItem] blocksFromMeta", blocksFromMeta);
+  const dedupe = (blocks: any[]) => {
+    const seen = new Set<string>();
+    const result: any[] = [];
+    for (const b of blocks) {
+      const key = normalize(b.content);
+      if (!key || seen.has(key)) continue;
+      seen.add(key);
+      result.push(b);
+    }
+    return result;
+  };
+
+  if (blocksFromMeta && blocksFromMeta.length > 0) {
+    // console.log("[MessageItem] blocksFromMeta", blocksFromMeta);
+    return dedupe(blocksFromMeta);
+  }
+
+  // 2) 回退解析：仅当正文包含 <think>…</think> 时
+  if (!hasNonEmptyThinkTag.value) return [];
+  // console.log("[MessageItem] parsedMessage", parsedMessage.value);
+  const parsed = parsedMessage.value.thinkBlocks || [];
+  return dedupe(
+    parsed.filter(
+      (b: any) =>
+        String(b?.content ?? "")
+          .replace(/\s+/g, " ")
+          .trim().length > 0
+    )
+  );
+});
+
+const activeThinkContent = computed(() => thinkMeta.value?.current ?? "");
+// 兜底：在流式中 && 有 current 文本 时视为“有活动块”
+const hasActiveThink = computed(() => {
+  const flagFromMeta = !!thinkMeta.value?.hasActiveThink;
+  const streaming = (props.message as any)?.isStreaming || !!props.isStreaming;
+  const hasCurrent = String(activeThinkContent.value).trim().length > 0;
+  return flagFromMeta || (streaming && hasCurrent);
+});
+
+const activeThinkNonEmpty = computed(() => {
+  const s = String(activeThinkContent.value || "")
+    .replace(/\s+/g, " ")
+    .trim();
+  return hasActiveThink.value && s.length > 0;
+});
+
+// 只有“原文中存在非空 <think> 段”才允许显示（仍遵循你之前的约束：以原文标签为准）
+const showThink = computed(
+  () => completedThinkBlocks.value.length > 0 || shouldShowActiveThink.value
 );
-const showThink = computed(() => hasThinkEver.value || hasActiveThink.value);
 
 // ====== 主体渲染内容（纯主内容，剥离 think；流式时走打字机）======
 const processedContent = computed<MessageContent[]>(() => {
@@ -156,12 +264,10 @@ const processedContent = computed<MessageContent[]>(() => {
 
   const visible = usingTyping
     ? (typewriter?.displayedText?.value ?? "")
-    : typeof props.message.content === "string"
-      ? (props.message.content as string)
-      : "";
+    : normalizedRawContent.value; // ✅ 统一来源
 
   const text = stripThink(visible);
-  return text ? [{ type: "text", data: { text } }] : [];
+  return text ? [{ type: MESSAGE_TYPES.TEXT, data: { text } }] : [];
 });
 
 // 工具函数 & 展示辅助
@@ -224,9 +330,18 @@ const downloadFile = (url: string, downloadUrl?: string) => {
 // 简单 Markdown 渲染（保持你的原逻辑）
 const renderMarkdown = (markdown: string) => {
   let html = markdown;
-  html = html.replace(/^### (.*$)/gim, "<h3>$1</h3>");
-  html = html.replace(/^## (.*$)/gim, "<h2>$1</h2>");
-  html = html.replace(/^# (.*$)/gim, "<h1>$1</h1>");
+
+  // 1) 标题：允许最多 3 个空格缩进 & 允许 # 号后无空格
+  //    例：###1. 生死观  或  ### 1. 生死观  都能匹配
+  html = html.replace(
+    /^\s{0,3}(#{1,6})\s*(.*)$/gm,
+    (_m, hashes: string, text: string) => {
+      const level = Math.min(hashes.length, 6);
+      return `<h${level}>${text.trim()}</h${level}>`;
+    }
+  );
+
+  // 2) 粗体 / 斜体 / 行内代码 / 链接（保持你的原逻辑）
   html = html.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
   html = html.replace(/\*(.*?)\*/g, "<em>$1</em>");
   html = html.replace(/`([^`]+)`/g, "<code>$1</code>");
@@ -234,32 +349,48 @@ const renderMarkdown = (markdown: string) => {
     /\[([^\]]+)\]\(([^)]+)\)/g,
     '<a href="$2" target="_blank" class="text-blue-600 hover:underline">$1</a>'
   );
-  html = html.replace(/^\- (.*$)/gim, "<li>$1</li>");
-  html = html.replace(/(<li>.*<\/li>)/s, "<ul>$1</ul>");
-  html = html.replace(/^\d+\. (.*$)/gim, "<li>$1</li>");
-  html = html.replace(/^> (.*$)/gim, "<blockquote>$1</blockquote>");
-  const tableRegex = /\|(.+)\|\n\|[-\s|]+\|\n((?:\|.+\|\n?)*)/g;
+
+  // 3) 引用（允许缩进）
+  html = html.replace(/^\s*>\s+(.*)$/gm, "<blockquote>$1</blockquote>");
+
+  // 4) 表格（保持你的原逻辑）
+  const tableRegex = /\|(.+)\|\n\|[-\s|:]+\|\n((?:\|.+\|\n?)*)/g;
   html = html.replace(tableRegex, (match, header, rows) => {
-    const headerCells = header
+    const headerCells = String(header)
       .split("|")
-      .map((c) => c.trim())
+      .map((c: string) => c.trim())
       .filter(Boolean);
     const headerRow =
-      "<tr>" + headerCells.map((c) => `<th>${c}</th>`).join("") + "</tr>";
-    const bodyRows = rows
+      "<tr>" +
+      headerCells.map((c: string) => `<th>${c}</th>`).join("") +
+      "</tr>";
+    const bodyRows = String(rows)
       .trim()
       .split("\n")
-      .map((row) => {
+      .map((row: string) => {
         const cells = row
           .split("|")
-          .map((c) => c.trim())
+          .map((c: string) => c.trim())
           .filter(Boolean);
-        return "<tr>" + cells.map((c) => `<td>${c}</td>`).join("") + "</tr>";
+        return (
+          "<tr>" + cells.map((c: string) => `<td>${c}</td>`).join("") + "</tr>"
+        );
       })
       .join("");
     return `<table class="border-collapse border border-gray-300"><thead>${headerRow}</thead><tbody>${bodyRows}</tbody></table>`;
   });
+
+  // 5) 无序列表：允许缩进（- * +），先每行各自包一层 <ul>，再合并相邻的 <ul>
+  html = html.replace(/^\s*[-*+]\s+(.*)$/gm, "<ul><li>$1</li></ul>");
+  html = html.replace(/<\/ul>\s*<ul>/g, "");
+
+  // 6) 有序列表：允许缩进（1. 2. ...），同样先包 <ol> 再合并
+  html = html.replace(/^\s*\d+\.\s+(.*)$/gm, "<ol><li>$1</li></ol>");
+  html = html.replace(/<\/ol>\s*<ol>/g, "");
+
+  // 7) 换行（放到最后）
   html = html.replace(/\n/g, "<br>");
+
   return html;
 };
 </script>
@@ -332,6 +463,7 @@ const renderMarkdown = (markdown: string) => {
         </div>
 
         <!-- Think 区块（优先使用 meta.think；无则回退 parser） -->
+        <!-- Think 区块（只有正文包含 <think> 才出现） -->
         <div v-if="showThink" class="space-y-2 mb-4">
           <!-- 已完成的 think 块：保持默认，是否展开你随意 -->
           <ThinkBlock
@@ -345,11 +477,11 @@ const renderMarkdown = (markdown: string) => {
 
           <!-- 正在进行的 think 块：默认收起 + 标题“思考中...” -->
           <ThinkBlock
-            v-if="
-              (message as any).meta?.think?.hasActiveThink &&
-              (message as any).meta?.think?.current
+            v-if="shouldShowActiveThink"
+            :content="
+              ((message as any).meta?.think ?? (message as any).metadata?.think)
+                ?.current
             "
-            :content="(message as any).meta?.think?.current"
             :index="completedThinkBlocks.length"
             :is-streaming="true"
             :default-expanded="false"
@@ -361,28 +493,29 @@ const renderMarkdown = (markdown: string) => {
         <!-- 主体（正文） -->
         <div class="space-y-3">
           <template v-for="(content, index) in processedContent" :key="index">
-            <!-- 文本 -->
+            <!-- 文本（保持原样式容器，只把插值改成 v-html） -->
             <div
-              v-if="content.type === 'text'"
+              v-if="content.type === MESSAGE_TYPES.TEXT"
               class="prose prose-sm max-w-none"
             >
-              <p class="text-gray-800 whitespace-pre-wrap">
-                {{ content.data.text }}
-                <span
-                  v-if="
-                    (message as any).role === 'assistant' &&
-                    ((message as any).isStreaming || isStreaming) &&
-                    !(message as any).isThinking
-                  "
-                  class="inline-block w-0.5 h-4 bg-blue-500 ml-0.5 animate-pulse"
-                  style="animation: blink 1s infinite"
-                />
-              </p>
+              <div
+                class="text-gray-800 whitespace-pre-wrap markdown-content"
+                v-html="renderMarkdown(content.data.text)"
+              ></div>
+              <span
+                v-if="
+                  (message as any).role === 'assistant' &&
+                  ((message as any).isStreaming || isStreaming) &&
+                  !(message as any).isThinking
+                "
+                class="inline-block w-0.5 h-4 bg-blue-500 ml-0.5 animate-pulse"
+                style="animation: blink 1s infinite"
+              />
             </div>
 
             <!-- Markdown -->
             <div
-              v-else-if="content.type === 'markdown'"
+              v-else-if="content.type === MESSAGE_TYPES.MARKDOWN"
               class="prose prose-sm max-w-none"
             >
               <div class="bg-gray-50 rounded-lg p-4 border">
@@ -405,7 +538,7 @@ const renderMarkdown = (markdown: string) => {
 
             <!-- 代码 -->
             <div
-              v-else-if="content.type === 'code'"
+              v-else-if="content.type === MESSAGE_TYPES.CODE"
               class="bg-gray-900 rounded-lg overflow-hidden"
             >
               <div
@@ -440,7 +573,10 @@ const renderMarkdown = (markdown: string) => {
             </div>
 
             <!-- 图片 -->
-            <div v-else-if="content.type === 'image'" class="space-y-2">
+            <div
+              v-else-if="content.type === MESSAGE_TYPES.IMAGE"
+              class="space-y-2"
+            >
               <div
                 class="relative inline-block rounded-lg overflow-hidden border border-gray-200"
               >
@@ -473,7 +609,10 @@ const renderMarkdown = (markdown: string) => {
             </div>
 
             <!-- 视频 -->
-            <div v-else-if="content.type === 'video'" class="space-y-2">
+            <div
+              v-else-if="content.type === MESSAGE_TYPES.VIDEO"
+              class="space-y-2"
+            >
               <div
                 class="relative rounded-lg overflow-hidden border border-gray-200 bg-black"
               >
@@ -503,7 +642,7 @@ const renderMarkdown = (markdown: string) => {
 
             <!-- 卡片 -->
             <div
-              v-else-if="content.type === 'card'"
+              v-else-if="content.type === MESSAGE_TYPES.CARD"
               class="max-w-sm border border-gray-200 rounded-lg overflow-hidden bg-white shadow-sm"
             >
               <div v-if="content.data.image" class="aspect-[4/3] bg-gray-100">
@@ -549,7 +688,7 @@ const renderMarkdown = (markdown: string) => {
 
             <!-- 文件 -->
             <div
-              v-else-if="content.type === 'file'"
+              v-else-if="content.type === MESSAGE_TYPES.FILE"
               class="border border-gray-200 rounded-lg p-4 bg-gray-50"
             >
               <div class="flex items-center space-x-3">
@@ -586,7 +725,7 @@ const renderMarkdown = (markdown: string) => {
 
             <!-- 系统消息 -->
             <div
-              v-else-if="content.type === 'system'"
+              v-else-if="content.type === MESSAGE_TYPES.SYSTEM"
               class="rounded-lg p-3"
               :class="{
                 'bg-blue-50 border border-blue-200':
@@ -664,6 +803,7 @@ const renderMarkdown = (markdown: string) => {
             size="xs"
             variant="ghost"
             icon="i-heroicons-trash"
+            color="red"
             @click="emit('delete')"
             >删除</UButton
           >

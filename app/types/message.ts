@@ -101,7 +101,7 @@ export interface SystemContent {
 export interface ChatMessage {
   id: string;
   role: ChatRole;
-  content: MessageContent;
+  content: string | MessageContent | MessageContent[];
   timestamp: Date;
   isThinking?: boolean; // 标记消息是否处于思考状态
   metadata?: Record<string, any>;
