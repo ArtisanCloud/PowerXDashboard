@@ -769,6 +769,8 @@
       "disconnectedPlaceholder": "Connection lost, cannot send message",
       "enterToSend": "Enter to send",
       "shiftEnterNewLine": "Shift+Enter for new line",
+      "ctrlEnterToSend": "Ctrl/Cmd+Enter to send",
+      "enterNewLine": "Enter for new line",
       "model": "Model",
       "temperature": "Temperature",
       "cancel": "Cancel",

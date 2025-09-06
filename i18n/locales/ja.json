@@ -442,6 +442,8 @@
       "disconnectedPlaceholder": "接続が切断されました。メッセージを送信できません",
       "enterToSend": "Enter で送信",
       "shiftEnterNewLine": "Shift+Enter で改行",
+      "ctrlEnterToSend": "Ctrl/Cmd+Enter で送信",
+      "enterNewLine": "Enter で改行",
       "model": "モデル",
       "temperature": "温度",
       "cancel": "キャンセル",

@@ -249,6 +249,8 @@
       "disconnectedPlaceholder": "연결이 끊어져 메시지를 보낼 수 없습니다",
       "enterToSend": "Enter로 전송",
       "shiftEnterNewLine": "Shift+Enter로 줄바꿈",
+      "ctrlEnterToSend": "Ctrl/Cmd+Enter로 전송",
+      "enterNewLine": "Enter로 줄바꿈",
       "model": "모델",
       "temperature": "온도",
       "cancel": "취소",

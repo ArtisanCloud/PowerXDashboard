@@ -770,6 +770,8 @@
       "disconnectedPlaceholder": "连接断开，无法发送消息",
       "enterToSend": "Enter 发送",
       "shiftEnterNewLine": "Shift+Enter 换行",
+      "ctrlEnterToSend": "Ctrl/Cmd+Enter 发送",
+      "enterNewLine": "Enter 换行",
       "model": "模型",
       "temperature": "温度",
       "cancel": "取消",

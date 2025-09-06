@@ -290,14 +290,14 @@ function sendMessage() {
 }
 
 function handleKeydown(e: KeyboardEvent) {
-  // Enter发送（IME 未组合时），Shift+Enter 换行；同时支持 Ctrl/Cmd+Enter 快捷发送
-  const sendByEnter = e.key === "Enter" && !e.shiftKey && !isComposing.value;
+  // 只支持组合键发送：Shift+Enter 换行，Ctrl/Cmd+Enter 发送
   const sendByModEnter = (e.ctrlKey || e.metaKey) && e.key === "Enter";
 
-  if (sendByEnter || sendByModEnter) {
+  if (sendByModEnter) {
     e.preventDefault();
     sendMessage();
   }
+  // 单独按 Enter 键时不发送消息，允许换行
 }
 
 function adjustTextareaHeight() {
@@ -771,8 +771,8 @@ function onSendClick() {
             <div v-else></div>
 
             <div class="hidden sm:flex items-center gap-4">
-              <span>{{ t("agent.chat.enterToSend") }}</span>
-              <span>{{ t("agent.chat.shiftEnterNewLine") }}</span>
+              <span>{{ t("agent.chat.ctrlEnterToSend") }}</span>
+              <span>{{ t("agent.chat.enterNewLine") }}</span>
             </div>
           </div>
         </div>
