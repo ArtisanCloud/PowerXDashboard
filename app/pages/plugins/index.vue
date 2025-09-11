@@ -3,7 +3,7 @@
     <div class="flex items-center justify-between">
       <div>
         <h1 class="text-lg font-semibold text-[var(--text-primary)]">
-          插件市场
+          插件应用广场
         </h1>
         <p class="text-sm text-[var(--text-secondary)]">
           浏览并安装扩展功能插件，增强系统能力

@@ -46,7 +46,7 @@ const mockSearchData: SearchResult[] = [
   },
   {
     id: "4",
-    title: "插件市场",
+    title: "插件应用广场",
     content: "丰富的插件生态，包括各种功能扩展和第三方集成",
     type: "plugin",
     category: "扩展功能",
