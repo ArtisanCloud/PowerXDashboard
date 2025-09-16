@@ -64,6 +64,8 @@
     "agent": "智能助手",
     "workflow": "工作流",
     "pluginMarketplace": "应用广场",
+    "pluginsInstalled": "已安装",
+    "pluginsMarket": "应用市场",
     "plugins": "插件",
     "settings": "设置",
     "userManagement": "用户管理",

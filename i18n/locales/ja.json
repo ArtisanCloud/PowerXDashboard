@@ -86,7 +86,9 @@
     },
     "aiSettings": "モデル設定",
     "workflow": "ワークフロー",
-    "pluginMarketplace": "プラグインマーケット"
+    "pluginMarketplace": "マーケット",
+    "pluginsInstalled": "インストール済み",
+    "pluginsMarket": "マーケット"
   },
   "header": {
     "profile": "プロフィール",

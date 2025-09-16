@@ -12,10 +12,17 @@
           </div>
         </div>
       </div>
-      <div class="flex items-center gap-2">
-        <UButton variant="ghost" icon="i-heroicons-arrow-left" :to="'/plugins/market'">返回</UButton>
-        <UButton v-if="isRoot && !sysInstalled" color="primary" icon="i-heroicons-arrow-down-tray" @click="installOpen = true">安装</UButton>
-        <UButton v-if="isRoot && sysInstalled" variant="ghost" color="red" icon="i-heroicons-trash" @click="uninstallPlugin">卸载</UButton>
+      <div class="flex flex-wrap items-center gap-2">
+        <UButton size="sm" variant="ghost" icon="i-heroicons-arrow-left" :to="'/plugins/market'">返回</UButton>
+        <UButton v-if="isRoot && !sysInstalled" size="sm" color="primary" icon="i-heroicons-arrow-down-tray" @click="installOpen = true">安装</UButton>
+        <UButton
+          v-if="isRoot && sysInstalled"
+          size="sm"
+          variant="outline"
+          color="error"
+          icon="i-heroicons-trash"
+          @click="uninstallPlugin"
+        >卸载</UButton>
         <!-- 顶部不放启用/停用与刷新，避免与下方系统卡片重复 -->
       </div>
     </div>
@@ -91,12 +98,22 @@
           <div class="text-sm text-[var(--text-secondary)] space-y-2">
             <div>系统启用：<UBadge :color="sysEnabled ? 'green' : 'neutral'" size="xs">{{ sysEnabled ? '是' : '否' }}</UBadge></div>
             <div>状态：{{ sysStatus || '-' }}</div>
-            <div class="flex items-center gap-2 mt-2">
-              <UButton v-if="isRoot" :color="sysEnabled ? 'neutral' : 'primary'" :icon="sysEnabled ? 'i-heroicons-pause' : 'i-heroicons-play'" @click="toggleEnable">
+             <div class="flex flex-wrap items-center gap-2 mt-2">
+              <UButton
+                v-if="isRoot"
+                size="sm"
+                :variant="sysEnabled ? 'outline' : 'solid'"
+                :color="sysEnabled ? 'error' : 'primary'"
+                :icon="sysEnabled ? 'i-heroicons-pause' : 'i-heroicons-play'"
+                @click="toggleEnable"
+              >
                 {{ sysEnabled ? '停用' : '启用' }}
               </UButton>
-              <UButton variant="ghost" icon="i-heroicons-arrow-path" @click="refreshStatus">刷新状态</UButton>
-            </div>
+              <UButton v-if="isRoot && sysInstalled" size="sm" variant="outline" icon="i-heroicons-arrow-path" @click="restartPlugin">重启</UButton>
+              <UButton v-if="isRoot && sysInstalled" size="sm" variant="outline" icon="i-heroicons-arrow-up-on-square" @click="switchVersion">切换版本</UButton>
+              <UButton size="sm" variant="ghost" icon="i-heroicons-clipboard-document-list" @click="openLogs">查看日志</UButton>
+              <UButton size="sm" variant="ghost" icon="i-heroicons-arrow-path" @click="refreshStatus">刷新状态</UButton>
+             </div>
           </div>
         </div>
 
@@ -108,12 +125,28 @@
               <UBadge :color="tenantEnabled ? 'green' : 'neutral'" size="xs">{{ tenantEnabled ? '是' : '否' }}</UBadge>
             </div>
             <div v-if="clientId">client_id：<code>{{ clientId }}</code></div>
-            <div class="flex items-center gap-2 mt-2">
-              <UButton v-if="isTenantAdmin" :color="tenantEnabled ? 'neutral' : 'primary'" :icon="tenantEnabled ? 'i-heroicons-pause' : 'i-heroicons-play'" @click="toggleTenant">
+             <div class="flex flex-wrap items-center gap-2 mt-2">
+              <UButton
+                v-if="isTenantAdmin"
+                size="sm"
+                :variant="tenantEnabled ? 'outline' : 'solid'"
+                :color="tenantEnabled ? 'error' : 'primary'"
+                :icon="tenantEnabled ? 'i-heroicons-pause' : 'i-heroicons-play'"
+                @click="toggleTenant"
+              >
                 {{ tenantEnabled ? '停用本租户' : '启用本租户' }}
               </UButton>
-              <UButton variant="ghost" icon="i-heroicons-arrow-path" @click="refreshTenant">刷新</UButton>
-            </div>
+              <UButton v-if="isTenantAdmin && tenantEnabled" size="sm" variant="outline" icon="i-heroicons-key" @click="rotateTenantSecret">轮换密钥</UButton>
+              <UButton
+                v-if="isTenantAdmin"
+                size="sm"
+                variant="outline"
+                color="error"
+                icon="i-heroicons-trash"
+                @click="deleteTenantConfig"
+              >删除配置</UButton>
+              <UButton size="sm" variant="ghost" icon="i-heroicons-arrow-path" @click="refreshTenant">刷新</UButton>
+             </div>
           </div>
         </div>
       </div>
@@ -128,6 +161,7 @@
 import InstallDialog from "~/components/plugins/InstallDialog.vue";
 import type { MarketplacePlugin } from "~/components/plugins/PluginCard.vue";
 import { useUserStore } from "~/stores/user";
+import { LazyPluginsLogsModal, LazyPluginsSwitchVersionModal } from "#components";
 
 definePageMeta({
   layout: "default",
@@ -268,6 +302,88 @@ async function toggleTenant() {
   }
 }
 
+async function rotateTenantSecret() {
+  const { useConfirm } = await import('~/composables/useConfirm')
+  const { confirm } = useConfirm()
+  const ok = await confirm({
+    title: '轮换密钥',
+    description: '旧密钥将立即失效，请及时更新插件端配置。',
+    message: '确定要为本租户轮换密钥吗？',
+    confirmLabel: '轮换',
+    cancelLabel: '取消',
+    tone: 'warning'
+  })
+  if (!ok) return
+  try {
+    const { useAdminPluginsService } = await import('~/composables/api/services/adminPluginsService');
+    const svc = useAdminPluginsService();
+    const resp: any = await svc.rotateCredentials(id.value);
+    const secret = resp?.client_secret || resp?.secret || ''
+    const cid = resp?.client_id || resp?.clientId
+    if (cid) clientId.value = cid
+    if (secret) {
+      const { confirm: info } = useConfirm()
+      await info({
+        title: '新密钥（仅此一次展示）',
+        message: secret,
+        confirmLabel: '已复制',
+        cancelLabel: '',
+        tone: 'info'
+      })
+    }
+  } catch (e) {
+    console.error('rotate credentials failed:', e)
+  }
+}
+
+async function deleteTenantConfig() {
+  const { useConfirm } = await import('~/composables/useConfirm')
+  const { confirm } = useConfirm()
+  const ok = await confirm({
+    title: '删除本租户配置',
+    description: '删除后本租户将无法访问该插件，需重新启用生成新密钥。',
+    message: '确定删除本租户配置吗？',
+    confirmLabel: '删除',
+    cancelLabel: '取消',
+    tone: 'danger'
+  })
+  if (!ok) return
+  try {
+    const { useAdminPluginsService } = await import('~/composables/api/services/adminPluginsService');
+    const svc = useAdminPluginsService();
+    await svc.deleteTenantConfig(id.value)
+    tenantEnabled.value = false
+    clientId.value = ''
+  } catch (e) {
+    console.error('delete tenant config failed:', e)
+  }
+}
+
+async function restartPlugin() {
+  try {
+    const { useAdminPluginsService } = await import('~/composables/api/services/adminPluginsService');
+    const svc = useAdminPluginsService();
+    await svc.restart(id.value)
+    await refreshStatus()
+  } catch (e) { console.error('restart failed:', e) }
+}
+
+async function switchVersion() {
+  const { useOverlay } = await import('#imports')
+  const overlay = useOverlay()
+  const modal = overlay.create(LazyPluginsSwitchVersionModal)
+  const instance = modal.open({ pluginId: id.value, currentVersion: plugin.value?.version })
+  const version = await instance.result
+  if (!version) return
+  try {
+    const { useAdminPluginsService } = await import('~/composables/api/services/adminPluginsService');
+    const svc = useAdminPluginsService();
+    await svc.switchVersion(id.value, version, { enable: true })
+    await refreshMeta();
+    await refreshStatus();
+  } catch (e) { console.error('switch version failed:', e) }
+}
+
 function formatCount(n: number) {
   if (n >= 10000) return (n / 10000).toFixed(1) + "w";
   if (n >= 1000) return (n / 1000).toFixed(1) + "k";
@@ -304,6 +420,13 @@ async function uninstallPlugin() {
   } catch (e) {
     console.error('uninstall failed:', e);
   }
+}
+
+async function openLogs() {
+  const { useOverlay } = await import('#imports')
+  const overlay = useOverlay()
+  const modal = overlay.create(LazyPluginsLogsModal)
+  modal.open({ pluginId: id.value })
 }
 
 </script>

@@ -52,6 +52,11 @@ export const useAdminPluginsService = () => {
     status: async (id: string) => unwrap(await api.get(`${base}/${encodeURIComponent(id)}/status`)),
     logs: async (id: string, params?: Record<string, any>) => unwrap(await api.get(`${base}/${encodeURIComponent(id)}/logs`, { params } as any)),
 
+    // 重启与切换版本
+    restart: async (id: string) => unwrap(await api.post(`${base}/${encodeURIComponent(id)}/restart`)),
+    switchVersion: async (id: string, version: string, payload?: Record<string, any>) =>
+      unwrap(await api.post(`${base}/${encodeURIComponent(id)}/switch_version`, { version, ...(payload || {}) })),
+
     // 租户级
     getTenantConfig: async (id: string) => unwrap(await api.get(`${base}/${encodeURIComponent(id)}/tenant_config`)),
     setTenantEnabled: async (id: string, enabled: boolean) => unwrap(await api.post(`${base}/${encodeURIComponent(id)}/tenant_enable`, { enabled })),

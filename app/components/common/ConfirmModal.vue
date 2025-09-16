@@ -73,7 +73,7 @@ const computedConfirmColor = computed(() => {
 
         <template #footer>
           <div class="flex justify-end gap-2">
-            <UButton color="neutral" variant="subtle" @click="onDismiss">{{ props.cancelLabel || '取消' }}</UButton>
+            <UButton v-if="props.cancelLabel !== ''" color="neutral" variant="subtle" @click="onDismiss">{{ props.cancelLabel || '取消' }}</UButton>
             <UButton :color="computedConfirmColor" @click="onConfirm">{{ props.confirmLabel || '确定' }}</UButton>
           </div>
         </template>
