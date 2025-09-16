@@ -2,32 +2,21 @@
   <div class="space-y-6 p-4 sm:p-6">
     <div class="flex items-center justify-between">
       <div class="flex items-start gap-3">
-        <img
-          v-if="plugin?.icon"
-          :src="plugin?.icon"
-          alt=""
-          class="w-12 h-12 rounded-md object-cover"
-        />
+        <img v-if="plugin?.icon" :src="plugin?.icon" alt="" class="w-12 h-12 rounded-md object-cover" />
         <div>
           <div class="text-xl font-semibold text-[var(--text-primary)]">
-            {{ plugin?.name || "-" }}
+            {{ plugin?.name || id }}
           </div>
           <div class="text-sm text-[var(--text-secondary)]">
-            版本 {{ plugin?.version || "-" }} · 作者
-            {{ plugin?.author || "-" }} · 分类 {{ plugin?.category || "-" }}
+            版本 {{ plugin?.version || "-" }} · 作者 {{ plugin?.author || "-" }} · 分类 {{ plugin?.category || "-" }}
           </div>
         </div>
       </div>
       <div class="flex items-center gap-2">
-        <UButton variant="ghost" icon="i-heroicons-arrow-left" :to="'/plugins'"
-          >返回</UButton
-        >
-        <UButton
-          color="primary"
-          icon="i-heroicons-arrow-down-tray"
-          @click="installOpen = true"
-          >安装</UButton
-        >
+        <UButton variant="ghost" icon="i-heroicons-arrow-left" :to="'/plugins/market'">返回</UButton>
+        <UButton v-if="isRoot && !sysInstalled" color="primary" icon="i-heroicons-arrow-down-tray" @click="installOpen = true">安装</UButton>
+        <UButton v-if="isRoot && sysInstalled" variant="ghost" color="red" icon="i-heroicons-trash" @click="uninstallPlugin">卸载</UButton>
+        <!-- 顶部不放启用/停用与刷新，避免与下方系统卡片重复 -->
       </div>
     </div>
 
@@ -94,80 +83,190 @@
           </div>
         </div>
 
-        <!-- 快速操作 -->
+        <!-- 系统控制 -->
         <div
           class="rounded-lg border border-[var(--border-color)] bg-[var(--card-bg)] p-4"
         >
-          <div class="font-medium text-[var(--text-primary)] mb-3">操作</div>
-          <div class="flex items-center gap-2">
-            <UButton variant="ghost" icon="i-heroicons-eye">文档</UButton>
-            <UButton variant="ghost" icon="i-heroicons-code-bracket"
-              >示例</UButton
-            >
+          <div class="font-medium text-[var(--text-primary)] mb-3">系统运行</div>
+          <div class="text-sm text-[var(--text-secondary)] space-y-2">
+            <div>系统启用：<UBadge :color="sysEnabled ? 'green' : 'neutral'" size="xs">{{ sysEnabled ? '是' : '否' }}</UBadge></div>
+            <div>状态：{{ sysStatus || '-' }}</div>
+            <div class="flex items-center gap-2 mt-2">
+              <UButton v-if="isRoot" :color="sysEnabled ? 'neutral' : 'primary'" :icon="sysEnabled ? 'i-heroicons-pause' : 'i-heroicons-play'" @click="toggleEnable">
+                {{ sysEnabled ? '停用' : '启用' }}
+              </UButton>
+              <UButton variant="ghost" icon="i-heroicons-arrow-path" @click="refreshStatus">刷新状态</UButton>
+            </div>
+          </div>
+        </div>
+
+        <!-- 租户控制（仅当前租户管理员可见） -->
+        <div class="rounded-lg border border-[var(--border-color)] bg-[var(--card-bg)] p-4">
+          <div class="font-medium text-[var(--text-primary)] mb-3">本租户</div>
+          <div class="text-sm text-[var(--text-secondary)] space-y-2">
+            <div>启用：
+              <UBadge :color="tenantEnabled ? 'green' : 'neutral'" size="xs">{{ tenantEnabled ? '是' : '否' }}</UBadge>
+            </div>
+            <div v-if="clientId">client_id：<code>{{ clientId }}</code></div>
+            <div class="flex items-center gap-2 mt-2">
+              <UButton v-if="isTenantAdmin" :color="tenantEnabled ? 'neutral' : 'primary'" :icon="tenantEnabled ? 'i-heroicons-pause' : 'i-heroicons-play'" @click="toggleTenant">
+                {{ tenantEnabled ? '停用本租户' : '启用本租户' }}
+              </UButton>
+              <UButton variant="ghost" icon="i-heroicons-arrow-path" @click="refreshTenant">刷新</UButton>
+            </div>
           </div>
         </div>
       </div>
     </div>
 
     <!-- 安装对话框 -->
-    <InstallDialog
-      v-model="installOpen"
-      :plugin="plugin"
-      @installed="onInstalled"
-    />
+    <InstallDialog v-model="installOpen" :plugin="plugin" @installed="onInstalled" />
   </div>
 </template>
 
 <script setup lang="ts">
 import InstallDialog from "~/components/plugins/InstallDialog.vue";
 import type { MarketplacePlugin } from "~/components/plugins/PluginCard.vue";
+import { useUserStore } from "~/stores/user";
 
 definePageMeta({
   layout: "default",
 });
 
 const route = useRoute();
-
-const db: Record<string, MarketplacePlugin> = {
-  "workflow-tools": {
-    id: "workflow-tools",
-    name: "Workflow 工具集",
-    description: "为工作流提供常用节点与模板集合，开箱即用。",
-    version: "1.4.2",
-    author: "PowerX Team",
-    category: "AI",
-    installs: 12432,
-    icon: "https://avatars.githubusercontent.com/u/9919?s=64&v=4",
-    tags: ["workflow", "ai", "nodes"],
-  },
-  "crm-sync": {
-    id: "crm-sync",
-    name: "CRM 同步",
-    description: "与主流 CRM 平台进行客户/订单同步。",
-    version: "0.9.8",
-    author: "ACME",
-    category: "集成",
-    installs: 5421,
-    icon: "https://avatars.githubusercontent.com/u/69631?s=64&v=4",
-    tags: ["crm", "sync", "integration"],
-  },
-  "chart-pro": {
-    id: "chart-pro",
-    name: "Chart Pro 图表",
-    description: "丰富可视化组件和图表主题，轻松构建分析看板。",
-    version: "2.3.0",
-    author: "DataViz Inc.",
-    category: "可视化",
-    installs: 9876,
-    icon: "https://avatars.githubusercontent.com/u/317889?s=64&v=4",
-    tags: ["chart", "visualization"],
-  },
-};
-
 const id = computed(() => String(route.params.id || ""));
-const plugin = computed<MarketplacePlugin | undefined>(() => db[id.value]);
+const plugin = ref<MarketplacePlugin | undefined>(undefined);
 
 const installOpen = ref(false);
+
+// 系统状态
+const sysEnabled = ref<boolean>(false);
+const sysInstalled = ref<boolean>(false);
+const sysStatus = ref<string>("");
+const tenantEnabled = ref<boolean>(false);
+const clientId = ref<string>("");
+
+const showSecret = ref(false);
+const oneTimeSecret = ref<string>("");
+
+async function refreshStatus() {
+  try {
+    const { useAdminPluginsService } = await import("~/composables/api/services/adminPluginsService");
+    const svc = useAdminPluginsService();
+    const s: any = await svc.status(id.value);
+    sysStatus.value = typeof s === 'string' ? s : s?.state || s?.status || '';
+    // 如果 marketplace 提供了 isSystemEnabled，可补充；否则从状态推断
+    sysEnabled.value = Boolean(s?.enabled ?? s?.isSystemEnabled ?? (sysStatus.value && sysStatus.value !== 'disabled'));
+  } catch (e) {
+    console.warn('load status failed:', e);
+  }
+}
+
+async function toggleEnable() {
+  try {
+    const { useAdminPluginsService } = await import("~/composables/api/services/adminPluginsService");
+    const svc = useAdminPluginsService();
+    if (sysEnabled.value) await svc.disable(id.value);
+    else await svc.enable(id.value);
+    await refreshStatus();
+    await refreshMeta();
+  } catch (e) {
+    console.error('toggle enable failed:', e);
+  }
+}
+
+onMounted(async () => {
+  // 加载详情（从 marketplace v2 里筛一条）
+  try {
+    const { useAdminPluginsService } = await import("~/composables/api/services/adminPluginsService");
+    const svc = useAdminPluginsService();
+    const list = await svc.getMarketplaceV2();
+    const item = Array.isArray(list) ? (list as any[]).find((p) => String(p.id || p.slug || p.name || '') === id.value) : undefined;
+    if (item) {
+      plugin.value = {
+        id: String(item.id || item.slug || item.name || ''),
+        name: item.name || item.id || '-',
+        description: item.description || '',
+        version: item.version || '-',
+        author: item.author || '',
+        category: item.category || '',
+        installs: Number(item.installs || item.downloadCount || 0),
+        icon: item.icon,
+        tags: Array.isArray(item.tags) ? item.tags : [],
+      };
+      sysInstalled.value = !!(item as any).isSystemInstalled;
+      if ((item as any).isSystemEnabled !== undefined) {
+        sysEnabled.value = !!(item as any).isSystemEnabled;
+      }
+    }
+  } catch (e) {
+    console.warn('load plugin detail failed:', e);
+  }
+  await refreshStatus();
+  await refreshTenant();
+});
+
+async function refreshMeta() {
+  try {
+    const { useAdminPluginsService } = await import("~/composables/api/services/adminPluginsService");
+    const svc = useAdminPluginsService();
+    const list = await svc.getMarketplaceV2();
+    const item = Array.isArray(list) ? (list as any[]).find((p) => String(p.id || p.slug || p.name || '') === id.value) : undefined;
+    if (item) {
+      sysInstalled.value = !!(item as any).isSystemInstalled;
+      if ((item as any).isSystemEnabled !== undefined) sysEnabled.value = !!(item as any).isSystemEnabled;
+    }
+  } catch (e) {
+    console.warn('refresh meta failed:', e);
+  }
+}
+
+async function refreshTenant() {
+  try {
+    const { useAdminPluginsService } = await import("~/composables/api/services/adminPluginsService");
+    const svc = useAdminPluginsService();
+    const conf: any = await svc.getTenantConfig(id.value);
+    tenantEnabled.value = Boolean(conf?.enabled ?? conf?.isEnabled);
+    clientId.value = conf?.client_id || conf?.clientId || clientId.value || '';
+  } catch (e) {
+    console.warn('load tenant config failed:', e);
+  }
+}
+
+async function toggleTenant() {
+  try {
+    const { useAdminPluginsService } = await import("~/composables/api/services/adminPluginsService");
+    const svc = useAdminPluginsService();
+    if (tenantEnabled.value) {
+      const { useConfirm } = await import('~/composables/useConfirm')
+      const { confirm } = useConfirm()
+      const ok = await confirm({
+        title: '停用本租户',
+        description: '仅影响当前租户的访问，其他租户不受影响。',
+        message: '确定要停用本租户对该插件的访问吗？',
+        confirmLabel: '停用',
+        cancelLabel: '取消',
+        tone: 'warning'
+      })
+      if (!ok) return
+      await svc.setTenantEnabled(id.value, false);
+      tenantEnabled.value = false;
+    } else {
+      const resp: any = await svc.setTenantEnabled(id.value, true);
+      // 首次启用可能返回一次性明文 secret
+      const secret = resp?.client_secret || resp?.secret || '';
+      const cid = resp?.client_id || resp?.clientId;
+      if (cid) clientId.value = cid;
+      if (secret) {
+        oneTimeSecret.value = secret;
+        showSecret.value = true;
+      }
+      tenantEnabled.value = true;
+    }
+  } catch (e) {
+    console.error('toggle tenant failed:', e);
+  }
+}
 
 function formatCount(n: number) {
   if (n >= 10000) return (n / 10000).toFixed(1) + "w";
@@ -179,4 +278,32 @@ function onInstalled(payload: { plugin: MarketplacePlugin; state: any }) {
   // TODO: 上报安装成功，刷新状态
   console.log("Installed:", payload);
 }
+// 角色
+const userStore = useUserStore();
+const isRoot = computed(() => userStore.isRoot);
+const isTenantAdmin = computed(() => userStore.isCurrentTenantAdmin);
+
+async function uninstallPlugin() {
+  const { useConfirm } = await import('~/composables/useConfirm')
+  const { confirm } = useConfirm()
+  const ok = await confirm({
+    title: '卸载插件',
+    description: '此操作将影响所有租户，且可能中断服务访问。',
+    message: '确定卸载该插件？卸载将影响所有租户。',
+    confirmLabel: '卸载',
+    cancelLabel: '取消',
+    tone: 'danger'
+  })
+  if (!ok) return
+  try {
+    const { useAdminPluginsService } = await import('~/composables/api/services/adminPluginsService');
+    const svc = useAdminPluginsService();
+    await svc.uninstall(id.value);
+    await refreshMeta();
+    await refreshStatus();
+  } catch (e) {
+    console.error('uninstall failed:', e);
+  }
+}
+
 </script>

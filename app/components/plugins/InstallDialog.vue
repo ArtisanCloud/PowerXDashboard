@@ -28,6 +28,23 @@
 
         <div class="mt-4">
           <UForm :state="state" class="space-y-4">
+            <!-- 安装来源：URL（对接后端 install/url） -->
+            <div class="rounded-md border border-[var(--border-color)] p-3 space-y-3">
+              <div class="text-sm font-medium text-[var(--text-primary)]">安装包来源</div>
+              <UInput v-model="state.url" placeholder="https://example.com/plugin.zip">
+                <template #leading>
+                  <span class="inline-block shrink-0">
+                    <UIcon name="i-heroicons-link" />
+                  </span>
+                </template>
+              </UInput>
+              <UInput v-model="state.sha256" placeholder="可选：期望的 SHA256 校验值" />
+              <div class="flex items-center gap-2">
+                <UCheckbox v-model="state.enableAfterInstall" />
+                <span class="text-sm text-[var(--text-secondary)]">安装后立即启用</span>
+              </div>
+              <div class="text-xs text-[var(--text-secondary)]">不填写 URL 将按示例演示，不向后端发送安装请求。</div>
+            </div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label class="block text-sm mb-1 text-[var(--text-secondary)]"
@@ -142,6 +159,10 @@ const scopes = ["用户级", "组织级", "系统级"];
 const envOptions = ["default", "staging", "production"];
 
 const state = reactive({
+  // 对接后端安装 URL
+  url: "",
+  sha256: "",
+  enableAfterInstall: true,
   scope: "用户级",
   namespace: "",
   env: "default",
@@ -167,8 +188,15 @@ async function confirmInstall() {
   }
   installing.value = true;
   try {
-    // TODO: 调用后端安装接口
-    await new Promise((r) => setTimeout(r, 800));
+    // 若填写了 URL，则走后端安装接口
+    if (state.url) {
+      const { useAdminPluginsService } = await import("~/composables/api/services/adminPluginsService");
+      const svc = useAdminPluginsService();
+      await svc.installFromUrl({ url: state.url, sha256: state.sha256 || undefined, enable: !!state.enableAfterInstall });
+    } else {
+      // 演示占位：保留原行为
+      await new Promise((r) => setTimeout(r, 600));
+    }
     emit("installed", {
       plugin: props.plugin,
       state: JSON.parse(JSON.stringify(state)),
