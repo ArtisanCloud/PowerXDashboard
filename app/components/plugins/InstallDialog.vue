@@ -1,49 +1,48 @@
 <template>
-  <UModal
-    v-model="open"
-    title="install-plugin-title"
-    description="install-plugin-desc"
-    :ui="{ width: 'sm:max-w-lg' }"
-  >
+  <UModal v-model="open" :title="plugin ? '安装插件' : '安装插件'" :description="plugin ? (plugin.name || '') : '选择安装来源：远程URL或本地包'" :ui="{ width: 'sm:max-w-lg' }">
     <template #content>
       <div class="p-4">
         <div class="flex items-start gap-3">
-          <img
-            v-if="plugin?.icon"
-            :src="plugin?.icon"
-            alt=""
-            class="w-10 h-10 rounded-md object-cover"
-          />
+          <img v-if="plugin?.icon" :src="plugin?.icon" alt="" class="w-10 h-10 rounded-md object-cover" />
           <div class="flex-1">
-            <div class="font-medium text-[var(--text-primary)]">
-              安装插件：{{ plugin?.name || "-" }}
-            </div>
-            <div class="text-xs text-[var(--text-secondary)]">
-              版本：{{ plugin?.version || "-" }} · 作者：{{
-                plugin?.author || "-"
-              }}
-            </div>
+            <div class="font-medium text-[var(--text-primary)]">{{ plugin ? `安装插件：${plugin?.name}` : '安装插件' }}</div>
+            <div v-if="plugin" class="text-xs text-[var(--text-secondary)]">版本：{{ plugin?.version || '-' }} · 作者：{{ plugin?.author || '-' }}</div>
           </div>
         </div>
 
         <div class="mt-4">
           <UForm :state="state" class="space-y-4">
+            <!-- 安装来源选择 -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm mb-1 text-[var(--text-secondary)]">安装方式</label>
+                <USelect v-model="state.installMode" :items="['远程URL','本地上传']" />
+              </div>
+              <div class="flex items-center gap-3 mt-6 md:mt-8">
+                <USwitch v-model="state.enableAfterInstall" />
+                <span class="text-sm text-[var(--text-secondary)]">安装后立即启用</span>
+              </div>
+            </div>
+
             <!-- 安装来源：URL（对接后端 install/url） -->
             <div class="rounded-md border border-[var(--border-color)] p-3 space-y-3">
               <div class="text-sm font-medium text-[var(--text-primary)]">安装包来源</div>
-              <UInput v-model="state.url" placeholder="https://example.com/plugin.zip">
+              <UInput v-if="state.installMode === '远程URL'" v-model="state.url" placeholder="https://example.com/plugin.zip">
                 <template #leading>
                   <span class="inline-block shrink-0">
                     <UIcon name="i-heroicons-link" />
                   </span>
                 </template>
               </UInput>
-              <UInput v-model="state.sha256" placeholder="可选：期望的 SHA256 校验值" />
-              <div class="flex items-center gap-2">
-                <UCheckbox v-model="state.enableAfterInstall" />
-                <span class="text-sm text-[var(--text-secondary)]">安装后立即启用</span>
+              <UInput v-if="state.installMode === '远程URL'" v-model="state.sha256" placeholder="可选：期望的 SHA256 校验值" />
+
+              <div v-if="state.installMode === '本地上传'" class="space-y-2">
+                <label class="block text-sm text-[var(--text-secondary)]">选择安装包（.zip）</label>
+                <input type="file" accept=".zip" @change="onFileChange" class="block w-full text-sm" />
+                <div v-if="state.fileName" class="text-xs text-[var(--text-secondary)]">已选择：{{ state.fileName }}</div>
               </div>
-              <div class="text-xs text-[var(--text-secondary)]">不填写 URL 将按示例演示，不向后端发送安装请求。</div>
+
+              <div class="text-xs text-[var(--text-secondary)]">不填写 URL 且不选择本地包将不会发起安装请求。</div>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
@@ -80,9 +79,7 @@
               </div>
               <div class="flex items-center gap-3 mt-6 md:mt-8">
                 <USwitch v-model="state.autoUpdate" />
-                <span class="text-sm text-[var(--text-secondary)]"
-                  >自动更新</span
-                >
+                <span class="text-sm text-[var(--text-secondary)]">自动更新</span>
               </div>
             </div>
 
@@ -123,14 +120,7 @@
 
         <div class="mt-5 flex items-center justify-end gap-2">
           <UButton variant="ghost" @click="close">取消</UButton>
-          <UButton
-            color="primary"
-            :loading="installing"
-            @click="confirmInstall"
-            icon="i-heroicons-arrow-down-tray"
-          >
-            安装
-          </UButton>
+          <UButton color="primary" :loading="installing" @click="confirmInstall" icon="i-heroicons-arrow-down-tray">安装</UButton>
         </div>
       </div>
     </template>
@@ -159,10 +149,13 @@ const scopes = ["用户级", "组织级", "系统级"];
 const envOptions = ["default", "staging", "production"];
 
 const state = reactive({
+  installMode: '远程URL' as '远程URL' | '本地上传',
   // 对接后端安装 URL
   url: "",
   sha256: "",
   enableAfterInstall: true,
+  file: null as File | null,
+  fileName: '',
   scope: "用户级",
   namespace: "",
   env: "default",
@@ -181,6 +174,13 @@ function close() {
   open.value = false;
 }
 
+function onFileChange(e: Event) {
+  const input = e.target as HTMLInputElement
+  const f = input.files && input.files[0]
+  state.file = f || null
+  state.fileName = f ? f.name : ''
+}
+
 async function confirmInstall() {
   if (!props.plugin) {
     close();
@@ -188,11 +188,17 @@ async function confirmInstall() {
   }
   installing.value = true;
   try {
-    // 若填写了 URL，则走后端安装接口
-    if (state.url) {
+    if (state.installMode === '远程URL' && state.url) {
       const { useAdminPluginsService } = await import("~/composables/api/services/adminPluginsService");
       const svc = useAdminPluginsService();
       await svc.installFromUrl({ url: state.url, sha256: state.sha256 || undefined, enable: !!state.enableAfterInstall });
+    } else if (state.installMode === '本地上传' && state.file) {
+      const { useAdminPluginsService } = await import("~/composables/api/services/adminPluginsService");
+      const svc = useAdminPluginsService();
+      const fd = new FormData();
+      fd.append('file', state.file);
+      fd.append('enable', String(!!state.enableAfterInstall));
+      await svc.installFromLocal(fd);
     } else {
       // 演示占位：保留原行为
       await new Promise((r) => setTimeout(r, 600));

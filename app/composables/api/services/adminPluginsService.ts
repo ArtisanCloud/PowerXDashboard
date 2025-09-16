@@ -31,7 +31,14 @@ export const useAdminPluginsService = () => {
     },
 
     // 系统级列表
-    list: () => api.get<AdminPluginItem[]>(`${base}/`),
+    list: async (): Promise<AdminPluginItem[]> => {
+      const r = await api.get<any>(`${base}/`)
+      const d = unwrap(r)
+      if (Array.isArray(d)) return d as AdminPluginItem[]
+      if (d && Array.isArray((d as any).items)) return (d as any).items as AdminPluginItem[]
+      if (d && Array.isArray((d as any).plugins)) return (d as any).plugins as AdminPluginItem[]
+      return []
+    },
 
     // 系统启用/停用
     enable: (id: string) => api.post(`${base}/${encodeURIComponent(id)}/enable`),

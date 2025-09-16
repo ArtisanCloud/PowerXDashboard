@@ -1,16 +1,13 @@
 <template>
   <div class="space-y-6 p-4">
-    <div class="flex items-center justify-between">
-      <div>
-        <h1 class="text-lg font-semibold text-[var(--text-primary)]">{{ $t('menu.pluginMarketplace') || '应用广场' }}</h1>
-        <p class="text-sm text-[var(--text-secondary)]">
-          浏览并安装扩展功能插件，增强系统能力
-        </p>
+    <div class="flex items-center justify-between gap-3">
+      <div class="flex items-center gap-2">
+        <UButton :variant="'solid'" size="sm" :to="'/plugins/market'">{{ $t('menu.pluginsMarket') || '应用市场' }}</UButton>
+        <UButton variant="ghost" size="sm" :to="'/plugins/installed'">{{ $t('menu.pluginsInstalled') || '已安装' }}</UButton>
       </div>
       <div class="flex items-center gap-2">
-        <UButton icon="i-heroicons-arrow-path" variant="ghost" @click="refresh"
-          >刷新</UButton
-        >
+        <UButton v-if="isRoot" size="sm" icon="i-heroicons-arrow-down-tray" @click="openInstallGeneric">安装</UButton>
+        <UButton icon="i-heroicons-arrow-path" variant="ghost" size="sm" @click="refresh">刷新</UButton>
       </div>
     </div>
 
@@ -263,6 +260,10 @@ const installOpen = ref(false);
 const selectedPlugin = ref<MarketplacePlugin | undefined>(undefined);
 function openInstall(p: MarketplacePlugin) {
   selectedPlugin.value = p;
+  installOpen.value = true;
+}
+function openInstallGeneric() {
+  selectedPlugin.value = undefined as any;
   installOpen.value = true;
 }
 function onInstalled(payload: { plugin: MarketplacePlugin; state: any }) {
