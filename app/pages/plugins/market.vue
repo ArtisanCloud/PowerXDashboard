@@ -292,9 +292,43 @@ function openInstallGeneric() {
   selectedPlugin.value = undefined as any;
   installOpen.value = true;
 }
-function onInstalled(payload: { plugin: MarketplacePlugin; state: any }) {
-  // TODO: 上报安装成功，刷新状态
-  console.log("Installed:", payload);
+async function onInstalled(payload?: {
+  plugin: MarketplacePlugin | null;
+  state: any;
+}) {
+  try {
+    // 1) 先关弹窗
+    installOpen.value = false;
+
+    // 2) 如果知道是哪个插件被安装了，先就地把那条打上“已安装/已启用”标记，避免闪烁
+    const pid = payload?.plugin?.id;
+    if (pid) {
+      const idx = all.value.findIndex((p) => p.id === pid);
+      if (idx !== -1) {
+        const sys =
+          (all.value[idx] as any).__sys || ((all.value[idx] as any).__sys = {});
+        sys.isSystemInstalled = true;
+        // 是否已启用取决于对话框勾选；拿不到就先不写死，交给刷新覆盖
+        if (payload?.state?.enableAfterInstall === true) {
+          sys.isSystemEnabled = true;
+          sys.systemStatus = "enabled";
+        }
+      }
+    }
+
+    // 3) 再从后端拉一次最新市场数据，确保状态一致
+    await fetchMarketplace();
+
+    // 4) （可选）若当前过滤条件把“已安装”过滤掉了，可以考虑把 status 回到“全部状态”
+    // if (status.value !== "全部状态") status.value = "全部状态"
+
+    // 5) 保持原有选择/页码体验：如果分页越界再纠正（已有 watch，会自动处理）
+  } catch (e) {
+    console.error("[market.onInstalled] refresh failed:", e);
+  } finally {
+    // 6) 清空选中项（下次打开是“通用安装”还是从卡片打开都不受影响）
+    selectedPlugin.value = undefined;
+  }
 }
 
 // 移除临时回调方案

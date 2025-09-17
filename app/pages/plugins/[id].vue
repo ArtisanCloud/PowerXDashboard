@@ -229,7 +229,8 @@
 
     <!-- 安装对话框 -->
     <InstallDialog
-      v-model="installOpen"
+      :model-value="installOpen"
+      @update:modelValue="(v) => (installOpen.value = v)"
       :plugin="plugin"
       @installed="onInstalled"
     />
@@ -290,8 +291,26 @@ async function toggleEnable() {
       "~/composables/api/services/adminPluginsService"
     );
     const svc = useAdminPluginsService();
-    if (sysEnabled.value) await svc.disable(id.value);
-    else await svc.enable(id.value);
+
+    if (sysEnabled.value) {
+      // 停用时需要确认
+      const { useConfirm } = await import("~/composables/useConfirm");
+      const { confirm } = useConfirm();
+      const ok = await confirm({
+        title: "停用插件",
+        description: "停用后该插件将无法为任何租户提供服务。",
+        message: "确定要停用该插件吗？",
+        confirmLabel: "停用",
+        cancelLabel: "取消",
+        tone: "warning",
+      });
+      if (!ok) return;
+      await svc.disable(id.value);
+    } else {
+      // 启用时直接执行
+      await svc.enable(id.value);
+    }
+
     await refreshStatus();
     await refreshMeta();
   } catch (e) {
