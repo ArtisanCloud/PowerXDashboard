@@ -2,17 +2,35 @@
   <div class="space-y-6 p-4">
     <div class="flex items-center justify-between gap-3">
       <div class="flex items-center gap-2">
-        <UButton :variant="'solid'" size="sm" :to="'/plugins/market'">{{ $t('menu.pluginsMarket') || '应用市场' }}</UButton>
-        <UButton variant="ghost" size="sm" :to="'/plugins/installed'">{{ $t('menu.pluginsInstalled') || '已安装' }}</UButton>
+        <UButton :variant="'solid'" size="sm" :to="'/plugins/market'">{{
+          $t("menu.pluginsMarket") || "应用市场"
+        }}</UButton>
+        <UButton variant="ghost" size="sm" :to="'/plugins/installed'">{{
+          $t("menu.pluginsInstalled") || "已安装"
+        }}</UButton>
       </div>
       <div class="flex items-center gap-2">
-        <UButton v-if="isRoot" size="sm" icon="i-heroicons-arrow-down-tray" @click="openInstallGeneric">安装</UButton>
-        <UButton icon="i-heroicons-arrow-path" variant="ghost" size="sm" @click="refresh">刷新</UButton>
+        <UButton
+          v-if="isRoot"
+          size="sm"
+          icon="i-heroicons-arrow-down-tray"
+          @click="openInstallGeneric"
+          >安装</UButton
+        >
+        <UButton
+          icon="i-heroicons-arrow-path"
+          variant="ghost"
+          size="sm"
+          @click="refresh"
+          >刷新</UButton
+        >
       </div>
     </div>
 
     <!-- 筛选区 -->
-    <div class="rounded-lg border border-[var(--border-color)] bg-[var(--card-bg)] p-4">
+    <div
+      class="rounded-lg border border-[var(--border-color)] bg-[var(--card-bg)] p-4"
+    >
       <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
         <UInput
           v-model="q"
@@ -62,7 +80,7 @@
           :is-system-installed="Boolean((p as any).__sys?.isSystemInstalled)"
           :is-system-enabled="Boolean((p as any).__sys?.isSystemEnabled)"
           :can-install="isRoot"
-          @install="openInstall(p)"
+          @install="openInstall"
         />
       </div>
 
@@ -114,7 +132,9 @@
 </template>
 
 <script setup lang="ts">
-import PluginCard, { type MarketplacePlugin } from "~/components/plugins/PluginCard.vue";
+import PluginCard, {
+  type MarketplacePlugin,
+} from "~/components/plugins/PluginCard.vue";
 import InstallDialog from "~/components/plugins/InstallDialog.vue";
 import { useUserStore } from "~/stores/user";
 
@@ -157,7 +177,9 @@ const all = ref<MarketplacePlugin[]>([]);
 
 async function fetchMarketplace() {
   try {
-    const { useAdminPluginsService } = await import("~/composables/api/services/adminPluginsService");
+    const { useAdminPluginsService } = await import(
+      "~/composables/api/services/adminPluginsService"
+    );
     const svc = useAdminPluginsService();
     const list = await svc.getMarketplaceV2();
     if (Array.isArray(list)) {
@@ -174,7 +196,7 @@ async function fetchMarketplace() {
         __sys: {
           isSystemInstalled: !!p.isSystemInstalled,
           isSystemEnabled: !!p.isSystemEnabled,
-          systemStatus: p.systemStatus || '',
+          systemStatus: p.systemStatus || "",
         },
       }));
     }
@@ -205,7 +227,8 @@ const filtered = computed(() => {
       if (s === "未安装") hitS = !isInstalled;
       else if (s === "已安装（未启用）") hitS = isInstalled && !isEnabled;
       else if (s === "已启用") hitS = isEnabled;
-      else if (s === "已停用") hitS = isInstalled && sys.systemStatus === 'disabled';
+      else if (s === "已停用")
+        hitS = isInstalled && sys.systemStatus === "disabled";
     }
     return hitQ && hitC && hitS;
   });
@@ -254,13 +277,16 @@ onMounted(() => {
     currentPage.value = totalPages.value;
 });
 
-function refresh() { fetchMarketplace(); }
+function refresh() {
+  fetchMarketplace();
+}
 
 const installOpen = ref(false);
 const selectedPlugin = ref<MarketplacePlugin | undefined>(undefined);
 function openInstall(p: MarketplacePlugin) {
   selectedPlugin.value = p;
   installOpen.value = true;
+  console.log("[openInstall] fired with", p); // 便于确认点击链路没问题
 }
 function openInstallGeneric() {
   selectedPlugin.value = undefined as any;

@@ -151,6 +151,13 @@
         </table>
       </div>
     </UCard>
+
+    <!-- 安装对话框 -->
+    <InstallDialog
+      v-model="installOpen"
+      :plugin="selectedPlugin"
+      @installed="onInstalled"
+    />
   </div>
 </template>
 
@@ -169,7 +176,10 @@ const isTenantAdmin = computed(() => userStore.isCurrentTenantAdmin);
 const q = ref("");
 const rows = ref<Row[]>([]);
 const installOpen = ref(false);
+const selectedPlugin = ref<any>(undefined);
+
 function openInstallGeneric() {
+  selectedPlugin.value = undefined; // 通用安装时允许为 undefined/null
   installOpen.value = true;
 }
 
@@ -205,7 +215,7 @@ async function load() {
     tenantEnabled: false,
     clientId: "",
   }));
-  // 并发拉取租户配置（仅当前租户管理员/root 才有意义，但显示给所有人影响不大）
+  // 并发拉取租户配置
   await Promise.all(
     rows.value.map(async (r) => {
       try {
@@ -221,6 +231,16 @@ onMounted(load);
 
 function refresh() {
   load();
+}
+
+// ✅ 这里允许 payload 为 undefined/null，且加了兜底，避免 “Unhandled error …”
+async function onInstalled(_payload?: { plugin: any | null; state: any }) {
+  try {
+    installOpen.value = false;
+    await load();
+  } catch (e) {
+    console.error("[installed] refresh after install failed:", e);
+  }
 }
 
 async function toggleEnable(r: Row) {
@@ -258,5 +278,3 @@ async function toggleTenant(r: Row) {
   }
 }
 </script>
-
-<InstallDialog v-model="installOpen" />
