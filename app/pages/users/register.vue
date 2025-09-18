@@ -394,7 +394,7 @@ const handleRegister = async () => {
 
         <div class="px-6 pb-6">
           <!-- 成功提示 -->
-          <UAlert v-if="success" color="green" variant="soft" class="mb-6">
+          <UAlert v-if="success" color="success" variant="soft" class="mb-6">
             <template #title>
               <div class="flex items-center space-x-2">
                 <UIcon

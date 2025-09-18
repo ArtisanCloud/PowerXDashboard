@@ -269,7 +269,7 @@ onMounted(async () => {
           <!-- 当前租户信息 -->
           <div v-if="selectedTenant" class="flex-1">
             <div class="flex items-center gap-2">
-              <UBadge color="blue" variant="subtle">
+              <UBadge color="primary" variant="subtle">
                 {{ selectedTenant.name }}
               </UBadge>
               <span class="text-sm text-gray-500">

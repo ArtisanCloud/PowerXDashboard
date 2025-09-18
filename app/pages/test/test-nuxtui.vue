@@ -15,8 +15,8 @@
           <div class="flex flex-wrap gap-4">
             <UButton>默认按钮</UButton>
             <UButton color="primary">主要按钮</UButton>
-            <UButton color="red">红色按钮</UButton>
-            <UButton color="green">绿色按钮</UButton>
+            <UButton color="error">红色按钮</UButton>
+            <UButton color="success">绿色按钮</UButton>
             <UButton variant="outline">轮廓按钮</UButton>
             <UButton variant="ghost">幽灵按钮</UButton>
           </div>
@@ -74,9 +74,9 @@
         <div class="space-y-4">
           <div class="flex flex-wrap gap-4">
             <UBadge>默认徽章</UBadge>
-            <UBadge color="red">红色徽章</UBadge>
-            <UBadge color="green">绿色徽章</UBadge>
-            <UBadge color="blue">蓝色徽章</UBadge>
+            <UBadge color="error">红色徽章</UBadge>
+            <UBadge color="success">绿色徽章</UBadge>
+            <UBadge color="primanry">蓝色徽章</UBadge>
             <UBadge variant="outline">轮廓徽章</UBadge>
           </div>
 
@@ -87,7 +87,7 @@
           />
 
           <UAlert
-            color="red"
+            color="error"
             icon="i-heroicons-exclamation-triangle"
             title="错误提示"
             description="这是一个错误提示框"
@@ -170,7 +170,7 @@
       <div class="text-center">
         <div class="space-x-4">
           <NuxtLink to="/test-tailwind">
-            <UButton color="blue">测试 Tailwind CSS</UButton>
+            <UButton color="primary">测试 Tailwind CSS</UButton>
           </NuxtLink>
           <NuxtLink to="/">
             <UButton variant="outline">返回首页</UButton>

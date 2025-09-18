@@ -622,7 +622,7 @@ const isFormModulePartiallySelected = (module: string) => {
                   />
                   <UButton
                     v-if="!role.builtin"
-                    color="red"
+                    color="error"
                     variant="ghost"
                     icon="i-heroicons-trash"
                     size="xs"

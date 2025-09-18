@@ -12,7 +12,7 @@
       <div class="space-x-4">
         <UButton @click="testLogin" color="primary"> 测试登录 </UButton>
 
-        <UButton @click="testLogout" color="red"> 测试登出 </UButton>
+        <UButton @click="testLogout" color="error"> 测试登出 </UButton>
       </div>
 
       <div v-if="error" class="text-red-500">错误: {{ error }}</div>

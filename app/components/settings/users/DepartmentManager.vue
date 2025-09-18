@@ -680,7 +680,7 @@ function buildUpdatePayload(): DepartmentUpdateParams {
                 <UButton
                   icon="i-heroicons-trash"
                   size="xs"
-                  color="red"
+                  color="error"
                   variant="ghost"
                   @click.stop="deleteDepartment(Number(item.id))"
                 />

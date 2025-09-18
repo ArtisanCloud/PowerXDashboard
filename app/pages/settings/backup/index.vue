@@ -272,7 +272,7 @@ const getBackupTypeColor = (type) => {
           </UButton>
 
           <UButton
-            color="green"
+            color="success"
             icon="i-heroicons-archive-box-arrow-down"
             size="lg"
             variant="outline"
@@ -313,7 +313,7 @@ const getBackupTypeColor = (type) => {
               >{{ Math.round(restoreProgress) }}%</span
             >
           </div>
-          <UProgress :value="restoreProgress" color="green" />
+          <UProgress :value="restoreProgress" color="success" />
         </div>
       </UCard>
 
@@ -339,7 +339,7 @@ const getBackupTypeColor = (type) => {
                 >
                   {{ getBackupTypeLabel(backup.type) }}
                 </UBadge>
-                <UBadge color="green" variant="subtle" size="sm">
+                <UBadge color="success" variant="subtle" size="sm">
                   {{ backup.status }}
                 </UBadge>
               </div>
@@ -353,7 +353,7 @@ const getBackupTypeColor = (type) => {
 
             <div class="flex items-center gap-2">
               <UButton
-                color="blue"
+                color="primary"
                 variant="outline"
                 size="xs"
                 icon="i-heroicons-arrow-down-tray"
@@ -363,7 +363,7 @@ const getBackupTypeColor = (type) => {
               </UButton>
 
               <UButton
-                color="green"
+                color="success"
                 variant="outline"
                 size="xs"
                 icon="i-heroicons-arrow-path"
@@ -374,7 +374,7 @@ const getBackupTypeColor = (type) => {
               </UButton>
 
               <UButton
-                color="red"
+                color="error"
                 variant="outline"
                 size="xs"
                 icon="i-heroicons-trash"

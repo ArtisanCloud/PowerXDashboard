@@ -404,7 +404,7 @@ export function useChatSessions(opts: { pageSize?: number } = {}) {
     // 状态（从 store 获取）
     sessionsByAgent: computed(() => sessionStore.sessionsByAgent),
     sessionsLoadingByAgent: computed(() => sessionStore.sessionsLoadingByAgent),
-    hasMoreByAgent: computed(() => sessionStore.getHasMoreByAgent),
+    hasMoreByAgent: computed(() => sessionStore.hasMoreByAgent),
     currentSessionId: computed(() => sessionStore.currentSessionId),
     currentAgentId: computed(() => sessionStore.currentAgentId),
     error: computed(() => sessionStore.error),

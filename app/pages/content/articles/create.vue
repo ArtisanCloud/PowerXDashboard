@@ -113,7 +113,7 @@
               </UButton>
               <UButton
                 type="submit"
-                color="blue"
+                color="primary"
                 @click="state.status = 'published'"
               >
                 发布文章

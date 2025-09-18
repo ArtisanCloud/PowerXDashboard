@@ -597,7 +597,7 @@ const deletePermission = async (permission: any) => {
             <UButton
               icon="i-heroicons-trash"
               size="sm"
-              color="red"
+              color="error"
               variant="ghost"
               @click="deletePermission(row.original)"
             />

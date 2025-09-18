@@ -241,15 +241,15 @@ onMounted(async () => {
         已选择 {{ selectedPermissions.length }} 个权限
       </span>
       <div class="flex gap-2">
-        <UButton size="sm" color="green" @click="batchEnable">
+        <UButton size="sm" color="success" @click="batchEnable">
           批量启用
         </UButton>
-        <UButton size="sm" color="gray" @click="batchDisable">
+        <UButton size="sm" color="neutral" @click="batchDisable">
           批量禁用
         </UButton>
         <UButton
           size="sm"
-          color="gray"
+          color="neutral"
           variant="ghost"
           @click="selectedPermissions = []"
         >

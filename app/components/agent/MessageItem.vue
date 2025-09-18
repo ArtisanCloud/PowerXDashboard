@@ -803,7 +803,7 @@ const renderMarkdown = (markdown: string) => {
             size="xs"
             variant="ghost"
             icon="i-heroicons-trash"
-            color="red"
+            color="error"
             @click="emit('delete')"
             >删除</UButton
           >

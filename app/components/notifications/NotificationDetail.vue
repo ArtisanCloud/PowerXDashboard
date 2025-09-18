@@ -146,7 +146,7 @@ watch(
             </h1>
             <UBadge
               v-if="notification.isImportant"
-              color="red"
+              color="error"
               variant="soft"
               size="sm"
             >
@@ -154,7 +154,7 @@ watch(
             </UBadge>
             <UBadge
               v-if="!notification.isRead"
-              color="blue"
+              color="info"
               variant="soft"
               size="sm"
             >
