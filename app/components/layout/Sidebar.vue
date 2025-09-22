@@ -8,6 +8,7 @@ import {
 } from "~/composables/api/services/menuService";
 import { cloneWithFilteredChildren } from "~/composables/useCopy";
 import { useUserStore } from "~/stores/user";
+import SidebarMenuItem from "~/components/layout/SidebarMenuItem.vue";
 
 /* ---------- stores / utils ---------- */
 const route = useRoute();
@@ -82,6 +83,9 @@ const resolveIcon = (name?: string) => {
 const isVisible = (it: MenuItem) => it.visible !== false;
 
 const MARKET_CATEGORY_ID = "cat:market";
+const isMarketSubCategory = (item: MenuItem) =>
+  typeof item.id === "string" && item.id.startsWith(`${MARKET_CATEGORY_ID}:`);
+
 
 /* ---------- 拉取菜单 ---------- */
 const {
@@ -365,350 +369,72 @@ function onTreeKeydown(e: KeyboardEvent) {
 
           <!-- 组内顶层项 -->
           <template v-if="group.id === MARKET_CATEGORY_ID">
-            <li
+            <template
               v-for="subGroup in group.items"
               :key="group.id + ':' + subGroup.id"
-              class="mt-3"
             >
-              <div
-                :class="[
-                  'flex items-center rounded-md text-slate-500 dark:text-slate-400 uppercase tracking-wide',
-                  collapsed ? 'justify-center px-2 text-xs' : 'px-3 py-1 text-xs'
-                ]"
+              <li
+                v-for="pluginMenu in subGroup.children || []"
+                :key="subGroup.id + ':' + pluginMenu.id"
+                class="mt-3"
               >
-                <span class="inline-block w-4 h-4 mr-2" v-if="!collapsed">
-                  <UIcon class="w-4 h-4" :name="resolveIcon(subGroup.icon)" />
-                </span>
-                <span class="truncate">
-                  {{ collapsed ? (subGroup.title ? subGroup.title[0] : '') : subGroup.title }}
-                </span>
-              </div>
-              <ul
-                v-show="!collapsed"
-                class="mt-1 space-y-1"
-                role="group"
-              >
-                <li
-                  v-for="item in subGroup.children || []"
-                  :key="subGroup.id + ':' + item.id"
+                <div
+                  :class="[
+                    'flex items-center rounded-md text-slate-500 dark:text-slate-400 uppercase tracking-wide',
+                    collapsed
+                      ? 'justify-center px-2 text-xs'
+                      : 'px-3 py-1 text-xs',
+                  ]"
                 >
-                  <div
-                    v-if="item.children"
-                    class="menu-item group relative w-full"
-                    role="treeitem"
-                    :aria-expanded="expandedItems.has(item.id)"
-                    :aria-controls="`submenu-${item.id}`"
-                  >
-                    <button
-                      @click="toggleExpanded(item.id)"
-                      :class="[
-                        'w-full flex items-center rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40',
-                        collapsed ? 'justify-center px-2' : 'justify-between px-3',
-                        densityClass,
-                        hasActiveChild(item.children)
-                          ? 'text-blue-700 dark:text-blue-100 bg-blue-500/10 ring-1 ring-blue-500/10'
-                          : 'text-slate-700 dark:text-slate-200 hover:bg-slate-900/5 dark:hover:bg-white/5',
-                      ]"
-                    >
-                      <div v-if="collapsed" class="flex items-center justify-center">
-                        <span class="inline-block w-5 h-5">
-                          <UIcon class="w-5 h-5" :name="resolveIcon(item.icon)" />
-                        </span>
-                      </div>
-                      <div v-else class="flex items-center justify-between w-full">
-                        <div class="flex items-center gap-3">
-                          <span class="inline-block w-5 h-5 flex-shrink-0">
-                            <UIcon class="w-5 h-5" :name="resolveIcon(item.icon)" />
-                          </span>
-                          <span class="truncate">{{ item.title }}</span>
-                        </div>
-                        <div class="flex items-center gap-2 flex-shrink-0">
-                          <UBadge v-if="item.badge" size="xs" color="primary">{{
-                            item.badge
-                          }}</UBadge>
-                          <UIcon
-                            name="i-heroicons-chevron-right"
-                            class="w-4 h-4 transition-transform"
-                            :class="{ 'rotate-90': expandedItems.has(item.id) }"
-                          />
-                        </div>
-                      </div>
-                    </button>
-
-                    <Transition
-                      enter-active-class="transition-[max-height,opacity] duration-200 ease-out"
-                      enter-from-class="opacity-0 max-h-0"
-                      enter-to-class="opacity-100 max-h-96"
-                      leave-active-class="transition-[max-height,opacity] duration-150 ease-in"
-                      leave-from-class="opacity-100 max-h-96"
-                      leave-to-class="opacity-0 max-h-0"
-                    >
-                      <ul
-                        v-show="expandedItems.has(item.id) && !collapsed"
-                        :id="`submenu-${item.id}`"
-                        class="mt-1 ml-6 space-y-1 overflow-hidden"
-                        role="group"
-                      >
-                        <li v-for="child in item.children" :key="child.id">
-                          <NuxtLink
-                            v-if="child.path"
-                            :to="linkFor(child.path)"
-                            class="flex items-center gap-3 px-3 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/30"
-                            :class="[
-                              densityClass,
-                              isActive(child.path)
-                                ? 'bg-blue-500/10 text-blue-700 dark:text-blue-100 ring-1 ring-blue-500/20'
-                                : 'text-slate-600 dark:text-slate-300 hover:bg-slate-900/5 dark:hover:bg-white/5 hover:text-slate-900 dark:hover:text-white',
-                            ]"
-                            :aria-current="isActive(child.path) ? 'page' : undefined"
-                            role="treeitem"
-                          >
-                            <span class="inline-block w-4 h-4">
-                              <UIcon
-                                class="w-4 h-4"
-                                :name="resolveIcon(child.icon)"
-                              />
-                            </span>
-                            <span class="truncate">{{ child.title }}</span>
-                          </NuxtLink>
-
-                          <div
-                            v-else
-                            class="flex items-center gap-3 px-3 text-sm text-slate-500"
-                            :class="densityClass"
-                            role="treeitem"
-                          >
-                            <span class="inline-block w-4 h-4">
-                              <UIcon
-                                class="w-4 h-4"
-                                :name="resolveIcon(child.icon)"
-                              />
-                            </span>
-                            <span class="truncate">{{ child.title }}</span>
-                          </div>
-                        </li>
-                      </ul>
-                    </Transition>
-                  </div>
-
-                  <!-- 2) 菜单项无子菜单（有 path） -->
-                  <template v-else-if="item.path">
-                    <NuxtLink
-                      :to="linkFor(item.path)"
-                      :class="[
-                        'menu-item group relative flex items-center rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40',
-                        collapsed ? 'justify-center px-2' : 'justify-between px-3',
-                        densityClass,
-                        isActive(item.path)
-                          ? 'text-blue-700 dark:text-blue-100 bg-blue-500/10 ring-1 ring-blue-500/20'
-                          : 'text-slate-700 dark:text-slate-200 hover:bg-slate-900/5 dark:hover:bg-white/5',
-                      ]"
-                      :aria-current="isActive(item.path) ? 'page' : undefined"
-                      role="treeitem"
-                    >
-                      <span
-                        v-if="isActive(item.path)"
-                        class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 rounded-r bg-blue-500 dark:bg-blue-400"
-                        aria-hidden="true"
-                      />
-                      <div v-if="collapsed" class="flex items-center justify-center">
-                        <span class="inline-block w-5 h-5">
-                          <UIcon class="w-5 h-5" :name="resolveIcon(item.icon)" />
-                        </span>
-                      </div>
-                      <div v-else class="flex items-center justify-between w-full">
-                        <div class="flex items-center gap-3">
-                          <span class="inline-block w-5 h-5 flex-shrink-0">
-                            <UIcon class="w-5 h-5" :name="resolveIcon(item.icon)" />
-                          </span>
-                          <span class="truncate">{{ item.title }}</span>
-                        </div>
-                        <UBadge v-if="item.badge" size="xs" color="primary">{{
-                          item.badge
-                        }}</UBadge>
-                      </div>
-                    </NuxtLink>
-                  </template>
-
-                  <!-- 3) 菜单占位（无 path） -->
-                  <div
-                    v-else
-                    :class="[
-                      'flex items-center text-slate-700 dark:text-slate-200 rounded-md',
-                      collapsed ? 'justify-center px-2' : 'gap-3 px-3',
-                      densityClass,
-                    ]"
-                    role="treeitem"
-                  >
-                    <span class="inline-block w-5 h-5 flex-shrink-0">
-                      <UIcon class="w-5 h-5" :name="resolveIcon(item.icon)" />
-                    </span>
-                    <span class="truncate">{{ item.title }}</span>
-                  </div>
-                </li>
-              </ul>
-            </li>
+                  <span class="inline-block w-4 h-4 mr-2" v-if="!collapsed">
+                    <UIcon
+                      class="w-4 h-4"
+                      :name="resolveIcon(pluginMenu.icon)"
+                    />
+                  </span>
+                  <span class="truncate">
+                    {{
+                      collapsed
+                        ? pluginMenu.title
+                          ? pluginMenu.title[0]
+                          : ''
+                        : pluginMenu.title
+                    }}
+                  </span>
+                </div>
+                <ul v-show="!collapsed" class="mt-1 space-y-1" role="group">
+                  <SidebarMenuItem
+                    v-for="item in pluginMenu.children || []"
+                    :key="pluginMenu.id + ':' + item.id"
+                    :item="item"
+                    :collapsed="collapsed"
+                    :densityClass="densityClass"
+                    :expandedItems="expandedItems"
+                    :isActive="isActive"
+                    :linkFor="linkFor"
+                    :resolveIcon="resolveIcon"
+                    :toggleExpanded="toggleExpanded"
+                    :hasActiveChild="hasActiveChild"
+                  />
+                </ul>
+              </li>
+            </template>
           </template>
           <template v-else>
-            <li v-for="item in group.items" :key="group.id + ':' + item.id">
-              <!-- 1) 有子菜单 -->
-              <div
-                v-if="item.children"
-                class="menu-item group relative w-full"
-                role="treeitem"
-                :aria-expanded="expandedItems.has(item.id)"
-                :aria-controls="`submenu-${item.id}`"
-              >
-                <button
-                  @click="toggleExpanded(item.id)"
-                  :class="[
-                    'w-full flex items-center rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40',
-                    collapsed ? 'justify-center px-2' : 'justify-between px-3',
-                    densityClass,
-                    hasActiveChild(item.children)
-                      ? 'text-blue-700 dark:text-blue-100 bg-blue-500/10 ring-1 ring-blue-500/10'
-                      : 'text-slate-700 dark:text-slate-200 hover:bg-slate-900/5 dark:hover:bg-white/5',
-                  ]"
-                >
-                  <div v-if="collapsed" class="flex items-center justify-center">
-                    <span class="inline-block w-5 h-5">
-                      <UIcon class="w-5 h-5" :name="resolveIcon(item.icon)" />
-                    </span>
-                  </div>
-                  <div v-else class="flex items-center justify-between w-full">
-                    <div class="flex items-center gap-3">
-                      <span class="inline-block w-5 h-5 flex-shrink-0">
-                        <UIcon class="w-5 h-5" :name="resolveIcon(item.icon)" />
-                      </span>
-                      <span class="truncate">{{ item.title }}</span>
-                    </div>
-                    <div class="flex items-center gap-2 flex-shrink-0">
-                      <UBadge v-if="item.badge" size="xs" color="primary">{{
-                        item.badge
-                      }}</UBadge>
-                      <UIcon
-                        name="i-heroicons-chevron-right"
-                        class="w-4 h-4 transition-transform"
-                        :class="{ 'rotate-90': expandedItems.has(item.id) }"
-                      />
-                    </div>
-                  </div>
-                </button>
-
-                <Transition
-                  enter-active-class="transition-[max-height,opacity] duration-200 ease-out"
-                  enter-from-class="opacity-0 max-h-0"
-                  enter-to-class="opacity-100 max-h-96"
-                  leave-active-class="transition-[max-height,opacity] duration-150 ease-in"
-                  leave-from-class="opacity-100 max-h-96"
-                  leave-to-class="opacity-0 max-h-0"
-                >
-                  <ul
-                    v-show="expandedItems.has(item.id) && !collapsed"
-                    :id="`submenu-${item.id}`"
-                    class="mt-1 ml-6 space-y-1 overflow-hidden"
-                    role="group"
-                  >
-                    <li v-for="child in item.children" :key="child.id">
-                      <NuxtLink
-                        v-if="child.path"
-                        :to="linkFor(child.path)"
-                        class="flex items-center gap-3 px-3 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/30"
-                        :class="[
-                          densityClass,
-                          isActive(child.path)
-                            ? 'bg-blue-500/10 text-blue-700 dark:text-blue-100 ring-1 ring-blue-500/20'
-                            : 'text-slate-600 dark:text-slate-300 hover:bg-slate-900/5 dark:hover:bg-white/5 hover:text-slate-900 dark:hover:text-white',
-                        ]"
-                        :aria-current="isActive(child.path) ? 'page' : undefined"
-                        role="treeitem"
-                      >
-                        <span class="inline-block w-4 h-4">
-                          <UIcon
-                            class="w-4 h-4"
-                            :name="resolveIcon(child.icon)"
-                          />
-                        </span>
-                        <span class="truncate">{{ child.title }}</span>
-                      </NuxtLink>
-
-                      <div
-                        v-else
-                        class="flex items-center gap-3 px-3 text-sm text-slate-500"
-                        :class="densityClass"
-                        role="treeitem"
-                      >
-                        <span class="inline-block w-4 h-4">
-                          <UIcon
-                            class="w-4 h-4"
-                            :name="resolveIcon(child.icon)"
-                          />
-                        </span>
-                        <span class="truncate">{{ child.title }}</span>
-                      </div>
-                    </li>
-                  </ul>
-                </Transition>
-              </div>
-
-              <!-- 2) 顶层无子菜单（有 path） -->
-              <template v-else-if="item.path">
-                <NuxtLink
-                  :to="linkFor(item.path)"
-                  :class="[
-                    'menu-item group relative flex items-center rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40',
-                    collapsed ? 'justify-center px-2' : 'justify-between px-3',
-                    densityClass,
-                    isActive(item.path)
-                      ? 'text-blue-700 dark:text-blue-100 bg-blue-500/10 ring-1 ring-blue-500/20'
-                      : 'text-slate-700 dark:text-slate-200 hover:bg-slate-900/5 dark:hover:bg-white/5',
-                  ]"
-                  :aria-current="isActive(item.path) ? 'page' : undefined"
-                  role="treeitem"
-                >
-                  <!-- 左侧高亮条 -->
-                  <span
-                    v-if="isActive(item.path)"
-                    class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 rounded-r bg-blue-500 dark:bg-blue-400"
-                    aria-hidden="true"
-                  />
-                  <div v-if="collapsed" class="flex items-center justify-center">
-                    <span class="inline-block w-5 h-5">
-                      <UIcon class="w-5 h-5" :name="resolveIcon(item.icon)" />
-                    </span>
-                  </div>
-                  <div v-else class="flex items-center justify-between w-full">
-                    <div class="flex items-center gap-3">
-                      <span class="inline-block w-5 h-5 flex-shrink-0">
-                        <UIcon class="w-5 h-5" :name="resolveIcon(item.icon)" />
-                      </span>
-                      <span class="truncate">{{ item.title }}</span>
-                    </div>
-                    <UBadge v-if="item.badge" size="xs" color="primary">{{
-                      item.badge
-                    }}</UBadge>
-                  </div>
-                </NuxtLink>
-              </template>
-
-              <!-- 3) 顶层占位（无 path） -->
-              <div
-                v-else
-                :class="[
-                  'flex items-center text-slate-700 dark:text-slate-200 rounded-md',
-                  collapsed ? 'justify-center px-2' : 'gap-3 px-3',
-                  densityClass,
-                ]"
-                role="treeitem"
-              >
-                <span class="inline-block w-5 h-5 flex-shrink-0">
-                  <UIcon class="w-5 h-5" :name="resolveIcon(item.icon)" />
-                </span>
-                <span v-if="!collapsed" class="truncate">{{ item.title }}</span>
-              </div>
-            </li>
+            <SidebarMenuItem
+              v-for="item in group.items"
+              :key="group.id + ':' + item.id"
+              :item="item"
+              :collapsed="collapsed"
+              :densityClass="densityClass"
+              :expandedItems="expandedItems"
+              :isActive="isActive"
+              :linkFor="linkFor"
+              :resolveIcon="resolveIcon"
+              :toggleExpanded="toggleExpanded"
+              :hasActiveChild="hasActiveChild"
+            />
           </template>
-
         </template>
 
       </ul>
