@@ -1,13 +1,21 @@
 import { useApiClient } from "../index";
 import type { ApiResponse } from "../types/types";
+import { useI18n } from "vue-i18n";
 
 /** ===== Types ===== */
+export interface MenuTitleI18n {
+  namespace?: string;
+  key?: string;
+  default?: string;
+}
+
 export interface MenuCategory {
   id: string;
   title: string;
   order: number;
   origin: string;
   children: MenuItem[];
+  titleI18n?: MenuTitleI18n;
 }
 
 export interface MenuItem {
@@ -23,12 +31,26 @@ export interface MenuItem {
   permissions?: string[];
   parentId?: string;
   slot?: string;
+  titleI18n?: MenuTitleI18n;
 }
 
 type MenusResponse = {
   /** 后端将来若提供“已排好序的扁平顶层菜单” */
   menus?: unknown[];
   categories?: unknown[];
+  i18n?: unknown[];
+};
+
+export interface MenuI18nPayload {
+  pluginId?: string;
+  format?: string;
+  defaultNamespace?: string;
+  namespaces?: string[];
+  locales?: Record<string, Record<string, any>>;
+}
+
+export type UserMenusResult = ApiResponse<MenuItem[]> & {
+  categories: MenuCategory[];
 };
 
 export interface MenuCreateParams {
@@ -60,6 +82,17 @@ const KEY_PLUGINS = "plugins" as const;
 const KEY_SYSTEM = "system" as const;
 const ORIGIN_PLUGIN = "plugin" as const;
 
+const localeParamMap: Record<string, string> = {
+  zh: "zh-CN",
+  en: "en-US",
+  ja: "ja-JP",
+  ko: "ko-KR",
+};
+
+const backendLocaleToFrontend: Record<string, string> = Object.fromEntries(
+  Object.entries(localeParamMap).map(([frontend, backend]) => [backend, frontend])
+);
+
 /** DEV 下冻结，帮助发现谁在改顺序 */
 function deepFreezeDev<T>(obj: T): T {
   if (process.dev && obj && typeof obj === "object") {
@@ -70,6 +103,16 @@ function deepFreezeDev<T>(obj: T): T {
     }
   }
   return obj;
+}
+
+function normalizeTitleI18n(raw: unknown): MenuTitleI18n | undefined {
+  if (!raw || typeof raw !== "object") return undefined;
+  const obj = raw as Record<string, unknown>;
+  const key = typeof obj.key === "string" ? obj.key : undefined;
+  const namespace = typeof obj.namespace === "string" ? obj.namespace : undefined;
+  const def = typeof obj.default === "string" ? obj.default : undefined;
+  if (!key && !namespace && !def) return undefined;
+  return { key, namespace, default: def };
 }
 
 /** 将 unknown 规范化为 MenuItem（递归处理 children；不排序） */
@@ -101,6 +144,23 @@ function normalizeMenuItem(raw: unknown): MenuItem {
       if (typeof b === "string" || typeof b === "number") return b;
       return undefined;
     })(),
+    titleI18n: normalizeTitleI18n((n as any).titleI18n),
+  };
+}
+
+function normalizeMenuCategory(raw: unknown): MenuCategory {
+  const n = (raw ?? {}) as Record<string, unknown>;
+  const childrenRaw = Array.isArray(n.children) ? n.children : [];
+
+  return {
+    id: String(n.id ?? ""),
+    title: typeof n.title === "string" ? (n.title as string) : "",
+    order: Number.isFinite(n.order as number)
+      ? Number(n.order)
+      : Number.POSITIVE_INFINITY,
+    origin: String(n.origin ?? ""),
+    children: childrenRaw.map(normalizeMenuItem),
+    titleI18n: normalizeTitleI18n((n as any).titleI18n),
   };
 }
 
@@ -128,21 +188,39 @@ function compareTopLevel(
 }
 
 /** 优先使用 data.menus（若存在），否则从 categories 恢复顶层 */
-function parseMenusFromResponse(resp: unknown): MenuItem[] {
+function parseMenusFromResponse(
+  resp: unknown
+): {
+  flatMenus: MenuItem[];
+  categories: MenuCategory[];
+  i18nPayloads: MenuI18nPayload[];
+} {
   const data = (resp as any)?.data ?? resp ?? {};
   const menusRaw = Array.isArray((data as any).menus)
     ? ((data as any).menus as unknown[])
     : null;
   if (menusRaw) {
     // 后端已拍好序：仅 normalize，不再排序
-    return menusRaw.map(normalizeMenuItem);
+    return {
+      flatMenus: menusRaw.map(normalizeMenuItem),
+      categories: [],
+      i18nPayloads: Array.isArray((data as any).i18n)
+        ? ((data as any).i18n as MenuI18nPayload[])
+        : [],
+    };
   }
 
   const catsRaw = Array.isArray((data as any).categories)
     ? ((data as any).categories as unknown[])
     : [];
 
-  return toTopLevelMenusFromCategories(catsRaw);
+  return {
+    flatMenus: toTopLevelMenusFromCategories(catsRaw),
+    categories: catsRaw.map(normalizeMenuCategory),
+    i18nPayloads: Array.isArray((data as any).i18n)
+      ? ((data as any).i18n as MenuI18nPayload[])
+      : [],
+  };
 }
 
 /** 从 categories 恢复顶层菜单并按“置顶→插件→系统”稳定排序 */
@@ -218,27 +296,38 @@ function toTopLevelMenusFromCategories(categories: unknown[]): MenuItem[] {
 
 export const useMenuService = () => {
   const apiClient = useApiClient();
+  const { locale, mergeLocaleMessage } = useI18n({ useScope: "global" });
   const baseUrl = "/admin/menus";
 
   return {
     /** 获取用户菜单（根据权限过滤）——只返回顶层扁平 MenuItem[]，顺序符合后端规则 */
     getUserMenus: async () => {
-      const res = await apiClient.get<ApiResponse<MenusResponse>>(baseUrl);
+      const currentLocale = String(locale.value ?? "").trim();
+      const resolvedLocale =
+        (localeParamMap[currentLocale] ?? currentLocale) || "zh-CN";
+      const res = await apiClient.get<ApiResponse<MenusResponse>>(baseUrl, {
+        params: { locale: resolvedLocale },
+      });
       const serverResp = (res?.data ?? res) as ApiResponse<MenusResponse>;
-      const menus = parseMenusFromResponse(serverResp);
+      const { flatMenus, categories, i18nPayloads } =
+        parseMenusFromResponse(serverResp);
 
-      deepFreezeDev(menus);
+      registerMenuLocales(i18nPayloads, mergeLocaleMessage);
+
+      deepFreezeDev(flatMenus);
+      deepFreezeDev(categories);
 
       // console.log(
       //   "[getUserMenus] menus =",
       //   menus.map((m) => `${m.title}(${m.id})`)
       // );
 
-      const normalized: ApiResponse<MenuItem[]> = {
+      const normalized: UserMenusResult = {
         code: serverResp.code ?? 200,
         message: serverResp.message ?? "success",
-        data: menus,
+        data: flatMenus,
         timestamp: serverResp.timestamp,
+        categories,
       };
       return normalized;
     },
@@ -256,3 +345,36 @@ export const useMenuService = () => {
       apiClient.post<ApiResponse<null>>(`${baseUrl}/order`, { menuOrders }),
   };
 };
+
+function registerMenuLocales(
+  payloads: MenuI18nPayload[] | undefined,
+  mergeLocaleMessage?: (locale: string, message: Record<string, any>) => void
+) {
+  if (!payloads?.length || typeof mergeLocaleMessage !== "function") return;
+
+  for (const payload of payloads) {
+    const locales = payload?.locales;
+    if (!locales) continue;
+
+    for (const [localeCode, namespaces] of Object.entries(locales)) {
+      if (!namespaces || typeof namespaces !== "object") continue;
+
+      const messageToMerge: Record<string, any> = {};
+      for (const [namespace, value] of Object.entries(namespaces)) {
+        if (!value || typeof value !== "object") continue;
+
+        if (payload?.defaultNamespace && namespace === payload.defaultNamespace) {
+          Object.assign(messageToMerge, value);
+        } else {
+          messageToMerge[namespace] = value;
+        }
+      }
+
+      if (Object.keys(messageToMerge).length > 0) {
+        const targetLocale =
+          backendLocaleToFrontend[localeCode] ?? localeCode;
+        mergeLocaleMessage(targetLocale, messageToMerge);
+      }
+    }
+  }
+}

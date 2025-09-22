@@ -3,12 +3,24 @@
     class="rounded-lg border border-[var(--border-color)] bg-[var(--card-bg)] overflow-hidden flex flex-col"
   >
     <div class="p-4 flex items-start gap-3">
-      <img
-        v-if="plugin.icon"
-        :src="plugin.icon"
-        alt=""
-        class="w-10 h-10 rounded-md object-cover"
-      />
+      <!-- 插件图标或默认图标 -->
+      <div
+        class="w-10 h-10 rounded-md bg-gray-100 flex items-center justify-center shrink-0"
+      >
+        <img
+          v-if="plugin.icon && !imageError"
+          :src="plugin.icon"
+          alt=""
+          class="w-10 h-10 rounded-md object-cover"
+          @error="handleImageError"
+        />
+        <!-- 默认插件图标 -->
+        <UIcon
+          v-else
+          name="i-heroicons-puzzle-piece-20-solid"
+          class="w-6 h-6 text-gray-400"
+        />
+      </div>
       <div class="flex-1 min-w-0">
         <div class="flex items-center justify-between gap-2">
           <h3 class="font-medium text-[var(--text-primary)] truncate">
@@ -78,6 +90,8 @@
 </template>
 
 <script setup lang="ts">
+import { ref, computed } from "vue";
+
 export type MarketplacePlugin = {
   id: string;
   name: string;
@@ -100,6 +114,14 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: "install", plugin: MarketplacePlugin): void;
 }>();
+
+// 图片加载错误状态
+const imageError = ref(false);
+
+// 处理图片加载错误
+const handleImageError = () => {
+  imageError.value = true;
+};
 
 function formatCount(n: number) {
   if (n >= 10000) return (n / 10000).toFixed(1) + "w";
