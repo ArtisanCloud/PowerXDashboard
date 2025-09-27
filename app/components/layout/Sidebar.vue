@@ -14,7 +14,7 @@ import SidebarMenuItem from "~/components/layout/SidebarMenuItem.vue";
 const route = useRoute();
 const menuService = useMenuService();
 const userStore = useUserStore();
-const { t, locale } = useI18n({ useScope: "global" });
+const { t, te, locale } = useI18n({ useScope: "global" });
 const localePath = useLocalePath() as (p: string) => string;
 
 /* ========== 折叠与密度 ========== */
@@ -42,16 +42,27 @@ const isActive = (path?: string) => {
 };
 
 const translateMenuTitle = (item: MenuItem) => {
+  // 插件菜单：后端给了 titleI18n
   const key = item.titleI18n?.key?.trim();
+
   if (key) {
     const fallback = item.titleI18n?.default ?? item.title ?? key;
-    return t(key, fallback);
+    // 先看前端是否已加载到这个 key
+    if (te(key)) return t(key);
+    // 否则直接用预翻译/默认值，不要把 fallback 误传给 t()
+    return fallback;
   }
+
+  // 系统菜单：title 本身就是 i18n key（如 "menu.agent"）
   const rawTitle = item.title;
   if (rawTitle?.startsWith?.("menu.")) {
-    const fallback = item.titleI18n?.default ?? rawTitle;
-    return t(rawTitle, fallback);
+    // 有翻译就用翻译
+    if (te(rawTitle)) return t(rawTitle);
+    // 没有就用 item.titleI18n.default（如果给了），再不行就原文/“未命名菜单”
+    return item.titleI18n?.default ?? rawTitle ?? t("menu.untitled", "未命名菜单");
   }
+
+  // 兜底
   return rawTitle || item.titleI18n?.default || t("menu.untitled", "未命名菜单");
 };
 
@@ -95,14 +106,20 @@ const {
   refresh: refreshMenus,
 } = await useAsyncData("user-menus", () => menuService.getUserMenus(), {
   default: () => ({ data: [] as MenuItem[], categories: [] as MenuCategory[] }),
-  transform: (response: UserMenusResult) => {
-    if (response && Array.isArray(response.data)) {
-      const categories = Array.isArray(response.categories)
-        ? (response.categories as MenuCategory[])
-        : [];
-      return { data: response.data as MenuItem[], categories };
+  transform: (response: any) => {
+    if (response && Array.isArray(response.categories)) {
+      // Case 1: response is { categories: [...] }
+      return { data: [], categories: response.categories };
     }
-    return { data: [] as MenuItem[], categories: [] as MenuCategory[] };
+    if (response && Array.isArray(response.data)) {
+      // Case 2: response is { data: [...] }
+      const categories = Array.isArray(response.categories)
+        ? response.categories
+        : [];
+      return { data: response.data, categories: categories };
+    }
+    // Fallback
+    return { data: [], categories: [] };
   },
   watch: [locale],
 });
@@ -369,56 +386,46 @@ function onTreeKeydown(e: KeyboardEvent) {
 
           <!-- 组内顶层项 -->
           <template v-if="group.id === MARKET_CATEGORY_ID">
-            <template
-              v-for="subGroup in group.items"
-              :key="group.id + ':' + subGroup.id"
+            <li
+              v-for="subCategory in group.items"
+              :key="group.id + ':' + subCategory.id"
+              class="mt-3"
             >
-              <li
-                v-for="pluginMenu in subGroup.children || []"
-                :key="subGroup.id + ':' + pluginMenu.id"
-                class="mt-3"
+              <div
+                :class="[
+                  'flex items-center rounded-md text-slate-500 dark:text-slate-400 uppercase tracking-wide',
+                  collapsed ? 'justify-center px-2 text-xs' : 'px-3 py-1 text-xs',
+                ]"
               >
-                <div
-                  :class="[
-                    'flex items-center rounded-md text-slate-500 dark:text-slate-400 uppercase tracking-wide',
+                <span class="inline-block w-4 h-4 mr-2" v-if="!collapsed">
+                  <UIcon class="w-4 h-4" :name="resolveIcon(subCategory.icon)" />
+                </span>
+                <span class="truncate">
+                  {{
                     collapsed
-                      ? 'justify-center px-2 text-xs'
-                      : 'px-3 py-1 text-xs',
-                  ]"
-                >
-                  <span class="inline-block w-4 h-4 mr-2" v-if="!collapsed">
-                    <UIcon
-                      class="w-4 h-4"
-                      :name="resolveIcon(pluginMenu.icon)"
-                    />
-                  </span>
-                  <span class="truncate">
-                    {{
-                      collapsed
-                        ? pluginMenu.title
-                          ? pluginMenu.title[0]
-                          : ''
-                        : pluginMenu.title
-                    }}
-                  </span>
-                </div>
-                <ul v-show="!collapsed" class="mt-1 space-y-1" role="group">
-                  <SidebarMenuItem
-                    v-for="item in pluginMenu.children || []"
-                    :key="pluginMenu.id + ':' + item.id"
-                    :item="item"
-                    :collapsed="collapsed"
-                    :densityClass="densityClass"
-                    :expandedItems="expandedItems"
-                    :isActive="isActive"
-                    :linkFor="linkFor"
-                    :resolveIcon="resolveIcon"
-                    :toggleExpanded="toggleExpanded"
-                    :hasActiveChild="hasActiveChild"
-                  />
-                </ul>
-              </li>
-            </template>
+                      ? subCategory.title
+                        ? subCategory.title[0]
+                        : ''
+                      : subCategory.title
+                  }}
+                </span>
+              </div>
+              <ul v-show="!collapsed" class="mt-1 space-y-1" role="group">
+                <SidebarMenuItem
+                  v-for="item in subCategory.children || []"
+                  :key="subCategory.id + ':' + item.id"
+                  :item="item"
+                  :collapsed="collapsed"
+                  :densityClass="densityClass"
+                  :expandedItems="expandedItems"
+                  :isActive="isActive"
+                  :linkFor="linkFor"
+                  :resolveIcon="resolveIcon"
+                  :toggleExpanded="toggleExpanded"
+                  :hasActiveChild="hasActiveChild"
+                />
+              </ul>
+            </li>
           </template>
           <template v-else>
             <SidebarMenuItem
