@@ -173,7 +173,7 @@ const cleanSrc = computed(() => {
     u.pathname = u.pathname.replace(/\/{2,}/g, '/')
 
     const full = u.toString()
-    if (full !== raw) console.warn('[WebView] src normalized:', { from: raw, to: full })
+    // if (full !== raw) console.warn('[WebView] src normalized:', { from: raw, to: full })
     console.log('[WebView] absolute src =', full) // 现在会打印出带 host 的完整地址
     return full
   } catch (e) {
