@@ -5,7 +5,7 @@ type TrustLevel = "trusted" | "untrusted";
 
 const props = withDefaults(
   defineProps<{
-    src: string; // e.g. /__up/_p/com.powerx.demo.hello_world/admin/
+    src: string | { href: string } // e.g. /__up/_p/com.powerx.demo.hello_world/admin/
     trust?: TrustLevel; // 'trusted' => 同域测量; 'untrusted' => 强沙箱（不可测量）
     min?: number; // 最小高度 px
     max?: number; // 最大高度 px
@@ -19,6 +19,14 @@ const props = withDefaults(
     viewOffset: 0,
   }
 );
+
+// 从 nuxt.config.ts -> runtimeConfig.public.upstream 读取后端基址
+// 例如 export default { runtimeConfig: { public: { upstream: process.env.POWERX_BACKEND || 'http://127.0.0.1:8077' } } }
+const { public: { upstream = 'http://127.0.0.1:8077' } } = useRuntimeConfig()
+
+watchEffect(() => {
+  console.log('[PXAdmin][WebView] src =', props.src)
+})
 
 /**
  * 可信模式：
@@ -149,6 +157,31 @@ onBeforeUnmount(() => {
   clearObservers();
 });
 
+const cleanSrc = computed(() => {
+  const raw = typeof props.src === 'string' ? props.src : props.src?.href || '/'
+
+  try {
+    // 1) 相对路径 → 以后端 upstream 为基准；绝对路径 → 原样解析
+    const u = (raw.startsWith('http://') || raw.startsWith('https://'))
+      ? new URL(raw)
+      : new URL(raw, upstream)     // 关键：用后端域名做基准，而不是 3030
+
+    // 2) /admin 强制补尾斜杠
+    u.pathname = u.pathname.replace(/\/admin(?!\/)/, '/admin/')
+
+    // 3) 清理可能出现的重复斜杠（不影响协议头部）
+    u.pathname = u.pathname.replace(/\/{2,}/g, '/')
+
+    const full = u.toString()
+    if (full !== raw) console.warn('[WebView] src normalized:', { from: raw, to: full })
+    console.log('[WebView] absolute src =', full) // 现在会打印出带 host 的完整地址
+    return full
+  } catch (e) {
+    console.warn('[WebView] bad src:', raw, e)
+    return raw
+  }
+})
+
 // 如果 src 变了，重新测量
 watch(
   () => props.src,
@@ -176,7 +209,7 @@ watch(
     <!-- :sandbox="sandbox" -->
     <iframe
       ref="iframeRef"
-      :src="src"
+      :src="cleanSrc"
       :title="title || 'Plugin WebView'"
       allow="clipboard-read *; clipboard-write *; fullscreen *"
       referrerpolicy="strict-origin-when-cross-origin"

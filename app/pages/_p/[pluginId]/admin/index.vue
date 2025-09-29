@@ -1,17 +1,20 @@
 <script setup lang="ts">
-// app/pages/_p/[pluginId]/admin/index.vue
+// /pages/_p/[pluginId]/admin/index.vue
+import PluginWebView from "@/components/PluginWebView.vue"
 
-import PluginWebView from "@/components/PluginWebView.vue";
-defineI18nRoute({ localized: false });
+// 这个页面就是“根 Dashboard”，iframe 直指 /_p/<id>/admin/
+const route = useRoute()
+const pluginId = computed(() => String(route.params.pluginId || ""))
 
-const route = useRoute();
-const runtime = useRuntimeConfig();
+// 统一用干净前缀 + 尾斜杠
+// const src = ref(`/_p/${pluginId.value}/admin/`)
+// const src = computed(() => `http://127.0.0.1:8077/_p/${pluginId.value}/admin/`)
+const src = computed(() => `/_p/${pluginId.value}/admin/`)
 
-// 方案B：同域代理（你已经配置了 /__up/_p/）
-const src = `/__up/_p/${route.params.pluginId}/admin`;
 
-// 若想直连后端：
-// const src = `${runtime.public.upstream}/_p/${route.params.pluginId}/admin/`
+onMounted(() => {
+  console.log("[PXAdmin][Page:index] iframe src ->", src.value)
+})
 </script>
 
 <template>

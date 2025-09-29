@@ -1,16 +1,19 @@
 import tailwindcss from "@tailwindcss/vite";
 
+const UPSTREAM_BASE = process.env.UPSTREAM || "http://127.0.0.1:8077";
+
+
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   ssr: false,
   router: {
     options: {
-      strict: true, // 将 strict 设为 false
+      strict: false, // 将 strict 设为 false
     },
   },
   runtimeConfig: {
     // 仅服务端可见
-    upstream: process.env.UPSTREAM || "http://127.0.0.1:8077", // 你的后端基础域名
+    upstream: UPSTREAM_BASE,
     wsUpstream: process.env.WS_UPSTREAM || "ws://127.0.0.1:8077", // 你的 WS 服务
     public: {
       // 注意这里直接给"完整前缀"，包含 /api
@@ -46,16 +49,13 @@ export default defineNuxtConfig({
     experimental: {
       websocket: true, // ✅ 开启 Nitro 原生 WS
     },
-    routeRules: {
-      "/__up/_p/**": { proxy: "http://127.0.0.1:8077/_p/**" },
+    prerender: { ignore: ['/_p/**'] },   // 不要静态化代理路径
 
-      // 这个是后端页面里请求的地址，所以需要套一层代理
-      "/_p/**": { proxy: "http://127.0.0.1:8077/_p/**" },
-    },
+
     devProxy: {
       "/api/_nuxt_icon": {},
       "/api/": {
-        target: "http://127.0.0.1:8077/api",
+        target: `${UPSTREAM_BASE}/api`,
         changeOrigin: true,
         prependPath: true,
         ws: true, // 必须：让 dev 代理支持 WebSocket
@@ -77,6 +77,7 @@ export default defineNuxtConfig({
   // i18n 配置
   i18n: {
     defaultLocale: process.env.NUXT_DEFAULT_LANGUAGE || "zh",
+    strategy: "no_prefix",
     locales: [
       { code: "zh", name: "简体中文", file: "zh.json" },
       { code: "en", name: "English", file: "en.json" },
@@ -86,7 +87,7 @@ export default defineNuxtConfig({
     langDir: "locales",
     detectBrowserLanguage: {
       useCookie: true,
-      cookieKey: "i18n_redirected",
+      cookieKey: "px_lang",
       redirectOn: "no prefix",
       alwaysRedirect: false,
       fallbackLocale: process.env.NUXT_DEFAULT_LANGUAGE || "zh",
