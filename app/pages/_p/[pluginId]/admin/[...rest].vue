@@ -1,8 +1,8 @@
 <script setup lang="ts">
 // /pages/_p/[pluginId]/admin/[...rest].vue
 import PluginWebView from "@/components/PluginWebView.vue"
+
 const route = useRoute()
-const router = useRouter()
 
 const pluginId = computed(() => String(route.params.pluginId || ""))
 const rest = computed(() => {
@@ -19,9 +19,13 @@ const src = computed(() => {
   return rest.value ? base + rest.value : base
 })
 
-watch(src, (v) => console.log("[PXAdmin][Page:rest] iframe src ->", v), { immediate: true })
+watch(src, (v) => console.log("[PXAdmin][Page:rest] iframe src ->", v), {immediate: true})
 </script>
 
 <template>
-  <PluginWebView :src="src" />
+  <PluginWebView
+    :plugin-id="pluginId"
+    :src="src"
+    :instance-id="route.fullPath"
+  />
 </template>
