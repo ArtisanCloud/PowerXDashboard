@@ -11,6 +11,13 @@ export default defineNuxtConfig({
       strict: false, // 将 strict 设为 false
     },
   },
+
+  colorMode: {
+    preference: "dark",
+    fallback: "light",
+    storageKey: "powerx-color-mode",
+  },
+
   runtimeConfig: {
     // 仅服务端可见
     upstream: UPSTREAM_BASE,
