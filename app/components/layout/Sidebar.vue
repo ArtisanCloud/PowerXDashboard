@@ -29,16 +29,28 @@ const densityClass = computed(() =>
 
 /* ---------- helpers ---------- */
 const isPluginPath = (p?: string) => !!p && p.startsWith("//_p/");
+const normalizeForCompare = (input?: string): string => {
+  if (!input) return "";
+  let value = input.trim();
+  if (!value) return "";
+  if (/^[a-zA-Z][a-zA-Z0-9+.-]*:/.test(value)) return "";
+  if (!value.startsWith("/")) value = `/${value}`;
+  value = value.replace(/\/{2,}/g, "/");
+  if (value.length > 1 && value.endsWith("/")) value = value.slice(0, -1);
+  return value;
+};
+const toSegments = (path: string): string[] =>
+  path && path !== "/" ? path.split("/").filter(Boolean) : [];
+const normalizeMenuPath = (path?: string): string => {
+  if (!path) return "";
+  const raw = isPluginPath(path) ? path : localePath(path);
+  return normalizeForCompare(raw);
+};
+const normalizedRoutePath = computed(() => normalizeForCompare(route.path));
+const routeSegments = computed(() => toSegments(normalizedRoutePath.value));
 const linkFor = (p?: string) => {
   if (!p) return "";
   return isPluginPath(p) ? p : localePath(p);
-};
-const isActive = (path?: string) => {
-  if (!path) return false;
-  if (isPluginPath(path))
-    return route.path === path || route.path.startsWith(path);
-  const localized = localePath(path);
-  return route.path === localized || route.path.startsWith(localized + "/");
 };
 
 const translateMenuTitle = (item: MenuItem) => {
@@ -219,14 +231,83 @@ const viewGroups = computed<MenuGroup[]>(() => {
   ].filter((group) => group.items.length > 0);
 });
 
+type MenuPathEntry = { normalized: string; segments: string[] };
+const menuPathEntries = computed<MenuPathEntry[]>(() => {
+  const entries: MenuPathEntry[] = [];
+  const addItems = (items?: MenuItem[]) => {
+    if (!items) return;
+    for (const item of items) {
+      if (!item) continue;
+      if (item.path) {
+        const normalized = normalizeMenuPath(item.path);
+        if (normalized) {
+          entries.push({ normalized, segments: toSegments(normalized) });
+        }
+      }
+      if (item.children?.length) addItems(item.children);
+    }
+  };
+
+  for (const group of viewGroups.value) {
+    addItems(group.items);
+  }
+
+  return entries;
+});
+
+const matchDepth = (entry: MenuPathEntry, segments: string[]): number => {
+  if (!entry.normalized) return -1;
+  if (entry.normalized === "/") return segments.length === 0 ? 0 : -1;
+  if (segments.length < entry.segments.length) return -1;
+  for (let i = 0; i < entry.segments.length; i += 1) {
+    const menuSegment = entry.segments[i];
+    const routeSegment = segments[i];
+    if (menuSegment === "*") return entry.segments.length;
+    if (menuSegment.startsWith(":")) {
+      if (!routeSegment) return -1;
+      continue;
+    }
+    if (menuSegment !== routeSegment) return -1;
+  }
+  return entry.segments.length;
+};
+
+const activeMenuPaths = computed<Set<string>>(() => {
+  const matches = new Set<string>();
+  const segments = routeSegments.value;
+  const entries = menuPathEntries.value;
+  let bestDepth = -1;
+
+  for (const entry of entries) {
+    const depth = matchDepth(entry, segments);
+    if (depth < 0) continue;
+    if (depth > bestDepth) {
+      bestDepth = depth;
+      matches.clear();
+      matches.add(entry.normalized);
+    } else if (depth === bestDepth) {
+      matches.add(entry.normalized);
+    }
+  }
+
+  return matches;
+});
+
+const isActive = (path?: string) => {
+  if (!path) return false;
+  const normalized = normalizeMenuPath(path);
+  if (!normalized) return false;
+  return activeMenuPaths.value.has(normalized);
+};
+const hasActiveChild = (children?: MenuItem[]) =>
+  !!children?.some((child) => isActive(child.path));
+
 /* ---------- 展开状态 ---------- */
 const expandedItems = ref<Set<string>>(new Set());
 const toggleExpanded = (id: string) => {
   const s = expandedItems.value;
   s.has(id) ? s.delete(id) : s.add(id);
 };
-const hasActiveChild = (children?: MenuItem[]) =>
-  !!children?.some((child) => isActive(child.path));
 const expandByRoute = () => {
   const set = new Set<string>();
   const markExpanded = (items?: MenuItem[]) => {
