@@ -1,27 +1,24 @@
 <script setup lang="ts">
-import { computed } from 'vue'
-import { useColorMode } from '@vueuse/core'
-import { usePluginBridge } from '~/composables/usePluginBridge'
+import { computed } from "vue";
+import { usePluginBridge } from "~/composables/usePluginBridge";
 
-type ThemeKey = 'system' | 'light' | 'dark'
+type ThemeKey = "system" | "light" | "dark";
 
-const colorMode = useColorMode()
-const { broadcast } = usePluginBridge()
+const colorMode = useColorMode();
+usePluginBridge(); // ensure bridge watchers stay active for theme sync
 
-const current = computed<ThemeKey>(() => {
-  const v = String(colorMode.value ?? 'light')
-  return v === 'auto' ? 'system' : (v as ThemeKey)
-})
+const normalizePreference = (value?: string | null): ThemeKey => {
+  const v = String(value ?? "").trim().toLowerCase();
+  if (v === "dark" || v === "light") return v;
+  return "system";
+};
+
+const current = computed<ThemeKey>(() =>
+  normalizePreference(colorMode.preference)
+);
 
 function apply(t: ThemeKey) {
-  colorMode.value = (t === 'system' ? 'auto' : t) as any
-  if (process.client) {
-    const effective = t === 'system'
-      ? (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
-      : t
-    document.documentElement.setAttribute('data-theme', effective)
-  }
-  broadcast({ source: 'powerx', type: 'theme', theme: t })
+  colorMode.preference = t;
 }
 </script>
 

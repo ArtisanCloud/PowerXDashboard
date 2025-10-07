@@ -52,9 +52,6 @@ const handleLogout = async () => {
   }
 };
 
-// 使用全局主题状态
-const theme = useState("theme", () => "auto");
-
 // 主题色到科技绿的渐变配置（与首页保持一致）
 const primaryToTechGreen = [
   "from-blue-600 via-teal-500 to-emerald-400",
@@ -197,14 +194,6 @@ onMounted(async () => {
     // 添加点击外部关闭菜单的事件监听
     document.addEventListener("click", handleClickOutside);
 
-    // 监听主题变化事件
-    window.addEventListener("theme-changed", (e: any) => {
-      theme.value = e.detail;
-    });
-
-    // 初始化主题
-    const savedTheme = localStorage.getItem("theme") || "auto";
-    theme.value = savedTheme;
   }
 });
 

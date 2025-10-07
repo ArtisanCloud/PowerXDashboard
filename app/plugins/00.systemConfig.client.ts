@@ -22,30 +22,48 @@ export default defineNuxtPlugin((nuxtApp) => {
     }
     document.documentElement.lang = lang;
 
-    // 使用和 ThemeSwitcher.vue 相同的全局状态和主题应用逻辑
-    const themeState = useState<string>("theme", () => "auto");
-
-    // 和 ThemeSwitcher.vue 相同的主题应用函数
-    const applyTheme = (newTheme: string) => {
-      themeState.value = newTheme;
-      localStorage.setItem("theme", newTheme);
-
-      if (newTheme === "auto") {
-        document.documentElement.removeAttribute("data-color-mode");
-        document.documentElement.classList.remove("light", "dark");
-      } else {
-        document.documentElement.setAttribute("data-color-mode", newTheme);
-        document.documentElement.classList.remove("light", "dark");
-        document.documentElement.classList.add(newTheme);
-      }
+    type ThemePreference = "light" | "dark" | "system";
+    const coerceTheme = (input?: string | null): ThemePreference | undefined => {
+      const value = String(input ?? "").trim().toLowerCase();
+      if (!value) return undefined;
+      if (value === "dark" || value === "light") return value;
+      if (value === "system" || value === "auto") return "system";
+      return undefined;
     };
 
-    // 应用主题设置
-    // console.log("🎯 init applying:", { lang, theme });
-    if (theme && theme !== "auto") {
-      applyTheme(theme);
-    } else if (theme === "auto") {
-      applyTheme("auto");
+    const colorMode = useColorMode();
+    const themeState = useState<ThemePreference>("theme", () =>
+      coerceTheme(colorMode.preference) ?? "system"
+    );
+
+    const applyThemePreference = (next: ThemePreference) => {
+      themeState.value = next;
+      colorMode.preference = next;
+    };
+
+    const forcedTheme = coerceTheme(pub.forceTheme);
+    const storedTheme =
+      coerceTheme(themeState.value) ?? coerceTheme(colorMode.preference);
+    const defaultTheme = coerceTheme(theme);
+    const desiredTheme =
+      forcedTheme ?? storedTheme ?? defaultTheme ?? ("system" as ThemePreference);
+
+    if (pub.forceTheme) {
+      applyThemePreference(forcedTheme);
+    } else if (desiredTheme) {
+      applyThemePreference(desiredTheme);
+    }
+
+    if (process.client) {
+      watch(
+        () => coerceTheme(colorMode.preference) ?? "system",
+        (pref) => {
+          if (themeState.value !== pref) {
+            themeState.value = pref;
+          }
+        },
+        { immediate: true }
+      );
     }
 
     if (pub.debugMode) {

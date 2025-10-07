@@ -1,6 +1,5 @@
-import {watch} from 'vue'
-import {useI18n} from '#imports'
-import {useColorMode} from '@vueuse/core'
+import { computed, watch } from "vue";
+import { useI18n } from "#imports";
 
 type PluginMeta = {
   pluginId: string
@@ -28,10 +27,13 @@ type PluginToPowerX =
   | { source: 'plugin'; type: 'ping'; ts: number }
 
 
-function themeFromValue(v: any): 'light' | 'dark' | 'system' {
-  const s = String(v ?? '')
-  return s === 'auto' ? 'system' : (s === 'light' || s === 'dark' ? s : 'system')
-}
+type ThemeKey = "light" | "dark" | "system";
+const normalizeThemePreference = (input?: string | null): ThemeKey => {
+  const value = String(input ?? "").trim().toLowerCase();
+  if (value === "dark" || value === "light") return value;
+  if (value === "system" || value === "auto") return "system";
+  return "system";
+};
 
 // 统一把 locale 转成字符串（防止传入对象）
 function toLocaleCode(input: any): string {
@@ -48,7 +50,13 @@ export function usePluginBridge() {
   const registry = useState<Map<HTMLIFrameElement, PluginMeta>>('px:iframes', () => new Map())
 
   const {locale} = useI18n()
-  const colorMode = useColorMode() // 注意：这里是一个 ref，使用 .value
+  const colorMode = useColorMode()
+  const themePreference = computed<ThemeKey>(() =>
+    normalizeThemePreference(colorMode.preference)
+  )
+  const resolvedTheme = computed<'light' | 'dark'>(() =>
+    colorMode.value === 'dark' ? 'dark' : 'light'
+  )
 
   const sendTo = (meta: PluginMeta, msg: PowerXToPlugin) => {
     try {
@@ -69,7 +77,7 @@ export function usePluginBridge() {
       source: 'powerx',
       type: 'sync',
       locale: toLocaleCode(locale?.value),
-      theme: themeFromValue(colorMode.value),
+      theme: themePreference.value,
       hostOrigin: window.location.origin,
       pluginId: m.pluginId,
       instanceId: m.instanceId,
@@ -93,11 +101,21 @@ export function usePluginBridge() {
     watch(locale, (val) => {
       broadcast({source: 'powerx', type: 'locale', locale: toLocaleCode(val)})
     })
-    watch(() => colorMode.value, (val) => {
-      const t = themeFromValue(val)
-      // console.info('[DBG][Admin] theme changed ->', { value: val, mapped: t })
-      broadcast({ source: 'powerx', type: 'theme', theme: t })
-    })
+    watch(
+      themePreference,
+      (pref) => {
+        broadcast({ source: 'powerx', type: 'theme', theme: pref })
+      },
+      { immediate: true }
+    )
+    watch(
+      resolvedTheme,
+      (_val, _prev) => {
+        if (themePreference.value === 'system') {
+          broadcast({ source: 'powerx', type: 'theme', theme: 'system' })
+        }
+      }
+    )
   }
 
   const register = (el?: HTMLIFrameElement | null, meta?: { pluginId: string; instanceId?: string }) => {

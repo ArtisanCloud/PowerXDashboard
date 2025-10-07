@@ -9,9 +9,6 @@ definePageMeta({
 
 const { t } = useI18n();
 
-// 使用全局主题状态
-const theme = useState("theme", () => "auto");
-
 // 主题色到科技绿的渐变配置
 const primaryToTechGreen = [
   "from-blue-600 via-teal-500 to-emerald-400",
@@ -130,15 +127,6 @@ onMounted(async () => {
     setTimeout(() => {
       particlesVisible.value = true;
     }, 500);
-
-    // 监听主题变化事件
-    window.addEventListener("theme-changed", (e: any) => {
-      theme.value = e.detail;
-    });
-
-    // 初始化主题
-    const savedTheme = localStorage.getItem("theme") || "auto";
-    theme.value = savedTheme;
 
     // 点击外部关闭用户菜单
     document.addEventListener("click", handleClickOutside);
