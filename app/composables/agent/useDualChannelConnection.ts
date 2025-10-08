@@ -37,6 +37,9 @@ export function useDualChannelConnection(
   agentId?: Ref<number | null>,
   sessionId?: Ref<string | null>
 ): DualChannelConnection {
+  const config = useRuntimeConfig();
+  const apiBase = config.public.apiBase;
+
   const sseActive = ref(false);
   const wsActive = ref(false);
   const currentRequestId = ref<string | null>(null);
@@ -82,7 +85,7 @@ export function useDualChannelConnection(
   const buildWSUrl = (path: string, params?: Record<string, any>) => {
     const protocol = location.protocol === "https:" ? "wss:" : "ws:";
     const host = location.host;
-    let url = `${protocol}//${host}/api${path}`;
+    let url = `${protocol}//${host}${apiBase}${path}`;
     if (params) {
       const qs = Object.entries(params)
         .filter(([, v]) => v != null)
@@ -99,7 +102,7 @@ export function useDualChannelConnection(
   };
 
   const buildHttpUrl = (path: string, params?: Record<string, any>) => {
-    let url = `/api${path}`;
+    let url = `${apiBase}${path}`;
     if (params) {
       const qs = Object.entries(params)
         .filter(([, v]) => v != null)

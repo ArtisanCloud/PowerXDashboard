@@ -25,7 +25,7 @@ export default defineNuxtConfig({
     public: {
       // 注意这里直接给"完整前缀"，包含 /api
       wsUpstream: process.env.WS_UPSTREAM || "ws://127.0.0.1:8077/api",
-      apiBase: "/api", // 前端请求 /api/**，对应后台的 /api/**
+      apiBase: "/api/v1", // 前端请求 /api/**，对应后台的 /api/**
       wsUrl: "/ws", // 如果要同域 WS，可再配反代；暂时可用你现有的 ws://localhost:3001/ws
 
       // 语言配置
